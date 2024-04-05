@@ -1932,22 +1932,25 @@ func (v *parser_) putBack(token TokenLike) {
 }
 
 var grammar = map[string]string{
-	"Source":       `Model EOL* EOF  ! Terminated with an end-of-file marker.`,
-	"Model":        `Notice Header Modules? Types? Functionals? Aspects? Classes? Instances?`,
-	"Notice":       `comment`,
-	"Header":       `comment "package" identifier`,
-	"Modules":      `"import" "(" Modules+ ")"`,
-	"Module":       `identifier text`,
-	"Types":        `"// Types" Type+`,
-	"Type":         `Declaration Abstraction Enumeration?`,
-	"Declaration":  `comment "type" identifier ("[" Parameters "]")?`,
-	"Parameters":   `Parameter ("," Parameter)* ","?`,
-	"Parameter":    `identifier Abstraction`,
-	"Abstraction":  `Prefix? identifier ("[" Arguments "]")?`,
-	"Prefix":       `"[" "]" | "map" "[" identifier "]" | "chan" | identifier "."`,
+	"Source":      `Model EOL* EOF  ! Terminated with an end-of-file marker.`,
+	"Model":       `Notice Header Modules? Types? Functionals? Aspects? Classes? Instances?`,
+	"Notice":      `comment`,
+	"Header":      `comment "package" identifier`,
+	"Modules":     `"import" "(" Module+ ")"`,
+	"Module":      `identifier text`,
+	"Types":       `"// Types" Type+`,
+	"Type":        `Declaration Abstraction Enumeration?`,
+	"Declaration": `comment "type" identifier ("[" Parameters "]")?`,
+	"Parameters":  `Parameter ("," Parameter)* ","?`,
+	"Parameter":   `identifier Abstraction`,
+	"Abstraction": `Prefix? identifier ("[" Arguments "]")?`,
+	"Prefix": `
+    "[" "]"
+    "map" "[" identifier "]"
+    "chan"
+    identifier "."`,
 	"Arguments":    `Abstraction ("," Abstraction)* ","?`,
-	"Enumeration":  `"const" "(" Values ")"`,
-	"Values":       `Parameter "=" "iota" identifier*`,
+	"Enumeration":  `"const" "(" Parameter "=" "iota" identifier* ")"`,
 	"Functionals":  `"// Functionals" Functional+`,
 	"Functional":   `Declaration "func" "(" Parameters? ")" Result`,
 	"Result":       `Abstraction | "(" Parameters ")"`,
