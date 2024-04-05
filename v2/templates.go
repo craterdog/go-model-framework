@@ -30,7 +30,7 @@ const classAccessTemplate_ = `
 
 const classReferenceTemplate_ = `
 var <TargetName>Class = &<TargetName>Class_{
-	// TBA - Assign class constant values.
+	// This class has no private constants to initialize.
 }`
 
 const genericReferenceTemplate_ = `
@@ -58,7 +58,7 @@ func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
 	default:
 		// Add a new bound class type.
 		result_ = &<TargetName>Class_[<Arguments>]{
-			// TBA - Assign class constant values.
+			// This class has no private constants to initialize.
 		}
 		<TargetName>Class[name] = result_
 	}

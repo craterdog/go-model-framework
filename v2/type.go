@@ -19,7 +19,7 @@ import ()
 // Reference
 
 var typeClass = &typeClass_{
-	// TBA - Assign class constant values.
+	// This class has no private constants to initialize.
 }
 
 // Function
@@ -33,7 +33,7 @@ func Type() TypeClassLike {
 // Target
 
 type typeClass_ struct {
-	// TBA - Add private class constants.
+	// This class has no private constants.
 }
 
 // Constants

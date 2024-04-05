@@ -19,7 +19,7 @@ import ()
 // Reference
 
 var moduleClass = &moduleClass_{
-	// TBA - Assign class constant values.
+	// This class has no private constants to initialize.
 }
 
 // Function
@@ -33,7 +33,7 @@ func Module() ModuleClassLike {
 // Target
 
 type moduleClass_ struct {
-	// TBA - Add private class constants.
+	// This class has no private constants.
 }
 
 // Constants

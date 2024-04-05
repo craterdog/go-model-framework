@@ -19,7 +19,7 @@ import ()
 // Reference
 
 var headerClass = &headerClass_{
-	// TBA - Assign class constant values.
+	// This class has no private constants to initialize.
 }
 
 // Function
@@ -33,7 +33,7 @@ func Header() HeaderClassLike {
 // Target
 
 type headerClass_ struct {
-	// TBA - Add private class constants.
+	// This class has no private constants.
 }
 
 // Constants

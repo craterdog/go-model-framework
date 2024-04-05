@@ -21,7 +21,7 @@ import (
 // Reference
 
 var functionClass = &functionClass_{
-	// TBA - Assign class constant values.
+	// This class has no private constants to initialize.
 }
 
 // Function
@@ -35,7 +35,7 @@ func Function() FunctionClassLike {
 // Target
 
 type functionClass_ struct {
-	// TBA - Add private class constants.
+	// This class has no private constants.
 }
 
 // Constants

@@ -19,7 +19,7 @@ import ()
 // Reference
 
 var tokenClass = &tokenClass_{
-	// TBA - Assign class constant values.
+	// This class has no private constants to initialize.
 }
 
 // Function
@@ -33,7 +33,7 @@ func Token() TokenClassLike {
 // Target
 
 type tokenClass_ struct {
-	// TBA - Add private class constants.
+	// This class has no private constants.
 }
 
 // Constants
