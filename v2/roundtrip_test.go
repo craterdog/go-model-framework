@@ -14,7 +14,7 @@ package models_test
 
 import (
 	fmt "fmt"
-	pac "github.com/craterdog/go-model-framework/v2"
+	mod "github.com/craterdog/go-model-framework/v2"
 	ass "github.com/stretchr/testify/assert"
 	osx "os"
 	sts "strings"
@@ -30,9 +30,9 @@ func TestRoundtrips(t *tes.T) {
 	}
 
 	for _, file := range files {
-		var parser = pac.Parser().Make()
-		var validator = pac.Validator().Make()
-		var formatter = pac.Formatter().Make()
+		var parser = mod.Parser().Make()
+		var validator = mod.Validator().Make()
+		var formatter = mod.Formatter().Make()
 		var filename = testDirectory + file.Name()
 		if sts.HasSuffix(filename, ".gomn") {
 			fmt.Println(filename)

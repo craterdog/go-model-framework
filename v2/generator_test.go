@@ -14,7 +14,7 @@ package models_test
 
 import (
 	fmt "fmt"
-	pac "github.com/craterdog/go-model-framework/v2"
+	mod "github.com/craterdog/go-model-framework/v2"
 	osx "os"
 	sts "strings"
 	tes "testing"
@@ -24,7 +24,7 @@ const generatedDirectory = "./generated/"
 const packageName = "example"
 
 func TestInitialization(t *tes.T) {
-	var generator = pac.Generator().Make()
+	var generator = mod.Generator().Make()
 
 	var directoryName = generatedDirectory + packageName + "/"
 	var err = osx.RemoveAll(directoryName)
@@ -41,7 +41,7 @@ func TestInitialization(t *tes.T) {
 }
 
 func TestGeneration(t *tes.T) {
-	var generator = pac.Generator().Make()
+	var generator = mod.Generator().Make()
 
 	var files, err = osx.ReadDir(testDirectory)
 	if err != nil {
