@@ -333,8 +333,16 @@ type ResultClassLike interface {
 }
 
 /*
-ScannerClassLike defines the set of class constants, constructors and functions
-that must be supported by all scanner-class-like classes.
+ScannerClassLike is a class interface that defines the set of class
+constants, constructors and functions that must be supported by each
+scanner-class-like concrete class.  The following functions are supported:
+
+FormatToken() returns a formatted string containing the attributes of the token.
+
+MatchToken() a list of strings representing any matches found in the specified
+text of the specified token type using the regular expression defined for that
+token type.  If the regular expression contains submatch patterns the matching
+substrings are returned as additional values in the list.
 */
 type ScannerClassLike interface {
 	// Constructors
@@ -352,8 +360,9 @@ type ScannerClassLike interface {
 }
 
 /*
-TokenClassLike defines the set of class constants, constructors and functions
-that must be supported by all token-class-like classes.
+TokenClassLike is a class interface that defines the set of class
+constants, constructors and functions that must be supported by each
+token-class-like concrete class.
 */
 type TokenClassLike interface {
 	// Constructors
@@ -642,8 +651,9 @@ type ScannerLike interface {
 }
 
 /*
-TokenLike defines the set of abstractions and methods that must be supported by
-all token-like instances.
+TokenLike is an instance interface that defines the complete set of
+abstractions and methods that must be supported by each instance of a
+token-like concrete class.
 */
 type TokenLike interface {
 	// Attributes
