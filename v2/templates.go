@@ -187,12 +187,12 @@ package <packagename>
 // Types
 
 /*
-<SpecializedType> is a specialized type representing...
+<ConstrainedType> is a constrained type representing...
 */
-type <SpecializedType> <primitiveType>
+type <ConstrainedType> <primitiveType>
 
 const (
-	<1stValue> <SpecializedType> = iota
+	<1stValue> <ConstrainedType> = iota
 	<2ndValue>
 	<3rdValue>
 	...

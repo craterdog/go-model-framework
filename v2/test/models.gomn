@@ -33,7 +33,7 @@ import (
 // Types
 
 /*
-PrefixType is a specialized type representing a prefix type.
+PrefixType is a constrained type representing a prefix type.
 */
 type PrefixType uint8
 
@@ -46,7 +46,7 @@ const (
 )
 
 /*
-TokenType is a specialized type representing any token type recognized by a
+TokenType is a constrained type representing any token type recognized by a
 scanner.
 */
 type TokenType uint8

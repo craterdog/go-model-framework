@@ -32,7 +32,7 @@ Item is a generic type representing any type of item.
 type Item any
 
 /*
-UnitType is a specialized type representing the possible units of temperature.
+UnitType is a constrained type representing the possible units of temperature.
 */
 type UnitType uint8
 
