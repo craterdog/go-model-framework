@@ -426,21 +426,6 @@ func (v *generator_) generateClass(
 	v.outputClass(classFile, template)
 }
 
-func (v *generator_) generateClasses(directory string, model ModelLike) {
-	var classes = model.GetClasses()
-	var instances = model.GetInstances()
-	if classes == nil || instances == nil {
-		return
-	}
-	var classIterator = classes.GetIterator()
-	var instanceIterator = instances.GetIterator()
-	for classIterator.HasNext() {
-		var class = classIterator.GetNext()
-		var instance = instanceIterator.GetNext()
-		v.generateClass(directory, model, class, instance)
-	}
-}
-
 func (v *generator_) generateClassAccess(class ClassLike) string {
 	var declaration = class.GetDeclaration()
 	var parameters = declaration.GetParameters()
@@ -478,6 +463,21 @@ func (v *generator_) generateClassConstants(class ClassLike) string {
 	}
 	constants += "\n"
 	return constants
+}
+
+func (v *generator_) generateClasses(directory string, model ModelLike) {
+	var classes = model.GetClasses()
+	var instances = model.GetInstances()
+	if classes == nil || instances == nil {
+		return
+	}
+	var classIterator = classes.GetIterator()
+	var instanceIterator = instances.GetIterator()
+	for classIterator.HasNext() {
+		var class = classIterator.GetNext()
+		var instance = instanceIterator.GetNext()
+		v.generateClass(directory, model, class, instance)
+	}
 }
 
 func (v *generator_) generateClassMethods(class ClassLike) string {

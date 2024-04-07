@@ -357,17 +357,6 @@ func (v *formatter_) formatFunction(function FunctionLike) {
 	v.formatResult(result)
 }
 
-func (v *formatter_) formatFunctions(functions col.ListLike[FunctionLike]) {
-	v.appendNewline()
-	v.appendString("// Functions")
-	var iterator = functions.GetIterator()
-	for iterator.HasNext() {
-		var function = iterator.GetNext()
-		v.appendNewline()
-		v.formatFunction(function)
-	}
-}
-
 func (v *formatter_) formatFunctional(functional FunctionalLike) {
 	var declaration = functional.GetDeclaration()
 	v.formatDeclaration(declaration)
@@ -390,6 +379,17 @@ func (v *formatter_) formatFunctionals(functionals col.ListLike[FunctionalLike])
 		var functional = iterator.GetNext()
 		v.formatFunctional(functional)
 		v.appendNewline()
+	}
+}
+
+func (v *formatter_) formatFunctions(functions col.ListLike[FunctionLike]) {
+	v.appendNewline()
+	v.appendString("// Functions")
+	var iterator = functions.GetIterator()
+	for iterator.HasNext() {
+		var function = iterator.GetNext()
+		v.appendNewline()
+		v.formatFunction(function)
 	}
 }
 

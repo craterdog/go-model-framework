@@ -1019,56 +1019,6 @@ func (v *parser_) parseFunction() (
 	return function, token, true
 }
 
-func (v *parser_) parseFunctions() (
-	functions col.ListLike[FunctionLike],
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Functions")
-	if !ok {
-		// This is not a sequence of functions.
-		return functions, token, false
-	}
-
-	// Attempt to parse at least one function.
-	var function FunctionLike
-	function, token, ok = v.parseFunction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateGrammar("Function",
-			"Functions",
-			"Function",
-		)
-		panic(message)
-	}
-	functions = col.List[FunctionLike]().Make()
-	for ok {
-		functions.AppendValue(function)
-		function, token, ok = v.parseFunction()
-	}
-	functions.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The functions must be sorted using their lowercase identifiers.
-			var firstFunction = first.(FunctionLike)
-			var firstString = sts.ToLower(firstFunction.GetIdentifier())
-			var secondFunction = second.(FunctionLike)
-			var secondString = sts.ToLower(secondFunction.GetIdentifier())
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
-
-	// Found a sequence of functions.
-	return functions, token, true
-}
-
 func (v *parser_) parseFunctional() (
 	functional FunctionalLike,
 	token TokenLike,
@@ -1191,6 +1141,56 @@ func (v *parser_) parseFunctionals() (
 
 	// Found a sequence of functionals.
 	return functionals, token, true
+}
+
+func (v *parser_) parseFunctions() (
+	functions col.ListLike[FunctionLike],
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a note.
+	_, token, ok = v.parseToken(NoteToken, "// Functions")
+	if !ok {
+		// This is not a sequence of functions.
+		return functions, token, false
+	}
+
+	// Attempt to parse at least one function.
+	var function FunctionLike
+	function, token, ok = v.parseFunction()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateGrammar("Function",
+			"Functions",
+			"Function",
+		)
+		panic(message)
+	}
+	functions = col.List[FunctionLike]().Make()
+	for ok {
+		functions.AppendValue(function)
+		function, token, ok = v.parseFunction()
+	}
+	functions.SortValuesWithRanker(
+		func(first, second col.Value) int {
+			// The functions must be sorted using their lowercase identifiers.
+			var firstFunction = first.(FunctionLike)
+			var firstString = sts.ToLower(firstFunction.GetIdentifier())
+			var secondFunction = second.(FunctionLike)
+			var secondString = sts.ToLower(secondFunction.GetIdentifier())
+			switch {
+			case firstString < secondString:
+				return -1
+			case firstString > secondString:
+				return 1
+			default:
+				return 0
+			}
+		},
+	)
+
+	// Found a sequence of functions.
+	return functions, token, true
 }
 
 func (v *parser_) parseHeader() (
@@ -1451,6 +1451,70 @@ func (v *parser_) parseMethods() (
 	return methods, token, true
 }
 
+func (v *parser_) parseModel() (
+	model ModelLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a notice.
+	var notice NoticeLike
+	notice, token, ok = v.parseNotice()
+	if !ok {
+		// This is not model.
+		return model, token, false
+	}
+
+	// Attempt to parse a header.
+	var header HeaderLike
+	header, token, ok = v.parseHeader()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateGrammar("Header",
+			"Model",
+			"Notice",
+			"Header",
+			"Modules",
+			"Types",
+			"Functionals",
+			"Aspects",
+			"Classes",
+			"Instances",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse an optional sequence of modules.
+	var modules, _, _ = v.parseModules()
+
+	// Attempt to parse an optional sequence of types.
+	var types, _, _ = v.parseTypes()
+
+	// Attempt to parse an optional sequence of functionals.
+	var functionals, _, _ = v.parseFunctionals()
+
+	// Attempt to parse an optional sequence of aspects.
+	var aspects, _, _ = v.parseAspects()
+
+	// Attempt to parse an optional sequence of classes.
+	var classes, _, _ = v.parseClasses()
+
+	// Attempt to parse an optional sequence of instances.
+	var instances, _, _ = v.parseInstances()
+
+	// Found a model.
+	model = Model().MakeWithAttributes(
+		notice,
+		header,
+		modules,
+		types,
+		functionals,
+		aspects,
+		classes,
+		instances,
+	)
+	return model, token, true
+}
+
 func (v *parser_) parseModule() (
 	module ModuleLike,
 	token TokenLike,
@@ -1569,70 +1633,6 @@ func (v *parser_) parseNotice() (
 	// Found a notice.
 	notice = Notice().MakeWithComment(comment)
 	return notice, token, true
-}
-
-func (v *parser_) parseModel() (
-	model ModelLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a notice.
-	var notice NoticeLike
-	notice, token, ok = v.parseNotice()
-	if !ok {
-		// This is not model.
-		return model, token, false
-	}
-
-	// Attempt to parse a header.
-	var header HeaderLike
-	header, token, ok = v.parseHeader()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateGrammar("Header",
-			"Model",
-			"Notice",
-			"Header",
-			"Modules",
-			"Types",
-			"Functionals",
-			"Aspects",
-			"Classes",
-			"Instances",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of modules.
-	var modules, _, _ = v.parseModules()
-
-	// Attempt to parse an optional sequence of types.
-	var types, _, _ = v.parseTypes()
-
-	// Attempt to parse an optional sequence of functionals.
-	var functionals, _, _ = v.parseFunctionals()
-
-	// Attempt to parse an optional sequence of aspects.
-	var aspects, _, _ = v.parseAspects()
-
-	// Attempt to parse an optional sequence of classes.
-	var classes, _, _ = v.parseClasses()
-
-	// Attempt to parse an optional sequence of instances.
-	var instances, _, _ = v.parseInstances()
-
-	// Found a model.
-	model = Model().MakeWithAttributes(
-		notice,
-		header,
-		modules,
-		types,
-		functionals,
-		aspects,
-		classes,
-		instances,
-	)
-	return model, token, true
 }
 
 func (v *parser_) parseParameter() (
@@ -1819,6 +1819,27 @@ func (v *parser_) parseResult() (
 	return result, token, false
 }
 
+func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
+	value string,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a specific token.
+	token = v.getNextToken()
+	value = token.GetValue()
+	if token.GetType() == expectedType {
+		var constrained = len(expectedValue) > 0
+		if !constrained || value == expectedValue {
+			// Found the expected token.
+			return value, token, true
+		}
+	}
+
+	// This is not the right token.
+	v.putBack(token)
+	return "", token, false
+}
+
 func (v *parser_) parseType() (
 	type_ TypeLike,
 	token TokenLike,
@@ -1903,27 +1924,6 @@ func (v *parser_) parseTypes() (
 
 	// Found a sequence of types.
 	return types, token, true
-}
-
-func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
-	value string,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a specific token.
-	token = v.getNextToken()
-	value = token.GetValue()
-	if token.GetType() == expectedType {
-		var constrained = len(expectedValue) > 0
-		if !constrained || value == expectedValue {
-			// Found the expected token.
-			return value, token, true
-		}
-	}
-
-	// This is not the right token.
-	v.putBack(token)
-	return "", token, false
 }
 
 func (v *parser_) putBack(token TokenLike) {
