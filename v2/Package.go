@@ -177,19 +177,6 @@ type FormatterClassLike interface {
 }
 
 /*
-FunctionalClassLike defines the set of class constants, constructors and
-functions that must be supported by all functional-class-like classes.
-*/
-type FunctionalClassLike interface {
-	// Constructors
-	MakeWithAttributes(
-		declaration DeclarationLike,
-		parameters col.ListLike[ParameterLike],
-		result ResultLike,
-	) FunctionalLike
-}
-
-/*
 FunctionClassLike defines the set of class constants, constructors and
 functions that must be supported by all function-class-like classes.
 */
@@ -200,6 +187,19 @@ type FunctionClassLike interface {
 		parameters col.ListLike[ParameterLike],
 		result ResultLike,
 	) FunctionLike
+}
+
+/*
+FunctionalClassLike defines the set of class constants, constructors and
+functions that must be supported by all functional-class-like classes.
+*/
+type FunctionalClassLike interface {
+	// Constructors
+	MakeWithAttributes(
+		declaration DeclarationLike,
+		parameters col.ListLike[ParameterLike],
+		result ResultLike,
+	) FunctionalLike
 }
 
 /*
@@ -501,23 +501,23 @@ type FormatterLike interface {
 }
 
 /*
-FunctionalLike defines the set of abstractions and methods that must be
-supported by all functional-like instances.
-*/
-type FunctionalLike interface {
-	// Attributes
-	GetDeclaration() DeclarationLike
-	GetParameters() col.ListLike[ParameterLike]
-	GetResult() ResultLike
-}
-
-/*
 FunctionLike defines the set of abstractions and methods that must be supported
 by all function-like instances.
 */
 type FunctionLike interface {
 	// Attributes
 	GetIdentifier() string
+	GetParameters() col.ListLike[ParameterLike]
+	GetResult() ResultLike
+}
+
+/*
+FunctionalLike defines the set of abstractions and methods that must be
+supported by all functional-like instances.
+*/
+type FunctionalLike interface {
+	// Attributes
+	GetDeclaration() DeclarationLike
 	GetParameters() col.ListLike[ParameterLike]
 	GetResult() ResultLike
 }
