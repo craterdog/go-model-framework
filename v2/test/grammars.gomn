@@ -422,10 +422,7 @@ type GeneratorLike interface {
 		copyright string,
 		notation string,
 	)
-	GenerateModel(
-		directory string,
-		wiki string,
-	)
+	GenerateModel(directory string)
 }
 
 /*

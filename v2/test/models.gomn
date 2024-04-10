@@ -492,6 +492,7 @@ type FormatterLike interface {
 	// Methods
 	FormatAbstraction(abstraction AbstractionLike) string
 	FormatArguments(arguments col.ListLike[AbstractionLike]) string
+	FormatGenerics(parameters col.ListLike[ParameterLike]) string
 	FormatMethod(method MethodLike) string
 	FormatModel(model ModelLike) string
 	FormatParameter(parameter ParameterLike) string
