@@ -67,6 +67,11 @@ func (v *formatter_) FormatArguments(arguments col.ListLike[AbstractionLike]) st
 	return v.getResult()
 }
 
+func (v *formatter_) FormatGenerics(parameters col.ListLike[ParameterLike]) string {
+	v.formatGenerics(parameters)
+	return v.getResult()
+}
+
 func (v *formatter_) FormatMethod(method MethodLike) string {
 	v.formatMethod(method)
 	return v.getResult()

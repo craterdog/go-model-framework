@@ -412,7 +412,7 @@ func (v *generator_) generateClass(
 	var classParameters = classDeclaration.GetParameters()
 	if classParameters != nil {
 		var formatter = Formatter().Make()
-		parameters = "[" + formatter.FormatParameters(classParameters) + "]"
+		parameters = "[" + formatter.FormatGenerics(classParameters) + "]"
 		arguments = "[" + formatter.FormatParameterNames(classParameters) + "]"
 	}
 	template = sts.ReplaceAll(template, "[<Parameters>]", parameters)

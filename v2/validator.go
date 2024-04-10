@@ -79,16 +79,15 @@ func (v *validator_) ValidateModel(model ModelLike) {
 	v.extractAspects(model)
 	v.extractClasses(model)
 	v.extractInstances(model)
-	v.validateClasses()
 
-	// Validate the catalogs.
-	v.validateModules()
-	v.validateClasses()
-	v.validateInstances()
-	v.validatePairings()
-	v.validateAspects()
-	v.validateTypes()
-	v.validateFunctionals()
+	// Validate the catalogs (note, the order matters).
+	v.validateModules(model)
+	v.validateClasses(model)
+	v.validateInstances(model)
+	v.validatePairings(model)
+	v.validateAspects(model)
+	v.validateTypes(model)
+	v.validateFunctionals(model)
 }
 
 // Private
@@ -222,13 +221,18 @@ func (v *validator_) validateAspect(aspect AspectLike) {
 	}
 }
 
-func (v *validator_) validateAspects() {
+func (v *validator_) validateAspects(model ModelLike) {
 	v.aspects_.SortValues()
 	var iterator = v.aspects_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var aspect = association.GetValue()
 		v.validateAspect(aspect)
+	}
+	var aspects = model.GetAspects()
+	if aspects != nil && !aspects.IsEmpty() {
+		aspects.RemoveAll()
+		aspects.AppendValues(v.aspects_.GetValues(v.aspects_.GetKeys()))
 	}
 }
 
@@ -302,13 +306,18 @@ func (v *validator_) validateClass(class ClassLike) {
 	}
 }
 
-func (v *validator_) validateClasses() {
+func (v *validator_) validateClasses(model ModelLike) {
 	v.classes_.SortValues()
 	var iterator = v.classes_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var class = association.GetValue()
 		v.validateClass(class)
+	}
+	var classes = model.GetClasses()
+	if classes != nil && !classes.IsEmpty() {
+		classes.RemoveAll()
+		classes.AppendValues(v.classes_.GetValues(v.classes_.GetKeys()))
 	}
 }
 
@@ -383,13 +392,18 @@ func (v *validator_) validateFunctional(functional FunctionalLike) {
 	}
 }
 
-func (v *validator_) validateFunctionals() {
+func (v *validator_) validateFunctionals(model ModelLike) {
 	v.functionals_.SortValues()
 	var iterator = v.functionals_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var functional = association.GetValue()
 		v.validateFunctional(functional)
+	}
+	var functionals = model.GetFunctionals()
+	if functionals != nil && !functionals.IsEmpty() {
+		functionals.RemoveAll()
+		functionals.AppendValues(v.functionals_.GetValues(v.functionals_.GetKeys()))
 	}
 }
 
@@ -418,13 +432,18 @@ func (v *validator_) validateInstance(instance InstanceLike) {
 	}
 }
 
-func (v *validator_) validateInstances() {
+func (v *validator_) validateInstances(model ModelLike) {
 	v.instances_.SortValues()
 	var iterator = v.instances_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var instance = association.GetValue()
 		v.validateInstance(instance)
+	}
+	var instances = model.GetInstances()
+	if instances != nil && !instances.IsEmpty() {
+		instances.RemoveAll()
+		instances.AppendValues(v.instances_.GetValues(v.instances_.GetKeys()))
 	}
 }
 
@@ -458,16 +477,22 @@ func (v *validator_) validateModule(module ModuleLike) {
 	}
 }
 
-func (v *validator_) validateModules() {
+func (v *validator_) validateModules(model ModelLike) {
+	v.modules_.SortValues()
 	var iterator = v.modules_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var module = association.GetValue()
 		v.validateModule(module)
 	}
+	var modules = model.GetModules()
+	if modules != nil && !modules.IsEmpty() {
+		modules.RemoveAll()
+		modules.AppendValues(v.modules_.GetValues(v.modules_.GetKeys()))
+	}
 }
 
-func (v *validator_) validatePairings() {
+func (v *validator_) validatePairings(model ModelLike) {
 	// Make sure each class interface has an associated instance interface.
 	var classes = col.List[string]().MakeFromSequence(v.classes_.GetKeys())
 	var instances = col.List[string]().MakeFromSequence(v.instances_.GetKeys())
@@ -552,12 +577,17 @@ func (v *validator_) validateType(type_ TypeLike) {
 	}
 }
 
-func (v *validator_) validateTypes() {
+func (v *validator_) validateTypes(model ModelLike) {
 	v.types_.SortValues()
 	var iterator = v.types_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var type_ = association.GetValue()
 		v.validateType(type_)
+	}
+	var types = model.GetTypes()
+	if types != nil && !types.IsEmpty() {
+		types.RemoveAll()
+		types.AppendValues(v.types_.GetValues(v.types_.GetKeys()))
 	}
 }

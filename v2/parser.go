@@ -397,23 +397,6 @@ func (v *parser_) parseAspects() (
 		aspects.AppendValue(aspect)
 		aspect, token, ok = v.parseAspect()
 	}
-	aspects.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The aspects must be sorted using their lowercase identifiers.
-			var firstAspect = first.(AspectLike)
-			var firstString = sts.ToLower(firstAspect.GetDeclaration().GetIdentifier())
-			var secondAspect = second.(AspectLike)
-			var secondString = sts.ToLower(secondAspect.GetDeclaration().GetIdentifier())
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of aspects.
 	return aspects, token, true
@@ -597,25 +580,6 @@ func (v *parser_) parseClasses() (
 		classes.AppendValue(class)
 		class, token, ok = v.parseClass()
 	}
-	classes.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The classes must be sorted using their lowercase identifiers.
-			var firstClass = first.(ClassLike)
-			var firstString = firstClass.GetDeclaration().GetIdentifier()
-			firstString = sts.ToLower(sts.TrimSuffix(firstString, "ClassLike"))
-			var secondClass = second.(ClassLike)
-			var secondString = secondClass.GetDeclaration().GetIdentifier()
-			secondString = sts.ToLower(sts.TrimSuffix(secondString, "ClassLike"))
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of classes.
 	return classes, token, true
@@ -792,23 +756,6 @@ func (v *parser_) parseConstructors() (
 		constructors.AppendValue(constructor)
 		constructor, token, ok = v.parseConstructor()
 	}
-	constructors.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The constructors must be sorted using their lowercase identifiers.
-			var firstConstructor = first.(ConstructorLike)
-			var firstString = sts.ToLower(firstConstructor.GetIdentifier())
-			var secondConstructor = second.(ConstructorLike)
-			var secondString = sts.ToLower(secondConstructor.GetIdentifier())
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of constructors.
 	return constructors, token, true
@@ -1121,23 +1068,6 @@ func (v *parser_) parseFunctionals() (
 		functionals.AppendValue(functional)
 		functional, token, ok = v.parseFunctional()
 	}
-	functionals.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The functionals must be sorted using their lowercase identifiers.
-			var firstFunctional = first.(FunctionalLike)
-			var firstString = sts.ToLower(firstFunctional.GetDeclaration().GetIdentifier())
-			var secondFunctional = second.(FunctionalLike)
-			var secondString = sts.ToLower(secondFunctional.GetDeclaration().GetIdentifier())
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of functionals.
 	return functionals, token, true
@@ -1171,23 +1101,6 @@ func (v *parser_) parseFunctions() (
 		functions.AppendValue(function)
 		function, token, ok = v.parseFunction()
 	}
-	functions.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The functions must be sorted using their lowercase identifiers.
-			var firstFunction = first.(FunctionLike)
-			var firstString = sts.ToLower(firstFunction.GetIdentifier())
-			var secondFunction = second.(FunctionLike)
-			var secondString = sts.ToLower(secondFunction.GetIdentifier())
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of functions.
 	return functions, token, true
@@ -1329,25 +1242,6 @@ func (v *parser_) parseInstances() (
 		instances.AppendValue(instance)
 		instance, token, ok = v.parseInstance()
 	}
-	instances.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The instances must be sorted using their lowercase identifiers.
-			var firstInstance = first.(InstanceLike)
-			var firstString = firstInstance.GetDeclaration().GetIdentifier()
-			firstString = sts.ToLower(sts.TrimSuffix(firstString, "Like"))
-			var secondInstance = second.(InstanceLike)
-			var secondString = secondInstance.GetDeclaration().GetIdentifier()
-			secondString = sts.ToLower(sts.TrimSuffix(secondString, "Like"))
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of instances.
 	return instances, token, true
@@ -1429,23 +1323,6 @@ func (v *parser_) parseMethods() (
 		methods.AppendValue(method)
 		method, token, ok = v.parseMethod()
 	}
-	methods.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The methods must be sorted using their lowercase identifiers.
-			var firstMethod = first.(MethodLike)
-			var firstString = sts.ToLower(firstMethod.GetIdentifier())
-			var secondMethod = second.(MethodLike)
-			var secondString = sts.ToLower(secondMethod.GetIdentifier())
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of methods.
 	return methods, token, true
@@ -1583,24 +1460,6 @@ func (v *parser_) parseModules() (
 		modules.AppendValue(module)
 		module, _, ok = v.parseModule()
 	}
-
-	// The modules must be sorted using their repository names.
-	modules.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			var firstModule = first.(ModuleLike)
-			var firstString = firstModule.GetText()
-			var secondModule = second.(ModuleLike)
-			var secondString = secondModule.GetText()
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Attempt to parse a delimiter.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
@@ -1904,23 +1763,6 @@ func (v *parser_) parseTypes() (
 		types.AppendValue(type_)
 		type_, token, ok = v.parseType()
 	}
-	types.SortValuesWithRanker(
-		func(first, second col.Value) int {
-			// The types must be sorted using their lowercase identifiers.
-			var firstType = first.(TypeLike)
-			var firstString = sts.ToLower(firstType.GetDeclaration().GetIdentifier())
-			var secondType = second.(TypeLike)
-			var secondString = sts.ToLower(secondType.GetDeclaration().GetIdentifier())
-			switch {
-			case firstString < secondString:
-				return -1
-			case firstString > secondString:
-				return 1
-			default:
-				return 0
-			}
-		},
-	)
 
 	// Found a sequence of types.
 	return types, token, true
