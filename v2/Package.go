@@ -19,7 +19,7 @@ This package follows the Crater Dog Technologies™ Go Coding Conventions locate
 here:
   - https://github.com/craterdog/go-model-framework/wiki
 
-Additional implementations of the concrete classes provided by this package can
+Additional concrete implementations of the classes defined by this package can
 be developed and used seamlessly since the interface definitions only depend on
 other interfaces and primitive types—and the class implementations only depend
 on interfaces, not on each other.
@@ -33,7 +33,7 @@ import (
 // Types
 
 /*
-PrefixType is a constrained type representing a prefix type.
+PrefixType is a constrained type representing a prefix type for the Go language.
 */
 type PrefixType uint8
 
@@ -66,8 +66,9 @@ const (
 // Classes
 
 /*
-AbstractionClassLike defines the set of class constants, constructors and
-functions that must be supported by all abstraction-class-like classes.
+AbstractionClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete abstraction-like class.
 */
 type AbstractionClassLike interface {
 	// Constructors
@@ -79,8 +80,9 @@ type AbstractionClassLike interface {
 }
 
 /*
-AspectClassLike defines the set of class constants, constructors and
-functions that must be supported by all aspect-class-like classes.
+AspectClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete aspect-like class.
 */
 type AspectClassLike interface {
 	// Constructors
@@ -91,8 +93,9 @@ type AspectClassLike interface {
 }
 
 /*
-AttributeClassLike defines the set of class constants, constructors and
-functions that must be supported by all attribute-class-like classes.
+AttributeClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete attribute-like class.
 */
 type AttributeClassLike interface {
 	// Constructors
@@ -104,8 +107,9 @@ type AttributeClassLike interface {
 }
 
 /*
-ClassClassLike defines the set of class constants, constructors and
-functions that must be supported by all class-class-like classes.
+ClassClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete class-like class.
 */
 type ClassClassLike interface {
 	// Constructors
@@ -118,8 +122,9 @@ type ClassClassLike interface {
 }
 
 /*
-ConstantClassLike defines the set of class constants, constructors and
-functions that must be supported by all constant-class-like classes.
+ConstantClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete constant-like class.
 */
 type ConstantClassLike interface {
 	// Constructors
@@ -130,8 +135,9 @@ type ConstantClassLike interface {
 }
 
 /*
-ConstructorClassLike defines the set of class constants, constructors and
-functions that must be supported by all constructor-class-like classes.
+ConstructorClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete constructor-like class.
 */
 type ConstructorClassLike interface {
 	// Constructors
@@ -143,8 +149,9 @@ type ConstructorClassLike interface {
 }
 
 /*
-DeclarationClassLike defines the set of class constants, constructors and
-functions that must be supported by all declaration-class-like classes.
+DeclarationClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete declaration-like class.
 */
 type DeclarationClassLike interface {
 	// Constructors
@@ -156,8 +163,9 @@ type DeclarationClassLike interface {
 }
 
 /*
-EnumerationClassLike defines the set of class constants, constructors and
-functions that must be supported by all enumeration-class-like classes.
+EnumerationClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete enumeration-like class.
 */
 type EnumerationClassLike interface {
 	// Constructors
@@ -168,8 +176,9 @@ type EnumerationClassLike interface {
 }
 
 /*
-FormatterClassLike defines the set of class constants, constructors and
-functions that must be supported by all formatter-class-like classes.
+FormatterClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete formatter-like class.
 */
 type FormatterClassLike interface {
 	// Constructors
@@ -177,8 +186,9 @@ type FormatterClassLike interface {
 }
 
 /*
-FunctionClassLike defines the set of class constants, constructors and
-functions that must be supported by all function-class-like classes.
+FunctionClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete function-like class.
 */
 type FunctionClassLike interface {
 	// Constructors
@@ -190,8 +200,9 @@ type FunctionClassLike interface {
 }
 
 /*
-FunctionalClassLike defines the set of class constants, constructors and
-functions that must be supported by all functional-class-like classes.
+FunctionalClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete functional-like class.
 */
 type FunctionalClassLike interface {
 	// Constructors
@@ -203,8 +214,9 @@ type FunctionalClassLike interface {
 }
 
 /*
-GeneratorClassLike defines the set of class constants, constructors and
-functions that must be supported by all generator-class-like classes.
+GeneratorClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete generator-like class.
 */
 type GeneratorClassLike interface {
 	// Constructors
@@ -212,8 +224,9 @@ type GeneratorClassLike interface {
 }
 
 /*
-HeaderClassLike defines the set of class constants, constructors and functions
-that must be supported by all header-class-like classes.
+HeaderClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete header-like class.
 */
 type HeaderClassLike interface {
 	// Constructors
@@ -224,8 +237,9 @@ type HeaderClassLike interface {
 }
 
 /*
-InstanceClassLike defines the set of class constants, constructors and functions
-that must be supported by all instance-class-like classes.
+InstanceClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete instance-like class.
 */
 type InstanceClassLike interface {
 	// Constructors
@@ -238,8 +252,9 @@ type InstanceClassLike interface {
 }
 
 /*
-MethodClassLike defines the set of class constants, constructors and functions
-that must be supported by all method-class-like classes.
+MethodClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete method-like class.
 */
 type MethodClassLike interface {
 	// Constructors
@@ -251,8 +266,9 @@ type MethodClassLike interface {
 }
 
 /*
-ModelClassLike defines the set of class constants, constructors and functions
-that must be supported by all package-class-like classes.
+ModelClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete model-like class.
 */
 type ModelClassLike interface {
 	// Constructors
@@ -269,8 +285,9 @@ type ModelClassLike interface {
 }
 
 /*
-ModuleClassLike defines the set of class constants, constructors and
-functions that must be supported by all module-class-like classes.
+ModuleClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete module-like class.
 */
 type ModuleClassLike interface {
 	// Constructors
@@ -281,8 +298,9 @@ type ModuleClassLike interface {
 }
 
 /*
-NoticeClassLike defines the set of class constants, constructors and
-functions that must be supported by all notice-class-like classes.
+NoticeClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete notice-like class.
 */
 type NoticeClassLike interface {
 	// Constructors
@@ -290,8 +308,9 @@ type NoticeClassLike interface {
 }
 
 /*
-ParameterClassLike defines the set of class constants, constructors and
-functions that must be supported by all parameter-class-like classes.
+ParameterClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete parameter-like class.
 */
 type ParameterClassLike interface {
 	// Constructors
@@ -302,8 +321,9 @@ type ParameterClassLike interface {
 }
 
 /*
-ParserClassLike defines the set of class constants, constructors and functions
-that must be supported by all parser-class-like classes.
+ParserClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete parser-like class.
 */
 type ParserClassLike interface {
 	// Constructors
@@ -311,8 +331,9 @@ type ParserClassLike interface {
 }
 
 /*
-PrefixClassLike defines the set of class constants, constructors and
-functions that must be supported by all prefix-class-like classes.
+PrefixClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete prefix-like class.
 */
 type PrefixClassLike interface {
 	// Constructors
@@ -323,8 +344,9 @@ type PrefixClassLike interface {
 }
 
 /*
-ResultClassLike defines the set of class constants, constructors and functions
-that must be supported by all result-class-like classes.
+ResultClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete result-like class.
 */
 type ResultClassLike interface {
 	// Constructors
@@ -333,9 +355,9 @@ type ResultClassLike interface {
 }
 
 /*
-ScannerClassLike is a class interface that defines the set of class
-constants, constructors and functions that must be supported by each
-scanner-class-like concrete class.  The following functions are supported:
+ScannerClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete scanner-like class.  The following functions are supported:
 
 FormatToken() returns a formatted string containing the attributes of the token.
 
@@ -360,9 +382,9 @@ type ScannerClassLike interface {
 }
 
 /*
-TokenClassLike is a class interface that defines the set of class
-constants, constructors and functions that must be supported by each
-token-class-like concrete class.
+TokenClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete token-like class.
 */
 type TokenClassLike interface {
 	// Constructors
@@ -375,8 +397,9 @@ type TokenClassLike interface {
 }
 
 /*
-TypeClassLike defines the set of class constants, constructors and
-functions that must be supported by all type-class-like classes.
+TypeClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete type-like class.
 */
 type TypeClassLike interface {
 	// Constructors
@@ -388,8 +411,9 @@ type TypeClassLike interface {
 }
 
 /*
-ValidatorClassLike defines the set of class constants, constructors and
-functions that must be supported by all validator-class-like classes.
+ValidatorClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete validator-like class.
 */
 type ValidatorClassLike interface {
 	// Constructors
@@ -399,8 +423,9 @@ type ValidatorClassLike interface {
 // Instances
 
 /*
-AbstractionLike defines the set of abstractions and methods that must be
-supported by all abstraction-like instances.
+AbstractionLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete abstraction-like class.
 */
 type AbstractionLike interface {
 	// Attributes
@@ -410,8 +435,9 @@ type AbstractionLike interface {
 }
 
 /*
-AspectLike defines the set of abstractions and methods that must be supported by
-all aspect-like instances.
+AspectLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete aspect-like class.
 */
 type AspectLike interface {
 	// Attributes
@@ -420,8 +446,9 @@ type AspectLike interface {
 }
 
 /*
-AttributeLike defines the set of abstractions and methods that must be supported
-by all attribute-like instances.
+AttributeLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete attribute-like class.
 */
 type AttributeLike interface {
 	// Attributes
@@ -431,8 +458,9 @@ type AttributeLike interface {
 }
 
 /*
-ClassLike defines the set of abstractions and methods that must be supported by
-all class-like instances.
+ClassLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete class-like class.
 */
 type ClassLike interface {
 	// Attributes
@@ -443,8 +471,9 @@ type ClassLike interface {
 }
 
 /*
-ConstantLike defines the set of abstractions and methods that must be supported
-by all constant-like instances.
+ConstantLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete constant-like class.
 */
 type ConstantLike interface {
 	// Attributes
@@ -453,8 +482,9 @@ type ConstantLike interface {
 }
 
 /*
-ConstructorLike defines the set of abstractions and methods that must be
-supported by all constructor-like instances.
+ConstructorLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete constructor-like class.
 */
 type ConstructorLike interface {
 	// Attributes
@@ -464,8 +494,9 @@ type ConstructorLike interface {
 }
 
 /*
-DeclarationLike defines the set of abstractions and methods that must be
-supported by all declaration-like instances.
+DeclarationLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete declaration-like class.
 */
 type DeclarationLike interface {
 	// Attributes
@@ -475,8 +506,9 @@ type DeclarationLike interface {
 }
 
 /*
-EnumerationLike defines the set of abstractions and methods that must be
-supported by all enumeration-like instances.
+EnumerationLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete enumeration-like class.
 */
 type EnumerationLike interface {
 	// Attributes
@@ -485,8 +517,9 @@ type EnumerationLike interface {
 }
 
 /*
-FormatterLike defines the set of abstractions and methods that must be
-supported by all formatter-like instances.
+FormatterLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete formatter-like class.
 */
 type FormatterLike interface {
 	// Methods
@@ -502,8 +535,9 @@ type FormatterLike interface {
 }
 
 /*
-FunctionLike defines the set of abstractions and methods that must be supported
-by all function-like instances.
+FunctionLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete function-like class.
 */
 type FunctionLike interface {
 	// Attributes
@@ -513,8 +547,9 @@ type FunctionLike interface {
 }
 
 /*
-FunctionalLike defines the set of abstractions and methods that must be
-supported by all functional-like instances.
+FunctionalLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete functional-like class.
 */
 type FunctionalLike interface {
 	// Attributes
@@ -524,8 +559,9 @@ type FunctionalLike interface {
 }
 
 /*
-GeneratorLike defines the set of abstractions and methods that must be
-supported by all generator-like instances.
+GeneratorLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete generator-like class.
 */
 type GeneratorLike interface {
 	// Methods
@@ -538,8 +574,9 @@ type GeneratorLike interface {
 }
 
 /*
-HeaderLike defines the set of abstractions and methods that must be supported by
-all header-like instances.
+HeaderLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete header-like class.
 */
 type HeaderLike interface {
 	// Attributes
@@ -548,8 +585,9 @@ type HeaderLike interface {
 }
 
 /*
-InstanceLike defines the set of abstractions and methods that must be supported
-by all instance-like instances.
+InstanceLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete instance-like class.
 */
 type InstanceLike interface {
 	// Attributes
@@ -560,8 +598,9 @@ type InstanceLike interface {
 }
 
 /*
-MethodLike defines the set of abstractions and methods that must be supported by
-all method-like instances.
+MethodLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete method-like class.
 */
 type MethodLike interface {
 	// Attributes
@@ -571,8 +610,9 @@ type MethodLike interface {
 }
 
 /*
-ModelLike defines the set of abstractions and methods that must be supported by
-all package-like instances.
+ModelLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete model-like class.
 */
 type ModelLike interface {
 	// Attributes
@@ -587,8 +627,9 @@ type ModelLike interface {
 }
 
 /*
-ModuleLike defines the set of abstractions and methods that must be
-supported by all module-like instances.
+ModuleLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete module-like class.
 */
 type ModuleLike interface {
 	// Attributes
@@ -597,8 +638,9 @@ type ModuleLike interface {
 }
 
 /*
-NoticeLike defines the set of abstractions and methods that must be supported
-by all notice-like instances.
+NoticeLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete notice-like class.
 */
 type NoticeLike interface {
 	// Attributes
@@ -606,8 +648,9 @@ type NoticeLike interface {
 }
 
 /*
-ParameterLike defines the set of abstractions and methods that must be supported
-by all parameter-like instances.
+ParameterLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete parameter-like class.
 */
 type ParameterLike interface {
 	// Attributes
@@ -616,8 +659,9 @@ type ParameterLike interface {
 }
 
 /*
-ParserLike defines the set of abstractions and methods that must be supported by
-all parser-like instances.
+ParserLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete parser-like class.
 */
 type ParserLike interface {
 	// Methods
@@ -625,8 +669,9 @@ type ParserLike interface {
 }
 
 /*
-PrefixLike defines the set of abstractions and methods that must be
-supported by all prefix-like instances.
+PrefixLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete prefix-like class.
 */
 type PrefixLike interface {
 	// Attributes
@@ -635,8 +680,9 @@ type PrefixLike interface {
 }
 
 /*
-ResultLike defines the set of abstractions and methods that must be supported by
-all result-like instances.
+ResultLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete result-like class.
 */
 type ResultLike interface {
 	// Attributes
@@ -645,16 +691,17 @@ type ResultLike interface {
 }
 
 /*
-ScannerLike defines the set of abstractions and methods that must be supported
-by all scanner-like instances.
+ScannerLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete scanner-like class.
 */
 type ScannerLike interface {
 }
 
 /*
 TokenLike is an instance interface that defines the complete set of
-abstractions and methods that must be supported by each instance of a
-token-like concrete class.
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete token-like class.
 */
 type TokenLike interface {
 	// Attributes
@@ -665,8 +712,9 @@ type TokenLike interface {
 }
 
 /*
-TypeLike defines the set of abstractions and methods that must be
-supported by all type-like instances.
+TypeLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete type-like class.
 */
 type TypeLike interface {
 	// Attributes
@@ -676,8 +724,9 @@ type TypeLike interface {
 }
 
 /*
-ValidatorLike defines the set of abstractions and methods that must be
-supported by all validator-like instances.
+ValidatorLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete validator-like class.
 */
 type ValidatorLike interface {
 	// Methods
