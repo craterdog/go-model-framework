@@ -529,7 +529,11 @@ func (v *generator_) generateConstantMethods(class ClassLike) string {
 func (v *generator_) generateConstructorMethods(class ClassLike) string {
 	var formatter = Formatter().Make()
 	var methods string
-	var iterator = class.GetConstructors().GetIterator()
+	var classConstructors = class.GetConstructors()
+	if classConstructors == nil {
+		return methods
+	}
+	var iterator = classConstructors.GetIterator()
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
 		var methodName = constructor.GetIdentifier()
@@ -844,12 +848,15 @@ func (v *generator_) retrieveAspect(
 	model ModelLike,
 	identifier string,
 ) AspectLike {
-	var iterator = model.GetAspects().GetIterator()
-	for iterator.HasNext() {
-		var aspect = iterator.GetNext()
-		var declaration = aspect.GetDeclaration()
-		if declaration.GetIdentifier() == identifier {
-			return aspect
+	var aspects = model.GetAspects()
+	if aspects != nil {
+		var iterator = aspects.GetIterator()
+		for iterator.HasNext() {
+			var aspect = iterator.GetNext()
+			var declaration = aspect.GetDeclaration()
+			if declaration.GetIdentifier() == identifier {
+				return aspect
+			}
 		}
 	}
 	var message = fmt.Sprintf(
