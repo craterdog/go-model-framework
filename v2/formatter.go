@@ -235,12 +235,12 @@ func (v *formatter_) formatClass(class ClassLike) {
 	v.depth_++
 	var hasContent bool
 	var constants = class.GetConstants()
-	if constants != nil {
+	if constants != nil && !constants.IsEmpty() {
 		v.formatConstants(constants)
 		hasContent = true
 	}
 	var constructors = class.GetConstructors()
-	if constructors != nil {
+	if constructors != nil && !constructors.IsEmpty() {
 		if hasContent {
 			v.appendString("\n")
 		}
@@ -248,7 +248,7 @@ func (v *formatter_) formatClass(class ClassLike) {
 		hasContent = true
 	}
 	var functions = class.GetFunctions()
-	if functions != nil {
+	if functions != nil && !functions.IsEmpty() {
 		if hasContent {
 			v.appendString("\n")
 		}
@@ -425,12 +425,12 @@ func (v *formatter_) formatInstance(instance InstanceLike) {
 	v.depth_++
 	var hasContent bool
 	var attributes = instance.GetAttributes()
-	if attributes != nil {
+	if attributes != nil && !attributes.IsEmpty() {
 		v.formatAttributes(attributes)
 		hasContent = true
 	}
 	var abstractions = instance.GetAbstractions()
-	if abstractions != nil {
+	if abstractions != nil && !abstractions.IsEmpty() {
 		if hasContent {
 			v.appendString("\n")
 		}
@@ -438,7 +438,7 @@ func (v *formatter_) formatInstance(instance InstanceLike) {
 		hasContent = true
 	}
 	var methods = instance.GetMethods()
-	if methods != nil {
+	if methods != nil && !methods.IsEmpty() {
 		if hasContent {
 			v.appendString("\n")
 		}
