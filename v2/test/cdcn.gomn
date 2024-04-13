@@ -11,19 +11,19 @@
 */
 
 /*
-Package "cdcn" defines a set of classes that provide an implementation of the
+Package "cdcn" provides a set of classes that provide an implementation of the
 notation-like abstract class for parsing and formatting source files containing
 Crater Dog Collection Notation™ (CDCN).  The complete language grammar for CDCN
 is located here:
   - https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/Grammar.cdsn
 
-This package follows the Crater Dog Technologies™ (craterdog) Go Coding
-Conventions located here:
+This package follows the Crater Dog Technologies™ Go Coding Conventions located
+here:
   - https://github.com/craterdog/go-model-framework/wiki
 
-Additional implementations of the classes provided by this package can be
-developed and used seamlessly since the interface definitions only depend on
-other interfaces and primitive types; and the class implementations only depend
+Additional concrete implementations of the classes defined by this package can
+be developed and used seamlessly since the interface definitions only depend on
+other interfaces and primitive types—and the class implementations only depend
 on interfaces, not on each other.
 */
 package cdcn
@@ -60,8 +60,9 @@ const (
 // Classes
 
 /*
-ParserClassLike defines the set of class constants, constructors and functions
-that must be supported by all parser-class-like classes.
+ParserClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete parser-like class.
 */
 type ParserClassLike interface {
 	// Constructors
@@ -69,9 +70,9 @@ type ParserClassLike interface {
 }
 
 /*
-ScannerClassLike is a class interface that defines the set of class
-constants, constructors and functions that must be supported by each
-scanner-class-like concrete class.  The following functions are supported:
+ScannerClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete scanner-like class.  The following functions are supported:
 
 FormatToken() returns a formatted string containing the attributes of the token.
 
@@ -96,9 +97,9 @@ type ScannerClassLike interface {
 }
 
 /*
-TokenClassLike is a class interface that defines the set of class
-constants, constructors and functions that must be supported by each
-token-class-like concrete class.
+TokenClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete token-like class.
 */
 type TokenClassLike interface {
 	// Constructors
@@ -113,8 +114,9 @@ type TokenClassLike interface {
 // Instances
 
 /*
-ParserLike defines the set of abstractions and methods that must be supported by
-all parser-like instances.
+ParserLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete parser-like class.
 */
 type ParserLike interface {
 	// Methods
@@ -122,16 +124,17 @@ type ParserLike interface {
 }
 
 /*
-ScannerLike defines the set of abstractions and methods that must be supported
-by all scanner-like instances.
+ScannerLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete scanner-like class.
 */
 type ScannerLike interface {
 }
 
 /*
 TokenLike is an instance interface that defines the complete set of
-abstractions and methods that must be supported by each instance of a
-token-like concrete class.
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete token-like class.
 */
 type TokenLike interface {
 	// Attributes
