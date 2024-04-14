@@ -10,7 +10,7 @@
 ................................................................................
 */
 
-package models
+package model
 
 const classTemplate_ = `<Notice><Header><Imports><Access><Class><Instance>`
 

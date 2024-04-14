@@ -6,19 +6,19 @@
 .                                                                              .
 .  This code is free software; you can redistribute it and/or modify it under  .
 .  the terms of The MIT License (MIT), as published by the Open Source         .
-.  Initiative. (See http://opensource.org/licenses/MIT)                        .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
 ................................................................................
 */
 
 /*
-Package "catalogs" defines...
+Package "catalog" defines...
 
 Additional implementations of the classes provided by this package can be
 developed and used seamlessly since the interface definitions only depend on
 other interfaces and primitive types; and the class implementations only depend
 on interfaces, not on each other.
 */
-package catalogs
+package catalog
 
 // Types
 

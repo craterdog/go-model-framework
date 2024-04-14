@@ -6,12 +6,12 @@
 .                                                                              .
 .  This code is free software; you can redistribute it and/or modify it under  .
 .  the terms of The MIT License (MIT), as published by the Open Source         .
-.  Initiative. (See http://opensource.org/licenses/MIT)                        .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
 ................................................................................
 */
 
 /*
-Package "models" provides the ability to generate Go class files based on a
+Package "model" provides the ability to generate Go class files based on a
 Go Package.go file that follows the format shown in the following code template:
   - https://github.com/craterdog/go-model-framework/blob/main/models/Package.go
 
@@ -24,7 +24,7 @@ be developed and used seamlessly since the interface definitions only depend on
 other interfaces and primitive types—and the class implementations only depend
 on interfaces, not on each other.
 */
-package models
+package model
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
