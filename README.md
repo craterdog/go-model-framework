@@ -1,9 +1,9 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
-## Go Package Framework
+## Go Class Model Framework
 
 ### Overview
-This project provides a class-based framework for jump-starting Go package
+This project provides a class-based model framework for jump-starting Go package
 development.  The class-based model follows the Crater Dog Technologies™
 (i.e. craterdog)
 [Go Coding Conventions](https://github.com/craterdog/go-model-framework/wiki).

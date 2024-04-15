@@ -176,15 +176,6 @@ type FormatterClassLike interface {
 }
 
 /*
-GeneratorClassLike defines the set of class constants, constructors and
-functions that must be supported by all generator-class-like classes.
-*/
-type GeneratorClassLike interface {
-	// Constructors
-	Make() GeneratorLike
-}
-
-/*
 GlyphClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete glyph-like class.
@@ -450,20 +441,6 @@ type FormatterLike interface {
 	// Methods
 	FormatDefinition(definition DefinitionLike) string
 	FormatGrammar(grammar GrammarLike) string
-}
-
-/*
-GeneratorLike defines the set of aspects and methods that must be supported by
-all generator-like instances.
-*/
-type GeneratorLike interface {
-	// Methods
-	CreateGrammar(
-		directory string,
-		name string,
-		copyright string,
-	)
-	GenerateModel(directory string)
 }
 
 /*
