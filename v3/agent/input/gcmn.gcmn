@@ -214,16 +214,6 @@ type FunctionalClassLike interface {
 }
 
 /*
-GeneratorClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete generator-like class.
-*/
-type GeneratorClassLike interface {
-	// Constructors
-	Make() GeneratorLike
-}
-
-/*
 HeaderClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete header-like class.
@@ -556,21 +546,6 @@ type FunctionalLike interface {
 	GetDeclaration() DeclarationLike
 	GetParameters() col.ListLike[ParameterLike]
 	GetResult() ResultLike
-}
-
-/*
-GeneratorLike is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete generator-like class.
-*/
-type GeneratorLike interface {
-	// Methods
-	CreateModel(
-		directory string,
-		name string,
-		copyright string,
-	)
-	GeneratePackage(directory string)
 }
 
 /*
