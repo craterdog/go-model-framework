@@ -64,7 +64,7 @@ func (v *formatter_) FormatDefinition(definition DefinitionLike) string {
 	return result_
 }
 
-func (v *formatter_) FormatGrammar(grammar GrammarLike) string {
+func (v *formatter_) FormatSyntax(syntax SyntaxLike) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_

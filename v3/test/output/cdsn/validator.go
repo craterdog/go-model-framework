@@ -58,7 +58,7 @@ type validator_ struct {
 
 // Public
 
-func (v *validator_) ValidateGrammar(grammar GrammarLike) {
+func (v *validator_) ValidateSyntax(syntax SyntaxLike) {
 	// TBA - Implement the method.
 }
 

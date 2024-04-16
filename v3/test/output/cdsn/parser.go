@@ -58,8 +58,8 @@ type parser_ struct {
 
 // Public
 
-func (v *parser_) ParseSource(source string) GrammarLike {
-	var result_ GrammarLike
+func (v *parser_) ParseSource(source string) SyntaxLike {
+	var result_ SyntaxLike
 	// TBA - Implement the method.
 	return result_
 }

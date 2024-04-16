@@ -11,13 +11,13 @@
 */
 
 /*
-Package "cdsn" provides a parser and formatter for language grammars defined
+Package "cdsn" provides a parser and formatter for language syntaxes defined
 using Crater Dog Syntax Notation™ (CDSN).  The parser performs validation on the
 resulting parse tree.  The formatter takes a validated parse tree and generates
 the corresponding CDSN source using the canonical format.
 
 For detailed documentation on this package refer to the wiki:
-  - https://github.com/craterdog/go-grammar-framework/wiki
+  - https://github.com/craterdog/go-syntax-framework/wiki
 
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:
@@ -189,19 +189,6 @@ type GlyphClassLike interface {
 }
 
 /*
-GrammarClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete grammar-like class.
-*/
-type GrammarClassLike interface {
-	// Constructors
-	MakeWithAttributes(
-		headers col.ListLike[HeaderLike],
-		definitions col.ListLike[DefinitionLike],
-	) GrammarLike
-}
-
-/*
 HeaderClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete header-like class.
@@ -305,6 +292,19 @@ type ScannerClassLike interface {
 		type_ TokenType,
 		text string,
 	) col.ListLike[string]
+}
+
+/*
+SyntaxClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete syntax-like class.
+*/
+type SyntaxClassLike interface {
+	// Constructors
+	MakeWithAttributes(
+		headers col.ListLike[HeaderLike],
+		definitions col.ListLike[DefinitionLike],
+	) SyntaxLike
 }
 
 /*
@@ -440,7 +440,7 @@ instance of a concrete formatter-like class.
 type FormatterLike interface {
 	// Methods
 	FormatDefinition(definition DefinitionLike) string
-	FormatGrammar(grammar GrammarLike) string
+	FormatSyntax(syntax SyntaxLike) string
 }
 
 /*
@@ -452,17 +452,6 @@ type GlyphLike interface {
 	// Attributes
 	GetFirst() string
 	GetLast() string
-}
-
-/*
-GrammarLike is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete grammar-like class.
-*/
-type GrammarLike interface {
-	// Attributes
-	GetHeaders() col.ListLike[HeaderLike]
-	GetDefinitions() col.ListLike[DefinitionLike]
 }
 
 /*
@@ -514,7 +503,7 @@ instance of a concrete parser-like class.
 */
 type ParserLike interface {
 	// Methods
-	ParseSource(source string) GrammarLike
+	ParseSource(source string) SyntaxLike
 }
 
 /*
@@ -549,6 +538,17 @@ type ScannerLike interface {
 }
 
 /*
+SyntaxLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete syntax-like class.
+*/
+type SyntaxLike interface {
+	// Attributes
+	GetHeaders() col.ListLike[HeaderLike]
+	GetDefinitions() col.ListLike[DefinitionLike]
+}
+
+/*
 TokenLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
 instance of a concrete token-like class.
@@ -568,5 +568,5 @@ instance of a concrete validator-like class.
 */
 type ValidatorLike interface {
 	// Methods
-	ValidateGrammar(grammar GrammarLike)
+	ValidateSyntax(syntax SyntaxLike)
 }

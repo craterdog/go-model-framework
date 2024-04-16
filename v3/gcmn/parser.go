@@ -72,8 +72,8 @@ func (v *parser_) ParseSource(source string) ModelLike {
 	var model, token, ok = v.parseModel()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Model",
-			"Source",
+		message += v.generateSyntax("Model",
+			"Gcmn",
 			"Model",
 		)
 		panic(message)
@@ -88,8 +88,8 @@ func (v *parser_) ParseSource(source string) ModelLike {
 	_, token, ok = v.parseToken(EOFToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("EOF",
-			"Source",
+		message += v.generateSyntax("EOF",
+			"Gcmn",
 			"Model",
 		)
 		panic(message)
@@ -143,13 +143,13 @@ func (v *parser_) formatError(token TokenLike) string {
 This private instance method is useful when creating scanner and parser error
 messages that include the required grammatical rules.
 */
-func (v *parser_) generateGrammar(expected string, names ...string) string {
+func (v *parser_) generateSyntax(expected string, names ...string) string {
 	var message = "Was expecting '" + expected + "' from:\n"
 	for _, name := range names {
 		message += fmt.Sprintf(
 			"  \033[32m%v: \033[33m%v\033[0m\n\n",
 			name,
-			grammar[name],
+			syntax[name],
 		)
 	}
 	return message
@@ -194,7 +194,7 @@ func (v *parser_) parseAbstraction() (
 		identifier, token, ok = v.parseToken(IdentifierToken, "")
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("Arguments",
+			message += v.generateSyntax("Arguments",
 				"Abstraction",
 				"Prefix",
 				"Arguments",
@@ -228,7 +228,7 @@ func (v *parser_) parseAbstraction() (
 		arguments, token, ok = v.parseArguments()
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("Arguments",
+			message += v.generateSyntax("Arguments",
 				"Abstraction",
 				"Prefix",
 				"Arguments",
@@ -240,7 +240,7 @@ func (v *parser_) parseAbstraction() (
 		_, token, ok = v.parseToken(DelimiterToken, "]")
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("]",
+			message += v.generateSyntax("]",
 				"Abstraction",
 				"Prefix",
 				"Arguments",
@@ -271,7 +271,7 @@ func (v *parser_) parseAbstractions() (
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Abstraction",
+		message += v.generateSyntax("Abstraction",
 			"Abstractions",
 			"Abstraction",
 		)
@@ -329,7 +329,7 @@ func (v *parser_) parseAspect() (
 	_, token, ok = v.parseToken(IdentifierToken, "interface")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(`"interface"`,
+		message += v.generateSyntax(`"interface"`,
 			"Aspect",
 			"Declaration",
 			"Methods",
@@ -341,7 +341,7 @@ func (v *parser_) parseAspect() (
 	_, token, ok = v.parseToken(DelimiterToken, "{")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("{",
+		message += v.generateSyntax("{",
 			"Aspect",
 			"Declaration",
 			"Methods",
@@ -356,7 +356,7 @@ func (v *parser_) parseAspect() (
 	_, token, ok = v.parseToken(DelimiterToken, "}")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("}",
+		message += v.generateSyntax("}",
 			"Aspect",
 			"Declaration",
 			"Methods",
@@ -386,7 +386,7 @@ func (v *parser_) parseAspects() (
 	aspect, token, ok = v.parseAspect()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Aspect",
+		message += v.generateSyntax("Aspect",
 			"Aspects",
 			"Aspect",
 		)
@@ -419,7 +419,7 @@ func (v *parser_) parseAttribute() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Attribute",
 			"Parameter",
 			"Abstraction",
@@ -434,7 +434,7 @@ func (v *parser_) parseAttribute() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Attribute",
 			"Parameter",
 			"Abstraction",
@@ -467,7 +467,7 @@ func (v *parser_) parseAttributes() (
 	attribute, token, ok = v.parseAttribute()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Attribute",
+		message += v.generateSyntax("Attribute",
 			"Attributes",
 			"Attribute",
 		)
@@ -500,7 +500,7 @@ func (v *parser_) parseClass() (
 	_, token, ok = v.parseToken(IdentifierToken, "interface")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(`"interface"`,
+		message += v.generateSyntax(`"interface"`,
 			"Class",
 			"Declaration",
 			"Constants",
@@ -514,7 +514,7 @@ func (v *parser_) parseClass() (
 	_, token, ok = v.parseToken(DelimiterToken, "{")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("{",
+		message += v.generateSyntax("{",
 			"Class",
 			"Declaration",
 			"Constants",
@@ -537,7 +537,7 @@ func (v *parser_) parseClass() (
 	_, token, ok = v.parseToken(DelimiterToken, "}")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("}",
+		message += v.generateSyntax("}",
 			"Class",
 			"Declaration",
 			"Constants",
@@ -569,7 +569,7 @@ func (v *parser_) parseClasses() (
 	class, token, ok = v.parseClass()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Class",
+		message += v.generateSyntax("Class",
 			"Classes",
 			"Class",
 		)
@@ -602,7 +602,7 @@ func (v *parser_) parseConstant() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Constant",
 			"Abstraction",
 		)
@@ -613,7 +613,7 @@ func (v *parser_) parseConstant() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Constant",
 			"Abstraction",
 		)
@@ -625,7 +625,7 @@ func (v *parser_) parseConstant() (
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Abstraction",
+		message += v.generateSyntax("Abstraction",
 			"Constant",
 			"Abstraction",
 		)
@@ -654,7 +654,7 @@ func (v *parser_) parseConstants() (
 	constant, token, ok = v.parseConstant()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Constant",
+		message += v.generateSyntax("Constant",
 			"Constants",
 			"Constant",
 		)
@@ -687,7 +687,7 @@ func (v *parser_) parseConstructor() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Constructor",
 			"Parameters",
 			"Abstraction",
@@ -702,7 +702,7 @@ func (v *parser_) parseConstructor() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Constructor",
 			"Parameters",
 			"Abstraction",
@@ -715,7 +715,7 @@ func (v *parser_) parseConstructor() (
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Abstraction",
+		message += v.generateSyntax("Abstraction",
 			"Constructor",
 			"Parameters",
 			"Abstraction",
@@ -745,7 +745,7 @@ func (v *parser_) parseConstructors() (
 	constructor, token, ok = v.parseConstructor()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Constructor",
+		message += v.generateSyntax("Constructor",
 			"Constructors",
 			"Constructor",
 		)
@@ -778,7 +778,7 @@ func (v *parser_) parseDeclaration() (
 	_, token, ok = v.parseToken(IdentifierToken, "type")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(`"type"`,
+		message += v.generateSyntax(`"type"`,
 			"Declaration",
 			"Parameters",
 		)
@@ -790,7 +790,7 @@ func (v *parser_) parseDeclaration() (
 	identifier, token, ok = v.parseToken(IdentifierToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("identifier",
+		message += v.generateSyntax("identifier",
 			"Declaration",
 			"Parameters",
 		)
@@ -804,7 +804,7 @@ func (v *parser_) parseDeclaration() (
 		parameters, token, ok = v.parseParameters()
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("Parameters",
+			message += v.generateSyntax("Parameters",
 				"Declaration",
 				"Parameters",
 			)
@@ -813,7 +813,7 @@ func (v *parser_) parseDeclaration() (
 		_, token, ok = v.parseToken(DelimiterToken, "]")
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("]",
+			message += v.generateSyntax("]",
 				"Declaration",
 				"Parameters",
 			)
@@ -842,7 +842,7 @@ func (v *parser_) parseEnumeration() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Enumeration",
 			"Parameter",
 		)
@@ -854,7 +854,7 @@ func (v *parser_) parseEnumeration() (
 	parameter, token, ok = v.parseParameter()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Parameter",
+		message += v.generateSyntax("Parameter",
 			"Enumeration",
 			"Parameter",
 		)
@@ -865,7 +865,7 @@ func (v *parser_) parseEnumeration() (
 	_, token, ok = v.parseToken(DelimiterToken, "=")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("=",
+		message += v.generateSyntax("=",
 			"Enumeration",
 			"Parameter",
 		)
@@ -876,7 +876,7 @@ func (v *parser_) parseEnumeration() (
 	_, token, ok = v.parseToken(IdentifierToken, "iota")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(`"iota"`,
+		message += v.generateSyntax(`"iota"`,
 			"Enumeration",
 			"Parameter",
 		)
@@ -896,7 +896,7 @@ func (v *parser_) parseEnumeration() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Enumeration",
 			"Parameter",
 		)
@@ -925,7 +925,7 @@ func (v *parser_) parseFunction() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Function",
 			"Parameters",
 			"Result",
@@ -940,7 +940,7 @@ func (v *parser_) parseFunction() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Function",
 			"Parameters",
 			"Result",
@@ -953,7 +953,7 @@ func (v *parser_) parseFunction() (
 	result, token, ok = v.parseResult()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Result",
+		message += v.generateSyntax("Result",
 			"Function",
 			"Parameters",
 			"Result",
@@ -983,7 +983,7 @@ func (v *parser_) parseFunctional() (
 	_, token, ok = v.parseToken(IdentifierToken, "func")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(`"func"`,
+		message += v.generateSyntax(`"func"`,
 			"Functional",
 			"Declaration",
 			"Parameters",
@@ -996,7 +996,7 @@ func (v *parser_) parseFunctional() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Functional",
 			"Declaration",
 			"Parameters",
@@ -1012,7 +1012,7 @@ func (v *parser_) parseFunctional() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Functional",
 			"Declaration",
 			"Parameters",
@@ -1026,7 +1026,7 @@ func (v *parser_) parseFunctional() (
 	result, token, ok = v.parseResult()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Result",
+		message += v.generateSyntax("Result",
 			"Functional",
 			"Declaration",
 			"Parameters",
@@ -1057,7 +1057,7 @@ func (v *parser_) parseFunctionals() (
 	functional, token, ok = v.parseFunctional()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Functional",
+		message += v.generateSyntax("Functional",
 			"Functionals",
 			"Functional",
 		)
@@ -1090,7 +1090,7 @@ func (v *parser_) parseFunctions() (
 	function, token, ok = v.parseFunction()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Function",
+		message += v.generateSyntax("Function",
 			"Functions",
 			"Function",
 		)
@@ -1123,7 +1123,7 @@ func (v *parser_) parseHeader() (
 	_, token, ok = v.parseToken(IdentifierToken, "package")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(`"package"`,
+		message += v.generateSyntax(`"package"`,
 			"Header",
 		)
 		panic(message)
@@ -1134,7 +1134,7 @@ func (v *parser_) parseHeader() (
 	identifier, token, ok = v.parseToken(IdentifierToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("identifier",
+		message += v.generateSyntax("identifier",
 			"Header",
 		)
 		panic(message)
@@ -1162,7 +1162,7 @@ func (v *parser_) parseInstance() (
 	_, token, ok = v.parseToken(IdentifierToken, "interface")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(`"interface"`,
+		message += v.generateSyntax(`"interface"`,
 			"Instance",
 			"Declaration",
 			"Attributes",
@@ -1176,7 +1176,7 @@ func (v *parser_) parseInstance() (
 	_, token, ok = v.parseToken(DelimiterToken, "{")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("{",
+		message += v.generateSyntax("{",
 			"Instance",
 			"Declaration",
 			"Attributes",
@@ -1199,7 +1199,7 @@ func (v *parser_) parseInstance() (
 	_, token, ok = v.parseToken(DelimiterToken, "}")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("}",
+		message += v.generateSyntax("}",
 			"Instance",
 			"Declaration",
 			"Attributes",
@@ -1231,7 +1231,7 @@ func (v *parser_) parseInstances() (
 	instance, token, ok = v.parseInstance()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Instance",
+		message += v.generateSyntax("Instance",
 			"Instances",
 			"Instance",
 		)
@@ -1264,7 +1264,7 @@ func (v *parser_) parseMethod() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Method",
 			"Parameters",
 			"Result",
@@ -1279,7 +1279,7 @@ func (v *parser_) parseMethod() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Method",
 			"Parameters",
 			"Result",
@@ -1312,7 +1312,7 @@ func (v *parser_) parseMethods() (
 	method, token, ok = v.parseMethod()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Method",
+		message += v.generateSyntax("Method",
 			"Methods",
 			"Method",
 		)
@@ -1346,7 +1346,7 @@ func (v *parser_) parseModel() (
 	header, token, ok = v.parseHeader()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Header",
+		message += v.generateSyntax("Header",
 			"Model",
 			"Notice",
 			"Header",
@@ -1410,7 +1410,7 @@ func (v *parser_) parseModule() (
 	text, token, ok = v.parseToken(TextToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("text",
+		message += v.generateSyntax("text",
 			"Module",
 		)
 		panic(message)
@@ -1437,7 +1437,7 @@ func (v *parser_) parseModules() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Modules",
 			"Module",
 		)
@@ -1449,7 +1449,7 @@ func (v *parser_) parseModules() (
 	module, token, ok = v.parseModule()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Module",
+		message += v.generateSyntax("Module",
 			"Modules",
 			"Module",
 		)
@@ -1465,7 +1465,7 @@ func (v *parser_) parseModules() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Modules",
 			"Module",
 		)
@@ -1512,7 +1512,7 @@ func (v *parser_) parseParameter() (
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Abstraction",
+		message += v.generateSyntax("Abstraction",
 			"Parameter",
 			"Abstraction",
 		)
@@ -1578,7 +1578,7 @@ func (v *parser_) parsePrefix() (
 		_, token, ok = v.parseToken(DelimiterToken, "[")
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("[",
+			message += v.generateSyntax("[",
 				"Prefix",
 			)
 			panic(message)
@@ -1586,7 +1586,7 @@ func (v *parser_) parsePrefix() (
 		identifier, token, ok = v.parseToken(IdentifierToken, "")
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("identifier",
+			message += v.generateSyntax("identifier",
 				"Prefix",
 			)
 			panic(message)
@@ -1594,7 +1594,7 @@ func (v *parser_) parsePrefix() (
 		_, token, ok = v.parseToken(DelimiterToken, "]")
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("]",
+			message += v.generateSyntax("]",
 				"Prefix",
 			)
 			panic(message)
@@ -1651,7 +1651,7 @@ func (v *parser_) parseResult() (
 		parameters, token, ok = v.parseParameters()
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("Parameters",
+			message += v.generateSyntax("Parameters",
 				"Result",
 				"Abstraction",
 				"Parameters",
@@ -1661,7 +1661,7 @@ func (v *parser_) parseResult() (
 		_, token, ok = v.parseToken(DelimiterToken, ")")
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar(")",
+			message += v.generateSyntax(")",
 				"Result",
 				"Abstraction",
 				"Parameters",
@@ -1717,7 +1717,7 @@ func (v *parser_) parseType() (
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Abstraction",
+		message += v.generateSyntax("Abstraction",
 			"Type",
 			"Declaration",
 			"Abstraction",
@@ -1752,7 +1752,7 @@ func (v *parser_) parseTypes() (
 	type_, token, ok = v.parseType()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Type",
+		message += v.generateSyntax("Type",
 			"Types",
 			"Type",
 		)
@@ -1773,8 +1773,8 @@ func (v *parser_) putBack(token TokenLike) {
 	v.next_.AddValue(token)
 }
 
-var grammar = map[string]string{
-	"Source":      `Model EOL* EOF  ! Terminated with an end-of-file marker.`,
+var syntax = map[string]string{
+	"Gcmn":        `Model EOL* EOF  ! Terminated with an end-of-file marker.`,
 	"Model":       `Notice Header Modules? Types? Functionals? Aspects? Classes? Instances?`,
 	"Notice":      `comment`,
 	"Header":      `comment "package" identifier`,
