@@ -20,24 +20,24 @@ import (
 	tes "testing"
 )
 
-const outputDirectory = "./output/"
+const inputDirectory = "../test/input/"
+const outputDirectory = "../test/output/"
 const packageName = "example"
 
 func TestInitialization(t *tes.T) {
 	var generator = age.Generator().Make()
 
-	var directoryName = outputDirectory + packageName + "/"
 	var err = osx.RemoveAll(outputDirectory)
 	if err != nil {
 		panic(err)
 	}
-	err = osx.MkdirAll(directoryName, 0755)
+	err = osx.MkdirAll(outputDirectory, 0755)
 	if err != nil {
 		panic(err)
 	}
 
 	var copyright string
-	generator.CreateModel(directoryName, packageName, copyright)
+	generator.CreateModel(outputDirectory, packageName, copyright)
 }
 
 func TestGeneration(t *tes.T) {

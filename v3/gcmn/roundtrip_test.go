@@ -10,7 +10,7 @@
 ................................................................................
 */
 
-package agent_test
+package gcmn_test
 
 import (
 	fmt "fmt"
@@ -21,7 +21,7 @@ import (
 	tes "testing"
 )
 
-const inputDirectory = "./input/"
+const inputDirectory = "../test/input/"
 
 func TestRoundtrips(t *tes.T) {
 	var files, err = osx.ReadDir(inputDirectory)

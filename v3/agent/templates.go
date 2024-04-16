@@ -170,9 +170,6 @@ const modelTemplate_ = `
 /*
 Package "<packagename>" provides...
 
-For detailed documentation on this package refer to the wiki:
-  - https://github.com/craterdog/<repository-name>/wiki
-
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:
   - https://github.com/craterdog/go-model-framework/wiki
@@ -211,7 +208,7 @@ type <FunctionName>Function func(<Parameters>) <AbstractType>
 // Aspects
 
 /*
-<AspectName> is an aspect interface that defines the set of method signatures
+<AspectName> is an aspect interface that defines a set of method signatures
 that must be supported by each instance of a <aspect name> concrete class.
 */
 type <AspectName> interface {
@@ -224,9 +221,9 @@ type <AspectName> interface {
 // Classes
 
 /*
-<ClassName>ClassLike is a class interface that defines the set of class
-constants, constructors and functions that must be supported by each
-<class-name>-like concrete class.
+<ClassName>ClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete <class-name>-like class.
 */
 type <ClassName>ClassLike interface {
 	// Constants
@@ -247,8 +244,8 @@ type <ClassName>ClassLike interface {
 
 /*
 <ClassName>Like is an instance interface that defines the complete set of
-abstractions and methods that must be supported by each instance of a
-<class-name>-like concrete class.
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete <class-name>-like class.
 */
 type <ClassName>Like interface {
 	// Attributes

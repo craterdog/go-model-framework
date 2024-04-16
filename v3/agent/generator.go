@@ -14,7 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v3"
+	col "github.com/craterdog/go-collection-framework/v3/collection"
 	mod "github.com/craterdog/go-model-framework/v3/gcmn"
 	osx "os"
 	sts "strings"
@@ -96,7 +96,7 @@ func (v *generator_) CreateModel(directory string, name string, copyright string
 	var bytes = []byte(template[1:]) // Remove leading "\n".
 
 	// Save the new model template.
-	var modelFile = directory + "Package.go"
+	var modelFile = directory + "Package.temp"
 	fmt.Printf(
 		"The model file %q does not exist, creating a template for it.\n",
 		modelFile,
