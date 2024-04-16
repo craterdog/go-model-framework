@@ -67,30 +67,7 @@ func (v *generator_) CreateModel(directory string, name string, copyright string
 	directory = v.createDirectory(directory, name)
 
 	// Center and insert the copyright notice into the model template.
-	var maximum = 78
-	var length = len(copyright)
-	if length > maximum {
-		var message = fmt.Sprintf(
-			"The copyright notice cannot be longer than 78 characters: %v",
-			copyright,
-		)
-		panic(message)
-	}
-	if length == 0 {
-		copyright = fmt.Sprintf(
-			"Copyright (c) %v.  All Rights Reserved.",
-			tim.Now().Year(),
-		)
-		length = len(copyright)
-	}
-	var padding = (maximum - length) / 2
-	for range padding {
-		copyright = " " + copyright + " "
-	}
-	if len(copyright) < maximum {
-		copyright = " " + copyright
-	}
-	copyright = "." + copyright + "."
+	copyright = v.expandCopyright(copyright)
 	var template = sts.ReplaceAll(modelTemplate_, "<Copyright>", copyright)
 	template = sts.ReplaceAll(template, "<packagename>", name)
 	var bytes = []byte(template[1:]) // Remove leading "\n".
@@ -131,6 +108,34 @@ func (v *generator_) createDirectory(directory string, name string) string {
 		panic(err)
 	}
 	return directory
+}
+
+func (v *generator_) expandCopyright(copyright string) string {
+	var maximum = 78
+	var length = len(copyright)
+	if length > maximum {
+		var message = fmt.Sprintf(
+			"The copyright notice cannot be longer than 78 characters: %v",
+			copyright,
+		)
+		panic(message)
+	}
+	if length == 0 {
+		copyright = fmt.Sprintf(
+			"Copyright (c) %v.  All Rights Reserved.",
+			tim.Now().Year(),
+		)
+		length = len(copyright)
+	}
+	var padding = (maximum - length) / 2
+	for range padding {
+		copyright = " " + copyright + " "
+	}
+	if len(copyright) < maximum {
+		copyright = " " + copyright
+	}
+	copyright = "." + copyright + "."
+	return copyright
 }
 
 func (v *generator_) extractConstructorAttributes(
