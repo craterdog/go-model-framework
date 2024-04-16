@@ -15,7 +15,7 @@ GO CLASS MODEL NOTATION
 This document contains a formal definition of the Go Class Model Notation™
 (GCMN) using Crater Dog Syntax Notation™ (CDSN).
 
-A language grammar consists of a set of token definitions and rule definitions.
+A language grammar consists of a set of rule definitions and token definitions.
 
 The following intrinsic character types are context specific:
  * ANY - Any language specific character.
