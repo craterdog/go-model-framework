@@ -66,7 +66,7 @@ type <AspectName> interface {
 /*
 <ClassName>ClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete <class-name>-like class.
+<class-name>-like concrete class.
 */
 type <ClassName>ClassLike interface {
 	// Constants
@@ -88,7 +88,7 @@ type <ClassName>ClassLike interface {
 /*
 <ClassName>Like is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete <class-name>-like class.
+instance of a <class-name>-like concrete class.
 */
 type <ClassName>Like interface {
 	// Attributes
