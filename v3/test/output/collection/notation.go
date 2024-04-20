@@ -19,7 +19,7 @@ import ()
 // Reference
 
 var notationClass = &notationClass_{
-	// This class has no private constants to initialize.
+	// Any private class constants should be initialized here.
 }
 
 // Function

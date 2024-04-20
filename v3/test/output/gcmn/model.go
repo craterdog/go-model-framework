@@ -21,7 +21,7 @@ import (
 // Reference
 
 var modelClass = &modelClass_{
-	// This class has no private constants to initialize.
+	// Any private class constants should be initialized here.
 }
 
 // Function
