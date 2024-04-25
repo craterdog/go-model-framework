@@ -12,7 +12,7 @@ development.  The class-based model follows the Crater Dog Technologies™
 The general development process—in a nutshell—is as follows:
  1. Install the
     [go-model-tools](https://github.com/craterdog/go-model-tools) module.
- 1. Run the `bin/generate` program to generate a `Package.go` class model
+ 1. Run the `bin/initialize` program to generate a `Package.go` class model
     template file in your package directory.
  1. Fill in the `Package.go` class model template with the abstract types and
     interfaces for the classes that your package will provide.
