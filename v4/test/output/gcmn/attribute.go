@@ -33,6 +33,7 @@ func Attribute() AttributeClassLike {
 // Target
 
 type attributeClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

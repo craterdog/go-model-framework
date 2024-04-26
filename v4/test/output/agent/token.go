@@ -33,6 +33,7 @@ func Token() TokenClassLike {
 // Target
 
 type tokenClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -35,6 +35,7 @@ func Constructor() ConstructorClassLike {
 // Target
 
 type constructorClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

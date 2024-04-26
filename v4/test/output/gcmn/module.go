@@ -33,6 +33,7 @@ func Module() ModuleClassLike {
 // Target
 
 type moduleClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

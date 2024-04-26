@@ -33,6 +33,7 @@ func Line() LineClassLike {
 // Target
 
 type lineClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

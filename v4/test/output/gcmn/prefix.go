@@ -33,6 +33,7 @@ func Prefix() PrefixClassLike {
 // Target
 
 type prefixClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

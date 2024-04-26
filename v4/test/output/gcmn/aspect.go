@@ -35,6 +35,7 @@ func Aspect() AspectClassLike {
 // Target
 
 type aspectClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

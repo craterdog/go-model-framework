@@ -231,7 +231,7 @@ func (v *parser_) parseAbstraction() (
 
 	// Attempt to parse a delimiter.
 	_, token, ok = v.parseToken(DelimiterToken, "[")
-	var arguments = gcf.List[gcm.AbstractionLike]()
+	var arguments col.ListLike[gcm.AbstractionLike]
 	if ok {
 		// Attempt to parse a sequence of arguments.
 		arguments, token, ok = v.parseArguments()
@@ -269,7 +269,6 @@ func (v *parser_) parseAbstractions() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	abstractions = gcf.List[gcm.AbstractionLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Abstractions")
 	if !ok {
 		// This is not a sequence of abstractions.
@@ -287,6 +286,7 @@ func (v *parser_) parseAbstractions() (
 		)
 		panic(message)
 	}
+	abstractions = gcf.List[gcm.AbstractionLike]()
 	for ok {
 		abstractions.AppendValue(abstraction)
 		abstraction, token, ok = v.parseAbstraction()
@@ -302,13 +302,13 @@ func (v *parser_) parseArguments() (
 	ok bool,
 ) {
 	// Attempt to parse at least one abstraction.
-	arguments = gcf.List[gcm.AbstractionLike]()
 	var abstraction gcm.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		// This is not a sequence of arguments.
 		return arguments, token, false
 	}
+	arguments = gcf.List[gcm.AbstractionLike]()
 	for ok {
 		arguments.AppendValue(abstraction)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
@@ -358,8 +358,18 @@ func (v *parser_) parseAspect() (
 		panic(message)
 	}
 
-	// Attempt to parse an optional sequence of methods.
-	var methods, _, _ = v.parseMethods()
+	// Attempt to parse a sequence of methods.
+	var methods col.ListLike[gcm.MethodLike]
+	methods, token, ok = v.parseMethods()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Methods",
+			"Aspect",
+			"Declaration",
+			"Methods",
+		)
+		panic(message)
+	}
 
 	// Attempt to parse a delimiter.
 	_, token, ok = v.parseToken(DelimiterToken, "}")
@@ -384,7 +394,6 @@ func (v *parser_) parseAspects() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	aspects = gcf.List[gcm.AspectLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Aspects")
 	if !ok {
 		// This is not a sequence of aspects.
@@ -402,6 +411,7 @@ func (v *parser_) parseAspects() (
 		)
 		panic(message)
 	}
+	aspects = gcf.List[gcm.AspectLike]()
 	for ok {
 		aspects.AppendValue(aspect)
 		aspect, token, ok = v.parseAspect()
@@ -465,7 +475,6 @@ func (v *parser_) parseAttributes() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	attributes = gcf.List[gcm.AttributeLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Attributes")
 	if !ok {
 		// This is not a sequence of attributes.
@@ -483,6 +492,7 @@ func (v *parser_) parseAttributes() (
 		)
 		panic(message)
 	}
+	attributes = gcf.List[gcm.AttributeLike]()
 	for ok {
 		attributes.AppendValue(attribute)
 		attribute, token, ok = v.parseAttribute()
@@ -567,7 +577,6 @@ func (v *parser_) parseClasses() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	classes = gcf.List[gcm.ClassLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Classes")
 	if !ok {
 		// This is not a sequence of classes.
@@ -585,6 +594,7 @@ func (v *parser_) parseClasses() (
 		)
 		panic(message)
 	}
+	classes = gcf.List[gcm.ClassLike]()
 	for ok {
 		classes.AppendValue(class)
 		class, token, ok = v.parseClass()
@@ -652,7 +662,6 @@ func (v *parser_) parseConstants() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	constants = gcf.List[gcm.ConstantLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Constants")
 	if !ok {
 		// This is not a sequence of constants.
@@ -670,6 +679,7 @@ func (v *parser_) parseConstants() (
 		)
 		panic(message)
 	}
+	constants = gcf.List[gcm.ConstantLike]()
 	for ok {
 		constants.AppendValue(constant)
 		constant, token, ok = v.parseConstant()
@@ -743,7 +753,6 @@ func (v *parser_) parseConstructors() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	constructors = gcf.List[gcm.ConstructorLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Constructors")
 	if !ok {
 		// This is not a sequence of constructors.
@@ -761,6 +770,7 @@ func (v *parser_) parseConstructors() (
 		)
 		panic(message)
 	}
+	constructors = gcf.List[gcm.ConstructorLike]()
 	for ok {
 		constructors.AppendValue(constructor)
 		constructor, token, ok = v.parseConstructor()
@@ -807,8 +817,8 @@ func (v *parser_) parseDeclaration() (
 	}
 
 	// Attempt to parse an optional sequence of parameters.
+	var parameters col.ListLike[gcm.ParameterLike]
 	_, token, ok = v.parseToken(DelimiterToken, "[")
-	var parameters = gcf.List[gcm.ParameterLike]()
 	if ok {
 		parameters, token, ok = v.parseParameters()
 		if !ok {
@@ -1055,7 +1065,6 @@ func (v *parser_) parseFunctionals() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	functionals = gcf.List[gcm.FunctionalLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Functionals")
 	if !ok {
 		// This is not a sequence of functionals.
@@ -1073,6 +1082,7 @@ func (v *parser_) parseFunctionals() (
 		)
 		panic(message)
 	}
+	functionals = gcf.List[gcm.FunctionalLike]()
 	for ok {
 		functionals.AppendValue(functional)
 		functional, token, ok = v.parseFunctional()
@@ -1088,7 +1098,6 @@ func (v *parser_) parseFunctions() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	functions = gcf.List[gcm.FunctionLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Functions")
 	if !ok {
 		// This is not a sequence of functions.
@@ -1106,6 +1115,7 @@ func (v *parser_) parseFunctions() (
 		)
 		panic(message)
 	}
+	functions = gcf.List[gcm.FunctionLike]()
 	for ok {
 		functions.AppendValue(function)
 		function, token, ok = v.parseFunction()
@@ -1229,7 +1239,6 @@ func (v *parser_) parseInstances() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	instances = gcf.List[gcm.InstanceLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Instances")
 	if !ok {
 		// This is not a sequence of instances.
@@ -1247,6 +1256,7 @@ func (v *parser_) parseInstances() (
 		)
 		panic(message)
 	}
+	instances = gcf.List[gcm.InstanceLike]()
 	for ok {
 		instances.AppendValue(instance)
 		instance, token, ok = v.parseInstance()
@@ -1310,7 +1320,6 @@ func (v *parser_) parseMethods() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	methods = gcf.List[gcm.MethodLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Methods")
 	if !ok {
 		// This is not a sequence of methods.
@@ -1328,6 +1337,7 @@ func (v *parser_) parseMethods() (
 		)
 		panic(message)
 	}
+	methods = gcf.List[gcm.MethodLike]()
 	for ok {
 		methods.AppendValue(method)
 		method, token, ok = v.parseMethod()
@@ -1436,7 +1446,6 @@ func (v *parser_) parseModules() (
 	ok bool,
 ) {
 	// Attempt to parse a literal.
-	modules = gcf.List[gcm.ModuleLike]()
 	_, token, ok = v.parseToken(IdentifierToken, "import")
 	if !ok {
 		// This is not a sequence of modules.
@@ -1465,6 +1474,7 @@ func (v *parser_) parseModules() (
 		)
 		panic(message)
 	}
+	modules = gcf.List[gcm.ModuleLike]()
 	for ok {
 		modules.AppendValue(module)
 		module, _, ok = v.parseModule()
@@ -1539,13 +1549,13 @@ func (v *parser_) parseParameters() (
 	ok bool,
 ) {
 	// Attempt to parse at least one parameter.
-	parameters = gcf.List[gcm.ParameterLike]()
 	var parameter gcm.ParameterLike
 	parameter, token, ok = v.parseParameter()
 	if !ok {
 		// This is not a sequence of parameters.
 		return parameters, token, false
 	}
+	parameters = gcf.List[gcm.ParameterLike]()
 	for ok {
 		parameters.AppendValue(parameter)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
@@ -1750,7 +1760,6 @@ func (v *parser_) parseTypes() (
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	types = gcf.List[gcm.TypeLike]()
 	_, token, ok = v.parseToken(NoteToken, "// Types")
 	if !ok {
 		// This is not a sequence of types.
@@ -1768,6 +1777,7 @@ func (v *parser_) parseTypes() (
 		)
 		panic(message)
 	}
+	types = gcf.List[gcm.TypeLike]()
 	for ok {
 		types.AppendValue(type_)
 		type_, token, ok = v.parseType()

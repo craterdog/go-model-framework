@@ -33,6 +33,7 @@ func Cardinality() CardinalityClassLike {
 // Target
 
 type cardinalityClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

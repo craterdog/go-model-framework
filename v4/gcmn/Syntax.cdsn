@@ -91,7 +91,7 @@ Result: Abstraction | "(" Parameters ")"
 
 Aspects: "// Aspects" Aspect+
 
-Aspect: Declaration "interface" "{" Methods? "}"
+Aspect: Declaration "interface" "{" Methods "}"
 
 Classes: "// Classes" Class+
 

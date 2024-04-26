@@ -33,6 +33,7 @@ func Precedence() PrecedenceClassLike {
 // Target
 
 type precedenceClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

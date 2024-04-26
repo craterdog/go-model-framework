@@ -33,6 +33,7 @@ func Definition() DefinitionClassLike {
 // Target
 
 type definitionClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

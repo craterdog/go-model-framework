@@ -33,6 +33,7 @@ func Predicate() PredicateClassLike {
 // Target
 
 type predicateClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

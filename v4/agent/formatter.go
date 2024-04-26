@@ -139,7 +139,7 @@ func (v *formatter_) formatAbstraction(abstraction gcm.AbstractionLike) {
 	var identifier = abstraction.GetIdentifier()
 	v.appendString(identifier)
 	var arguments = abstraction.GetArguments()
-	if arguments.GetSize() > 0 {
+	if arguments != nil {
 		v.appendString("[")
 		v.formatArguments(arguments)
 		v.appendString("]")
@@ -189,9 +189,7 @@ func (v *formatter_) formatAspect(aspect gcm.AspectLike) {
 	v.appendString(" interface {")
 	v.depth_++
 	var methods = aspect.GetMethods()
-	if methods.GetSize() > 0 {
-		v.formatMethods(methods)
-	}
+	v.formatMethods(methods)
 	v.depth_--
 	v.appendNewline()
 	v.appendString("}")
@@ -243,12 +241,12 @@ func (v *formatter_) formatClass(class gcm.ClassLike) {
 	v.depth_++
 	var hasContent bool
 	var constants = class.GetConstants()
-	if constants.GetSize() > 0 {
+	if constants != nil {
 		v.formatConstants(constants)
 		hasContent = true
 	}
 	var constructors = class.GetConstructors()
-	if constructors.GetSize() > 0 {
+	if constructors != nil {
 		if hasContent {
 			v.appendString("\n")
 		}
@@ -256,7 +254,7 @@ func (v *formatter_) formatClass(class gcm.ClassLike) {
 		hasContent = true
 	}
 	var functions = class.GetFunctions()
-	if functions.GetSize() > 0 {
+	if functions != nil {
 		if hasContent {
 			v.appendString("\n")
 		}
@@ -303,7 +301,7 @@ func (v *formatter_) formatConstructor(constructor gcm.ConstructorLike) {
 	v.appendString(identifier)
 	v.appendString("(")
 	var parameters = constructor.GetParameters()
-	if parameters.GetSize() > 0 {
+	if parameters != nil {
 		v.formatParameters(parameters)
 	}
 	v.appendString(") ")
@@ -331,7 +329,7 @@ func (v *formatter_) formatDeclaration(declaration gcm.DeclarationLike) {
 	var identifier = declaration.GetIdentifier()
 	v.appendString(identifier)
 	var parameters = declaration.GetParameters()
-	if parameters.GetSize() > 0 {
+	if parameters != nil {
 		v.appendString("[")
 		v.formatGenerics(parameters)
 		v.appendString("]")
@@ -362,7 +360,7 @@ func (v *formatter_) formatFunction(function gcm.FunctionLike) {
 	v.appendString(identifier)
 	v.appendString("(")
 	var parameters = function.GetParameters()
-	if parameters.GetSize() > 0 {
+	if parameters != nil {
 		v.formatParameters(parameters)
 	}
 	v.appendString(") ")
@@ -375,7 +373,7 @@ func (v *formatter_) formatFunctional(functional gcm.FunctionalLike) {
 	v.formatDeclaration(declaration)
 	v.appendString(" func(")
 	var parameters = functional.GetParameters()
-	if parameters.GetSize() > 0 {
+	if parameters != nil {
 		v.formatParameters(parameters)
 	}
 	v.appendString(") ")
@@ -433,12 +431,12 @@ func (v *formatter_) formatInstance(instance gcm.InstanceLike) {
 	v.depth_++
 	var hasContent bool
 	var attributes = instance.GetAttributes()
-	if attributes.GetSize() > 0 {
+	if attributes != nil {
 		v.formatAttributes(attributes)
 		hasContent = true
 	}
 	var abstractions = instance.GetAbstractions()
-	if abstractions.GetSize() > 0 {
+	if abstractions != nil {
 		if hasContent {
 			v.appendString("\n")
 		}
@@ -446,7 +444,7 @@ func (v *formatter_) formatInstance(instance gcm.InstanceLike) {
 		hasContent = true
 	}
 	var methods = instance.GetMethods()
-	if methods.GetSize() > 0 {
+	if methods != nil {
 		if hasContent {
 			v.appendString("\n")
 		}
@@ -474,7 +472,7 @@ func (v *formatter_) formatMethod(method gcm.MethodLike) {
 	v.appendString(identifier)
 	v.appendString("(")
 	var parameters = method.GetParameters()
-	if parameters.GetSize() > 0 {
+	if parameters != nil {
 		v.formatParameters(parameters)
 	}
 	v.appendString(")")
@@ -533,27 +531,27 @@ func (v *formatter_) formatModel(model gcm.ModelLike) {
 	v.formatHeader(header)
 	v.appendNewline()
 	var modules = model.GetModules()
-	if modules.GetSize() > 0 {
+	if modules != nil {
 		v.formatModules(modules)
 	}
 	var types = model.GetTypes()
-	if types.GetSize() > 0 {
+	if types != nil {
 		v.formatTypes(types)
 	}
 	var functionals = model.GetFunctionals()
-	if functionals.GetSize() > 0 {
+	if functionals != nil {
 		v.formatFunctionals(functionals)
 	}
 	var aspects = model.GetAspects()
-	if aspects.GetSize() > 0 {
+	if aspects != nil {
 		v.formatAspects(aspects)
 	}
 	var classes = model.GetClasses()
-	if classes.GetSize() > 0 {
+	if classes != nil {
 		v.formatClasses(classes)
 	}
 	var instances = model.GetInstances()
-	if instances.GetSize() > 0 {
+	if instances != nil {
 		v.formatInstances(instances)
 	}
 }
@@ -647,9 +645,7 @@ func (v *formatter_) formatResult(result gcm.ResultLike) {
 	} else {
 		v.appendString("(")
 		var parameters = result.GetParameters()
-		if parameters.GetSize() > 0 {
-			v.formatParameters(parameters)
-		}
+		v.formatParameters(parameters)
 		v.appendString(")")
 	}
 }

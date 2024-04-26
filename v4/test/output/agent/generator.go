@@ -33,6 +33,7 @@ func Generator() GeneratorClassLike {
 // Target
 
 type generatorClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

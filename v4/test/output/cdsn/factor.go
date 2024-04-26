@@ -33,6 +33,7 @@ func Factor() FactorClassLike {
 // Target
 
 type factorClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

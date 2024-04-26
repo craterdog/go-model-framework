@@ -35,6 +35,7 @@ func Function() FunctionClassLike {
 // Target
 
 type functionClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -35,6 +35,7 @@ func Instance() InstanceClassLike {
 // Target
 
 type instanceClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

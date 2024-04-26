@@ -35,6 +35,7 @@ func Model() ModelClassLike {
 // Target
 
 type modelClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

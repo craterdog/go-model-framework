@@ -33,6 +33,7 @@ func Parameter() ParameterClassLike {
 // Target
 
 type parameterClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -36,6 +36,7 @@ func Formatter() FormatterClassLike {
 // Target
 
 type formatterClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

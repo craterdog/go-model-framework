@@ -35,6 +35,7 @@ func Scanner() ScannerClassLike {
 // Target
 
 type scannerClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

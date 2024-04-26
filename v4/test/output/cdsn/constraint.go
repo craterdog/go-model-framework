@@ -33,6 +33,7 @@ func Constraint() ConstraintClassLike {
 // Target
 
 type constraintClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

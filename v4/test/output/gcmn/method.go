@@ -35,6 +35,7 @@ func Method() MethodClassLike {
 // Target
 
 type methodClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

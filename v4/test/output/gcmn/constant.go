@@ -33,6 +33,7 @@ func Constant() ConstantClassLike {
 // Target
 
 type constantClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -35,6 +35,7 @@ func Declaration() DeclarationClassLike {
 // Target
 
 type declarationClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

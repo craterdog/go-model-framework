@@ -35,6 +35,7 @@ func Parser() ParserClassLike {
 // Target
 
 type parserClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

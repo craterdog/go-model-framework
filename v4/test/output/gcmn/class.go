@@ -35,6 +35,7 @@ func Class() ClassClassLike {
 // Target
 
 type classClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

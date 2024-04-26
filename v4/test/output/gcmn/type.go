@@ -33,6 +33,7 @@ func Type() TypeClassLike {
 // Target
 
 type typeClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -35,6 +35,7 @@ func Abstraction() AbstractionClassLike {
 // Target
 
 type abstractionClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

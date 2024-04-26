@@ -58,7 +58,7 @@ func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
 	default:
 		// Add a new bound class type.
 		result_ = &<TargetName>Class_[<Arguments>]{
-			// This class has no private constants to initialize.
+			// Any private class constants should be initialized here.
 		}
 		<TargetName>Class[name] = result_
 	}

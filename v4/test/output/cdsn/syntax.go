@@ -35,6 +35,7 @@ func Syntax() SyntaxClassLike {
 // Target
 
 type syntaxClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

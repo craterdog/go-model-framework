@@ -10,7 +10,7 @@
 ................................................................................
 */
 
-package cdsn
+package collection
 
 import ()
 
@@ -18,21 +18,21 @@ import ()
 
 // Reference
 
-var atomClass = &atomClass_{
+var notationClass = &notationClass_{
 	// Any private class constants should be initialized here.
 }
 
 // Function
 
-func Atom() AtomClassLike {
-	return atomClass
+func Notation() NotationClassLike {
+	return notationClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type atomClass_ struct {
+type notationClass_ struct {
 	// This class has no private constants.
 }
 
@@ -40,16 +40,8 @@ type atomClass_ struct {
 
 // Constructors
 
-func (c *atomClass_) MakeWithGlyph(glyph GlyphLike) AtomLike {
-	return &atom_{
-		glyph_: glyph,
-	}
-}
-
-func (c *atomClass_) MakeWithIntrinsic(intrinsic string) AtomLike {
-	return &atom_{
-		intrinsic_: intrinsic,
-	}
+func (c *notationClass_) Make() NotationLike {
+	return &notation_{}
 }
 
 // Functions
@@ -58,24 +50,28 @@ func (c *atomClass_) MakeWithIntrinsic(intrinsic string) AtomLike {
 
 // Target
 
-type atom_ struct {
-	class_ AtomClassLike
-	glyph_ GlyphLike
-	intrinsic_ string
+type notation_ struct {
+	class_ NotationClassLike
 }
 
 // Attributes
 
-func (v *atom_) GetClass() AtomClassLike {
+func (v *notation_) GetClass() NotationClassLike {
 	return v.class_
 }
 
-func (v *atom_) GetGlyph() GlyphLike {
-	return v.glyph_
+// Canonical
+
+func (v *notation_) FormatCollection(collection Collection) string {
+	var result_ string
+	// TBA - Implement the method.
+	return result_
 }
 
-func (v *atom_) GetIntrinsic() string {
-	return v.intrinsic_
+func (v *notation_) ParseSource(source string) Collection {
+	var result_ Collection
+	// TBA - Implement the method.
+	return result_
 }
 
 // Public

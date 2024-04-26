@@ -35,6 +35,7 @@ func Result() ResultClassLike {
 // Target
 
 type resultClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

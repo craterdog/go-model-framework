@@ -35,6 +35,7 @@ func Inline() InlineClassLike {
 // Target
 
 type inlineClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -33,6 +33,7 @@ func Glyph() GlyphClassLike {
 // Target
 
 type glyphClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -150,15 +150,16 @@ func (v *generator_) extractConstructorAttributes(
 	catalog col.CatalogLike[string, string],
 ) {
 	var constructors = class.GetConstructors()
-	if constructors.GetSize() > 0 {
-		var iterator = constructors.GetIterator()
-		for iterator.HasNext() {
-			var constructor = iterator.GetNext()
-			var methodName = constructor.GetIdentifier()
-			if sts.HasPrefix(methodName, "MakeWith") {
-				var parameters = constructor.GetParameters()
-				v.extractParameterAttributes(parameters, catalog)
-			}
+	if constructors == nil {
+		return
+	}
+	var iterator = constructors.GetIterator()
+	for iterator.HasNext() {
+		var constructor = iterator.GetNext()
+		var methodName = constructor.GetIdentifier()
+		if sts.HasPrefix(methodName, "MakeWith") {
+			var parameters = constructor.GetParameters()
+			v.extractParameterAttributes(parameters, catalog)
 		}
 	}
 }
@@ -171,38 +172,39 @@ func (v *generator_) extractInstanceAttributes(
 	var attributeType string
 	var formatter = Formatter().Make()
 	var attributes = instance.GetAttributes()
-	if attributes.GetSize() > 0 {
-		var iterator = attributes.GetIterator()
-		for iterator.HasNext() {
-			var attribute = iterator.GetNext()
-			var identifier = attribute.GetIdentifier()
-			var abstraction gcm.AbstractionLike
-			switch {
-			case sts.HasPrefix(identifier, "Get"):
-				attributeName = sts.TrimPrefix(identifier, "Get")
-				abstraction = attribute.GetAbstraction()
-			case sts.HasPrefix(identifier, "Is"):
-				attributeName = sts.TrimPrefix(identifier, "Is")
-				abstraction = attribute.GetAbstraction()
-			case sts.HasPrefix(identifier, "Was"):
-				attributeName = sts.TrimPrefix(identifier, "Was")
-				abstraction = attribute.GetAbstraction()
-			case sts.HasPrefix(identifier, "Has"):
-				attributeName = sts.TrimPrefix(identifier, "Has")
-				abstraction = attribute.GetAbstraction()
-			default:
-				if attributeName == v.makePrivate(sts.TrimPrefix(identifier, "Set")) {
-					// This attribute was already added.
-					continue
-				}
-				attributeName = sts.TrimPrefix(identifier, "Set")
-				var parameter = attribute.GetParameter()
-				abstraction = parameter.GetAbstraction()
+	if attributes == nil {
+		return
+	}
+	var iterator = attributes.GetIterator()
+	for iterator.HasNext() {
+		var attribute = iterator.GetNext()
+		var identifier = attribute.GetIdentifier()
+		var abstraction gcm.AbstractionLike
+		switch {
+		case sts.HasPrefix(identifier, "Get"):
+			attributeName = sts.TrimPrefix(identifier, "Get")
+			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(identifier, "Is"):
+			attributeName = sts.TrimPrefix(identifier, "Is")
+			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(identifier, "Was"):
+			attributeName = sts.TrimPrefix(identifier, "Was")
+			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(identifier, "Has"):
+			attributeName = sts.TrimPrefix(identifier, "Has")
+			abstraction = attribute.GetAbstraction()
+		default:
+			if attributeName == v.makePrivate(sts.TrimPrefix(identifier, "Set")) {
+				// This attribute was already added.
+				continue
 			}
-			attributeName = v.makePrivate(attributeName)
-			attributeType = formatter.FormatAbstraction(abstraction)
-			catalog.SetValue(attributeName, attributeType)
+			attributeName = sts.TrimPrefix(identifier, "Set")
+			var parameter = attribute.GetParameter()
+			abstraction = parameter.GetAbstraction()
 		}
+		attributeName = v.makePrivate(attributeName)
+		attributeType = formatter.FormatAbstraction(abstraction)
+		catalog.SetValue(attributeName, attributeType)
 	}
 }
 
@@ -241,8 +243,8 @@ func (v *generator_) generateAbstractionMethods(
 		var methodName = aspectMethod.GetIdentifier()
 		var methodParameters = aspectMethod.GetParameters()
 		var parameters string
-		if methodParameters.GetSize() > 0 {
-			if genericTypes.GetSize() > 0 {
+		if methodParameters != nil {
+			if genericTypes != nil {
 				// Replace the generic type names from the aspect definition
 				// with the actual types defined in the instance interface.
 				methodParameters = v.replaceParameterTypes(
@@ -257,7 +259,7 @@ func (v *generator_) generateAbstractionMethods(
 		var body = methodBodyTemplate_
 		var methodResult = aspectMethod.GetResult()
 		if methodResult != nil {
-			if genericTypes.GetSize() > 0 {
+			if genericTypes != nil {
 				// Replace the generic type names from the aspect definition
 				// with the actual types defined in the instance interface.
 				methodResult = v.replaceResultTypes(
@@ -427,7 +429,7 @@ func (v *generator_) generateClass(
 	var parameters string
 	var arguments string
 	var classParameters = classDeclaration.GetParameters()
-	if classParameters.GetSize() > 0 {
+	if classParameters != nil {
 		var formatter = Formatter().Make()
 		parameters = "[" + formatter.FormatGenerics(classParameters) + "]"
 		arguments = "[" + formatter.FormatParameterNames(classParameters) + "]"
@@ -448,7 +450,7 @@ func (v *generator_) generateClassAccess(class gcm.ClassLike) string {
 	var parameters = declaration.GetParameters()
 	var reference = classReferenceTemplate_
 	var function = classFunctionTemplate_
-	if parameters.GetSize() > 0 {
+	if parameters != nil {
 		reference = genericReferenceTemplate_
 		function = genericFunctionTemplate_
 	}
@@ -556,7 +558,7 @@ func (v *generator_) generateConstructorMethods(class gcm.ClassLike) string {
 		var methodName = constructor.GetIdentifier()
 		var ConstructorParameters = constructor.GetParameters()
 		var parameters string
-		if ConstructorParameters.GetSize() > 0 {
+		if ConstructorParameters != nil {
 			parameters = formatter.FormatParameters(ConstructorParameters)
 		}
 		var abstraction = constructor.GetAbstraction()
@@ -587,7 +589,7 @@ func (v *generator_) generateFunctionMethods(class gcm.ClassLike) string {
 		var identifier = function.GetIdentifier()
 		var functionParameters = function.GetParameters()
 		var parameters string
-		if functionParameters.GetSize() > 0 {
+		if functionParameters != nil {
 			parameters = formatter.FormatParameters(functionParameters)
 		}
 		var result = function.GetResult()
@@ -613,7 +615,7 @@ func (v *generator_) generateHeader(model gcm.ModelLike) string {
 func (v *generator_) generateImports(model gcm.ModelLike, class string) string {
 	var modules string
 	var packageModules = model.GetModules()
-	if packageModules.GetSize() > 0 {
+	if packageModules != nil {
 		var iterator = packageModules.GetIterator()
 		for iterator.HasNext() {
 			var packageModule = iterator.GetNext()
@@ -713,7 +715,7 @@ func (v *generator_) generatePublicMethods(instance gcm.InstanceLike) string {
 		var methodName = publicMethod.GetIdentifier()
 		var methodParameters = publicMethod.GetParameters()
 		var parameters string
-		if methodParameters.GetSize() > 0 {
+		if methodParameters != nil {
 			parameters = formatter.FormatParameters(methodParameters)
 		}
 		var body = methodBodyTemplate_
@@ -797,7 +799,7 @@ func (v *generator_) replaceGenericType(
 			break
 		}
 	}
-	if arguments.GetSize() > 0 {
+	if arguments != nil {
 		var argumentIterator = arguments.GetIterator()
 		arguments = gcf.List[gcm.AbstractionLike]()
 		for argumentIterator.HasNext() {
@@ -866,7 +868,7 @@ func (v *generator_) retrieveAspect(
 	identifier string,
 ) gcm.AspectLike {
 	var aspects = model.GetAspects()
-	if aspects.GetSize() > 0 {
+	if aspects != nil {
 		var iterator = aspects.GetIterator()
 		for iterator.HasNext() {
 			var aspect = iterator.GetNext()

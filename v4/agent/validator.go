@@ -103,6 +103,9 @@ func (v *validator_) ValidateModel(model gcm.ModelLike) {
 
 func (v *validator_) extractAspects(model gcm.ModelLike) {
 	var aspects = model.GetAspects()
+	if aspects == nil {
+		return
+	}
 	var iterator = aspects.GetIterator()
 	for iterator.HasNext() {
 		var aspect = iterator.GetNext()
@@ -113,6 +116,9 @@ func (v *validator_) extractAspects(model gcm.ModelLike) {
 
 func (v *validator_) extractClasses(model gcm.ModelLike) {
 	var classes = model.GetClasses()
+	if classes == nil {
+		return
+	}
 	var iterator = classes.GetIterator()
 	for iterator.HasNext() {
 		var class = iterator.GetNext()
@@ -125,6 +131,9 @@ func (v *validator_) extractClasses(model gcm.ModelLike) {
 
 func (v *validator_) extractFunctionals(model gcm.ModelLike) {
 	var functionals = model.GetFunctionals()
+	if functionals == nil {
+		return
+	}
 	var iterator = functionals.GetIterator()
 	for iterator.HasNext() {
 		var functional = iterator.GetNext()
@@ -135,6 +144,9 @@ func (v *validator_) extractFunctionals(model gcm.ModelLike) {
 
 func (v *validator_) extractInstances(model gcm.ModelLike) {
 	var instances = model.GetInstances()
+	if instances == nil {
+		return
+	}
 	var iterator = instances.GetIterator()
 	for iterator.HasNext() {
 		var instance = iterator.GetNext()
@@ -147,6 +159,9 @@ func (v *validator_) extractInstances(model gcm.ModelLike) {
 
 func (v *validator_) extractModules(model gcm.ModelLike) {
 	var modules = model.GetModules()
+	if modules == nil {
+		return
+	}
 	var iterator = modules.GetIterator()
 	for iterator.HasNext() {
 		var module = iterator.GetNext()
@@ -157,6 +172,9 @@ func (v *validator_) extractModules(model gcm.ModelLike) {
 
 func (v *validator_) extractTypes(model gcm.ModelLike) {
 	var types = model.GetTypes()
+	if types == nil {
+		return
+	}
 	var iterator = types.GetIterator()
 	for iterator.HasNext() {
 		var type_ = iterator.GetNext()
@@ -167,11 +185,15 @@ func (v *validator_) extractTypes(model gcm.ModelLike) {
 
 func (v *validator_) validateAbstraction(abstraction gcm.AbstractionLike) {
 	var prefix = abstraction.GetPrefix()
-	v.validatePrefix(prefix)
+	if prefix != nil {
+		v.validatePrefix(prefix)
+	}
 	var identifier = abstraction.GetIdentifier()
 	v.abstractions_.SetValue(identifier, abstraction)
 	var arguments = abstraction.GetArguments()
-	v.validateArguments(arguments)
+	if arguments != nil {
+		v.validateArguments(arguments)
+	}
 }
 
 func (v *validator_) validateAbstractions(abstractions col.ListLike[gcm.AbstractionLike]) {
@@ -215,8 +237,10 @@ func (v *validator_) validateAspects(model gcm.ModelLike) {
 		v.validateAspect(aspect)
 	}
 	var aspects = model.GetAspects()
-	aspects.RemoveAll()
-	aspects.AppendValues(v.aspects_.GetValues(v.aspects_.GetKeys()))
+	if aspects != nil {
+		aspects.RemoveAll()
+		aspects.AppendValues(v.aspects_.GetValues(v.aspects_.GetKeys()))
+	}
 }
 
 func (v *validator_) validateAttribute(attribute gcm.AttributeLike) {
@@ -267,7 +291,7 @@ func (v *validator_) validateBoolean(abstraction gcm.AbstractionLike) {
 		panic("A question attribute must have a boolean type.")
 	}
 	var arguments = abstraction.GetArguments()
-	if !arguments.IsEmpty() {
+	if arguments != nil {
 		panic("A boolean type cannot be a generic type.")
 	}
 }
@@ -276,11 +300,17 @@ func (v *validator_) validateClass(class gcm.ClassLike) {
 	var declaration = class.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var constants = class.GetConstants()
-	v.validateConstants(constants)
+	if constants != nil {
+		v.validateConstants(constants)
+	}
 	var constructors = class.GetConstructors()
-	v.validateConstructors(constructors)
+	if constructors != nil {
+		v.validateConstructors(constructors)
+	}
 	var functions = class.GetFunctions()
-	v.validateFunctions(functions)
+	if functions != nil {
+		v.validateFunctions(functions)
+	}
 }
 
 func (v *validator_) validateClasses(model gcm.ModelLike) {
@@ -292,8 +322,10 @@ func (v *validator_) validateClasses(model gcm.ModelLike) {
 		v.validateClass(class)
 	}
 	var classes = model.GetClasses()
-	classes.RemoveAll()
-	classes.AppendValues(v.classes_.GetValues(v.classes_.GetKeys()))
+	if classes != nil {
+		classes.RemoveAll()
+		classes.AppendValues(v.classes_.GetValues(v.classes_.GetKeys()))
+	}
 }
 
 func (v *validator_) validateConstant(constant gcm.ConstantLike) {
@@ -311,7 +343,9 @@ func (v *validator_) validateConstants(constants col.ListLike[gcm.ConstantLike])
 
 func (v *validator_) validateConstructor(constructor gcm.ConstructorLike) {
 	var parameters = constructor.GetParameters()
-	v.validateParameters(parameters)
+	if parameters != nil {
+		v.validateParameters(parameters)
+	}
 	var abstraction = constructor.GetAbstraction()
 	v.validateAbstraction(abstraction)
 }
@@ -326,7 +360,9 @@ func (v *validator_) validateConstructors(constructors col.ListLike[gcm.Construc
 
 func (v *validator_) validateDeclaration(declaration gcm.DeclarationLike) {
 	var parameters = declaration.GetParameters()
-	v.validateParameters(parameters)
+	if parameters != nil {
+		v.validateParameters(parameters)
+	}
 }
 
 func (v *validator_) validateEnumeration(enumeration gcm.EnumerationLike) {
@@ -336,7 +372,9 @@ func (v *validator_) validateEnumeration(enumeration gcm.EnumerationLike) {
 
 func (v *validator_) validateFunction(function gcm.FunctionLike) {
 	var parameters = function.GetParameters()
-	v.validateParameters(parameters)
+	if parameters != nil {
+		v.validateParameters(parameters)
+	}
 	var result = function.GetResult()
 	v.validateResult(result)
 }
@@ -345,7 +383,9 @@ func (v *validator_) validateFunctional(functional gcm.FunctionalLike) {
 	var declaration = functional.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var parameters = functional.GetParameters()
-	v.validateParameters(parameters)
+	if parameters != nil {
+		v.validateParameters(parameters)
+	}
 	var result = functional.GetResult()
 	v.validateResult(result)
 	var identifier = declaration.GetIdentifier()
@@ -368,8 +408,10 @@ func (v *validator_) validateFunctionals(model gcm.ModelLike) {
 		v.validateFunctional(functional)
 	}
 	var functionals = model.GetFunctionals()
-	functionals.RemoveAll()
-	functionals.AppendValues(v.functionals_.GetValues(v.functionals_.GetKeys()))
+	if functionals != nil {
+		functionals.RemoveAll()
+		functionals.AppendValues(v.functionals_.GetValues(v.functionals_.GetKeys()))
+	}
 }
 
 func (v *validator_) validateFunctions(functions col.ListLike[gcm.FunctionLike]) {
@@ -383,20 +425,22 @@ func (v *validator_) validateFunctions(functions col.ListLike[gcm.FunctionLike])
 func (v *validator_) validateGetClassMethod(class string) {
 	var instance = v.instances_.GetValue(class)
 	var attributes = instance.GetAttributes()
-	var iterator = attributes.GetIterator()
-	for iterator.HasNext() {
-		var attribute = iterator.GetNext()
-		var identifier = attribute.GetIdentifier()
-		if identifier == "GetClass" {
-			var abstraction = attribute.GetAbstraction()
-			if class+"classlike" == sts.ToLower(abstraction.GetIdentifier()) {
-				return
+	if attributes != nil {
+		var iterator = attributes.GetIterator()
+		for iterator.HasNext() {
+			var attribute = iterator.GetNext()
+			var identifier = attribute.GetIdentifier()
+			if identifier == "GetClass" {
+				var abstraction = attribute.GetAbstraction()
+				if class+"classlike" == sts.ToLower(abstraction.GetIdentifier()) {
+					return
+				}
 			}
 		}
 	}
 	fmt.Printf(
 		"The following class is missing a GetClass() instance method: %v\n",
-		class,
+		sts.TrimSuffix(instance.GetDeclaration().GetIdentifier(), "Like"),
 	)
 }
 
@@ -404,11 +448,17 @@ func (v *validator_) validateInstance(instance gcm.InstanceLike) {
 	var declaration = instance.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var attributes = instance.GetAttributes()
-	v.validateAttributes(attributes)
+	if attributes != nil {
+		v.validateAttributes(attributes)
+	}
 	var abstractions = instance.GetAbstractions()
-	v.validateAbstractions(abstractions)
+	if abstractions != nil {
+		v.validateAbstractions(abstractions)
+	}
 	var methods = instance.GetMethods()
-	v.validateMethods(methods)
+	if methods != nil {
+		v.validateMethods(methods)
+	}
 }
 
 func (v *validator_) validateInstances(model gcm.ModelLike) {
@@ -420,15 +470,21 @@ func (v *validator_) validateInstances(model gcm.ModelLike) {
 		v.validateInstance(instance)
 	}
 	var instances = model.GetInstances()
-	instances.RemoveAll()
-	instances.AppendValues(v.instances_.GetValues(v.instances_.GetKeys()))
+	if instances != nil {
+		instances.RemoveAll()
+		instances.AppendValues(v.instances_.GetValues(v.instances_.GetKeys()))
+	}
 }
 
 func (v *validator_) validateMethod(method gcm.MethodLike) {
 	var parameters = method.GetParameters()
-	v.validateParameters(parameters)
+	if parameters != nil {
+		v.validateParameters(parameters)
+	}
 	var result = method.GetResult()
-	v.validateResult(result)
+	if result != nil {
+		v.validateResult(result)
+	}
 }
 
 func (v *validator_) validateMethods(methods col.ListLike[gcm.MethodLike]) {
@@ -459,8 +515,10 @@ func (v *validator_) validateModules(model gcm.ModelLike) {
 		v.validateModule(module)
 	}
 	var modules = model.GetModules()
-	modules.RemoveAll()
-	modules.AppendValues(v.modules_.GetValues(v.modules_.GetKeys()))
+	if modules != nil {
+		modules.RemoveAll()
+		modules.AppendValues(v.modules_.GetValues(v.modules_.GetKeys()))
+	}
 }
 
 func (v *validator_) validatePairings(model gcm.ModelLike) {
@@ -506,7 +564,7 @@ func (v *validator_) validateParameters(parameters col.ListLike[gcm.ParameterLik
 }
 
 func (v *validator_) validatePrefix(prefix gcm.PrefixLike) {
-	if prefix != nil && prefix.GetType() == gcm.AliasPrefix {
+	if prefix.GetType() == gcm.AliasPrefix {
 		var identifier = prefix.GetIdentifier()
 		if v.modules_.GetValue(identifier) == nil {
 			var message = fmt.Sprintf(
@@ -523,9 +581,8 @@ func (v *validator_) validateResult(result gcm.ResultLike) {
 		var abstraction = result.GetAbstraction()
 		if abstraction != nil {
 			v.validateAbstraction(abstraction)
-		}
-		var parameters = result.GetParameters()
-		if parameters != nil {
+		} else {
+			var parameters = result.GetParameters()
 			v.validateParameters(parameters)
 		}
 	}
@@ -537,7 +594,9 @@ func (v *validator_) validateType(type_ gcm.TypeLike) {
 	var abstraction = type_.GetAbstraction()
 	v.validateAbstraction(abstraction)
 	var enumeration = type_.GetEnumeration()
-	v.validateEnumeration(enumeration)
+	if enumeration != nil {
+		v.validateEnumeration(enumeration)
+	}
 	var identifier = declaration.GetIdentifier()
 	abstraction = v.abstractions_.GetValue(identifier)
 	if abstraction == nil {
@@ -558,6 +617,8 @@ func (v *validator_) validateTypes(model gcm.ModelLike) {
 		v.validateType(type_)
 	}
 	var types = model.GetTypes()
-	types.RemoveAll()
-	types.AppendValues(v.types_.GetValues(v.types_.GetKeys()))
+	if types != nil {
+		types.RemoveAll()
+		types.AppendValues(v.types_.GetValues(v.types_.GetKeys()))
+	}
 }

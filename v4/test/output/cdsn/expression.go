@@ -33,6 +33,7 @@ func Expression() ExpressionClassLike {
 // Target
 
 type expressionClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

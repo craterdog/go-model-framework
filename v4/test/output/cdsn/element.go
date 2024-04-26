@@ -33,6 +33,7 @@ func Element() ElementClassLike {
 // Target
 
 type elementClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

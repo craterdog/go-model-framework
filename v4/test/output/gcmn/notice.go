@@ -33,6 +33,7 @@ func Notice() NoticeClassLike {
 // Target
 
 type noticeClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

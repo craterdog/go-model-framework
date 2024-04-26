@@ -35,6 +35,7 @@ func Filter() FilterClassLike {
 // Target
 
 type filterClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

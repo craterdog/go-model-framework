@@ -35,6 +35,7 @@ func Enumeration() EnumerationClassLike {
 // Target
 
 type enumerationClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

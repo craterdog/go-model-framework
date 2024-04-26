@@ -35,6 +35,7 @@ func Alternative() AlternativeClassLike {
 // Target
 
 type alternativeClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants

@@ -35,6 +35,7 @@ func Multiline() MultilineClassLike {
 // Target
 
 type multilineClass_ struct {
+	// This class has no private constants.
 }
 
 // Constants
