@@ -21,7 +21,7 @@ import (
 // Reference
 
 var aspectClass = &aspectClass_{
-	// This class has no private constants to initialize.
+	// Any private class constants should be initialized here.
 }
 
 // Function
@@ -35,7 +35,6 @@ func Aspect() AspectClassLike {
 // Target
 
 type aspectClass_ struct {
-	// This class has no private constants.
 }
 
 // Constants

@@ -19,7 +19,7 @@ import ()
 // Reference
 
 var parameterClass = &parameterClass_{
-	// This class has no private constants to initialize.
+	// Any private class constants should be initialized here.
 }
 
 // Function
@@ -33,7 +33,6 @@ func Parameter() ParameterClassLike {
 // Target
 
 type parameterClass_ struct {
-	// This class has no private constants.
 }
 
 // Constants

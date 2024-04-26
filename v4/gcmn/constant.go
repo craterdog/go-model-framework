@@ -19,7 +19,7 @@ import ()
 // Reference
 
 var constantClass = &constantClass_{
-	// This class has no private constants to initialize.
+	// Any private class constants should be initialized here.
 }
 
 // Function
@@ -33,7 +33,6 @@ func Constant() ConstantClassLike {
 // Target
 
 type constantClass_ struct {
-	// This class has no private constants.
 }
 
 // Constants
