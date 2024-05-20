@@ -13,7 +13,7 @@
 package agent
 
 import (
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 )
 
 // CLASS ACCESS
@@ -64,7 +64,7 @@ func (v *validator_) GetClass() ValidatorClassLike {
 
 // Public
 
-func (v *validator_) ValidateModel(model gcm.ModelLike) {
+func (v *validator_) ValidateModel(model ast.ModelLike) {
 	// TBA - Implement the method.
 }
 

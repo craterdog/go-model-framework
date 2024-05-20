@@ -14,7 +14,7 @@ package agent
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 )
 
 // CLASS ACCESS
@@ -65,55 +65,55 @@ func (v *formatter_) GetClass() FormatterClassLike {
 
 // Public
 
-func (v *formatter_) FormatAbstraction(abstraction gcm.AbstractionLike) string {
+func (v *formatter_) FormatAbstraction(abstraction ast.AbstractionLike) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatArguments(arguments col.ListLike[gcm.AbstractionLike]) string {
+func (v *formatter_) FormatArguments(arguments col.ListLike[ast.AbstractionLike]) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatGenerics(parameters col.ListLike[gcm.ParameterLike]) string {
+func (v *formatter_) FormatGenerics(parameters col.ListLike[ast.ParameterLike]) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatMethod(method gcm.MethodLike) string {
+func (v *formatter_) FormatMethod(method ast.MethodLike) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatModel(model gcm.ModelLike) string {
+func (v *formatter_) FormatModel(model ast.ModelLike) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatParameter(parameter gcm.ParameterLike) string {
+func (v *formatter_) FormatParameter(parameter ast.ParameterLike) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatParameterNames(parameters col.ListLike[gcm.ParameterLike]) string {
+func (v *formatter_) FormatParameterNames(parameters col.ListLike[ast.ParameterLike]) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatParameters(parameters col.ListLike[gcm.ParameterLike]) string {
+func (v *formatter_) FormatParameters(parameters col.ListLike[ast.ParameterLike]) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *formatter_) FormatResult(result gcm.ResultLike) string {
+func (v *formatter_) FormatResult(result ast.ResultLike) string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_

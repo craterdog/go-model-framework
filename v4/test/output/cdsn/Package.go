@@ -11,11 +11,13 @@
 */
 
 /*
-Package "cdsn" provides the language syntax definition for the Crater Dog Syntax
-Notation™ (CDSN) using CDSN itself.
+Package "ast" provides a parser and formatter for language syntaxes defined
+using Crater Dog Syntax Notation™ (CDSN).  The parser performs validation on the
+resulting parse tree.  The formatter takes a validated parse tree and generates
+the corresponding CDSN source using the canonical format.
 
 For detailed documentation on this package refer to the wiki:
-  - https://github.com/craterdog/go-syntax-framework/wiki
+  - https://github.com/craterdog/go-grammar-framework/wiki
 
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:
@@ -26,7 +28,7 @@ be developed and used seamlessly since the interface definitions only depend on
 other interfaces and primitive types—and the class implementations only depend
 on interfaces, not on each other.
 */
-package cdsn
+package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4/collection"

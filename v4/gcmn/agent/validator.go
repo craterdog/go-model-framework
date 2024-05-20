@@ -165,8 +165,8 @@ func (v *validator_) extractModules(model ast.ModelLike) {
 	var iterator = modules.GetIterator()
 	for iterator.HasNext() {
 		var module = iterator.GetNext()
-		var identifier = sts.ToLower(module.GetIdentifier())
-		v.modules_.SetValue(identifier, module)
+		var text = module.GetText()
+		v.modules_.SetValue(text, module)
 	}
 }
 
@@ -565,14 +565,21 @@ func (v *validator_) validateParameters(parameters col.ListLike[ast.ParameterLik
 
 func (v *validator_) validatePrefix(prefix ast.PrefixLike) {
 	if prefix.GetType() == ast.AliasPrefix {
-		var identifier = prefix.GetIdentifier()
-		if v.modules_.GetValue(identifier) == nil {
-			var message = fmt.Sprintf(
-				"Unknown module alias: %v",
-				identifier,
-			)
-			panic(message)
+		var alias = prefix.GetIdentifier()
+		var iterator = v.modules_.GetIterator()
+		for iterator.HasNext() {
+			var association = iterator.GetNext()
+			var module = association.GetValue()
+			if module.GetIdentifier() == alias {
+				// Found a matching alias.
+				return
+			}
 		}
+		var message = fmt.Sprintf(
+			"Unknown module alias: %v",
+			alias,
+		)
+		panic(message)
 	}
 }
 

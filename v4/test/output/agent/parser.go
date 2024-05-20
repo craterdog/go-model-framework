@@ -13,7 +13,7 @@
 package agent
 
 import (
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 )
 
 // CLASS ACCESS
@@ -64,8 +64,8 @@ func (v *parser_) GetClass() ParserClassLike {
 
 // Public
 
-func (v *parser_) ParseSource(source string) gcm.ModelLike {
-	var result_ gcm.ModelLike
+func (v *parser_) ParseSource(source string) ast.ModelLike {
+	var result_ ast.ModelLike
 	// TBA - Implement the method.
 	return result_
 }
