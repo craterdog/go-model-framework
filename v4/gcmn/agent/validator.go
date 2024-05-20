@@ -16,7 +16,7 @@ import (
 	fmt "fmt"
 	gcf "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	sts "strings"
 )
 
@@ -54,13 +54,13 @@ func (c *validatorClass_) Make() ValidatorLike {
 
 type validator_ struct {
 	class_        ValidatorClassLike
-	modules_      col.CatalogLike[string, gcm.ModuleLike]
-	types_        col.CatalogLike[string, gcm.TypeLike]
-	functionals_  col.CatalogLike[string, gcm.FunctionalLike]
-	aspects_      col.CatalogLike[string, gcm.AspectLike]
-	classes_      col.CatalogLike[string, gcm.ClassLike]
-	instances_    col.CatalogLike[string, gcm.InstanceLike]
-	abstractions_ col.CatalogLike[string, gcm.AbstractionLike]
+	modules_      col.CatalogLike[string, ast.ModuleLike]
+	types_        col.CatalogLike[string, ast.TypeLike]
+	functionals_  col.CatalogLike[string, ast.FunctionalLike]
+	aspects_      col.CatalogLike[string, ast.AspectLike]
+	classes_      col.CatalogLike[string, ast.ClassLike]
+	instances_    col.CatalogLike[string, ast.InstanceLike]
+	abstractions_ col.CatalogLike[string, ast.AbstractionLike]
 }
 
 // Attributes
@@ -71,15 +71,15 @@ func (v *validator_) GetClass() ValidatorClassLike {
 
 // Public
 
-func (v *validator_) ValidateModel(model gcm.ModelLike) {
+func (v *validator_) ValidateModel(model ast.ModelLike) {
 	// Initialize the catalogs.
-	v.modules_ = gcf.Catalog[string, gcm.ModuleLike]()
-	v.types_ = gcf.Catalog[string, gcm.TypeLike]()
-	v.functionals_ = gcf.Catalog[string, gcm.FunctionalLike]()
-	v.aspects_ = gcf.Catalog[string, gcm.AspectLike]()
-	v.classes_ = gcf.Catalog[string, gcm.ClassLike]()
-	v.instances_ = gcf.Catalog[string, gcm.InstanceLike]()
-	v.abstractions_ = gcf.Catalog[string, gcm.AbstractionLike]()
+	v.modules_ = gcf.Catalog[string, ast.ModuleLike]()
+	v.types_ = gcf.Catalog[string, ast.TypeLike]()
+	v.functionals_ = gcf.Catalog[string, ast.FunctionalLike]()
+	v.aspects_ = gcf.Catalog[string, ast.AspectLike]()
+	v.classes_ = gcf.Catalog[string, ast.ClassLike]()
+	v.instances_ = gcf.Catalog[string, ast.InstanceLike]()
+	v.abstractions_ = gcf.Catalog[string, ast.AbstractionLike]()
 
 	// Extract the catalogs.
 	v.extractModules(model)
@@ -101,7 +101,7 @@ func (v *validator_) ValidateModel(model gcm.ModelLike) {
 
 // Private
 
-func (v *validator_) extractAspects(model gcm.ModelLike) {
+func (v *validator_) extractAspects(model ast.ModelLike) {
 	var aspects = model.GetAspects()
 	if aspects == nil {
 		return
@@ -114,7 +114,7 @@ func (v *validator_) extractAspects(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) extractClasses(model gcm.ModelLike) {
+func (v *validator_) extractClasses(model ast.ModelLike) {
 	var classes = model.GetClasses()
 	if classes == nil {
 		return
@@ -129,7 +129,7 @@ func (v *validator_) extractClasses(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) extractFunctionals(model gcm.ModelLike) {
+func (v *validator_) extractFunctionals(model ast.ModelLike) {
 	var functionals = model.GetFunctionals()
 	if functionals == nil {
 		return
@@ -142,7 +142,7 @@ func (v *validator_) extractFunctionals(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) extractInstances(model gcm.ModelLike) {
+func (v *validator_) extractInstances(model ast.ModelLike) {
 	var instances = model.GetInstances()
 	if instances == nil {
 		return
@@ -157,7 +157,7 @@ func (v *validator_) extractInstances(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) extractModules(model gcm.ModelLike) {
+func (v *validator_) extractModules(model ast.ModelLike) {
 	var modules = model.GetModules()
 	if modules == nil {
 		return
@@ -170,7 +170,7 @@ func (v *validator_) extractModules(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) extractTypes(model gcm.ModelLike) {
+func (v *validator_) extractTypes(model ast.ModelLike) {
 	var types = model.GetTypes()
 	if types == nil {
 		return
@@ -183,7 +183,7 @@ func (v *validator_) extractTypes(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) validateAbstraction(abstraction gcm.AbstractionLike) {
+func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 	var prefix = abstraction.GetPrefix()
 	if prefix != nil {
 		v.validatePrefix(prefix)
@@ -196,7 +196,7 @@ func (v *validator_) validateAbstraction(abstraction gcm.AbstractionLike) {
 	}
 }
 
-func (v *validator_) validateAbstractions(abstractions col.ListLike[gcm.AbstractionLike]) {
+func (v *validator_) validateAbstractions(abstractions col.ListLike[ast.AbstractionLike]) {
 	var iterator = abstractions.GetIterator()
 	for iterator.HasNext() {
 		var abstraction = iterator.GetNext()
@@ -204,7 +204,7 @@ func (v *validator_) validateAbstractions(abstractions col.ListLike[gcm.Abstract
 	}
 }
 
-func (v *validator_) validateArguments(arguments col.ListLike[gcm.AbstractionLike]) {
+func (v *validator_) validateArguments(arguments col.ListLike[ast.AbstractionLike]) {
 	var iterator = arguments.GetIterator()
 	for iterator.HasNext() {
 		var argument = iterator.GetNext()
@@ -212,7 +212,7 @@ func (v *validator_) validateArguments(arguments col.ListLike[gcm.AbstractionLik
 	}
 }
 
-func (v *validator_) validateAspect(aspect gcm.AspectLike) {
+func (v *validator_) validateAspect(aspect ast.AspectLike) {
 	var declaration = aspect.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var methods = aspect.GetMethods()
@@ -228,7 +228,7 @@ func (v *validator_) validateAspect(aspect gcm.AspectLike) {
 	}
 }
 
-func (v *validator_) validateAspects(model gcm.ModelLike) {
+func (v *validator_) validateAspects(model ast.ModelLike) {
 	v.aspects_.SortValues()
 	var iterator = v.aspects_.GetIterator()
 	for iterator.HasNext() {
@@ -243,7 +243,7 @@ func (v *validator_) validateAspects(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) validateAttribute(attribute gcm.AttributeLike) {
+func (v *validator_) validateAttribute(attribute ast.AttributeLike) {
 	var identifier = attribute.GetIdentifier()
 	var parameter = attribute.GetParameter()
 	var abstraction = attribute.GetAbstraction()
@@ -273,7 +273,7 @@ func (v *validator_) validateAttribute(attribute gcm.AttributeLike) {
 	}
 }
 
-func (v *validator_) validateAttributes(attributes col.ListLike[gcm.AttributeLike]) {
+func (v *validator_) validateAttributes(attributes col.ListLike[ast.AttributeLike]) {
 	var iterator = attributes.GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
@@ -281,7 +281,7 @@ func (v *validator_) validateAttributes(attributes col.ListLike[gcm.AttributeLik
 	}
 }
 
-func (v *validator_) validateBoolean(abstraction gcm.AbstractionLike) {
+func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 	var prefix = abstraction.GetPrefix()
 	if prefix != nil {
 		panic("A boolean type cannot have a prefix.")
@@ -296,7 +296,7 @@ func (v *validator_) validateBoolean(abstraction gcm.AbstractionLike) {
 	}
 }
 
-func (v *validator_) validateClass(class gcm.ClassLike) {
+func (v *validator_) validateClass(class ast.ClassLike) {
 	var declaration = class.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var constants = class.GetConstants()
@@ -313,7 +313,7 @@ func (v *validator_) validateClass(class gcm.ClassLike) {
 	}
 }
 
-func (v *validator_) validateClasses(model gcm.ModelLike) {
+func (v *validator_) validateClasses(model ast.ModelLike) {
 	v.classes_.SortValues()
 	var iterator = v.classes_.GetIterator()
 	for iterator.HasNext() {
@@ -328,12 +328,12 @@ func (v *validator_) validateClasses(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) validateConstant(constant gcm.ConstantLike) {
+func (v *validator_) validateConstant(constant ast.ConstantLike) {
 	var abstraction = constant.GetAbstraction()
 	v.validateAbstraction(abstraction)
 }
 
-func (v *validator_) validateConstants(constants col.ListLike[gcm.ConstantLike]) {
+func (v *validator_) validateConstants(constants col.ListLike[ast.ConstantLike]) {
 	var iterator = constants.GetIterator()
 	for iterator.HasNext() {
 		var constant = iterator.GetNext()
@@ -341,7 +341,7 @@ func (v *validator_) validateConstants(constants col.ListLike[gcm.ConstantLike])
 	}
 }
 
-func (v *validator_) validateConstructor(constructor gcm.ConstructorLike) {
+func (v *validator_) validateConstructor(constructor ast.ConstructorLike) {
 	var parameters = constructor.GetParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
@@ -350,7 +350,7 @@ func (v *validator_) validateConstructor(constructor gcm.ConstructorLike) {
 	v.validateAbstraction(abstraction)
 }
 
-func (v *validator_) validateConstructors(constructors col.ListLike[gcm.ConstructorLike]) {
+func (v *validator_) validateConstructors(constructors col.ListLike[ast.ConstructorLike]) {
 	var iterator = constructors.GetIterator()
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
@@ -358,19 +358,19 @@ func (v *validator_) validateConstructors(constructors col.ListLike[gcm.Construc
 	}
 }
 
-func (v *validator_) validateDeclaration(declaration gcm.DeclarationLike) {
+func (v *validator_) validateDeclaration(declaration ast.DeclarationLike) {
 	var parameters = declaration.GetParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
 	}
 }
 
-func (v *validator_) validateEnumeration(enumeration gcm.EnumerationLike) {
+func (v *validator_) validateEnumeration(enumeration ast.EnumerationLike) {
 	var parameter = enumeration.GetParameter()
 	v.validateParameter(parameter)
 }
 
-func (v *validator_) validateFunction(function gcm.FunctionLike) {
+func (v *validator_) validateFunction(function ast.FunctionLike) {
 	var parameters = function.GetParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
@@ -379,7 +379,7 @@ func (v *validator_) validateFunction(function gcm.FunctionLike) {
 	v.validateResult(result)
 }
 
-func (v *validator_) validateFunctional(functional gcm.FunctionalLike) {
+func (v *validator_) validateFunctional(functional ast.FunctionalLike) {
 	var declaration = functional.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var parameters = functional.GetParameters()
@@ -399,7 +399,7 @@ func (v *validator_) validateFunctional(functional gcm.FunctionalLike) {
 	}
 }
 
-func (v *validator_) validateFunctionals(model gcm.ModelLike) {
+func (v *validator_) validateFunctionals(model ast.ModelLike) {
 	v.functionals_.SortValues()
 	var iterator = v.functionals_.GetIterator()
 	for iterator.HasNext() {
@@ -414,7 +414,7 @@ func (v *validator_) validateFunctionals(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) validateFunctions(functions col.ListLike[gcm.FunctionLike]) {
+func (v *validator_) validateFunctions(functions col.ListLike[ast.FunctionLike]) {
 	var iterator = functions.GetIterator()
 	for iterator.HasNext() {
 		var function = iterator.GetNext()
@@ -444,7 +444,7 @@ func (v *validator_) validateGetClassMethod(class string) {
 	)
 }
 
-func (v *validator_) validateInstance(instance gcm.InstanceLike) {
+func (v *validator_) validateInstance(instance ast.InstanceLike) {
 	var declaration = instance.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var attributes = instance.GetAttributes()
@@ -461,7 +461,7 @@ func (v *validator_) validateInstance(instance gcm.InstanceLike) {
 	}
 }
 
-func (v *validator_) validateInstances(model gcm.ModelLike) {
+func (v *validator_) validateInstances(model ast.ModelLike) {
 	v.instances_.SortValues()
 	var iterator = v.instances_.GetIterator()
 	for iterator.HasNext() {
@@ -476,7 +476,7 @@ func (v *validator_) validateInstances(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) validateMethod(method gcm.MethodLike) {
+func (v *validator_) validateMethod(method ast.MethodLike) {
 	var parameters = method.GetParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
@@ -487,7 +487,7 @@ func (v *validator_) validateMethod(method gcm.MethodLike) {
 	}
 }
 
-func (v *validator_) validateMethods(methods col.ListLike[gcm.MethodLike]) {
+func (v *validator_) validateMethods(methods col.ListLike[ast.MethodLike]) {
 	var iterator = methods.GetIterator()
 	for iterator.HasNext() {
 		var method = iterator.GetNext()
@@ -495,7 +495,7 @@ func (v *validator_) validateMethods(methods col.ListLike[gcm.MethodLike]) {
 	}
 }
 
-func (v *validator_) validateModule(module gcm.ModuleLike) {
+func (v *validator_) validateModule(module ast.ModuleLike) {
 	var identifier = module.GetIdentifier()
 	if len(identifier) != 3 {
 		var message = fmt.Sprintf(
@@ -506,7 +506,7 @@ func (v *validator_) validateModule(module gcm.ModuleLike) {
 	}
 }
 
-func (v *validator_) validateModules(model gcm.ModelLike) {
+func (v *validator_) validateModules(model ast.ModelLike) {
 	v.modules_.SortValues()
 	var iterator = v.modules_.GetIterator()
 	for iterator.HasNext() {
@@ -521,7 +521,7 @@ func (v *validator_) validateModules(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) validatePairings(model gcm.ModelLike) {
+func (v *validator_) validatePairings(model ast.ModelLike) {
 	// Make sure each class interface has an associated instance interface.
 	var classes = gcf.List[string](v.classes_.GetKeys())
 	var instances = gcf.List[string](v.instances_.GetKeys())
@@ -550,12 +550,12 @@ func (v *validator_) validatePairings(model gcm.ModelLike) {
 	}
 }
 
-func (v *validator_) validateParameter(parameter gcm.ParameterLike) {
+func (v *validator_) validateParameter(parameter ast.ParameterLike) {
 	var abstraction = parameter.GetAbstraction()
 	v.validateAbstraction(abstraction)
 }
 
-func (v *validator_) validateParameters(parameters col.ListLike[gcm.ParameterLike]) {
+func (v *validator_) validateParameters(parameters col.ListLike[ast.ParameterLike]) {
 	var iterator = parameters.GetIterator()
 	for iterator.HasNext() {
 		var parameter = iterator.GetNext()
@@ -563,8 +563,8 @@ func (v *validator_) validateParameters(parameters col.ListLike[gcm.ParameterLik
 	}
 }
 
-func (v *validator_) validatePrefix(prefix gcm.PrefixLike) {
-	if prefix.GetType() == gcm.AliasPrefix {
+func (v *validator_) validatePrefix(prefix ast.PrefixLike) {
+	if prefix.GetType() == ast.AliasPrefix {
 		var identifier = prefix.GetIdentifier()
 		if v.modules_.GetValue(identifier) == nil {
 			var message = fmt.Sprintf(
@@ -576,7 +576,7 @@ func (v *validator_) validatePrefix(prefix gcm.PrefixLike) {
 	}
 }
 
-func (v *validator_) validateResult(result gcm.ResultLike) {
+func (v *validator_) validateResult(result ast.ResultLike) {
 	if result != nil {
 		var abstraction = result.GetAbstraction()
 		if abstraction != nil {
@@ -588,7 +588,7 @@ func (v *validator_) validateResult(result gcm.ResultLike) {
 	}
 }
 
-func (v *validator_) validateType(type_ gcm.TypeLike) {
+func (v *validator_) validateType(type_ ast.TypeLike) {
 	var declaration = type_.GetDeclaration()
 	v.validateDeclaration(declaration)
 	var abstraction = type_.GetAbstraction()
@@ -608,7 +608,7 @@ func (v *validator_) validateType(type_ gcm.TypeLike) {
 	}
 }
 
-func (v *validator_) validateTypes(model gcm.ModelLike) {
+func (v *validator_) validateTypes(model ast.ModelLike) {
 	v.types_.SortValues()
 	var iterator = v.types_.GetIterator()
 	for iterator.HasNext() {

@@ -47,10 +47,10 @@ func (c *tokenClass_) MakeWithAttributes(
 	value string,
 ) TokenLike {
 	return &token_{
-		line_:     line,
+		line_: line,
 		position_: position,
-		type_:     type_,
-		value_:    value,
+		type_: type_,
+		value_: value,
 	}
 }
 
@@ -61,11 +61,11 @@ func (c *tokenClass_) MakeWithAttributes(
 // Target
 
 type token_ struct {
-	class_    TokenClassLike
-	line_     int
+	class_ TokenClassLike
+	line_ int
 	position_ int
-	type_     TokenType
-	value_    string
+	type_ TokenType
+	value_ string
 }
 
 // Attributes

@@ -14,7 +14,7 @@ package agent_test
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-model-framework/v4/agent"
+	age "github.com/craterdog/go-model-framework/v4/gcmn/agent"
 	osx "os"
 	sts "strings"
 	tes "testing"

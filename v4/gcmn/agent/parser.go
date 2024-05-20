@@ -16,7 +16,7 @@ import (
 	fmt "fmt"
 	gcf "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	sts "strings"
 )
 
@@ -72,7 +72,7 @@ func (v *parser_) GetClass() ParserClassLike {
 
 // Public
 
-func (v *parser_) ParseSource(source string) gcm.ModelLike {
+func (v *parser_) ParseSource(source string) ast.ModelLike {
 	// The scanner runs in a separate Go routine.
 	v.source_ = source
 	Scanner().Make(v.source_, v.tokens_)
@@ -190,12 +190,12 @@ func (v *parser_) getNextToken() TokenLike {
 }
 
 func (v *parser_) parseAbstraction() (
-	abstraction gcm.AbstractionLike,
+	abstraction ast.AbstractionLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse an optional prefix.
-	var prefix gcm.PrefixLike
+	var prefix ast.PrefixLike
 	prefix, _, ok = v.parsePrefix()
 	var identifier string
 	if ok {
@@ -231,7 +231,7 @@ func (v *parser_) parseAbstraction() (
 
 	// Attempt to parse a delimiter.
 	_, token, ok = v.parseToken(DelimiterToken, "[")
-	var arguments col.ListLike[gcm.AbstractionLike]
+	var arguments col.ListLike[ast.AbstractionLike]
 	if ok {
 		// Attempt to parse a sequence of arguments.
 		arguments, token, ok = v.parseArguments()
@@ -259,12 +259,12 @@ func (v *parser_) parseAbstraction() (
 	}
 
 	// Found an abstraction.
-	abstraction = gcm.Abstraction().MakeWithAttributes(prefix, identifier, arguments)
+	abstraction = ast.Abstraction().MakeWithAttributes(prefix, identifier, arguments)
 	return abstraction, token, true
 }
 
 func (v *parser_) parseAbstractions() (
-	abstractions col.ListLike[gcm.AbstractionLike],
+	abstractions col.ListLike[ast.AbstractionLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -276,7 +276,7 @@ func (v *parser_) parseAbstractions() (
 	}
 
 	// Attempt to parse at least one abstraction.
-	var abstraction gcm.AbstractionLike
+	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
@@ -286,7 +286,7 @@ func (v *parser_) parseAbstractions() (
 		)
 		panic(message)
 	}
-	abstractions = gcf.List[gcm.AbstractionLike]()
+	abstractions = gcf.List[ast.AbstractionLike]()
 	for ok {
 		abstractions.AppendValue(abstraction)
 		abstraction, token, ok = v.parseAbstraction()
@@ -297,18 +297,18 @@ func (v *parser_) parseAbstractions() (
 }
 
 func (v *parser_) parseArguments() (
-	arguments col.ListLike[gcm.AbstractionLike],
+	arguments col.ListLike[ast.AbstractionLike],
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse at least one abstraction.
-	var abstraction gcm.AbstractionLike
+	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		// This is not a sequence of arguments.
 		return arguments, token, false
 	}
-	arguments = gcf.List[gcm.AbstractionLike]()
+	arguments = gcf.List[ast.AbstractionLike]()
 	for ok {
 		arguments.AppendValue(abstraction)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
@@ -322,12 +322,12 @@ func (v *parser_) parseArguments() (
 }
 
 func (v *parser_) parseAspect() (
-	aspect gcm.AspectLike,
+	aspect ast.AspectLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a declaration.
-	var declaration gcm.DeclarationLike
+	var declaration ast.DeclarationLike
 	declaration, token, ok = v.parseDeclaration()
 	if !ok {
 		// This is not an aspect.
@@ -359,7 +359,7 @@ func (v *parser_) parseAspect() (
 	}
 
 	// Attempt to parse a sequence of methods.
-	var methods col.ListLike[gcm.MethodLike]
+	var methods col.ListLike[ast.MethodLike]
 	methods, token, ok = v.parseMethods()
 	if !ok {
 		var message = v.formatError(token)
@@ -384,12 +384,12 @@ func (v *parser_) parseAspect() (
 	}
 
 	// Found an aspect.
-	aspect = gcm.Aspect().MakeWithAttributes(declaration, methods)
+	aspect = ast.Aspect().MakeWithAttributes(declaration, methods)
 	return aspect, token, true
 }
 
 func (v *parser_) parseAspects() (
-	aspects col.ListLike[gcm.AspectLike],
+	aspects col.ListLike[ast.AspectLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -401,7 +401,7 @@ func (v *parser_) parseAspects() (
 	}
 
 	// Attempt to parse at least one aspect.
-	var aspect gcm.AspectLike
+	var aspect ast.AspectLike
 	aspect, token, ok = v.parseAspect()
 	if !ok {
 		var message = v.formatError(token)
@@ -411,7 +411,7 @@ func (v *parser_) parseAspects() (
 		)
 		panic(message)
 	}
-	aspects = gcf.List[gcm.AspectLike]()
+	aspects = gcf.List[ast.AspectLike]()
 	for ok {
 		aspects.AppendValue(aspect)
 		aspect, token, ok = v.parseAspect()
@@ -422,7 +422,7 @@ func (v *parser_) parseAspects() (
 }
 
 func (v *parser_) parseAttribute() (
-	attribute gcm.AttributeLike,
+	attribute ast.AttributeLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -465,12 +465,12 @@ func (v *parser_) parseAttribute() (
 	var abstraction, _, _ = v.parseAbstraction()
 
 	// Found a attribute.
-	attribute = gcm.Attribute().MakeWithAttributes(identifier, parameter, abstraction)
+	attribute = ast.Attribute().MakeWithAttributes(identifier, parameter, abstraction)
 	return attribute, token, true
 }
 
 func (v *parser_) parseAttributes() (
-	attributes col.ListLike[gcm.AttributeLike],
+	attributes col.ListLike[ast.AttributeLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -482,7 +482,7 @@ func (v *parser_) parseAttributes() (
 	}
 
 	// Attempt to parse at least one attribute.
-	var attribute gcm.AttributeLike
+	var attribute ast.AttributeLike
 	attribute, token, ok = v.parseAttribute()
 	if !ok {
 		var message = v.formatError(token)
@@ -492,7 +492,7 @@ func (v *parser_) parseAttributes() (
 		)
 		panic(message)
 	}
-	attributes = gcf.List[gcm.AttributeLike]()
+	attributes = gcf.List[ast.AttributeLike]()
 	for ok {
 		attributes.AppendValue(attribute)
 		attribute, token, ok = v.parseAttribute()
@@ -503,12 +503,12 @@ func (v *parser_) parseAttributes() (
 }
 
 func (v *parser_) parseClass() (
-	class gcm.ClassLike,
+	class ast.ClassLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a declaration.
-	var declaration gcm.DeclarationLike
+	var declaration ast.DeclarationLike
 	declaration, token, ok = v.parseDeclaration()
 	if !ok {
 		// This is not a class.
@@ -567,12 +567,12 @@ func (v *parser_) parseClass() (
 	}
 
 	// Found a class.
-	class = gcm.Class().MakeWithAttributes(declaration, constants, constructors, functions)
+	class = ast.Class().MakeWithAttributes(declaration, constants, constructors, functions)
 	return class, token, true
 }
 
 func (v *parser_) parseClasses() (
-	classes col.ListLike[gcm.ClassLike],
+	classes col.ListLike[ast.ClassLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -584,7 +584,7 @@ func (v *parser_) parseClasses() (
 	}
 
 	// Attempt to parse at least one class.
-	var class gcm.ClassLike
+	var class ast.ClassLike
 	class, token, ok = v.parseClass()
 	if !ok {
 		var message = v.formatError(token)
@@ -594,7 +594,7 @@ func (v *parser_) parseClasses() (
 		)
 		panic(message)
 	}
-	classes = gcf.List[gcm.ClassLike]()
+	classes = gcf.List[ast.ClassLike]()
 	for ok {
 		classes.AppendValue(class)
 		class, token, ok = v.parseClass()
@@ -605,7 +605,7 @@ func (v *parser_) parseClasses() (
 }
 
 func (v *parser_) parseConstant() (
-	constant gcm.ConstantLike,
+	constant ast.ConstantLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -640,7 +640,7 @@ func (v *parser_) parseConstant() (
 	}
 
 	// Attempt to parse an abstraction.
-	var abstraction gcm.AbstractionLike
+	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
@@ -652,12 +652,12 @@ func (v *parser_) parseConstant() (
 	}
 
 	// Found a constant.
-	constant = gcm.Constant().MakeWithAttributes(identifier, abstraction)
+	constant = ast.Constant().MakeWithAttributes(identifier, abstraction)
 	return constant, token, true
 }
 
 func (v *parser_) parseConstants() (
-	constants col.ListLike[gcm.ConstantLike],
+	constants col.ListLike[ast.ConstantLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -669,7 +669,7 @@ func (v *parser_) parseConstants() (
 	}
 
 	// Attempt to parse at least one constant.
-	var constant gcm.ConstantLike
+	var constant ast.ConstantLike
 	constant, token, ok = v.parseConstant()
 	if !ok {
 		var message = v.formatError(token)
@@ -679,7 +679,7 @@ func (v *parser_) parseConstants() (
 		)
 		panic(message)
 	}
-	constants = gcf.List[gcm.ConstantLike]()
+	constants = gcf.List[ast.ConstantLike]()
 	for ok {
 		constants.AppendValue(constant)
 		constant, token, ok = v.parseConstant()
@@ -690,7 +690,7 @@ func (v *parser_) parseConstants() (
 }
 
 func (v *parser_) parseConstructor() (
-	constructor gcm.ConstructorLike,
+	constructor ast.ConstructorLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -730,7 +730,7 @@ func (v *parser_) parseConstructor() (
 	}
 
 	// Attempt to parse an abstraction.
-	var abstraction gcm.AbstractionLike
+	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
@@ -743,12 +743,12 @@ func (v *parser_) parseConstructor() (
 	}
 
 	// Found a constructor.
-	constructor = gcm.Constructor().MakeWithAttributes(identifier, parameters, abstraction)
+	constructor = ast.Constructor().MakeWithAttributes(identifier, parameters, abstraction)
 	return constructor, token, true
 }
 
 func (v *parser_) parseConstructors() (
-	constructors col.ListLike[gcm.ConstructorLike],
+	constructors col.ListLike[ast.ConstructorLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -760,7 +760,7 @@ func (v *parser_) parseConstructors() (
 	}
 
 	// Attempt to parse at least one constructor.
-	var constructor gcm.ConstructorLike
+	var constructor ast.ConstructorLike
 	constructor, token, ok = v.parseConstructor()
 	if !ok {
 		var message = v.formatError(token)
@@ -770,7 +770,7 @@ func (v *parser_) parseConstructors() (
 		)
 		panic(message)
 	}
-	constructors = gcf.List[gcm.ConstructorLike]()
+	constructors = gcf.List[ast.ConstructorLike]()
 	for ok {
 		constructors.AppendValue(constructor)
 		constructor, token, ok = v.parseConstructor()
@@ -781,7 +781,7 @@ func (v *parser_) parseConstructors() (
 }
 
 func (v *parser_) parseDeclaration() (
-	declaration gcm.DeclarationLike,
+	declaration ast.DeclarationLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -817,7 +817,7 @@ func (v *parser_) parseDeclaration() (
 	}
 
 	// Attempt to parse an optional sequence of parameters.
-	var parameters col.ListLike[gcm.ParameterLike]
+	var parameters col.ListLike[ast.ParameterLike]
 	_, token, ok = v.parseToken(DelimiterToken, "[")
 	if ok {
 		parameters, token, ok = v.parseParameters()
@@ -841,12 +841,12 @@ func (v *parser_) parseDeclaration() (
 	}
 
 	// Found a declaration.
-	declaration = gcm.Declaration().MakeWithAttributes(comment, identifier, parameters)
+	declaration = ast.Declaration().MakeWithAttributes(comment, identifier, parameters)
 	return declaration, token, true
 }
 
 func (v *parser_) parseEnumeration() (
-	enumeration gcm.EnumerationLike,
+	enumeration ast.EnumerationLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -869,7 +869,7 @@ func (v *parser_) parseEnumeration() (
 	}
 
 	// Attempt to parse a parameter.
-	var parameter gcm.ParameterLike
+	var parameter ast.ParameterLike
 	parameter, token, ok = v.parseParameter()
 	if !ok {
 		var message = v.formatError(token)
@@ -923,12 +923,12 @@ func (v *parser_) parseEnumeration() (
 	}
 
 	// Found an enumeration.
-	enumeration = gcm.Enumeration().MakeWithAttributes(parameter, identifiers)
+	enumeration = ast.Enumeration().MakeWithAttributes(parameter, identifiers)
 	return enumeration, token, true
 }
 
 func (v *parser_) parseFunction() (
-	function gcm.FunctionLike,
+	function ast.FunctionLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -968,7 +968,7 @@ func (v *parser_) parseFunction() (
 	}
 
 	// Attempt to parse a result.
-	var result gcm.ResultLike
+	var result ast.ResultLike
 	result, token, ok = v.parseResult()
 	if !ok {
 		var message = v.formatError(token)
@@ -981,17 +981,17 @@ func (v *parser_) parseFunction() (
 	}
 
 	// Found a function.
-	function = gcm.Function().MakeWithAttributes(identifier, parameters, result)
+	function = ast.Function().MakeWithAttributes(identifier, parameters, result)
 	return function, token, true
 }
 
 func (v *parser_) parseFunctional() (
-	functional gcm.FunctionalLike,
+	functional ast.FunctionalLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a declaration.
-	var declaration gcm.DeclarationLike
+	var declaration ast.DeclarationLike
 	declaration, token, ok = v.parseDeclaration()
 	if !ok {
 		// This is not a functional.
@@ -1041,7 +1041,7 @@ func (v *parser_) parseFunctional() (
 	}
 
 	// Attempt to parse a result.
-	var result gcm.ResultLike
+	var result ast.ResultLike
 	result, token, ok = v.parseResult()
 	if !ok {
 		var message = v.formatError(token)
@@ -1055,12 +1055,12 @@ func (v *parser_) parseFunctional() (
 	}
 
 	// Found a functional.
-	functional = gcm.Functional().MakeWithAttributes(declaration, parameters, result)
+	functional = ast.Functional().MakeWithAttributes(declaration, parameters, result)
 	return functional, token, true
 }
 
 func (v *parser_) parseFunctionals() (
-	functionals col.ListLike[gcm.FunctionalLike],
+	functionals col.ListLike[ast.FunctionalLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -1072,7 +1072,7 @@ func (v *parser_) parseFunctionals() (
 	}
 
 	// Attempt to parse at least one functional.
-	var functional gcm.FunctionalLike
+	var functional ast.FunctionalLike
 	functional, token, ok = v.parseFunctional()
 	if !ok {
 		var message = v.formatError(token)
@@ -1082,7 +1082,7 @@ func (v *parser_) parseFunctionals() (
 		)
 		panic(message)
 	}
-	functionals = gcf.List[gcm.FunctionalLike]()
+	functionals = gcf.List[ast.FunctionalLike]()
 	for ok {
 		functionals.AppendValue(functional)
 		functional, token, ok = v.parseFunctional()
@@ -1093,7 +1093,7 @@ func (v *parser_) parseFunctionals() (
 }
 
 func (v *parser_) parseFunctions() (
-	functions col.ListLike[gcm.FunctionLike],
+	functions col.ListLike[ast.FunctionLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -1105,7 +1105,7 @@ func (v *parser_) parseFunctions() (
 	}
 
 	// Attempt to parse at least one function.
-	var function gcm.FunctionLike
+	var function ast.FunctionLike
 	function, token, ok = v.parseFunction()
 	if !ok {
 		var message = v.formatError(token)
@@ -1115,7 +1115,7 @@ func (v *parser_) parseFunctions() (
 		)
 		panic(message)
 	}
-	functions = gcf.List[gcm.FunctionLike]()
+	functions = gcf.List[ast.FunctionLike]()
 	for ok {
 		functions.AppendValue(function)
 		function, token, ok = v.parseFunction()
@@ -1126,7 +1126,7 @@ func (v *parser_) parseFunctions() (
 }
 
 func (v *parser_) parseHeader() (
-	header gcm.HeaderLike,
+	header ast.HeaderLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1160,17 +1160,17 @@ func (v *parser_) parseHeader() (
 	}
 
 	// Found a header.
-	header = gcm.Header().MakeWithAttributes(comment, identifier)
+	header = ast.Header().MakeWithAttributes(comment, identifier)
 	return header, token, true
 }
 
 func (v *parser_) parseInstance() (
-	instance gcm.InstanceLike,
+	instance ast.InstanceLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a declaration.
-	var declaration gcm.DeclarationLike
+	var declaration ast.DeclarationLike
 	declaration, token, ok = v.parseDeclaration()
 	if !ok {
 		// This is not an instance.
@@ -1229,12 +1229,12 @@ func (v *parser_) parseInstance() (
 	}
 
 	// Found an instance.
-	instance = gcm.Instance().MakeWithAttributes(declaration, attributes, abstractions, methods)
+	instance = ast.Instance().MakeWithAttributes(declaration, attributes, abstractions, methods)
 	return instance, token, true
 }
 
 func (v *parser_) parseInstances() (
-	instances col.ListLike[gcm.InstanceLike],
+	instances col.ListLike[ast.InstanceLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -1246,7 +1246,7 @@ func (v *parser_) parseInstances() (
 	}
 
 	// Attempt to parse at least one instance.
-	var instance gcm.InstanceLike
+	var instance ast.InstanceLike
 	instance, token, ok = v.parseInstance()
 	if !ok {
 		var message = v.formatError(token)
@@ -1256,7 +1256,7 @@ func (v *parser_) parseInstances() (
 		)
 		panic(message)
 	}
-	instances = gcf.List[gcm.InstanceLike]()
+	instances = gcf.List[ast.InstanceLike]()
 	for ok {
 		instances.AppendValue(instance)
 		instance, token, ok = v.parseInstance()
@@ -1267,7 +1267,7 @@ func (v *parser_) parseInstances() (
 }
 
 func (v *parser_) parseMethod() (
-	method gcm.MethodLike,
+	method ast.MethodLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1310,12 +1310,12 @@ func (v *parser_) parseMethod() (
 	var result, _, _ = v.parseResult()
 
 	// Found a method.
-	method = gcm.Method().MakeWithAttributes(identifier, parameters, result)
+	method = ast.Method().MakeWithAttributes(identifier, parameters, result)
 	return method, token, true
 }
 
 func (v *parser_) parseMethods() (
-	methods col.ListLike[gcm.MethodLike],
+	methods col.ListLike[ast.MethodLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -1327,7 +1327,7 @@ func (v *parser_) parseMethods() (
 	}
 
 	// Attempt to parse at least one method.
-	var method gcm.MethodLike
+	var method ast.MethodLike
 	method, token, ok = v.parseMethod()
 	if !ok {
 		var message = v.formatError(token)
@@ -1337,7 +1337,7 @@ func (v *parser_) parseMethods() (
 		)
 		panic(message)
 	}
-	methods = gcf.List[gcm.MethodLike]()
+	methods = gcf.List[ast.MethodLike]()
 	for ok {
 		methods.AppendValue(method)
 		method, token, ok = v.parseMethod()
@@ -1348,12 +1348,12 @@ func (v *parser_) parseMethods() (
 }
 
 func (v *parser_) parseModel() (
-	model gcm.ModelLike,
+	model ast.ModelLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a notice.
-	var notice gcm.NoticeLike
+	var notice ast.NoticeLike
 	notice, token, ok = v.parseNotice()
 	if !ok {
 		// This is not model.
@@ -1361,7 +1361,7 @@ func (v *parser_) parseModel() (
 	}
 
 	// Attempt to parse a header.
-	var header gcm.HeaderLike
+	var header ast.HeaderLike
 	header, token, ok = v.parseHeader()
 	if !ok {
 		var message = v.formatError(token)
@@ -1398,7 +1398,7 @@ func (v *parser_) parseModel() (
 	var instances, _, _ = v.parseInstances()
 
 	// Found a model.
-	model = gcm.Model().MakeWithAttributes(
+	model = ast.Model().MakeWithAttributes(
 		notice,
 		header,
 		modules,
@@ -1412,7 +1412,7 @@ func (v *parser_) parseModel() (
 }
 
 func (v *parser_) parseModule() (
-	module gcm.ModuleLike,
+	module ast.ModuleLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1436,12 +1436,12 @@ func (v *parser_) parseModule() (
 	}
 
 	// Found a module.
-	module = gcm.Module().MakeWithAttributes(identifier, text)
+	module = ast.Module().MakeWithAttributes(identifier, text)
 	return module, token, true
 }
 
 func (v *parser_) parseModules() (
-	modules col.ListLike[gcm.ModuleLike],
+	modules col.ListLike[ast.ModuleLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -1464,7 +1464,7 @@ func (v *parser_) parseModules() (
 	}
 
 	// Attempt to parse one or more modules.
-	var module gcm.ModuleLike
+	var module ast.ModuleLike
 	module, token, ok = v.parseModule()
 	if !ok {
 		var message = v.formatError(token)
@@ -1474,7 +1474,7 @@ func (v *parser_) parseModules() (
 		)
 		panic(message)
 	}
-	modules = gcf.List[gcm.ModuleLike]()
+	modules = gcf.List[ast.ModuleLike]()
 	for ok {
 		modules.AppendValue(module)
 		module, _, ok = v.parseModule()
@@ -1496,7 +1496,7 @@ func (v *parser_) parseModules() (
 }
 
 func (v *parser_) parseNotice() (
-	notice gcm.NoticeLike,
+	notice ast.NoticeLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1509,12 +1509,12 @@ func (v *parser_) parseNotice() (
 	}
 
 	// Found a notice.
-	notice = gcm.Notice().MakeWithComment(comment)
+	notice = ast.Notice().MakeWithComment(comment)
 	return notice, token, true
 }
 
 func (v *parser_) parseParameter() (
-	parameter gcm.ParameterLike,
+	parameter ast.ParameterLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1527,7 +1527,7 @@ func (v *parser_) parseParameter() (
 	}
 
 	// Attempt to parse an abstraction.
-	var abstraction gcm.AbstractionLike
+	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
@@ -1539,23 +1539,23 @@ func (v *parser_) parseParameter() (
 	}
 
 	// Found a parameter.
-	parameter = gcm.Parameter().MakeWithAttributes(identifier, abstraction)
+	parameter = ast.Parameter().MakeWithAttributes(identifier, abstraction)
 	return parameter, token, true
 }
 
 func (v *parser_) parseParameters() (
-	parameters col.ListLike[gcm.ParameterLike],
+	parameters col.ListLike[ast.ParameterLike],
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse at least one parameter.
-	var parameter gcm.ParameterLike
+	var parameter ast.ParameterLike
 	parameter, token, ok = v.parseParameter()
 	if !ok {
 		// This is not a sequence of parameters.
 		return parameters, token, false
 	}
-	parameters = gcf.List[gcm.ParameterLike]()
+	parameters = gcf.List[ast.ParameterLike]()
 	for ok {
 		parameters.AppendValue(parameter)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
@@ -1569,12 +1569,12 @@ func (v *parser_) parseParameters() (
 }
 
 func (v *parser_) parsePrefix() (
-	prefix gcm.PrefixLike,
+	prefix ast.PrefixLike,
 	token TokenLike,
 	ok bool,
 ) {
 	var identifier string
-	var prefixType gcm.PrefixType
+	var prefixType ast.PrefixType
 
 	// Attempt to parse an array prefix.
 	var delimiterToken TokenLike
@@ -1583,8 +1583,8 @@ func (v *parser_) parsePrefix() (
 		// Attempt to parse a delimiter.
 		_, token, ok = v.parseToken(DelimiterToken, "]")
 		if ok {
-			prefixType = gcm.ArrayPrefix
-			prefix = gcm.Prefix().MakeWithAttributes(identifier, prefixType)
+			prefixType = ast.ArrayPrefix
+			prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
 			return prefix, token, true
 		}
 		v.putBack(delimiterToken)
@@ -1618,16 +1618,16 @@ func (v *parser_) parsePrefix() (
 			)
 			panic(message)
 		}
-		prefixType = gcm.MapPrefix
-		prefix = gcm.Prefix().MakeWithAttributes(identifier, prefixType)
+		prefixType = ast.MapPrefix
+		prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
 		return prefix, token, true
 	}
 
 	// Attempt to parse a channel prefix.
 	_, token, ok = v.parseToken(IdentifierToken, "chan")
 	if ok {
-		prefixType = gcm.ChannelPrefix
-		prefix = gcm.Prefix().MakeWithAttributes(identifier, prefixType)
+		prefixType = ast.ChannelPrefix
+		prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
 		return prefix, token, true
 	}
 
@@ -1640,8 +1640,8 @@ func (v *parser_) parsePrefix() (
 			v.putBack(identifierToken)
 			return prefix, token, false
 		}
-		prefixType = gcm.AliasPrefix
-		prefix = gcm.Prefix().MakeWithAttributes(identifier, prefixType)
+		prefixType = ast.AliasPrefix
+		prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
 		return prefix, token, true
 	}
 
@@ -1650,22 +1650,22 @@ func (v *parser_) parsePrefix() (
 }
 
 func (v *parser_) parseResult() (
-	result gcm.ResultLike,
+	result ast.ResultLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse an abstraction.
-	var abstraction gcm.AbstractionLike
+	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if ok {
 		// Found an abstraction result.
-		result = gcm.Result().MakeWithAbstraction(abstraction)
+		result = ast.Result().MakeWithAbstraction(abstraction)
 		return result, token, true
 	}
 
 	// Attempt to parse a sequence of parameters.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
-	var parameters col.ListLike[gcm.ParameterLike]
+	var parameters col.ListLike[ast.ParameterLike]
 	if ok {
 		parameters, token, ok = v.parseParameters()
 		if !ok {
@@ -1689,7 +1689,7 @@ func (v *parser_) parseResult() (
 		}
 
 		// Found a named parameters result.
-		result = gcm.Result().MakeWithParameters(parameters)
+		result = ast.Result().MakeWithParameters(parameters)
 		return result, token, true
 	}
 
@@ -1719,12 +1719,12 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 }
 
 func (v *parser_) parseType() (
-	type_ gcm.TypeLike,
+	type_ ast.TypeLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a declaration.
-	var declaration gcm.DeclarationLike
+	var declaration ast.DeclarationLike
 	declaration, token, ok = v.parseDeclaration()
 	if !ok {
 		// This is not a type.
@@ -1732,7 +1732,7 @@ func (v *parser_) parseType() (
 	}
 
 	// Attempt to parse an abstraction.
-	var abstraction gcm.AbstractionLike
+	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		var message = v.formatError(token)
@@ -1746,16 +1746,16 @@ func (v *parser_) parseType() (
 	}
 
 	// Attempt to parse an optional enumeration.
-	var enumeration gcm.EnumerationLike
+	var enumeration ast.EnumerationLike
 	enumeration, token, _ = v.parseEnumeration()
 
 	// Found a type.
-	type_ = gcm.Type().MakeWithAttributes(declaration, abstraction, enumeration)
+	type_ = ast.Type().MakeWithAttributes(declaration, abstraction, enumeration)
 	return type_, token, true
 }
 
 func (v *parser_) parseTypes() (
-	types col.ListLike[gcm.TypeLike],
+	types col.ListLike[ast.TypeLike],
 	token TokenLike,
 	ok bool,
 ) {
@@ -1767,7 +1767,7 @@ func (v *parser_) parseTypes() (
 	}
 
 	// Attempt to parse at least one type.
-	var type_ gcm.TypeLike
+	var type_ ast.TypeLike
 	type_, token, ok = v.parseType()
 	if !ok {
 		var message = v.formatError(token)
@@ -1777,7 +1777,7 @@ func (v *parser_) parseTypes() (
 		)
 		panic(message)
 	}
-	types = gcf.List[gcm.TypeLike]()
+	types = gcf.List[ast.TypeLike]()
 	for ok {
 		types.AppendValue(type_)
 		type_, token, ok = v.parseType()

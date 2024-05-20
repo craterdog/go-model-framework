@@ -28,7 +28,7 @@ package agent
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 )
 
 // Types
@@ -147,15 +147,15 @@ type FormatterLike interface {
 	GetClass() FormatterClassLike
 
 	// Methods
-	FormatAbstraction(abstraction gcm.AbstractionLike) string
-	FormatArguments(arguments col.ListLike[gcm.AbstractionLike]) string
-	FormatGenerics(parameters col.ListLike[gcm.ParameterLike]) string
-	FormatMethod(method gcm.MethodLike) string
-	FormatModel(model gcm.ModelLike) string
-	FormatParameter(parameter gcm.ParameterLike) string
-	FormatParameterNames(parameters col.ListLike[gcm.ParameterLike]) string
-	FormatParameters(parameters col.ListLike[gcm.ParameterLike]) string
-	FormatResult(result gcm.ResultLike) string
+	FormatAbstraction(abstraction ast.AbstractionLike) string
+	FormatArguments(arguments col.ListLike[ast.AbstractionLike]) string
+	FormatGenerics(parameters col.ListLike[ast.ParameterLike]) string
+	FormatMethod(method ast.MethodLike) string
+	FormatModel(model ast.ModelLike) string
+	FormatParameter(parameter ast.ParameterLike) string
+	FormatParameterNames(parameters col.ListLike[ast.ParameterLike]) string
+	FormatParameters(parameters col.ListLike[ast.ParameterLike]) string
+	FormatResult(result ast.ResultLike) string
 }
 
 /*
@@ -186,7 +186,7 @@ type ParserLike interface {
 	GetClass() ParserClassLike
 
 	// Methods
-	ParseSource(source string) gcm.ModelLike
+	ParseSource(source string) ast.ModelLike
 }
 
 /*
@@ -223,5 +223,5 @@ type ValidatorLike interface {
 	GetClass() ValidatorClassLike
 
 	// Methods
-	ValidateModel(model gcm.ModelLike)
+	ValidateModel(model ast.ModelLike)
 }

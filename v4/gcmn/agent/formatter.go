@@ -14,7 +14,7 @@ package agent
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	reg "regexp"
 	sts "strings"
 )
@@ -65,47 +65,47 @@ func (v *formatter_) GetClass() FormatterClassLike {
 
 // Public
 
-func (v *formatter_) FormatAbstraction(abstraction gcm.AbstractionLike) string {
+func (v *formatter_) FormatAbstraction(abstraction ast.AbstractionLike) string {
 	v.formatAbstraction(abstraction)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatArguments(arguments col.ListLike[gcm.AbstractionLike]) string {
+func (v *formatter_) FormatArguments(arguments col.ListLike[ast.AbstractionLike]) string {
 	v.formatArguments(arguments)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatGenerics(parameters col.ListLike[gcm.ParameterLike]) string {
+func (v *formatter_) FormatGenerics(parameters col.ListLike[ast.ParameterLike]) string {
 	v.formatGenerics(parameters)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatMethod(method gcm.MethodLike) string {
+func (v *formatter_) FormatMethod(method ast.MethodLike) string {
 	v.formatMethod(method)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatModel(model gcm.ModelLike) string {
+func (v *formatter_) FormatModel(model ast.ModelLike) string {
 	v.formatModel(model)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatParameter(parameter gcm.ParameterLike) string {
+func (v *formatter_) FormatParameter(parameter ast.ParameterLike) string {
 	v.formatParameter(parameter)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatParameterNames(parameters col.ListLike[gcm.ParameterLike]) string {
+func (v *formatter_) FormatParameterNames(parameters col.ListLike[ast.ParameterLike]) string {
 	v.formatParameterNames(parameters)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatParameters(parameters col.ListLike[gcm.ParameterLike]) string {
+func (v *formatter_) FormatParameters(parameters col.ListLike[ast.ParameterLike]) string {
 	v.formatParameters(parameters)
 	return v.getResult()
 }
 
-func (v *formatter_) FormatResult(result gcm.ResultLike) string {
+func (v *formatter_) FormatResult(result ast.ResultLike) string {
 	v.formatResult(result)
 	return v.getResult()
 }
@@ -131,7 +131,7 @@ func (v *formatter_) fixComment(comment string) string {
 	return comment
 }
 
-func (v *formatter_) formatAbstraction(abstraction gcm.AbstractionLike) {
+func (v *formatter_) formatAbstraction(abstraction ast.AbstractionLike) {
 	var prefix = abstraction.GetPrefix()
 	if prefix != nil {
 		v.formatPrefix(prefix)
@@ -146,7 +146,7 @@ func (v *formatter_) formatAbstraction(abstraction gcm.AbstractionLike) {
 	}
 }
 
-func (v *formatter_) formatAbstractions(abstractions col.ListLike[gcm.AbstractionLike]) {
+func (v *formatter_) formatAbstractions(abstractions col.ListLike[ast.AbstractionLike]) {
 	v.appendNewline()
 	v.appendString("// Abstractions")
 	var iterator = abstractions.GetIterator()
@@ -157,7 +157,7 @@ func (v *formatter_) formatAbstractions(abstractions col.ListLike[gcm.Abstractio
 	}
 }
 
-func (v *formatter_) formatArguments(arguments col.ListLike[gcm.AbstractionLike]) {
+func (v *formatter_) formatArguments(arguments col.ListLike[ast.AbstractionLike]) {
 	var size = arguments.GetSize()
 	if size > 2 {
 		v.depth_++
@@ -183,7 +183,7 @@ func (v *formatter_) formatArguments(arguments col.ListLike[gcm.AbstractionLike]
 	}
 }
 
-func (v *formatter_) formatAspect(aspect gcm.AspectLike) {
+func (v *formatter_) formatAspect(aspect ast.AspectLike) {
 	var declaration = aspect.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" interface {")
@@ -195,7 +195,7 @@ func (v *formatter_) formatAspect(aspect gcm.AspectLike) {
 	v.appendString("}")
 }
 
-func (v *formatter_) formatAspects(aspects col.ListLike[gcm.AspectLike]) {
+func (v *formatter_) formatAspects(aspects col.ListLike[ast.AspectLike]) {
 	v.appendNewline()
 	v.appendString("// Aspects")
 	v.appendNewline()
@@ -207,7 +207,7 @@ func (v *formatter_) formatAspects(aspects col.ListLike[gcm.AspectLike]) {
 	}
 }
 
-func (v *formatter_) formatAttribute(attribute gcm.AttributeLike) {
+func (v *formatter_) formatAttribute(attribute ast.AttributeLike) {
 	var identifier = attribute.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("(")
@@ -223,7 +223,7 @@ func (v *formatter_) formatAttribute(attribute gcm.AttributeLike) {
 	}
 }
 
-func (v *formatter_) formatAttributes(attributes col.ListLike[gcm.AttributeLike]) {
+func (v *formatter_) formatAttributes(attributes col.ListLike[ast.AttributeLike]) {
 	v.appendNewline()
 	v.appendString("// Attributes")
 	var iterator = attributes.GetIterator()
@@ -234,7 +234,7 @@ func (v *formatter_) formatAttributes(attributes col.ListLike[gcm.AttributeLike]
 	}
 }
 
-func (v *formatter_) formatClass(class gcm.ClassLike) {
+func (v *formatter_) formatClass(class ast.ClassLike) {
 	var declaration = class.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" interface {")
@@ -265,7 +265,7 @@ func (v *formatter_) formatClass(class gcm.ClassLike) {
 	v.appendString("}")
 }
 
-func (v *formatter_) formatClasses(classes col.ListLike[gcm.ClassLike]) {
+func (v *formatter_) formatClasses(classes col.ListLike[ast.ClassLike]) {
 	v.appendNewline()
 	v.appendString("// Classes")
 	v.appendNewline()
@@ -277,7 +277,7 @@ func (v *formatter_) formatClasses(classes col.ListLike[gcm.ClassLike]) {
 	}
 }
 
-func (v *formatter_) formatConstant(constant gcm.ConstantLike) {
+func (v *formatter_) formatConstant(constant ast.ConstantLike) {
 	var identifier = constant.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("() ")
@@ -285,7 +285,7 @@ func (v *formatter_) formatConstant(constant gcm.ConstantLike) {
 	v.formatAbstraction(abstraction)
 }
 
-func (v *formatter_) formatConstants(constants col.ListLike[gcm.ConstantLike]) {
+func (v *formatter_) formatConstants(constants col.ListLike[ast.ConstantLike]) {
 	v.appendNewline()
 	v.appendString("// Constants")
 	var iterator = constants.GetIterator()
@@ -296,7 +296,7 @@ func (v *formatter_) formatConstants(constants col.ListLike[gcm.ConstantLike]) {
 	}
 }
 
-func (v *formatter_) formatConstructor(constructor gcm.ConstructorLike) {
+func (v *formatter_) formatConstructor(constructor ast.ConstructorLike) {
 	var identifier = constructor.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("(")
@@ -309,7 +309,7 @@ func (v *formatter_) formatConstructor(constructor gcm.ConstructorLike) {
 	v.formatAbstraction(abstraction)
 }
 
-func (v *formatter_) formatConstructors(constructors col.ListLike[gcm.ConstructorLike]) {
+func (v *formatter_) formatConstructors(constructors col.ListLike[ast.ConstructorLike]) {
 	v.appendNewline()
 	v.appendString("// Constructors")
 	var iterator = constructors.GetIterator()
@@ -320,7 +320,7 @@ func (v *formatter_) formatConstructors(constructors col.ListLike[gcm.Constructo
 	}
 }
 
-func (v *formatter_) formatDeclaration(declaration gcm.DeclarationLike) {
+func (v *formatter_) formatDeclaration(declaration ast.DeclarationLike) {
 	v.appendNewline()
 	var comment = declaration.GetComment()
 	comment = v.fixComment(comment)
@@ -336,7 +336,7 @@ func (v *formatter_) formatDeclaration(declaration gcm.DeclarationLike) {
 	}
 }
 
-func (v *formatter_) formatEnumeration(enumeration gcm.EnumerationLike) {
+func (v *formatter_) formatEnumeration(enumeration ast.EnumerationLike) {
 	v.appendNewline()
 	v.appendString("const (")
 	v.depth_++
@@ -355,7 +355,7 @@ func (v *formatter_) formatEnumeration(enumeration gcm.EnumerationLike) {
 	v.appendString(")")
 }
 
-func (v *formatter_) formatFunction(function gcm.FunctionLike) {
+func (v *formatter_) formatFunction(function ast.FunctionLike) {
 	var identifier = function.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("(")
@@ -368,7 +368,7 @@ func (v *formatter_) formatFunction(function gcm.FunctionLike) {
 	v.formatResult(result)
 }
 
-func (v *formatter_) formatFunctional(functional gcm.FunctionalLike) {
+func (v *formatter_) formatFunctional(functional ast.FunctionalLike) {
 	var declaration = functional.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" func(")
@@ -381,7 +381,7 @@ func (v *formatter_) formatFunctional(functional gcm.FunctionalLike) {
 	v.formatResult(result)
 }
 
-func (v *formatter_) formatFunctionals(functionals col.ListLike[gcm.FunctionalLike]) {
+func (v *formatter_) formatFunctionals(functionals col.ListLike[ast.FunctionalLike]) {
 	v.appendNewline()
 	v.appendString("// Functionals")
 	v.appendNewline()
@@ -393,7 +393,7 @@ func (v *formatter_) formatFunctionals(functionals col.ListLike[gcm.FunctionalLi
 	}
 }
 
-func (v *formatter_) formatFunctions(functions col.ListLike[gcm.FunctionLike]) {
+func (v *formatter_) formatFunctions(functions col.ListLike[ast.FunctionLike]) {
 	v.appendNewline()
 	v.appendString("// Functions")
 	var iterator = functions.GetIterator()
@@ -404,7 +404,7 @@ func (v *formatter_) formatFunctions(functions col.ListLike[gcm.FunctionLike]) {
 	}
 }
 
-func (v *formatter_) formatGenerics(parameters col.ListLike[gcm.ParameterLike]) {
+func (v *formatter_) formatGenerics(parameters col.ListLike[ast.ParameterLike]) {
 	var iterator = parameters.GetIterator()
 	var parameter = iterator.GetNext()
 	v.formatParameter(parameter)
@@ -415,7 +415,7 @@ func (v *formatter_) formatGenerics(parameters col.ListLike[gcm.ParameterLike]) 
 	}
 }
 
-func (v *formatter_) formatHeader(header gcm.HeaderLike) {
+func (v *formatter_) formatHeader(header ast.HeaderLike) {
 	var comment = header.GetComment()
 	comment = v.fixComment(comment)
 	v.appendString(comment)
@@ -424,7 +424,7 @@ func (v *formatter_) formatHeader(header gcm.HeaderLike) {
 	v.appendString(identifier)
 }
 
-func (v *formatter_) formatInstance(instance gcm.InstanceLike) {
+func (v *formatter_) formatInstance(instance ast.InstanceLike) {
 	var declaration = instance.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" interface {")
@@ -455,7 +455,7 @@ func (v *formatter_) formatInstance(instance gcm.InstanceLike) {
 	v.appendString("}")
 }
 
-func (v *formatter_) formatInstances(instances col.ListLike[gcm.InstanceLike]) {
+func (v *formatter_) formatInstances(instances col.ListLike[ast.InstanceLike]) {
 	v.appendNewline()
 	v.appendString("// Instances")
 	v.appendNewline()
@@ -467,7 +467,7 @@ func (v *formatter_) formatInstances(instances col.ListLike[gcm.InstanceLike]) {
 	}
 }
 
-func (v *formatter_) formatMethod(method gcm.MethodLike) {
+func (v *formatter_) formatMethod(method ast.MethodLike) {
 	var identifier = method.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("(")
@@ -483,7 +483,7 @@ func (v *formatter_) formatMethod(method gcm.MethodLike) {
 	}
 }
 
-func (v *formatter_) formatMethods(methods col.ListLike[gcm.MethodLike]) {
+func (v *formatter_) formatMethods(methods col.ListLike[ast.MethodLike]) {
 	v.appendNewline()
 	v.appendString("// Methods")
 	var iterator = methods.GetIterator()
@@ -494,7 +494,7 @@ func (v *formatter_) formatMethods(methods col.ListLike[gcm.MethodLike]) {
 	}
 }
 
-func (v *formatter_) formatModule(module gcm.ModuleLike) {
+func (v *formatter_) formatModule(module ast.ModuleLike) {
 	var identifier = module.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString(" ")
@@ -502,7 +502,7 @@ func (v *formatter_) formatModule(module gcm.ModuleLike) {
 	v.appendString(text)
 }
 
-func (v *formatter_) formatModules(modules col.ListLike[gcm.ModuleLike]) {
+func (v *formatter_) formatModules(modules col.ListLike[ast.ModuleLike]) {
 	v.appendNewline()
 	v.appendString("import (")
 	v.depth_++
@@ -518,13 +518,13 @@ func (v *formatter_) formatModules(modules col.ListLike[gcm.ModuleLike]) {
 	v.appendNewline()
 }
 
-func (v *formatter_) formatNotice(notice gcm.NoticeLike) {
+func (v *formatter_) formatNotice(notice ast.NoticeLike) {
 	var comment = notice.GetComment()
 	comment = v.fixComment(comment)
 	v.appendString(comment)
 }
 
-func (v *formatter_) formatModel(model gcm.ModelLike) {
+func (v *formatter_) formatModel(model ast.ModelLike) {
 	var notice = model.GetNotice()
 	v.formatNotice(notice)
 	var header = model.GetHeader()
@@ -556,7 +556,7 @@ func (v *formatter_) formatModel(model gcm.ModelLike) {
 	}
 }
 
-func (v *formatter_) formatParameter(parameter gcm.ParameterLike) {
+func (v *formatter_) formatParameter(parameter ast.ParameterLike) {
 	var identifier = parameter.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString(" ")
@@ -564,12 +564,12 @@ func (v *formatter_) formatParameter(parameter gcm.ParameterLike) {
 	v.formatAbstraction(abstraction)
 }
 
-func (v *formatter_) formatParameterName(parameter gcm.ParameterLike) {
+func (v *formatter_) formatParameterName(parameter ast.ParameterLike) {
 	var identifier = parameter.GetIdentifier()
 	v.appendString(identifier)
 }
 
-func (v *formatter_) formatParameterNames(parameters col.ListLike[gcm.ParameterLike]) {
+func (v *formatter_) formatParameterNames(parameters col.ListLike[ast.ParameterLike]) {
 	var size = parameters.GetSize()
 	if size > 2 {
 		v.depth_++
@@ -595,7 +595,7 @@ func (v *formatter_) formatParameterNames(parameters col.ListLike[gcm.ParameterL
 	}
 }
 
-func (v *formatter_) formatParameters(parameters col.ListLike[gcm.ParameterLike]) {
+func (v *formatter_) formatParameters(parameters col.ListLike[ast.ParameterLike]) {
 	var size = parameters.GetSize()
 	if size > 1 {
 		v.depth_++
@@ -621,24 +621,24 @@ func (v *formatter_) formatParameters(parameters col.ListLike[gcm.ParameterLike]
 	}
 }
 
-func (v *formatter_) formatPrefix(prefix gcm.PrefixLike) {
+func (v *formatter_) formatPrefix(prefix ast.PrefixLike) {
 	var identifier = prefix.GetIdentifier()
 	switch prefix.GetType() {
-	case gcm.AliasPrefix:
+	case ast.AliasPrefix:
 		v.appendString(identifier)
 		v.appendString(".")
-	case gcm.ArrayPrefix:
+	case ast.ArrayPrefix:
 		v.appendString("[]")
-	case gcm.ChannelPrefix:
+	case ast.ChannelPrefix:
 		v.appendString("chan ")
-	case gcm.MapPrefix:
+	case ast.MapPrefix:
 		v.appendString("map[")
 		v.appendString(identifier)
 		v.appendString("]")
 	}
 }
 
-func (v *formatter_) formatResult(result gcm.ResultLike) {
+func (v *formatter_) formatResult(result ast.ResultLike) {
 	var abstraction = result.GetAbstraction()
 	if abstraction != nil {
 		v.formatAbstraction(abstraction)
@@ -650,7 +650,7 @@ func (v *formatter_) formatResult(result gcm.ResultLike) {
 	}
 }
 
-func (v *formatter_) formatType(type_ gcm.TypeLike) {
+func (v *formatter_) formatType(type_ ast.TypeLike) {
 	var declaration = type_.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" ")
@@ -663,7 +663,7 @@ func (v *formatter_) formatType(type_ gcm.TypeLike) {
 	}
 }
 
-func (v *formatter_) formatTypes(types col.ListLike[gcm.TypeLike]) {
+func (v *formatter_) formatTypes(types col.ListLike[ast.TypeLike]) {
 	v.appendNewline()
 	v.appendString("// Types")
 	v.appendNewline()

@@ -16,7 +16,7 @@ import (
 	fmt "fmt"
 	gcf "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	gcm "github.com/craterdog/go-model-framework/v4/gcmn"
+	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	osx "os"
 	sts "strings"
 	tim "time"
@@ -146,7 +146,7 @@ func (v *generator_) expandCopyright(copyright string) string {
 }
 
 func (v *generator_) extractConstructorAttributes(
-	class gcm.ClassLike,
+	class ast.ClassLike,
 	catalog col.CatalogLike[string, string],
 ) {
 	var constructors = class.GetConstructors()
@@ -165,7 +165,7 @@ func (v *generator_) extractConstructorAttributes(
 }
 
 func (v *generator_) extractInstanceAttributes(
-	instance gcm.InstanceLike,
+	instance ast.InstanceLike,
 	catalog col.CatalogLike[string, string],
 ) {
 	var attributeName string
@@ -179,7 +179,7 @@ func (v *generator_) extractInstanceAttributes(
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
 		var identifier = attribute.GetIdentifier()
-		var abstraction gcm.AbstractionLike
+		var abstraction ast.AbstractionLike
 		switch {
 		case sts.HasPrefix(identifier, "Get"):
 			attributeName = sts.TrimPrefix(identifier, "Get")
@@ -209,7 +209,7 @@ func (v *generator_) extractInstanceAttributes(
 }
 
 func (v *generator_) extractParameterAttributes(
-	parameters col.ListLike[gcm.ParameterLike],
+	parameters col.ListLike[ast.ParameterLike],
 	catalog col.CatalogLike[string, string],
 ) {
 	var formatter = Formatter().Make()
@@ -225,8 +225,8 @@ func (v *generator_) extractParameterAttributes(
 }
 
 func (v *generator_) generateAbstractionMethods(
-	aspect gcm.AspectLike,
-	abstraction gcm.AbstractionLike,
+	aspect ast.AspectLike,
+	abstraction ast.AbstractionLike,
 ) string {
 	var formatter = Formatter().Make()
 	var aspectDeclaration = aspect.GetDeclaration()
@@ -286,8 +286,8 @@ func (v *generator_) generateAbstractionMethods(
 }
 
 func (v *generator_) generateAbstractions(
-	model gcm.ModelLike,
-	instance gcm.InstanceLike,
+	model ast.ModelLike,
+	instance ast.InstanceLike,
 ) string {
 	var formatter = Formatter().Make()
 	var result string
@@ -316,8 +316,8 @@ func (v *generator_) generateAbstractions(
 }
 
 func (v *generator_) generateAttributeAssignments(
-	class gcm.ClassLike,
-	constructor gcm.ConstructorLike,
+	class ast.ClassLike,
+	constructor ast.ConstructorLike,
 ) string {
 	var assignments string
 	var identifier = constructor.GetIdentifier()
@@ -339,7 +339,7 @@ func (v *generator_) generateAttributeAssignments(
 	return assignments
 }
 
-func (v *generator_) generateAttributeMethods(instance gcm.InstanceLike) string {
+func (v *generator_) generateAttributeMethods(instance ast.InstanceLike) string {
 	var formatter = Formatter().Make()
 	var methods string
 	var instanceAttributes = instance.GetAttributes()
@@ -395,9 +395,9 @@ func (v *generator_) generateAttributeMethods(instance gcm.InstanceLike) string 
 
 func (v *generator_) generateClass(
 	directory string,
-	model gcm.ModelLike,
-	class gcm.ClassLike,
-	instance gcm.InstanceLike,
+	model ast.ModelLike,
+	class ast.ClassLike,
+	instance ast.InstanceLike,
 ) {
 	var template = classTemplate_
 
@@ -445,7 +445,7 @@ func (v *generator_) generateClass(
 	v.outputClass(classFile, template)
 }
 
-func (v *generator_) generateClassAccess(class gcm.ClassLike) string {
+func (v *generator_) generateClassAccess(class ast.ClassLike) string {
 	var declaration = class.GetDeclaration()
 	var parameters = declaration.GetParameters()
 	var reference = classReferenceTemplate_
@@ -460,7 +460,7 @@ func (v *generator_) generateClassAccess(class gcm.ClassLike) string {
 	return access + "\n"
 }
 
-func (v *generator_) generateClassConstants(class gcm.ClassLike) string {
+func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 	var formatter = Formatter().Make()
 	var constants string
 	var classConstants = class.GetConstants()
@@ -484,7 +484,7 @@ func (v *generator_) generateClassConstants(class gcm.ClassLike) string {
 	return constants
 }
 
-func (v *generator_) generateClasses(directory string, model gcm.ModelLike) {
+func (v *generator_) generateClasses(directory string, model ast.ModelLike) {
 	var classes = model.GetClasses()
 	var instances = model.GetInstances()
 	if classes == nil || instances == nil {
@@ -499,7 +499,7 @@ func (v *generator_) generateClasses(directory string, model gcm.ModelLike) {
 	}
 }
 
-func (v *generator_) generateClassMethods(class gcm.ClassLike) string {
+func (v *generator_) generateClassMethods(class ast.ClassLike) string {
 	var methods = classMethodsTemplate_
 	var target = v.generateClassTarget(class)
 	methods = sts.ReplaceAll(methods, "<Target>", target)
@@ -512,14 +512,14 @@ func (v *generator_) generateClassMethods(class gcm.ClassLike) string {
 	return methods
 }
 
-func (v *generator_) generateClassTarget(class gcm.ClassLike) string {
+func (v *generator_) generateClassTarget(class ast.ClassLike) string {
 	var target = classTargetTemplate_
 	var constants = v.generateClassConstants(class)
 	target = sts.ReplaceAll(target, "<Constants>", constants) + "\n"
 	return target
 }
 
-func (v *generator_) generateConstantMethods(class gcm.ClassLike) string {
+func (v *generator_) generateConstantMethods(class ast.ClassLike) string {
 	var formatter = Formatter().Make()
 	var methods string
 	var classConstants = class.GetConstants()
@@ -545,7 +545,7 @@ func (v *generator_) generateConstantMethods(class gcm.ClassLike) string {
 	return methods
 }
 
-func (v *generator_) generateConstructorMethods(class gcm.ClassLike) string {
+func (v *generator_) generateConstructorMethods(class ast.ClassLike) string {
 	var formatter = Formatter().Make()
 	var methods string
 	var classConstructors = class.GetConstructors()
@@ -576,7 +576,7 @@ func (v *generator_) generateConstructorMethods(class gcm.ClassLike) string {
 	return methods
 }
 
-func (v *generator_) generateFunctionMethods(class gcm.ClassLike) string {
+func (v *generator_) generateFunctionMethods(class ast.ClassLike) string {
 	var formatter = Formatter().Make()
 	var methods string
 	var classFunctions = class.GetFunctions()
@@ -605,14 +605,14 @@ func (v *generator_) generateFunctionMethods(class gcm.ClassLike) string {
 	return methods
 }
 
-func (v *generator_) generateHeader(model gcm.ModelLike) string {
+func (v *generator_) generateHeader(model ast.ModelLike) string {
 	var packageName = model.GetHeader().GetIdentifier()
 	var header = headerTemplate_
 	header = sts.ReplaceAll(header, "<PackageName>", packageName) + "\n"
 	return header
 }
 
-func (v *generator_) generateImports(model gcm.ModelLike, class string) string {
+func (v *generator_) generateImports(model ast.ModelLike, class string) string {
 	var modules string
 	var packageModules = model.GetModules()
 	if packageModules != nil {
@@ -639,8 +639,8 @@ func (v *generator_) generateImports(model gcm.ModelLike, class string) string {
 }
 
 func (v *generator_) generateInstanceAttributes(
-	class gcm.ClassLike,
-	instance gcm.InstanceLike,
+	class ast.ClassLike,
+	instance ast.InstanceLike,
 ) string {
 	var attributes string
 	var catalog = gcf.Catalog[string, string]()
@@ -665,9 +665,9 @@ func (v *generator_) generateInstanceAttributes(
 }
 
 func (v *generator_) generateInstanceMethods(
-	model gcm.ModelLike,
-	class gcm.ClassLike,
-	instance gcm.InstanceLike,
+	model ast.ModelLike,
+	class ast.ClassLike,
+	instance ast.InstanceLike,
 ) string {
 	var instanceMethods = instanceMethodsTemplate_
 	var target = v.generateInstanceTarget(class, instance)
@@ -682,8 +682,8 @@ func (v *generator_) generateInstanceMethods(
 }
 
 func (v *generator_) generateInstanceTarget(
-	class gcm.ClassLike,
-	instance gcm.InstanceLike,
+	class ast.ClassLike,
+	instance ast.InstanceLike,
 ) string {
 	var target = instanceTargetTemplate_
 	var attributes = v.generateInstanceAttributes(class, instance)
@@ -691,7 +691,7 @@ func (v *generator_) generateInstanceTarget(
 	return target
 }
 
-func (v *generator_) generateModel(directory string, model gcm.ModelLike) {
+func (v *generator_) generateModel(directory string, model ast.ModelLike) {
 	var formatter = Formatter().Make()
 	var source = formatter.FormatModel(model)
 	var bytes = []byte(source)
@@ -702,7 +702,7 @@ func (v *generator_) generateModel(directory string, model gcm.ModelLike) {
 	}
 }
 
-func (v *generator_) generatePublicMethods(instance gcm.InstanceLike) string {
+func (v *generator_) generatePublicMethods(instance ast.InstanceLike) string {
 	var formatter = Formatter().Make()
 	var publicMethods string
 	var instanceMethods = instance.GetMethods()
@@ -761,7 +761,7 @@ func (v *generator_) outputClass(classFile, class string) {
 	}
 }
 
-func (v *generator_) parseModel(directory string) gcm.ModelLike {
+func (v *generator_) parseModel(directory string) ast.ModelLike {
 	var modelFile = directory + "Package.go"
 	var bytes, err = osx.ReadFile(modelFile)
 	if err != nil {
@@ -780,10 +780,10 @@ func (v *generator_) parseModel(directory string) gcm.ModelLike {
 }
 
 func (v *generator_) replaceGenericType(
-	genericTypes col.ListLike[gcm.ParameterLike],
-	concreteTypes col.ListLike[gcm.AbstractionLike],
-	abstraction gcm.AbstractionLike,
-) gcm.AbstractionLike {
+	genericTypes col.ListLike[ast.ParameterLike],
+	concreteTypes col.ListLike[ast.AbstractionLike],
+	abstraction ast.AbstractionLike,
+) ast.AbstractionLike {
 	var formatter = Formatter().Make()
 	var prefix = abstraction.GetPrefix()
 	var identifier = abstraction.GetIdentifier()
@@ -801,7 +801,7 @@ func (v *generator_) replaceGenericType(
 	}
 	if arguments != nil {
 		var argumentIterator = arguments.GetIterator()
-		arguments = gcf.List[gcm.AbstractionLike]()
+		arguments = gcf.List[ast.AbstractionLike]()
 		for argumentIterator.HasNext() {
 			var argument = argumentIterator.GetNext()
 			argument = v.replaceGenericType(
@@ -812,17 +812,17 @@ func (v *generator_) replaceGenericType(
 			arguments.AppendValue(argument)
 		}
 	}
-	abstraction = gcm.Abstraction().MakeWithAttributes(prefix, identifier, arguments)
+	abstraction = ast.Abstraction().MakeWithAttributes(prefix, identifier, arguments)
 	return abstraction
 }
 
 func (v *generator_) replaceParameterTypes(
-	genericTypes col.ListLike[gcm.ParameterLike],
-	concreteTypes col.ListLike[gcm.AbstractionLike],
-	methodParameters col.ListLike[gcm.ParameterLike],
-) col.ListLike[gcm.ParameterLike] {
+	genericTypes col.ListLike[ast.ParameterLike],
+	concreteTypes col.ListLike[ast.AbstractionLike],
+	methodParameters col.ListLike[ast.ParameterLike],
+) col.ListLike[ast.ParameterLike] {
 	var parameterIterator = methodParameters.GetIterator()
-	methodParameters = gcf.List[gcm.ParameterLike]()
+	methodParameters = gcf.List[ast.ParameterLike]()
 	for parameterIterator.HasNext() {
 		var methodParameter = parameterIterator.GetNext()
 		var parameterName = methodParameter.GetIdentifier()
@@ -832,17 +832,17 @@ func (v *generator_) replaceParameterTypes(
 			concreteTypes,
 			parameterType,
 		)
-		methodParameter = gcm.Parameter().MakeWithAttributes(parameterName, parameterType)
+		methodParameter = ast.Parameter().MakeWithAttributes(parameterName, parameterType)
 		methodParameters.AppendValue(methodParameter)
 	}
 	return methodParameters
 }
 
 func (v *generator_) replaceResultTypes(
-	genericTypes col.ListLike[gcm.ParameterLike],
-	concreteTypes col.ListLike[gcm.AbstractionLike],
-	methodResult gcm.ResultLike,
-) gcm.ResultLike {
+	genericTypes col.ListLike[ast.ParameterLike],
+	concreteTypes col.ListLike[ast.AbstractionLike],
+	methodResult ast.ResultLike,
+) ast.ResultLike {
 	var resultAbstraction = methodResult.GetAbstraction()
 	if resultAbstraction != nil {
 		resultAbstraction = v.replaceGenericType(
@@ -850,7 +850,7 @@ func (v *generator_) replaceResultTypes(
 			concreteTypes,
 			resultAbstraction,
 		)
-		methodResult = gcm.Result().MakeWithAbstraction(resultAbstraction)
+		methodResult = ast.Result().MakeWithAbstraction(resultAbstraction)
 	} else {
 		var resultParameters = methodResult.GetParameters()
 		resultParameters = v.replaceParameterTypes(
@@ -858,15 +858,15 @@ func (v *generator_) replaceResultTypes(
 			concreteTypes,
 			resultParameters,
 		)
-		methodResult = gcm.Result().MakeWithParameters(resultParameters)
+		methodResult = ast.Result().MakeWithParameters(resultParameters)
 	}
 	return methodResult
 }
 
 func (v *generator_) retrieveAspect(
-	model gcm.ModelLike,
+	model ast.ModelLike,
 	identifier string,
-) gcm.AspectLike {
+) ast.AspectLike {
 	var aspects = model.GetAspects()
 	if aspects != nil {
 		var iterator = aspects.GetIterator()

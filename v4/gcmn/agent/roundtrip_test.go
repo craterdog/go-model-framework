@@ -14,15 +14,15 @@ package agent_test
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-model-framework/v4/agent"
+	age "github.com/craterdog/go-model-framework/v4/gcmn/agent"
 	ass "github.com/stretchr/testify/assert"
 	osx "os"
 	sts "strings"
 	tes "testing"
 )
 
-const inputDirectory = "../test/input/"
-const outputDirectory = "../test/output/"
+const inputDirectory = "../../test/input/"
+const outputDirectory = "../../test/output/"
 
 func TestRoundtrips(t *tes.T) {
 	fmt.Println("Roundtrip Test")
