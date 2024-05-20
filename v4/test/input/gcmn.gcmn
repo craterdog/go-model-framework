@@ -27,7 +27,7 @@ on interfaces, not on each other.
 package gcmn
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // Types

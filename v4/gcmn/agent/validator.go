@@ -14,8 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
-	gcf "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
 	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	sts "strings"
 )
@@ -73,13 +72,13 @@ func (v *validator_) GetClass() ValidatorClassLike {
 
 func (v *validator_) ValidateModel(model ast.ModelLike) {
 	// Initialize the catalogs.
-	v.modules_ = gcf.Catalog[string, ast.ModuleLike]()
-	v.types_ = gcf.Catalog[string, ast.TypeLike]()
-	v.functionals_ = gcf.Catalog[string, ast.FunctionalLike]()
-	v.aspects_ = gcf.Catalog[string, ast.AspectLike]()
-	v.classes_ = gcf.Catalog[string, ast.ClassLike]()
-	v.instances_ = gcf.Catalog[string, ast.InstanceLike]()
-	v.abstractions_ = gcf.Catalog[string, ast.AbstractionLike]()
+	v.modules_ = col.Catalog[string, ast.ModuleLike]()
+	v.types_ = col.Catalog[string, ast.TypeLike]()
+	v.functionals_ = col.Catalog[string, ast.FunctionalLike]()
+	v.aspects_ = col.Catalog[string, ast.AspectLike]()
+	v.classes_ = col.Catalog[string, ast.ClassLike]()
+	v.instances_ = col.Catalog[string, ast.InstanceLike]()
+	v.abstractions_ = col.Catalog[string, ast.AbstractionLike]()
 
 	// Extract the catalogs.
 	v.extractModules(model)
@@ -523,8 +522,8 @@ func (v *validator_) validateModules(model ast.ModelLike) {
 
 func (v *validator_) validatePairings(model ast.ModelLike) {
 	// Make sure each class interface has an associated instance interface.
-	var classes = gcf.List[string](v.classes_.GetKeys())
-	var instances = gcf.List[string](v.instances_.GetKeys())
+	var classes = col.List[string](v.classes_.GetKeys())
+	var instances = col.List[string](v.instances_.GetKeys())
 	if classes.GetSize() != instances.GetSize() {
 		var message = fmt.Sprintf(
 			"Mismatched class and instance interfaces:\n%v\n%v\n",

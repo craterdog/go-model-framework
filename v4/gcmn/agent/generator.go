@@ -14,8 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
-	gcf "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
 	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	osx "os"
 	sts "strings"
@@ -643,7 +642,7 @@ func (v *generator_) generateInstanceAttributes(
 	instance ast.InstanceLike,
 ) string {
 	var attributes string
-	var catalog = gcf.Catalog[string, string]()
+	var catalog = col.Catalog[string, string]()
 	v.extractInstanceAttributes(instance, catalog)
 	v.extractConstructorAttributes(class, catalog)
 	if catalog.IsEmpty() {
@@ -801,7 +800,7 @@ func (v *generator_) replaceGenericType(
 	}
 	if arguments != nil {
 		var argumentIterator = arguments.GetIterator()
-		arguments = gcf.List[ast.AbstractionLike]()
+		arguments = col.List[ast.AbstractionLike]()
 		for argumentIterator.HasNext() {
 			var argument = argumentIterator.GetNext()
 			argument = v.replaceGenericType(
@@ -822,7 +821,7 @@ func (v *generator_) replaceParameterTypes(
 	methodParameters col.ListLike[ast.ParameterLike],
 ) col.ListLike[ast.ParameterLike] {
 	var parameterIterator = methodParameters.GetIterator()
-	methodParameters = gcf.List[ast.ParameterLike]()
+	methodParameters = col.List[ast.ParameterLike]()
 	for parameterIterator.HasNext() {
 		var methodParameter = parameterIterator.GetNext()
 		var parameterName = methodParameter.GetIdentifier()
