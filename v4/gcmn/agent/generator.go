@@ -16,7 +16,6 @@ import (
 	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v4"
 	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
-	osx "os"
 	sts "strings"
 	tim "time"
 	uni "unicode"
@@ -68,53 +67,42 @@ func (v *generator_) GetClass() GeneratorClassLike {
 
 // Public
 
-func (v *generator_) CreateModel(directory string, name string, copyright string) {
-	// Create a new directory for the model.
-	directory = v.createDirectory(directory, name)
-
-	// Center and insert the copyright notice into the model template.
+func (v *generator_) CreateModel(name string, copyright string) string {
 	copyright = v.expandCopyright(copyright)
 	var template = sts.ReplaceAll(modelTemplate_, "<Copyright>", copyright)
 	template = sts.ReplaceAll(template, "<packagename>", name)
-	var bytes = []byte(template[1:]) // Remove leading "\n".
-
-	// Save the new model template.
-	var modelFile = directory + "Package.temp"
-	fmt.Printf(
-		"The model file %q does not exist.\n\tCreating a template for it...\n",
-		modelFile,
-	)
-	var err = osx.WriteFile(modelFile, bytes, 0644)
-	if err != nil {
-		panic(err)
-	}
+	return template[1:] // Remove the leading "\n".
 }
 
-func (v *generator_) GeneratePackage(directory string) {
-	if !sts.HasSuffix(directory, "/") {
-		directory += "/"
+func (v *generator_) GenerateClass(
+	model ast.ModelLike,
+	name string,
+) string {
+	var classIterator = model.GetClasses().GetIterator()
+	var instanceIterator = model.GetInstances().GetIterator()
+	for classIterator.HasNext() && instanceIterator.HasNext() {
+		var class = classIterator.GetNext()
+		var className = sts.ToLower(sts.TrimSuffix(
+			class.GetDeclaration().GetIdentifier(),
+			"ClassLike",
+		))
+		var instance = instanceIterator.GetNext()
+		var instanceName = sts.ToLower(sts.TrimSuffix(
+			instance.GetDeclaration().GetIdentifier(),
+			"Like",
+		))
+		if className == name && instanceName == name {
+			return v.generateClass(model, class, instance)
+		}
 	}
-	var model = v.parseModel(directory)
-	if model == nil {
-		return
-	}
-	v.generateModel(directory, model)
-	v.generateClasses(directory, model)
+	var message = fmt.Sprintf(
+		"The following class does not exist in the model: %v",
+		name,
+	)
+	panic(message)
 }
 
 // Private
-
-func (v *generator_) createDirectory(directory string, name string) string {
-	if !sts.HasSuffix(directory, "/") {
-		directory += "/"
-	}
-	directory += name + "/"
-	var err = osx.MkdirAll(directory, 0755)
-	if err != nil {
-		panic(err)
-	}
-	return directory
-}
 
 func (v *generator_) expandCopyright(copyright string) string {
 	var maximum = 78
@@ -393,11 +381,10 @@ func (v *generator_) generateAttributeMethods(instance ast.InstanceLike) string 
 }
 
 func (v *generator_) generateClass(
-	directory string,
 	model ast.ModelLike,
 	class ast.ClassLike,
 	instance ast.InstanceLike,
-) {
+) string {
 	var template = classTemplate_
 
 	var notice = model.GetNotice().GetComment()
@@ -438,10 +425,7 @@ func (v *generator_) generateClass(
 
 	var imports = v.generateImports(model, template)
 	template = sts.ReplaceAll(template, "<Imports>", imports)
-
-	var fileName = sts.ToLower(className)
-	var classFile = directory + fileName + ".go"
-	v.outputClass(classFile, template)
+	return template
 }
 
 func (v *generator_) generateClassAccess(class ast.ClassLike) string {
@@ -481,21 +465,6 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 	}
 	constants += "\n"
 	return constants
-}
-
-func (v *generator_) generateClasses(directory string, model ast.ModelLike) {
-	var classes = model.GetClasses()
-	var instances = model.GetInstances()
-	if classes == nil || instances == nil {
-		return
-	}
-	var classIterator = classes.GetIterator()
-	var instanceIterator = instances.GetIterator()
-	for classIterator.HasNext() {
-		var class = classIterator.GetNext()
-		var instance = instanceIterator.GetNext()
-		v.generateClass(directory, model, class, instance)
-	}
 }
 
 func (v *generator_) generateClassMethods(class ast.ClassLike) string {
@@ -690,17 +659,6 @@ func (v *generator_) generateInstanceTarget(
 	return target
 }
 
-func (v *generator_) generateModel(directory string, model ast.ModelLike) {
-	var formatter = Formatter().Make()
-	var source = formatter.FormatModel(model)
-	var bytes = []byte(source)
-	var modelFile = directory + "Package.go"
-	var err = osx.WriteFile(modelFile, bytes, 0644)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (v *generator_) generatePublicMethods(instance ast.InstanceLike) string {
 	var formatter = Formatter().Make()
 	var publicMethods string
@@ -742,40 +700,6 @@ func (v *generator_) makePrivate(identifier string) string {
 	runes := []rune(identifier)
 	runes[0] = uni.ToLower(runes[0])
 	return string(runes)
-}
-
-func (v *generator_) outputClass(classFile, class string) {
-	var _, err = osx.ReadFile(classFile)
-	if err == nil {
-		// Don't overwrite an existing class file.
-		fmt.Printf(
-			"The class file %q already exists, leaving it alone.\n",
-			classFile,
-		)
-		return
-	}
-	err = osx.WriteFile(classFile, []byte(class), 0644)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (v *generator_) parseModel(directory string) ast.ModelLike {
-	var modelFile = directory + "Package.go"
-	var bytes, err = osx.ReadFile(modelFile)
-	if err != nil {
-		var message = fmt.Sprintf(
-			"The specified directory is missing a model file: %v",
-			modelFile,
-		)
-		panic(message)
-	}
-	var source = string(bytes)
-	var parser = Parser().Make()
-	var model = parser.ParseSource(source)
-	var validator = Validator().Make()
-	validator.ValidateModel(model)
-	return model
 }
 
 func (v *generator_) replaceGenericType(

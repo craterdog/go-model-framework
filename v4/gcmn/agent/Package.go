@@ -169,11 +169,13 @@ type GeneratorLike interface {
 
 	// Methods
 	CreateModel(
-		directory string,
 		name string,
 		copyright string,
-	)
-	GeneratePackage(directory string)
+	) string
+	GenerateClass(
+		model ast.ModelLike,
+		name string,
+	) string
 }
 
 /*
