@@ -40,7 +40,38 @@ import (
 // AST
 
 type (
-	ModelLike ast.ModelLike
+	PrefixType ast.PrefixType
+)
+
+const (
+	ErrorPrefix   = ast.ErrorPrefix
+	AliasPrefix   = ast.AliasPrefix
+	ArrayPrefix   = ast.ArrayPrefix
+	ChannelPrefix = ast.ChannelPrefix
+	MapPrefix     = ast.MapPrefix
+)
+
+type (
+	AbstractionLike ast.AbstractionLike
+	AspectLike      ast.AspectLike
+	AttributeLike   ast.AttributeLike
+	ClassLike       ast.ClassLike
+	ConstantLike    ast.ConstantLike
+	ConstructorLike ast.ConstructorLike
+	DeclarationLike ast.DeclarationLike
+	EnumerationLike ast.EnumerationLike
+	FunctionLike    ast.FunctionLike
+	FunctionalLike  ast.FunctionalLike
+	HeaderLike      ast.HeaderLike
+	InstanceLike    ast.InstanceLike
+	MethodLike      ast.MethodLike
+	ModelLike       ast.ModelLike
+	ModuleLike      ast.ModuleLike
+	NoticeLike      ast.NoticeLike
+	ParameterLike   ast.ParameterLike
+	PrefixLike      ast.PrefixLike
+	ResultLike      ast.ResultLike
+	TypeLike        ast.TypeLike
 )
 
 // Agents
@@ -67,11 +98,6 @@ func CreateModel(
 func FormatModel(model ModelLike) string {
 	var formatter = age.Formatter().Make()
 	return formatter.FormatModel(model)
-}
-
-func GenerateClass(model ModelLike, name string) string {
-	var generator = age.Generator().Make()
-	return generator.GenerateClass(model, name)
 }
 
 func GenerateClasses(model ModelLike) col.CatalogLike[string, string] {
