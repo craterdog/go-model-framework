@@ -24,7 +24,7 @@ func TestFunctions(t *tes.T) {
 	mod.ValidateModel(model)
 	var actual = mod.FormatModel(model)
 	ass.Equal(t, gcmn, actual)
-	_ = mod.GenerateClass(model, "token")
+	_ = mod.GenerateClasses(model)
 }
 
 const gcmn = `/*

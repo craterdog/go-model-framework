@@ -29,8 +29,10 @@ implementation files for each abstract class defined in the Package.go file.
 package module
 
 import (
+	col "github.com/craterdog/go-collection-framework/v4"
 	age "github.com/craterdog/go-model-framework/v4/gcmn/agent"
 	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
+	sts "strings"
 )
 
 // TYPE PROMOTIONS
@@ -70,6 +72,22 @@ func FormatModel(model ModelLike) string {
 func GenerateClass(model ModelLike, name string) string {
 	var generator = age.Generator().Make()
 	return generator.GenerateClass(model, name)
+}
+
+func GenerateClasses(model ModelLike) col.CatalogLike[string, string] {
+	var classes = col.Catalog[string, string]()
+	var generator = age.Generator().Make()
+	var iterator = model.GetClasses().GetIterator()
+	for iterator.HasNext() {
+		var class = iterator.GetNext()
+		var className = sts.ToLower(sts.TrimSuffix(
+			class.GetDeclaration().GetIdentifier(),
+			"ClassLike",
+		))
+		var classSource = generator.GenerateClass(model, className)
+		classes.SetValue(className, classSource)
+	}
+	return classes
 }
 
 func ParseSource(source string) ModelLike {
