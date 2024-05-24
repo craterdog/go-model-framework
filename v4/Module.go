@@ -36,9 +36,59 @@ import (
 	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 )
 
+// TYPE ALIASES
+
+// AST
+
+type (
+	PrefixType = ast.PrefixType
+)
+
+const (
+	ErrorPrefix   = ast.ErrorPrefix
+	AliasPrefix   = ast.AliasPrefix
+	ArrayPrefix   = ast.ArrayPrefix
+	ChannelPrefix = ast.ChannelPrefix
+	MapPrefix     = ast.MapPrefix
+)
+
+type (
+	AbstractionLike = ast.AbstractionLike
+	AspectLike      = ast.AspectLike
+	AttributeLike   = ast.AttributeLike
+	ClassLike       = ast.ClassLike
+	ConstantLike    = ast.ConstantLike
+	ConstructorLike = ast.ConstructorLike
+	DeclarationLike = ast.DeclarationLike
+	EnumerationLike = ast.EnumerationLike
+	FunctionLike    = ast.FunctionLike
+	FunctionalLike  = ast.FunctionalLike
+	HeaderLike      = ast.HeaderLike
+	InstanceLike    = ast.InstanceLike
+	MethodLike      = ast.MethodLike
+	ModelLike       = ast.ModelLike
+	ModuleLike      = ast.ModuleLike
+	NoticeLike      = ast.NoticeLike
+	ParameterLike   = ast.ParameterLike
+	PrefixLike      = ast.PrefixLike
+	ResultLike      = ast.ResultLike
+	TypeLike        = ast.TypeLike
+)
+
 // Agents
 
-func Formatter(arguments ...any) age.FormatterLike {
+type (
+	FormatterLike = age.FormatterLike
+	GeneratorLike = age.GeneratorLike
+	ParserLike    = age.ParserLike
+	ValidatorLike = age.ValidatorLike
+)
+
+// UNIVERSAL CONSTRUCTORS
+
+// Agents
+
+func Formatter(arguments ...any) FormatterLike {
 	if len(arguments) > 0 {
 		panic("The formatter constructor does not take any arguments.")
 	}
@@ -46,7 +96,7 @@ func Formatter(arguments ...any) age.FormatterLike {
 	return formatter
 }
 
-func Generator(arguments ...any) age.GeneratorLike {
+func Generator(arguments ...any) GeneratorLike {
 	if len(arguments) > 0 {
 		panic("The generator constructor does not take any arguments.")
 	}
@@ -54,7 +104,7 @@ func Generator(arguments ...any) age.GeneratorLike {
 	return generator
 }
 
-func Parser(arguments ...any) age.ParserLike {
+func Parser(arguments ...any) ParserLike {
 	if len(arguments) > 0 {
 		panic("The parser constructor does not take any arguments.")
 	}
@@ -62,7 +112,7 @@ func Parser(arguments ...any) age.ParserLike {
 	return parser
 }
 
-func Validator(arguments ...any) age.ValidatorLike {
+func Validator(arguments ...any) ValidatorLike {
 	if len(arguments) > 0 {
 		panic("The validator constructor does not take any arguments.")
 	}
@@ -72,20 +122,20 @@ func Validator(arguments ...any) age.ValidatorLike {
 
 // AST
 
-func Abstraction(arguments ...any) ast.AbstractionLike {
+func Abstraction(arguments ...any) AbstractionLike {
 	// Initialize the possible arguments.
-	var prefix ast.PrefixLike
+	var prefix PrefixLike
 	var identifier string
-	var arguments_ col.ListLike[ast.AbstractionLike]
+	var arguments_ col.ListLike[AbstractionLike]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.PrefixLike:
+		case PrefixLike:
 			prefix = actual
 		case string:
 			identifier = actual
-		case col.ListLike[ast.AbstractionLike]:
+		case col.ListLike[AbstractionLike]:
 			arguments_ = actual
 		default:
 			var message = fmt.Sprintf(
@@ -105,17 +155,17 @@ func Abstraction(arguments ...any) ast.AbstractionLike {
 	return abstraction
 }
 
-func Aspect(arguments ...any) ast.AspectLike {
+func Aspect(arguments ...any) AspectLike {
 	// Initialize the possible arguments.
-	var declaration ast.DeclarationLike
-	var methods col.ListLike[ast.MethodLike]
+	var declaration DeclarationLike
+	var methods col.ListLike[MethodLike]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.DeclarationLike:
+		case DeclarationLike:
 			declaration = actual
-		case col.ListLike[ast.MethodLike]:
+		case col.ListLike[MethodLike]:
 			methods = actual
 		default:
 			var message = fmt.Sprintf(
@@ -134,20 +184,20 @@ func Aspect(arguments ...any) ast.AspectLike {
 	return aspect
 }
 
-func Attribute(arguments ...any) ast.AttributeLike {
+func Attribute(arguments ...any) AttributeLike {
 	// Initialize the possible arguments.
 	var identifier string
-	var parameter ast.ParameterLike
-	var abstraction ast.AbstractionLike
+	var parameter ParameterLike
+	var abstraction AbstractionLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case string:
 			identifier = actual
-		case ast.ParameterLike:
+		case ParameterLike:
 			parameter = actual
-		case ast.AbstractionLike:
+		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
@@ -167,23 +217,23 @@ func Attribute(arguments ...any) ast.AttributeLike {
 	return attribute
 }
 
-func Class(arguments ...any) ast.ClassLike {
+func Class(arguments ...any) ClassLike {
 	// Initialize the possible arguments.
-	var declaration ast.DeclarationLike
-	var constants col.ListLike[ast.ConstantLike]
-	var constructors col.ListLike[ast.ConstructorLike]
-	var functions col.ListLike[ast.FunctionLike]
+	var declaration DeclarationLike
+	var constants col.ListLike[ConstantLike]
+	var constructors col.ListLike[ConstructorLike]
+	var functions col.ListLike[FunctionLike]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.DeclarationLike:
+		case DeclarationLike:
 			declaration = actual
-		case col.ListLike[ast.ConstantLike]:
+		case col.ListLike[ConstantLike]:
 			constants = actual
-		case col.ListLike[ast.ConstructorLike]:
+		case col.ListLike[ConstructorLike]:
 			constructors = actual
-		case col.ListLike[ast.FunctionLike]:
+		case col.ListLike[FunctionLike]:
 			functions = actual
 		default:
 			var message = fmt.Sprintf(
@@ -204,17 +254,17 @@ func Class(arguments ...any) ast.ClassLike {
 	return class
 }
 
-func Constant(arguments ...any) ast.ConstantLike {
+func Constant(arguments ...any) ConstantLike {
 	// Initialize the possible arguments.
 	var identifier string
-	var abstraction ast.AbstractionLike
+	var abstraction AbstractionLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case string:
 			identifier = actual
-		case ast.AbstractionLike:
+		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
@@ -233,20 +283,20 @@ func Constant(arguments ...any) ast.ConstantLike {
 	return constant
 }
 
-func Constructor(arguments ...any) ast.ConstructorLike {
+func Constructor(arguments ...any) ConstructorLike {
 	// Initialize the possible arguments.
 	var identifier string
-	var parameters col.ListLike[ast.ParameterLike]
-	var abstraction ast.AbstractionLike
+	var parameters col.ListLike[ParameterLike]
+	var abstraction AbstractionLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case string:
 			identifier = actual
-		case col.ListLike[ast.ParameterLike]:
+		case col.ListLike[ParameterLike]:
 			parameters = actual
-		case ast.AbstractionLike:
+		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
@@ -266,11 +316,11 @@ func Constructor(arguments ...any) ast.ConstructorLike {
 	return constructor
 }
 
-func Declaration(arguments ...any) ast.DeclarationLike {
+func Declaration(arguments ...any) DeclarationLike {
 	// Initialize the possible arguments.
 	var comment string
 	var identifier string
-	var parameters col.ListLike[ast.ParameterLike]
+	var parameters col.ListLike[ParameterLike]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
@@ -281,7 +331,7 @@ func Declaration(arguments ...any) ast.DeclarationLike {
 			} else {
 				identifier = actual
 			}
-		case col.ListLike[ast.ParameterLike]:
+		case col.ListLike[ParameterLike]:
 			parameters = actual
 		default:
 			var message = fmt.Sprintf(
@@ -301,16 +351,16 @@ func Declaration(arguments ...any) ast.DeclarationLike {
 	return declaration
 }
 
-func Enumeration(arguments ...any) ast.EnumerationLike {
+func Enumeration(arguments ...any) EnumerationLike {
 	// Initialize the possible arguments.
-	var parameter ast.ParameterLike
+	var parameter ParameterLike
 	var notation = cdc.Notation().Make()
 	var identifiers = col.List[string](notation).Make()
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.ParameterLike:
+		case ParameterLike:
 			parameter = actual
 		case string:
 			identifiers.AppendValue(actual)
@@ -331,20 +381,20 @@ func Enumeration(arguments ...any) ast.EnumerationLike {
 	return enumeration
 }
 
-func Function(arguments ...any) ast.FunctionLike {
+func Function(arguments ...any) FunctionLike {
 	// Initialize the possible arguments.
 	var identifier string
-	var parameters col.ListLike[ast.ParameterLike]
-	var result ast.ResultLike
+	var parameters col.ListLike[ParameterLike]
+	var result ResultLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case string:
 			identifier = actual
-		case col.ListLike[ast.ParameterLike]:
+		case col.ListLike[ParameterLike]:
 			parameters = actual
-		case ast.ResultLike:
+		case ResultLike:
 			result = actual
 		default:
 			var message = fmt.Sprintf(
@@ -364,20 +414,20 @@ func Function(arguments ...any) ast.FunctionLike {
 	return function
 }
 
-func Functional(arguments ...any) ast.FunctionalLike {
+func Functional(arguments ...any) FunctionalLike {
 	// Initialize the possible arguments.
-	var declaration ast.DeclarationLike
-	var parameters col.ListLike[ast.ParameterLike]
-	var result ast.ResultLike
+	var declaration DeclarationLike
+	var parameters col.ListLike[ParameterLike]
+	var result ResultLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.DeclarationLike:
+		case DeclarationLike:
 			declaration = actual
-		case col.ListLike[ast.ParameterLike]:
+		case col.ListLike[ParameterLike]:
 			parameters = actual
-		case ast.ResultLike:
+		case ResultLike:
 			result = actual
 		default:
 			var message = fmt.Sprintf(
@@ -397,7 +447,7 @@ func Functional(arguments ...any) ast.FunctionalLike {
 	return functional
 }
 
-func Header(arguments ...any) ast.HeaderLike {
+func Header(arguments ...any) HeaderLike {
 	// Initialize the possible arguments.
 	var comment string
 	var identifier string
@@ -428,23 +478,23 @@ func Header(arguments ...any) ast.HeaderLike {
 	return header
 }
 
-func Instance(arguments ...any) ast.InstanceLike {
+func Instance(arguments ...any) InstanceLike {
 	// Initialize the possible arguments.
-	var declaration ast.DeclarationLike
-	var attributes col.ListLike[ast.AttributeLike]
-	var abstractions col.ListLike[ast.AbstractionLike]
-	var methods col.ListLike[ast.MethodLike]
+	var declaration DeclarationLike
+	var attributes col.ListLike[AttributeLike]
+	var abstractions col.ListLike[AbstractionLike]
+	var methods col.ListLike[MethodLike]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.DeclarationLike:
+		case DeclarationLike:
 			declaration = actual
-		case col.ListLike[ast.AttributeLike]:
+		case col.ListLike[AttributeLike]:
 			attributes = actual
-		case col.ListLike[ast.AbstractionLike]:
+		case col.ListLike[AbstractionLike]:
 			abstractions = actual
-		case col.ListLike[ast.MethodLike]:
+		case col.ListLike[MethodLike]:
 			methods = actual
 		default:
 			var message = fmt.Sprintf(
@@ -465,20 +515,20 @@ func Instance(arguments ...any) ast.InstanceLike {
 	return instance
 }
 
-func Method(arguments ...any) ast.MethodLike {
+func Method(arguments ...any) MethodLike {
 	// Initialize the possible arguments.
 	var identifier string
-	var parameters col.ListLike[ast.ParameterLike]
-	var result ast.ResultLike
+	var parameters col.ListLike[ParameterLike]
+	var result ResultLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case string:
 			identifier = actual
-		case col.ListLike[ast.ParameterLike]:
+		case col.ListLike[ParameterLike]:
 			parameters = actual
-		case ast.ResultLike:
+		case ResultLike:
 			result = actual
 		default:
 			var message = fmt.Sprintf(
@@ -498,35 +548,35 @@ func Method(arguments ...any) ast.MethodLike {
 	return method
 }
 
-func Model(arguments ...any) ast.ModelLike {
+func Model(arguments ...any) ModelLike {
 	// Initialize the possible arguments.
-	var notice ast.NoticeLike
-	var header ast.HeaderLike
-	var modules col.ListLike[ast.ModuleLike]
-	var types col.ListLike[ast.TypeLike]
-	var functionals col.ListLike[ast.FunctionalLike]
-	var aspects col.ListLike[ast.AspectLike]
-	var classes col.ListLike[ast.ClassLike]
-	var instances col.ListLike[ast.InstanceLike]
+	var notice NoticeLike
+	var header HeaderLike
+	var modules col.ListLike[ModuleLike]
+	var types col.ListLike[TypeLike]
+	var functionals col.ListLike[FunctionalLike]
+	var aspects col.ListLike[AspectLike]
+	var classes col.ListLike[ClassLike]
+	var instances col.ListLike[InstanceLike]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.NoticeLike:
+		case NoticeLike:
 			notice = actual
-		case ast.HeaderLike:
+		case HeaderLike:
 			header = actual
-		case col.ListLike[ast.ModuleLike]:
+		case col.ListLike[ModuleLike]:
 			modules = actual
-		case col.ListLike[ast.TypeLike]:
+		case col.ListLike[TypeLike]:
 			types = actual
-		case col.ListLike[ast.FunctionalLike]:
+		case col.ListLike[FunctionalLike]:
 			functionals = actual
-		case col.ListLike[ast.AspectLike]:
+		case col.ListLike[AspectLike]:
 			aspects = actual
-		case col.ListLike[ast.ClassLike]:
+		case col.ListLike[ClassLike]:
 			classes = actual
-		case col.ListLike[ast.InstanceLike]:
+		case col.ListLike[InstanceLike]:
 			instances = actual
 		default:
 			var message = fmt.Sprintf(
@@ -551,7 +601,7 @@ func Model(arguments ...any) ast.ModelLike {
 	return model
 }
 
-func Module(arguments ...any) ast.ModuleLike {
+func Module(arguments ...any) ModuleLike {
 	// Initialize the possible arguments.
 	var identifier string
 	var text string
@@ -582,7 +632,7 @@ func Module(arguments ...any) ast.ModuleLike {
 	return module
 }
 
-func Notice(arguments ...any) ast.NoticeLike {
+func Notice(arguments ...any) NoticeLike {
 	// Initialize the possible arguments.
 	var comment string
 
@@ -607,17 +657,17 @@ func Notice(arguments ...any) ast.NoticeLike {
 	return notice
 }
 
-func Parameter(arguments ...any) ast.ParameterLike {
+func Parameter(arguments ...any) ParameterLike {
 	// Initialize the possible arguments.
 	var identifier string
-	var abstraction ast.AbstractionLike
+	var abstraction AbstractionLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case string:
 			identifier = actual
-		case ast.AbstractionLike:
+		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
@@ -636,17 +686,17 @@ func Parameter(arguments ...any) ast.ParameterLike {
 	return parameter
 }
 
-func Prefix(arguments ...any) ast.PrefixLike {
+func Prefix(arguments ...any) PrefixLike {
 	// Initialize the possible arguments.
 	var identifier string
-	var type_ ast.PrefixType
+	var type_ PrefixType
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case string:
 			identifier = actual
-		case ast.PrefixType:
+		case PrefixType:
 			type_ = actual
 		default:
 			var message = fmt.Sprintf(
@@ -665,17 +715,17 @@ func Prefix(arguments ...any) ast.PrefixLike {
 	return prefix
 }
 
-func Result(arguments ...any) ast.ResultLike {
+func Result(arguments ...any) ResultLike {
 	// Initialize the possible arguments.
-	var abstraction ast.AbstractionLike
-	var parameters col.ListLike[ast.ParameterLike]
+	var abstraction AbstractionLike
+	var parameters col.ListLike[ParameterLike]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.AbstractionLike:
+		case AbstractionLike:
 			abstraction = actual
-		case col.ListLike[ast.ParameterLike]:
+		case col.ListLike[ParameterLike]:
 			parameters = actual
 		default:
 			var message = fmt.Sprintf(
@@ -687,33 +737,32 @@ func Result(arguments ...any) ast.ResultLike {
 	}
 
 	// Call the constructor.
-	var class = ast.Result()
-	var result ast.ResultLike
+	var result ResultLike
 	switch {
 	case abstraction != nil:
-		result = class.MakeWithAbstraction(abstraction)
+		result = ast.Result().MakeWithAbstraction(abstraction)
 	case parameters != nil:
-		result = class.MakeWithParameters(parameters)
+		result = ast.Result().MakeWithParameters(parameters)
 	default:
 		panic("The constructor for a result requires an argument.")
 	}
 	return result
 }
 
-func Type(arguments ...any) ast.TypeLike {
+func Type(arguments ...any) TypeLike {
 	// Initialize the possible arguments.
-	var declaration ast.DeclarationLike
-	var abstraction ast.AbstractionLike
-	var enumeration ast.EnumerationLike
+	var declaration DeclarationLike
+	var abstraction AbstractionLike
+	var enumeration EnumerationLike
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case ast.DeclarationLike:
+		case DeclarationLike:
 			declaration = actual
-		case ast.AbstractionLike:
+		case AbstractionLike:
 			abstraction = actual
-		case ast.EnumerationLike:
+		case EnumerationLike:
 			enumeration = actual
 		default:
 			var message = fmt.Sprintf(
