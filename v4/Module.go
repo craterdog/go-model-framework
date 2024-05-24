@@ -86,40 +86,6 @@ type (
 
 // UNIVERSAL CONSTRUCTORS
 
-// Agents
-
-func Formatter(arguments ...any) FormatterLike {
-	if len(arguments) > 0 {
-		panic("The formatter constructor does not take any arguments.")
-	}
-	var formatter = age.Formatter().Make()
-	return formatter
-}
-
-func Generator(arguments ...any) GeneratorLike {
-	if len(arguments) > 0 {
-		panic("The generator constructor does not take any arguments.")
-	}
-	var generator = age.Generator().Make()
-	return generator
-}
-
-func Parser(arguments ...any) ParserLike {
-	if len(arguments) > 0 {
-		panic("The parser constructor does not take any arguments.")
-	}
-	var parser = age.Parser().Make()
-	return parser
-}
-
-func Validator(arguments ...any) ValidatorLike {
-	if len(arguments) > 0 {
-		panic("The validator constructor does not take any arguments.")
-	}
-	var validator = age.Validator().Make()
-	return validator
-}
-
 // AST
 
 func Abstraction(arguments ...any) AbstractionLike {
@@ -780,4 +746,38 @@ func Type(arguments ...any) TypeLike {
 		enumeration,
 	)
 	return type_
+}
+
+// Agents
+
+func Formatter(arguments ...any) FormatterLike {
+	if len(arguments) > 0 {
+		panic("The formatter constructor does not take any arguments.")
+	}
+	var formatter = age.Formatter().Make()
+	return formatter
+}
+
+func Generator(arguments ...any) GeneratorLike {
+	if len(arguments) > 0 {
+		panic("The generator constructor does not take any arguments.")
+	}
+	var generator = age.Generator().Make()
+	return generator
+}
+
+func Parser(arguments ...any) ParserLike {
+	if len(arguments) > 0 {
+		panic("The parser constructor does not take any arguments.")
+	}
+	var parser = age.Parser().Make()
+	return parser
+}
+
+func Validator(arguments ...any) ValidatorLike {
+	if len(arguments) > 0 {
+		panic("The validator constructor does not take any arguments.")
+	}
+	var validator = age.Validator().Make()
+	return validator
 }
