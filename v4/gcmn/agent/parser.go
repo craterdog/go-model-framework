@@ -14,7 +14,8 @@ package agent
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v4"
+	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	sts "strings"
 )
@@ -46,9 +47,10 @@ type parserClass_ struct {
 // Constructors
 
 func (c *parserClass_) Make() ParserLike {
+	var notation = cdc.Notation().Make()
 	return &parser_{
-		tokens_: col.Queue[TokenLike](c.queueSize_),
-		next_:   col.Stack[TokenLike](c.stackSize_),
+		tokens_: col.Queue[TokenLike](notation).MakeWithCapacity(c.queueSize_),
+		next_:   col.Stack[TokenLike](notation).MakeWithCapacity(c.stackSize_),
 	}
 }
 
@@ -285,7 +287,8 @@ func (v *parser_) parseAbstractions() (
 		)
 		panic(message)
 	}
-	abstractions = col.List[ast.AbstractionLike]()
+	var notation = cdc.Notation().Make()
+	abstractions = col.List[ast.AbstractionLike](notation).Make()
 	for ok {
 		abstractions.AppendValue(abstraction)
 		abstraction, token, ok = v.parseAbstraction()
@@ -307,7 +310,8 @@ func (v *parser_) parseArguments() (
 		// This is not a sequence of arguments.
 		return arguments, token, false
 	}
-	arguments = col.List[ast.AbstractionLike]()
+	var notation = cdc.Notation().Make()
+	arguments = col.List[ast.AbstractionLike](notation).Make()
 	for ok {
 		arguments.AppendValue(abstraction)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
@@ -410,7 +414,8 @@ func (v *parser_) parseAspects() (
 		)
 		panic(message)
 	}
-	aspects = col.List[ast.AspectLike]()
+	var notation = cdc.Notation().Make()
+	aspects = col.List[ast.AspectLike](notation).Make()
 	for ok {
 		aspects.AppendValue(aspect)
 		aspect, token, ok = v.parseAspect()
@@ -491,7 +496,8 @@ func (v *parser_) parseAttributes() (
 		)
 		panic(message)
 	}
-	attributes = col.List[ast.AttributeLike]()
+	var notation = cdc.Notation().Make()
+	attributes = col.List[ast.AttributeLike](notation).Make()
 	for ok {
 		attributes.AppendValue(attribute)
 		attribute, token, ok = v.parseAttribute()
@@ -593,7 +599,8 @@ func (v *parser_) parseClasses() (
 		)
 		panic(message)
 	}
-	classes = col.List[ast.ClassLike]()
+	var notation = cdc.Notation().Make()
+	classes = col.List[ast.ClassLike](notation).Make()
 	for ok {
 		classes.AppendValue(class)
 		class, token, ok = v.parseClass()
@@ -678,7 +685,8 @@ func (v *parser_) parseConstants() (
 		)
 		panic(message)
 	}
-	constants = col.List[ast.ConstantLike]()
+	var notation = cdc.Notation().Make()
+	constants = col.List[ast.ConstantLike](notation).Make()
 	for ok {
 		constants.AppendValue(constant)
 		constant, token, ok = v.parseConstant()
@@ -769,7 +777,8 @@ func (v *parser_) parseConstructors() (
 		)
 		panic(message)
 	}
-	constructors = col.List[ast.ConstructorLike]()
+	var notation = cdc.Notation().Make()
+	constructors = col.List[ast.ConstructorLike](notation).Make()
 	for ok {
 		constructors.AppendValue(constructor)
 		constructor, token, ok = v.parseConstructor()
@@ -903,7 +912,8 @@ func (v *parser_) parseEnumeration() (
 
 	// Attempt to parse a sequence of identifiers.
 	var identifier string
-	var identifiers = col.List[string]()
+	var notation = cdc.Notation().Make()
+	var identifiers = col.List[string](notation).Make()
 	identifier, _, ok = v.parseToken(IdentifierToken, "")
 	for ok {
 		identifiers.AppendValue(identifier)
@@ -1081,7 +1091,8 @@ func (v *parser_) parseFunctionals() (
 		)
 		panic(message)
 	}
-	functionals = col.List[ast.FunctionalLike]()
+	var notation = cdc.Notation().Make()
+	functionals = col.List[ast.FunctionalLike](notation).Make()
 	for ok {
 		functionals.AppendValue(functional)
 		functional, token, ok = v.parseFunctional()
@@ -1114,7 +1125,8 @@ func (v *parser_) parseFunctions() (
 		)
 		panic(message)
 	}
-	functions = col.List[ast.FunctionLike]()
+	var notation = cdc.Notation().Make()
+	functions = col.List[ast.FunctionLike](notation).Make()
 	for ok {
 		functions.AppendValue(function)
 		function, token, ok = v.parseFunction()
@@ -1255,7 +1267,8 @@ func (v *parser_) parseInstances() (
 		)
 		panic(message)
 	}
-	instances = col.List[ast.InstanceLike]()
+	var notation = cdc.Notation().Make()
+	instances = col.List[ast.InstanceLike](notation).Make()
 	for ok {
 		instances.AppendValue(instance)
 		instance, token, ok = v.parseInstance()
@@ -1336,7 +1349,8 @@ func (v *parser_) parseMethods() (
 		)
 		panic(message)
 	}
-	methods = col.List[ast.MethodLike]()
+	var notation = cdc.Notation().Make()
+	methods = col.List[ast.MethodLike](notation).Make()
 	for ok {
 		methods.AppendValue(method)
 		method, token, ok = v.parseMethod()
@@ -1473,7 +1487,8 @@ func (v *parser_) parseModules() (
 		)
 		panic(message)
 	}
-	modules = col.List[ast.ModuleLike]()
+	var notation = cdc.Notation().Make()
+	modules = col.List[ast.ModuleLike](notation).Make()
 	for ok {
 		modules.AppendValue(module)
 		module, _, ok = v.parseModule()
@@ -1554,7 +1569,8 @@ func (v *parser_) parseParameters() (
 		// This is not a sequence of parameters.
 		return parameters, token, false
 	}
-	parameters = col.List[ast.ParameterLike]()
+	var notation = cdc.Notation().Make()
+	parameters = col.List[ast.ParameterLike](notation).Make()
 	for ok {
 		parameters.AppendValue(parameter)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
@@ -1776,7 +1792,8 @@ func (v *parser_) parseTypes() (
 		)
 		panic(message)
 	}
-	types = col.List[ast.TypeLike]()
+	var notation = cdc.Notation().Make()
+	types = col.List[ast.TypeLike](notation).Make()
 	for ok {
 		types.AppendValue(type_)
 		type_, token, ok = v.parseType()

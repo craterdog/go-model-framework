@@ -10,10 +10,10 @@
 ................................................................................
 */
 
-package gcmn
+package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS

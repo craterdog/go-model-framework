@@ -14,7 +14,8 @@ package agent
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v4"
+	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
 	sts "strings"
 )
@@ -72,13 +73,14 @@ func (v *validator_) GetClass() ValidatorClassLike {
 
 func (v *validator_) ValidateModel(model ast.ModelLike) {
 	// Initialize the catalogs.
-	v.modules_ = col.Catalog[string, ast.ModuleLike]()
-	v.types_ = col.Catalog[string, ast.TypeLike]()
-	v.functionals_ = col.Catalog[string, ast.FunctionalLike]()
-	v.aspects_ = col.Catalog[string, ast.AspectLike]()
-	v.classes_ = col.Catalog[string, ast.ClassLike]()
-	v.instances_ = col.Catalog[string, ast.InstanceLike]()
-	v.abstractions_ = col.Catalog[string, ast.AbstractionLike]()
+	var notation = cdc.Notation().Make()
+	v.modules_ = col.Catalog[string, ast.ModuleLike](notation).Make()
+	v.types_ = col.Catalog[string, ast.TypeLike](notation).Make()
+	v.functionals_ = col.Catalog[string, ast.FunctionalLike](notation).Make()
+	v.aspects_ = col.Catalog[string, ast.AspectLike](notation).Make()
+	v.classes_ = col.Catalog[string, ast.ClassLike](notation).Make()
+	v.instances_ = col.Catalog[string, ast.InstanceLike](notation).Make()
+	v.abstractions_ = col.Catalog[string, ast.AbstractionLike](notation).Make()
 
 	// Extract the catalogs.
 	v.extractModules(model)
@@ -522,8 +524,9 @@ func (v *validator_) validateModules(model ast.ModelLike) {
 
 func (v *validator_) validatePairings(model ast.ModelLike) {
 	// Make sure each class interface has an associated instance interface.
-	var classes = col.List[string](v.classes_.GetKeys())
-	var instances = col.List[string](v.instances_.GetKeys())
+	var notation = cdc.Notation().Make()
+	var classes = col.List[string](notation).MakeFromSequence(v.classes_.GetKeys())
+	var instances = col.List[string](notation).MakeFromSequence(v.instances_.GetKeys())
 	if classes.GetSize() != instances.GetSize() {
 		var message = fmt.Sprintf(
 			"Mismatched class and instance interfaces:\n%v\n%v\n",
