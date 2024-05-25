@@ -184,82 +184,130 @@ package <packagename>
 // Types
 
 /*
-<ConstrainedType> is a constrained type representing...
+TokenType is a constrained type representing any token type recognized by a
+scanner.
 */
-type <ConstrainedType> <primitiveType>
+type TokenType uint8
 
 const (
-	<1stValue> <ConstrainedType> = iota
-	<2ndValue>
-	<3rdValue>
-	...
+	ErrorToken TokenType = iota
+	CommentToken
+	DelimiterToken
+	EOFToken
+	EOLToken
+	IdentifierToken
+	NoteToken
+	SpaceToken
+	TextToken
 )
-...
 
 // Functionals
 
 /*
-<FunctionName>Function is a functional type that defines the signature for any
-function that...
+RankingFunction[V any] is a functional type that defines the signature for any
+function that can determine the relative ordering of two values. The result must
+be one of the following:
+
+	-1: The first value is less than the second value.
+	 0: The first value is equal to the second value.
+	 1: The first value is more than the second value.
+
+The meaning of "less" and "more" is determined by the specific function that
+implements this signature.
 */
-type <FunctionName>Function func(<Parameters>) <AbstractType>
-...
+type RankingFunction[V any] func(
+	first V,
+	second V,
+) int
 
 // Aspects
 
 /*
-<AspectName> is an aspect interface that defines a set of method signatures
-that must be supported by each instance of a <aspect name> concrete class.
+Sequential[V any] is an aspect interface that defines a set of method signatures
+that must be supported by each instance of a sequential concrete class.
 */
-type <AspectName> interface {
+type Sequential[V any] interface {
 	// Methods
-	<MethodName>(<Parameters>) <AbstractType>
-	...
+	AsArray() []V
+	GetSize() int
+	IsEmpty() bool
 }
-...
 
 // Classes
 
 /*
-<ClassName>ClassLike is a class interface that defines the complete set of
+SetClassLike[V any] is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-<class-name>-like concrete class.
+concrete set-like class.
+
+The following functions are supported:
+
+And() returns a new set containing the values that are both of the specified
+sets.
+
+Or() returns a new set containing the values that are in either of the specified
+sets.
+
+Sans() returns a new set containing the values that are in the first specified
+set but not in the second specified set.
+
+Xor() returns a new set containing the values that are in the first specified
+set or the second specified set but not both.
 */
-type <ClassName>ClassLike interface {
+type SetClassLike[V any] interface {
 	// Constants
-	<ConstantName>() <AbstractType>
-	...
+	Ranker() RankingFunction
 
 	// Constructors
-	Make<FromContext>(<Parameters>) <ClassName>Like
-	...
+	Make() SetLike[V]
+	MakeFromArray(values []V) SetLike[V]
+	MakeFromSequence(values Sequential[V]) SetLike[V]
+	MakeFromSource(source string) SetLike[V]
 
 	// Functions
-	<FunctionName>(<Parameters>) <AbstractType>
-	...
+	And(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
+	Or(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
+	Sans(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
+	Xor(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
 }
-...
 
 // Instances
 
 /*
-<ClassName>Like is an instance interface that defines the complete set of
+SetLike[V any] is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a <class-name>-like concrete class.
+instance of a concrete set-like class.  A set-like class maintains an ordered
+sequence of values which can grow or shrink as needed.
+
+This type is parameterized as follows:
+  - V is any type of value.
+
+The order of the values is determined by a configurable ranking function.
 */
-type <ClassName>Like interface {
+type SetLike[V any] interface {
 	// Attributes
-	Get<AttributeName>() <AttributeType>
-	Set<AttributeName>(<attributeName> <AttributeType>)
-	...
+	GetClass() SetClassLike[V]
 
 	// Abstractions
-	<AspectName>
-	...
+	Sequential[V]
 
 	// Methods
-	<MethodName>(<Parameters>) <AbstractType>
-	...
+	AddValue(value V)
+	AddValues(values Sequential[V])
+	RemoveAll()
+	RemoveValue(value V)
+	RemoveValues(values Sequential[V])
 }
-...
 `

@@ -32,8 +32,8 @@ import (
 	fmt "fmt"
 	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	age "github.com/craterdog/go-model-framework/v4/gcmn/agent"
-	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
+	age "github.com/craterdog/go-model-framework/v4/agent"
+	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
 
 // TYPE ALIASES

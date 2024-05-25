@@ -14,7 +14,7 @@ package agent
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
+	ast "github.com/craterdog/go-model-framework/v4/ast"
 	reg "regexp"
 	sts "strings"
 )

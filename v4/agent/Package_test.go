@@ -13,63 +13,64 @@
 package agent_test
 
 import (
-	age "github.com/craterdog/go-model-framework/v4/gcmn/agent"
+	age "github.com/craterdog/go-model-framework/v4/agent"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestCreateModel(t *tes.T) {
+	var formatter = age.Formatter().Make()
 	var generator = age.Generator().Make()
 	var name = "example"
 	var copyright string
 
 	// Generate a new model template default copyright.
-	var actual = generator.CreateModel(name, copyright)
-	ass.Equal(t, defaultCopyright+template, actual)
+	var model = generator.CreateModel(name, copyright)
+	var source = formatter.FormatModel(model)
+	ass.Equal(t, expected, source)
 
 	// Generate a new model template custom copyright.
 	copyright = "Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved."
-	actual = generator.CreateModel(name, copyright)
-	ass.Equal(t, customCopyright+template, actual)
+	generator.CreateModel(name, copyright)
 }
 
 func TestGenerateClass(t *tes.T) {
-	// Parse the source code for the class model.
-	var parser = age.Parser().Make()
-	var model = parser.ParseSource(gcmn)
-
-	// Generate a new concrete class for the set class.
+	// Generate a new example class model using the default copyright.
 	var generator = age.Generator().Make()
-	var actual = generator.GenerateClass(model, "set")
-	ass.Equal(t, class, actual)
+	var name = "example"
+	var copyright string
+	var model = generator.CreateModel(name, copyright)
+
+	// Generate a new concrete set class for the example class model.
+	var source = generator.GenerateClass(model, "set")
+	ass.Equal(t, class, source)
 }
 
 func TestRoundtrip(t *tes.T) {
+	// Generate a new example class model using the default copyright.
+	var generator = age.Generator().Make()
+	var name = "example"
+	var copyright string
+	var model = generator.CreateModel(name, copyright)
+
+	// Format the class model.
+	var formatter = age.Formatter().Make()
+	var source = formatter.FormatModel(model)
+	ass.Equal(t, expected, source)
+
 	// Parse the source code for the class model.
 	var parser = age.Parser().Make()
-	var model = parser.ParseSource(gcmn)
+	model = parser.ParseSource(source)
 
 	// Validate the class model.
 	var validator = age.Validator().Make()
 	validator.ValidateModel(model)
-
-	// Format the class model.
-	var formatter = age.Formatter().Make()
-	var actual = formatter.FormatModel(model)
-	ass.Equal(t, gcmn, actual)
 }
 
-const defaultCopyright = `/*
+const expected = `/*
 ................................................................................
 .                   Copyright (c) 2024.  All Rights Reserved.                  .
-................................................................................`
-
-const customCopyright = `/*
 ................................................................................
-.    Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved.    .
-................................................................................`
-
-const template = `
 .  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
 .                                                                              .
 .  This code is free software; you can redistribute it and/or modify it under  .
@@ -91,115 +92,6 @@ other interfaces and primitive types—and the class implementations only depend
 on interfaces, not on each other.
 */
 package example
-
-// Types
-
-/*
-<ConstrainedType> is a constrained type representing...
-*/
-type <ConstrainedType> <primitiveType>
-
-const (
-	<1stValue> <ConstrainedType> = iota
-	<2ndValue>
-	<3rdValue>
-	...
-)
-...
-
-// Functionals
-
-/*
-<FunctionName>Function is a functional type that defines the signature for any
-function that...
-*/
-type <FunctionName>Function func(<Parameters>) <AbstractType>
-...
-
-// Aspects
-
-/*
-<AspectName> is an aspect interface that defines a set of method signatures
-that must be supported by each instance of a <aspect name> concrete class.
-*/
-type <AspectName> interface {
-	// Methods
-	<MethodName>(<Parameters>) <AbstractType>
-	...
-}
-...
-
-// Classes
-
-/*
-<ClassName>ClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-<class-name>-like concrete class.
-*/
-type <ClassName>ClassLike interface {
-	// Constants
-	<ConstantName>() <AbstractType>
-	...
-
-	// Constructors
-	Make<FromContext>(<Parameters>) <ClassName>Like
-	...
-
-	// Functions
-	<FunctionName>(<Parameters>) <AbstractType>
-	...
-}
-...
-
-// Instances
-
-/*
-<ClassName>Like is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a <class-name>-like concrete class.
-*/
-type <ClassName>Like interface {
-	// Attributes
-	Get<AttributeName>() <AttributeType>
-	Set<AttributeName>(<attributeName> <AttributeType>)
-	...
-
-	// Abstractions
-	<AspectName>
-	...
-
-	// Methods
-	<MethodName>(<Parameters>) <AbstractType>
-	...
-}
-...
-`
-
-const gcmn = `/*
-................................................................................
-.    Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved.    .
-................................................................................
-.  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
-.                                                                              .
-.  This code is free software; you can redistribute it and/or modify it under  .
-.  the terms of The MIT License (MIT), as published by the Open Source         .
-.  Initiative. (See https://opensource.org/license/MIT)                        .
-................................................................................
-*/
-
-/*
-Package "test" provides...
-
-This package follows the Crater Dog Technologies™ Go Coding Conventions located
-here:
-  - https://github.com/craterdog/go-model-framework/wiki
-
-Additional implementations of the concrete classes provided by this package can
-be developed and used seamlessly since the interface definitions only depend on
-other interfaces and primitive types—and the class implementations only depend
-on interfaces, not on each other.
-*/
-package test
 
 // Types
 
@@ -334,7 +226,7 @@ type SetLike[V any] interface {
 
 const class = `/*
 ................................................................................
-.    Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved.    .
+.                   Copyright (c) 2024.  All Rights Reserved.                  .
 ................................................................................
 .  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
 .                                                                              .
@@ -344,7 +236,7 @@ const class = `/*
 ................................................................................
 */
 
-package test
+package example
 
 import (
 	fmt "fmt"

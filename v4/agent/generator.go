@@ -16,7 +16,7 @@ import (
 	fmt "fmt"
 	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
-	ast "github.com/craterdog/go-model-framework/v4/gcmn/ast"
+	ast "github.com/craterdog/go-model-framework/v4/ast"
 	sts "strings"
 	tim "time"
 	uni "unicode"
@@ -68,11 +68,17 @@ func (v *generator_) GetClass() GeneratorClassLike {
 
 // Public
 
-func (v *generator_) CreateModel(name string, copyright string) string {
+func (v *generator_) CreateModel(
+	name string,
+	copyright string,
+) ast.ModelLike {
 	copyright = v.expandCopyright(copyright)
 	var template = sts.ReplaceAll(modelTemplate_, "<Copyright>", copyright)
 	template = sts.ReplaceAll(template, "<packagename>", name)
-	return template[1:] // Remove the leading "\n".
+	var source = template[1:] // Remove the leading "\n".
+	var parser = Parser().Make()
+	var model = parser.ParseSource(source)
+	return model
 }
 
 func (v *generator_) GenerateClass(
