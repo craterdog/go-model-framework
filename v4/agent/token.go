@@ -12,8 +12,6 @@
 
 package agent
 
-import ()
-
 // CLASS ACCESS
 
 // Reference

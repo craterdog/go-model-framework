@@ -59,8 +59,12 @@ class constants, constructors and functions that must be supported by each
 concrete formatter-like class.
 */
 type FormatterClassLike interface {
+	// Constants
+	DefaultMaximum() int
+
 	// Constructors
 	Make() FormatterLike
+	MakeWithMaximum(maximum int) FormatterLike
 }
 
 /*
@@ -145,6 +149,8 @@ instance of a concrete formatter-like class.
 type FormatterLike interface {
 	// Attributes
 	GetClass() FormatterClassLike
+	GetDepth() int
+	GetMaximum() int
 
 	// Methods
 	FormatAbstraction(abstraction ast.AbstractionLike) string
