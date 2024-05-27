@@ -216,9 +216,9 @@ loop:
 NOTE:
 These private constants define the regular expression sub-patterns that make up
 all token types.  Unfortunately there is no way to make them private to the
-scanner class namespace since they must be TRUE Go constants to be initialized
-in this way.  We append an underscore to each name to lessen the chance of a
-name collision with other private Go class constants in this package.
+scanner class since they must be TRUE Go constants to be initialized in this
+way.  We append an underscore to each name to lessen the chance of a name
+collision with other private Go class constants in this package.
 */
 const (
 	any_        = `.|\n`
