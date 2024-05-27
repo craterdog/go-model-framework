@@ -47,10 +47,8 @@ type parserClass_ struct {
 // Constructors
 
 func (c *parserClass_) Make() ParserLike {
-	var notation = cdc.Notation().Make()
 	return &parser_{
-		tokens_: col.Queue[TokenLike](notation).MakeWithCapacity(c.queueSize_),
-		next_:   col.Stack[TokenLike](notation).MakeWithCapacity(c.stackSize_),
+		class_: c,
 	}
 }
 
@@ -74,8 +72,12 @@ func (v *parser_) GetClass() ParserClassLike {
 // Public
 
 func (v *parser_) ParseSource(source string) ast.ModelLike {
-	// The scanner runs in a separate Go routine.
 	v.source_ = source
+	var notation = cdc.Notation().Make()
+	v.tokens_ = col.Queue[TokenLike](notation).MakeWithCapacity(parserClass.queueSize_)
+	v.next_ = col.Stack[TokenLike](notation).MakeWithCapacity(parserClass.stackSize_)
+
+	// The scanner runs in a separate Go routine.
 	Scanner().Make(v.source_, v.tokens_)
 
 	// Attempt to parse a model.
@@ -83,7 +85,7 @@ func (v *parser_) ParseSource(source string) ast.ModelLike {
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("Model",
-			"Gcmn",
+			"AST",
 			"Model",
 		)
 		panic(message)
@@ -99,7 +101,7 @@ func (v *parser_) ParseSource(source string) ast.ModelLike {
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("EOF",
-			"Gcmn",
+			"AST",
 			"Model",
 		)
 		panic(message)
@@ -1719,18 +1721,18 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 ) {
 	// Attempt to parse a specific token.
 	token = v.getNextToken()
-	value = token.GetValue()
 	if token.GetType() == expectedType {
-		var constrained = len(expectedValue) > 0
-		if !constrained || value == expectedValue {
-			// Found the expected token.
+		value = token.GetValue()
+		var notConstrained = len(expectedValue) == 0
+		if notConstrained || value == expectedValue {
+			// Found the right token.
 			return value, token, true
 		}
 	}
 
 	// This is not the right token.
 	v.putBack(token)
-	return "", token, false
+	return value, token, false
 }
 
 func (v *parser_) parseType() (
@@ -1809,11 +1811,11 @@ func (v *parser_) putBack(token TokenLike) {
 }
 
 var syntax = map[string]string{
-	"Gcmn":        `Model EOL* EOF  ! Terminated with an end-of-file marker.`,
+	"AST":         `Model EOL* EOF  ! Terminated with an end-of-file marker.`,
 	"Model":       `Notice Header Modules? Types? Functionals? Aspects? Classes? Instances?`,
 	"Notice":      `comment`,
 	"Header":      `comment "package" identifier`,
-	"Modules":     `"import" "(" Module+ ")"`,
+	"Modules":     `"import" "(" Module* ")"`,
 	"Module":      `identifier text`,
 	"Types":       `"// Types" Type+`,
 	"Type":        `Declaration Abstraction Enumeration?`,
@@ -1832,7 +1834,7 @@ var syntax = map[string]string{
 	"Functional":   `Declaration "func" "(" Parameters? ")" Result`,
 	"Result":       `Abstraction | "(" Parameters ")"`,
 	"Aspects":      `"// Aspects" Aspect+`,
-	"Aspect":       `Declaration "interface" "{" Methods? "}"`,
+	"Aspect":       `Declaration "interface" "{" Methods "}"`,
 	"Classes":      `"// Classes" Class+`,
 	"Class":        `Declaration "interface" "{" Constants? Constructors? Functions? "}"`,
 	"Constants":    `"// Constants" Constant+`,
