@@ -1,6 +1,6 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
-## Contributing to the Go Class Framework
+## Contributing to the Go Class Model Framework
 Thanks for taking time to contribute to this project. We would appreciate help
 with any of the following:
  * Finding and reporting problems
@@ -30,7 +30,7 @@ following:
     new code.
  1. Make the changes to the existing code and add any new code that is required.
  1. Make sure that all code changes and new code meet the coding conventions for
-    the [class framework](https://github.com/craterdog/go-model-framework/wiki)
+    the [class model framework](https://github.com/craterdog/go-model-framework/wiki)
     and that all unit tests pass.
  1. Create a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for your proposed changes.
  1. We will review the pull request and then merge the changes into the main branch.
