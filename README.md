@@ -4,22 +4,21 @@
 
 ### Overview
 This project provides a class-based model framework for jump-starting Go package
-development.  The class-based model follows the Crater Dog Technologies™
-(i.e. craterdog)
-[Go Coding Conventions](https://github.com/craterdog/go-model-framework/wiki).
+development.  It can be used to up-level the typically low-level of Go code.
+
+### Quick Links
+For more information on this project click on the following links:
+ * [project documentation](https://github.com/craterdog/go-model-framework/wiki)
+ * [coding conventions](https://github.com/craterdog/go-model-framework/wiki)
+ * [command-line tools](https://github.com/craterdog/go-model-tools/wiki)
 
 ### Getting Started
-The general development process—in a nutshell—is as follows:
- 1. Install the
-    [go-model-tools](https://github.com/craterdog/go-model-tools) module.
- 1. Run the `bin/initialize` program to generate a `Package.go` class model
-    template file in your package directory.
- 1. Fill in the `Package.go` class model template with the abstract types and
-    interfaces for the classes that your package will provide.
- 1. Run the `bin/generate` program again to generate a concrete class file for each
-    of the corresponding abstract classes defined in your `Package.go` file.
- 1. Insert the method implementations for the class methods and instance methods
-    associated with each concrete class.
+To include the Go packages for this module use the following import statement:
+```go
+import (
+	col "github.com/craterdog/go-model-framework/v4"
+)
+```
 
 ### Contributing
 Project contributors are always welcome. Check out the contributing guidelines
