@@ -314,6 +314,7 @@ func (v *generator_) generateAttributeAssignments(
 	if !sts.HasPrefix(identifier, "MakeWith") {
 		return assignments
 	}
+	assignments = "\n"
 	var parameters = constructor.GetParameters()
 	var iterator = parameters.GetIterator()
 	for iterator.HasNext() {
@@ -323,9 +324,8 @@ func (v *generator_) generateAttributeAssignments(
 		var assignment = attributeAssignmentTemplate_
 		assignment = sts.ReplaceAll(assignment, "<AttributeName>", attributeName)
 		assignment = sts.ReplaceAll(assignment, "<ParameterName>", parameterName)
-		assignments += assignment
+		assignments += assignment + "\n"
 	}
-	assignments += "\n\t"
 	return assignments
 }
 
