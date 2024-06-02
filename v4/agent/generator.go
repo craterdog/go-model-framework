@@ -280,10 +280,10 @@ func (v *generator_) generateAbstractions(
 	instance ast.InstanceLike,
 ) string {
 	var formatter = Formatter().Make()
-	var result string
+	var aspects string
 	var abstractions = instance.GetAbstractions()
 	if abstractions == nil {
-		return result
+		return aspects
 	}
 	var iterator = abstractions.GetIterator()
 	for iterator.HasNext() {
@@ -300,9 +300,9 @@ func (v *generator_) generateAbstractions(
 		var instanceAspect = instanceAspectTemplate_
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<AspectName>", aspectName)
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<Methods>", methods)
-		result += instanceAspect
+		aspects += instanceAspect
 	}
-	return result
+	return aspects
 }
 
 func (v *generator_) generateAttributeAssignments(
@@ -336,6 +336,7 @@ func (v *generator_) generateAttributeMethods(instance ast.InstanceLike) string 
 	if instanceAttributes == nil {
 		return methods
 	}
+	methods = "\n// Attributes\n"
 	var iterator = instanceAttributes.GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
@@ -454,6 +455,7 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 		constants = "\n\t// This class has no private constants.\n"
 		return constants
 	}
+	constants = "\n"
 	var iterator = classConstants.GetIterator()
 	for iterator.HasNext() {
 		var classConstant = iterator.GetNext()
@@ -464,9 +466,8 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 		var constant = classConstantTemplate_
 		constant = sts.ReplaceAll(constant, "<ConstantName>", constantName)
 		constant = sts.ReplaceAll(constant, "<ConstantType>", constantType)
-		constants += constant
+		constants += constant + "\n"
 	}
-	constants += "\n"
 	return constants
 }
 
@@ -486,7 +487,7 @@ func (v *generator_) generateClassMethods(class ast.ClassLike) string {
 func (v *generator_) generateClassTarget(class ast.ClassLike) string {
 	var target = classTargetTemplate_
 	var constants = v.generateClassConstants(class)
-	target = sts.ReplaceAll(target, "<Constants>", constants) + "\n"
+	target = sts.ReplaceAll(target, "<Constants>", constants)
 	return target
 }
 
@@ -497,6 +498,7 @@ func (v *generator_) generateConstantMethods(class ast.ClassLike) string {
 	if classConstants == nil {
 		return methods
 	}
+	methods = "\n// Constants\n"
 	var iterator = classConstants.GetIterator()
 	for iterator.HasNext() {
 		var constant = iterator.GetNext()
@@ -511,7 +513,7 @@ func (v *generator_) generateConstantMethods(class ast.ClassLike) string {
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", "")
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method + "\n"
+		methods += method
 	}
 	return methods
 }
@@ -523,6 +525,7 @@ func (v *generator_) generateConstructorMethods(class ast.ClassLike) string {
 	if classConstructors == nil {
 		return methods
 	}
+	methods = "\n// Constructors\n"
 	var iterator = classConstructors.GetIterator()
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
@@ -542,7 +545,7 @@ func (v *generator_) generateConstructorMethods(class ast.ClassLike) string {
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method + "\n"
+		methods += method
 	}
 	return methods
 }
@@ -554,6 +557,7 @@ func (v *generator_) generateFunctionMethods(class ast.ClassLike) string {
 	if classFunctions == nil {
 		return methods
 	}
+	methods = "\n// Functions\n"
 	var iterator = classFunctions.GetIterator()
 	for iterator.HasNext() {
 		var function = iterator.GetNext()
@@ -571,7 +575,7 @@ func (v *generator_) generateFunctionMethods(class ast.ClassLike) string {
 		method = sts.ReplaceAll(method, "<MethodName>", identifier)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method + "\n"
+		methods += method
 	}
 	return methods
 }
@@ -622,6 +626,7 @@ func (v *generator_) generateInstanceAttributes(
 		attributes = "\n\t// TBA - Add private instance attributes.\n"
 		return attributes
 	}
+	attributes = "\n"
 	var iterator = catalog.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -630,9 +635,8 @@ func (v *generator_) generateInstanceAttributes(
 		var attribute = instanceAttributeTemplate_
 		attribute = sts.ReplaceAll(attribute, "<AttributeName>", attributeName)
 		attribute = sts.ReplaceAll(attribute, "<AttributeType>", attributeType)
-		attributes += attribute
+		attributes += attribute + "\n"
 	}
-	attributes += "\n"
 	return attributes
 }
 
@@ -659,12 +663,12 @@ func (v *generator_) generateInstanceTarget(
 ) string {
 	var target = instanceTargetTemplate_
 	var attributes = v.generateInstanceAttributes(class, instance)
-	target = sts.ReplaceAll(target, "<Attributes>", attributes) + "\n"
+	target = sts.ReplaceAll(target, "<Attributes>", attributes)
 	return target
 }
 
 func (v *generator_) generateNotice(model ast.ModelLike) string {
-	var notice = model.GetNotice().GetComment()
+	var notice = model.GetNotice().GetComment() + "\n"
 	return notice
 }
 
@@ -675,6 +679,7 @@ func (v *generator_) generatePublicMethods(instance ast.InstanceLike) string {
 	if instanceMethods == nil {
 		return publicMethods
 	}
+	publicMethods = "\n// Public\n"
 	var iterator = instanceMethods.GetIterator()
 	for iterator.HasNext() {
 		var publicMethod = iterator.GetNext()

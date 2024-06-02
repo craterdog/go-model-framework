@@ -12,28 +12,23 @@
 
 package agent
 
-const classTemplate_ = `<Notice>
-<Header>
-<Imports>
-<Access>
-<Class>
-<Instance>`
+const classTemplate_ = `<Notice><Header><Imports><Access><Class><Instance>`
 
 const headerTemplate_ = `
-package <Name>`
+package <Name>
+`
 
 const importsTemplate_ = `
 import (<Modules>)
 `
 
-const classAccessTemplate_ = `// CLASS ACCESS
+const classAccessTemplate_ = `
+// CLASS ACCESS
 
 // Reference
 <Reference>
-
 // Function
-<Function>
-`
+<Function>`
 
 const classReferenceTemplate_ = `
 var <TargetName>Class = &<TargetName>Class_{
@@ -42,12 +37,14 @@ var <TargetName>Class = &<TargetName>Class_{
 
 const genericReferenceTemplate_ = `
 var <TargetName>Class = map[string]any{}
-var <TargetName>Mutex syn.Mutex`
+var <TargetName>Mutex syn.Mutex
+`
 
 const classFunctionTemplate_ = `
 func <ClassName>() <ClassName>ClassLike {
 	return <TargetName>Class
-}`
+}
+`
 
 const genericFunctionTemplate_ = `
 func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
@@ -73,27 +70,24 @@ func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
 
 	// Return a reference to the bound class type.
 	return result_
-}`
+}
+`
 
-const classMethodsTemplate_ = `// CLASS METHODS
+const classMethodsTemplate_ = `
+// CLASS METHODS
 
 // Target
-<Target>
-// Constants
-<Constants>
-// Constructors
-<Constructors>
-// Functions
-<Functions>`
+<Target><Constants><Constructors><Functions>`
 
 const classTargetTemplate_ = `
-type <TargetName>Class_[<Parameters>] struct {<Constants>}`
+type <TargetName>Class_[<Parameters>] struct {<Constants>}
+`
 
-const classConstantTemplate_ = `
-	<ConstantName>_ <ConstantType>`
+const classConstantTemplate_ = `	<ConstantName>_ <ConstantType>`
 
 const classMethodTemplate_ = `
-func (c *<TargetName>Class_[<Arguments>]) <MethodName>(<Parameters>)<ResultType> {<Body>}`
+func (c *<TargetName>Class_[<Arguments>]) <MethodName>(<Parameters>)<ResultType> {<Body>}
+`
 
 const constantBodyTemplate_ = `
 	return c.<ConstantName>_
@@ -103,8 +97,7 @@ const constructorBodyTemplate_ = `
 	return &<TargetName>_[<Arguments>]{<Assignments>}
 `
 
-const attributeAssignmentTemplate_ = `
-		<AttributeName>_: <ParameterName>,`
+const attributeAssignmentTemplate_ = `	<AttributeName>_: <ParameterName>,`
 
 const functionBodyTemplate_ = `
 	var result_<ResultType>
@@ -112,25 +105,22 @@ const functionBodyTemplate_ = `
 	return result_
 `
 
-const instanceMethodsTemplate_ = `// INSTANCE METHODS
+const instanceMethodsTemplate_ = `
+// INSTANCE METHODS
 
 // Target
-<Target>
-// Attributes
-<Attributes>
-<Abstractions>
-// Public
-<Methods>
+<Target><Attributes><Abstractions><Methods>
 // Private
 `
 
 const instanceTargetTemplate_ = `
-type <TargetName>_[<Parameters>] struct {<Attributes>}`
+type <TargetName>_[<Parameters>] struct {<Attributes>}
+`
 
-const instanceAttributeTemplate_ = `
-	<AttributeName>_ <AttributeType>`
+const instanceAttributeTemplate_ = `	<AttributeName>_ <AttributeType>`
 
-const instanceAspectTemplate_ = `// <AspectName>
+const instanceAspectTemplate_ = `
+// <AspectName>
 <Methods>`
 
 const instanceMethodTemplate_ = `
