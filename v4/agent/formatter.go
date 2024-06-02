@@ -352,6 +352,7 @@ func (v *formatter_) formatDeclaration(declaration ast.DeclarationLike) {
 	var comment = declaration.GetComment()
 	comment = v.fixComment(comment)
 	v.appendString(comment)
+	v.appendNewline()
 	v.appendString("type ")
 	var identifier = declaration.GetIdentifier()
 	v.appendString(identifier)
@@ -446,9 +447,11 @@ func (v *formatter_) formatHeader(header ast.HeaderLike) {
 	var comment = header.GetComment()
 	comment = v.fixComment(comment)
 	v.appendString(comment)
+	v.appendNewline()
 	v.appendString("package ")
 	var identifier = header.GetIdentifier()
 	v.appendString(identifier)
+	v.appendNewline()
 }
 
 func (v *formatter_) formatInstance(instance ast.InstanceLike) {
@@ -549,6 +552,8 @@ func (v *formatter_) formatNotice(notice ast.NoticeLike) {
 	var comment = notice.GetComment()
 	comment = v.fixComment(comment)
 	v.appendString(comment)
+	v.appendNewline()
+	v.appendNewline()
 }
 
 func (v *formatter_) formatModel(model ast.ModelLike) {
@@ -556,7 +561,6 @@ func (v *formatter_) formatModel(model ast.ModelLike) {
 	v.formatNotice(notice)
 	var header = model.GetHeader()
 	v.formatHeader(header)
-	v.appendNewline()
 	var modules = model.GetModules()
 	if modules != nil {
 		v.formatModules(modules)

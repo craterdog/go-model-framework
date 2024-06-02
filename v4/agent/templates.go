@@ -12,21 +12,28 @@
 
 package agent
 
-const classTemplate_ = `<Notice><Header><Imports><Access><Class><Instance>`
+const classTemplate_ = `<Notice>
+<Header>
+<Imports>
+<Access>
+<Class>
+<Instance>`
 
-const headerTemplate_ = `package <PackageName>`
+const headerTemplate_ = `
+package <Name>`
 
 const importsTemplate_ = `
-import (<Modules>)`
+import (<Modules>)
+`
 
-const classAccessTemplate_ = `
-// CLASS ACCESS
+const classAccessTemplate_ = `// CLASS ACCESS
 
 // Reference
 <Reference>
 
 // Function
-<Function>`
+<Function>
+`
 
 const classReferenceTemplate_ = `
 var <TargetName>Class = &<TargetName>Class_{
@@ -68,8 +75,7 @@ func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
 	return result_
 }`
 
-const classMethodsTemplate_ = `
-// CLASS METHODS
+const classMethodsTemplate_ = `// CLASS METHODS
 
 // Target
 <Target>
@@ -106,13 +112,13 @@ const functionBodyTemplate_ = `
 	return result_
 `
 
-const instanceMethodsTemplate_ = `
-// INSTANCE METHODS
+const instanceMethodsTemplate_ = `// INSTANCE METHODS
 
 // Target
 <Target>
 // Attributes
-<Attributes><Abstractions>
+<Attributes>
+<Abstractions>
 // Public
 <Methods>
 // Private
@@ -124,8 +130,7 @@ type <TargetName>_[<Parameters>] struct {<Attributes>}`
 const instanceAttributeTemplate_ = `
 	<AttributeName>_ <AttributeType>`
 
-const instanceAspectTemplate_ = `
-// <AspectName>
+const instanceAspectTemplate_ = `// <AspectName>
 <Methods>`
 
 const instanceMethodTemplate_ = `
@@ -154,8 +159,7 @@ const setterBodyTemplate_ = `
 	v.<AttributeName>_ = <ParameterName>
 `
 
-const modelTemplate_ = `
-/*
+const modelTemplate_ = `/*
 ................................................................................
 <Copyright>
 ................................................................................
@@ -168,7 +172,7 @@ const modelTemplate_ = `
 */
 
 /*
-Package "<packagename>" provides...
+Package "<name>" provides...
 
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:
@@ -179,7 +183,7 @@ be developed and used seamlessly since the interface definitions only depend on
 other interfaces and primitive types—and the class implementations only depend
 on interfaces, not on each other.
 */
-package <packagename>
+package <name>
 
 // Types
 
@@ -309,5 +313,4 @@ type SetLike[V any] interface {
 	RemoveAll()
 	RemoveValue(value V)
 	RemoveValues(values Sequential[V])
-}
-`
+}`

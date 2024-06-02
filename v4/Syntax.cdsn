@@ -133,7 +133,7 @@ the name of other tokens.  Token definitions cannot be recursive and the
 scanning of tokens is NOT greedy.  And any spaces within a token definition
 are NOT ignored.
 <!
-comment: "/*" EOL ANY* EOL "*/" EOL+  ! Chooses the shortest possible match.
+comment: "/*" ANY* "*/"  ! Chooses the shortest possible match.
 
 delimiter: "[" | "]" | "(" | ")" | "{" | "}" | "." | "," | "="
 

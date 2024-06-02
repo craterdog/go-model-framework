@@ -221,11 +221,13 @@ way.  We append an underscore to each name to lessen the chance of a name
 collision with other private Go class constants in this package.
 */
 const (
-	any_        = `.|\n`
-	comment_    = `/\*\n((?:` + any_ + `)*?)\n\*/[\n]+`
+	any_        = `.|` + eol_
+	comment_    = `/\*` + `((?:` + any_ + `)*?)` + `\*/`
 	control_    = `\p{Cc}`
 	delimiter_  = `[[\](){}\.,=]`
 	digit_      = `\p{Nd}`
+	eof_        = `\z`
+	eol_        = `\n`
 	identifier_ = `(?:` + letter_ + `)(?:` + letter_ + `|` + digit_ + `)*`
 	letter_     = lower_ + `|` + upper_ + `|_`
 	lower_      = `\p{Ll}`

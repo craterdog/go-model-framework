@@ -73,9 +73,8 @@ func (v *generator_) CreateModel(
 	copyright string,
 ) ast.ModelLike {
 	copyright = v.expandCopyright(copyright)
-	var template = sts.ReplaceAll(modelTemplate_, "<Copyright>", copyright)
-	template = sts.ReplaceAll(template, "<packagename>", name)
-	var source = template[1:] // Remove the leading "\n".
+	var source = sts.ReplaceAll(modelTemplate_, "<Copyright>", copyright)
+	source = sts.ReplaceAll(source, "<name>", name)
 	var parser = Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
@@ -99,7 +98,8 @@ func (v *generator_) GenerateClass(
 			"Like",
 		))
 		if className == name && instanceName == name {
-			return v.generateClass(model, class, instance)
+			var source = v.generateClass(model, class, instance)
+			return source
 		}
 	}
 	var message = fmt.Sprintf(
@@ -394,7 +394,7 @@ func (v *generator_) generateClass(
 ) string {
 	var template = classTemplate_
 
-	var notice = model.GetNotice().GetComment()
+	var notice = v.generateNotice(model)
 	template = sts.ReplaceAll(template, "<Notice>", notice)
 
 	var header = v.generateHeader(model)
@@ -447,7 +447,7 @@ func (v *generator_) generateClassAccess(class ast.ClassLike) string {
 	var access = classAccessTemplate_
 	access = sts.ReplaceAll(access, "<Reference>", reference)
 	access = sts.ReplaceAll(access, "<Function>", function)
-	return access + "\n"
+	return access
 }
 
 func (v *generator_) generateClassConstants(class ast.ClassLike) string {
@@ -581,9 +581,9 @@ func (v *generator_) generateFunctionMethods(class ast.ClassLike) string {
 }
 
 func (v *generator_) generateHeader(model ast.ModelLike) string {
-	var packageName = model.GetHeader().GetIdentifier()
+	var name = model.GetHeader().GetIdentifier()
 	var header = headerTemplate_
-	header = sts.ReplaceAll(header, "<PackageName>", packageName) + "\n"
+	header = sts.ReplaceAll(header, "<Name>", name)
 	return header
 }
 
@@ -609,7 +609,7 @@ func (v *generator_) generateImports(model ast.ModelLike, class string) string {
 		modules += "\n"
 	}
 	var imports = importsTemplate_
-	imports = sts.ReplaceAll(imports, "<Modules>", modules) + "\n"
+	imports = sts.ReplaceAll(imports, "<Modules>", modules)
 	return imports
 }
 
@@ -634,9 +634,8 @@ func (v *generator_) generateInstanceAttributes(
 		var attribute = instanceAttributeTemplate_
 		attribute = sts.ReplaceAll(attribute, "<AttributeName>", attributeName)
 		attribute = sts.ReplaceAll(attribute, "<AttributeType>", attributeType)
-		attributes += attribute
+		attributes += attribute + "\n"
 	}
-	attributes += "\n"
 	return attributes
 }
 
@@ -665,6 +664,11 @@ func (v *generator_) generateInstanceTarget(
 	var attributes = v.generateInstanceAttributes(class, instance)
 	target = sts.ReplaceAll(target, "<Attributes>", attributes) + "\n"
 	return target
+}
+
+func (v *generator_) generateNotice(model ast.ModelLike) string {
+	var notice = model.GetNotice().GetComment()
+	return notice
 }
 
 func (v *generator_) generatePublicMethods(instance ast.InstanceLike) string {
