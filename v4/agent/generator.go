@@ -187,11 +187,7 @@ func (v *generator_) extractInstanceAttributes(
 		case sts.HasPrefix(identifier, "Has"):
 			attributeName = sts.TrimPrefix(identifier, "Has")
 			abstraction = attribute.GetAbstraction()
-		default:
-			if attributeName == v.makePrivate(sts.TrimPrefix(identifier, "Set")) {
-				// This attribute was already added.
-				continue
-			}
+		case sts.HasPrefix(identifier, "Set"):
 			attributeName = sts.TrimPrefix(identifier, "Set")
 			var parameter = attribute.GetParameter()
 			abstraction = parameter.GetAbstraction()
@@ -274,7 +270,7 @@ func (v *generator_) generateAbstractionMethods(
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		abstractionMethods += method + "\n"
+		abstractionMethods += method
 	}
 	return abstractionMethods
 }
@@ -382,7 +378,7 @@ func (v *generator_) generateAttributeMethods(instance ast.InstanceLike) string 
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameter)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method + "\n"
+		methods += method
 	}
 	return methods
 }
@@ -634,8 +630,9 @@ func (v *generator_) generateInstanceAttributes(
 		var attribute = instanceAttributeTemplate_
 		attribute = sts.ReplaceAll(attribute, "<AttributeName>", attributeName)
 		attribute = sts.ReplaceAll(attribute, "<AttributeType>", attributeType)
-		attributes += attribute + "\n"
+		attributes += attribute
 	}
+	attributes += "\n"
 	return attributes
 }
 
@@ -703,7 +700,7 @@ func (v *generator_) generatePublicMethods(instance ast.InstanceLike) string {
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		publicMethods += method + "\n"
+		publicMethods += method
 	}
 	return publicMethods
 }

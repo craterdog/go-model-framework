@@ -211,6 +211,7 @@ The order of the values is determined by a configurable ranking function.
 type SetLike[V any] interface {
 	// Attributes
 	GetClass() SetClassLike[V]
+	SetPassword(password []rune)
 
 	// Abstractions
 	Sequential[V]
@@ -353,12 +354,17 @@ func (c *setClass_[V]) Xor(
 
 type set_[V any] struct {
 	class_ SetClassLike[V]
+	password_ []rune
 }
 
 // Attributes
 
 func (v *set_[V]) GetClass() SetClassLike[V] {
 	return v.class_
+}
+
+func (v *set_[V]) SetPassword(password []rune) {
+	v.password_ = password
 }
 
 // Sequential[V]

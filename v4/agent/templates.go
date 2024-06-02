@@ -134,7 +134,8 @@ const instanceAspectTemplate_ = `// <AspectName>
 <Methods>`
 
 const instanceMethodTemplate_ = `
-func (v *<TargetName>_[<Arguments>]) <MethodName>(<Parameters>)<ResultType> {<Body>}`
+func (v *<TargetName>_[<Arguments>]) <MethodName>(<Parameters>)<ResultType> {<Body>}
+`
 
 const methodBodyTemplate_ = `
 	// TBA - Implement the method.
@@ -303,6 +304,7 @@ The order of the values is determined by a configurable ranking function.
 type SetLike[V any] interface {
 	// Attributes
 	GetClass() SetClassLike[V]
+	SetPassword(password []rune)
 
 	// Abstractions
 	Sequential[V]
