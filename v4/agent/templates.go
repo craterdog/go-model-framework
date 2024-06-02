@@ -33,7 +33,8 @@ const classAccessTemplate_ = `
 const classReferenceTemplate_ = `
 var <TargetName>Class = &<TargetName>Class_{
 	// Any private class constants should be initialized here.
-}`
+}
+`
 
 const genericReferenceTemplate_ = `
 var <TargetName>Class = map[string]any{}
