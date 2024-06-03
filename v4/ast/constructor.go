@@ -21,7 +21,7 @@ import (
 // Reference
 
 var constructorClass = &constructorClass_{
-	// Any private class constants should be initialized here.
+	// Initialize class constants.
 }
 
 // Function
@@ -35,9 +35,8 @@ func Constructor() ConstructorClassLike {
 // Target
 
 type constructorClass_ struct {
+	// Define class constants.
 }
-
-// Constants
 
 // Constructors
 
@@ -47,19 +46,20 @@ func (c *constructorClass_) MakeWithAttributes(
 	abstraction AbstractionLike,
 ) ConstructorLike {
 	return &constructor_{
+		// Initialize instance attributes.
+		class_:       c,
 		identifier_:  identifier,
 		parameters_:  parameters,
 		abstraction_: abstraction,
 	}
 }
 
-// Functions
-
 // INSTANCE METHODS
 
 // Target
 
 type constructor_ struct {
+	// Define instance attributes.
 	class_       ConstructorClassLike
 	identifier_  string
 	parameters_  col.ListLike[ParameterLike]
@@ -83,7 +83,5 @@ func (v *constructor_) GetParameters() col.ListLike[ParameterLike] {
 func (v *constructor_) GetAbstraction() AbstractionLike {
 	return v.abstraction_
 }
-
-// Public
 
 // Private

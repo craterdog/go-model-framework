@@ -21,7 +21,7 @@ import (
 // Reference
 
 var methodClass = &methodClass_{
-	// Any private class constants should be initialized here.
+	// Initialize class constants.
 }
 
 // Function
@@ -35,9 +35,8 @@ func Method() MethodClassLike {
 // Target
 
 type methodClass_ struct {
+	// Define class constants.
 }
-
-// Constants
 
 // Constructors
 
@@ -47,19 +46,20 @@ func (c *methodClass_) MakeWithAttributes(
 	result ResultLike,
 ) MethodLike {
 	return &method_{
+		// Initialize instance attributes.
+		class_:      c,
 		identifier_: identifier,
 		parameters_: parameters,
 		result_:     result,
 	}
 }
 
-// Functions
-
 // INSTANCE METHODS
 
 // Target
 
 type method_ struct {
+	// Define instance attributes.
 	class_      MethodClassLike
 	identifier_ string
 	parameters_ col.ListLike[ParameterLike]
@@ -83,7 +83,5 @@ func (v *method_) GetParameters() col.ListLike[ParameterLike] {
 func (v *method_) GetResult() ResultLike {
 	return v.result_
 }
-
-// Public
 
 // Private

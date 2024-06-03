@@ -21,7 +21,7 @@ import (
 // Reference
 
 var aspectClass = &aspectClass_{
-	// Any private class constants should be initialized here.
+	// Initialize class constants.
 }
 
 // Function
@@ -35,9 +35,8 @@ func Aspect() AspectClassLike {
 // Target
 
 type aspectClass_ struct {
+	// Define class constants.
 }
-
-// Constants
 
 // Constructors
 
@@ -46,18 +45,19 @@ func (c *aspectClass_) MakeWithAttributes(
 	methods col.ListLike[MethodLike],
 ) AspectLike {
 	return &aspect_{
+		// Initialize instance attributes.
+		class_:       c,
 		declaration_: declaration,
 		methods_:     methods,
 	}
 }
-
-// Functions
 
 // INSTANCE METHODS
 
 // Target
 
 type aspect_ struct {
+	// Define instance attributes.
 	class_       AspectClassLike
 	declaration_ DeclarationLike
 	methods_     col.ListLike[MethodLike]
@@ -76,7 +76,5 @@ func (v *aspect_) GetDeclaration() DeclarationLike {
 func (v *aspect_) GetMethods() col.ListLike[MethodLike] {
 	return v.methods_
 }
-
-// Public
 
 // Private

@@ -21,7 +21,7 @@ import (
 // Reference
 
 var resultClass = &resultClass_{
-	// Any private class constants should be initialized here.
+	// Initialize class constants.
 }
 
 // Function
@@ -35,31 +35,33 @@ func Result() ResultClassLike {
 // Target
 
 type resultClass_ struct {
+	// Define class constants.
 }
-
-// Constants
 
 // Constructors
 
 func (c *resultClass_) MakeWithAbstraction(abstraction AbstractionLike) ResultLike {
 	return &result_{
+		// Initialize instance attributes.
+		class_:       c,
 		abstraction_: abstraction,
 	}
 }
 
 func (c *resultClass_) MakeWithParameters(parameters col.ListLike[ParameterLike]) ResultLike {
 	return &result_{
+		// Initialize instance attributes.
+		class_:      c,
 		parameters_: parameters,
 	}
 }
-
-// Functions
 
 // INSTANCE METHODS
 
 // Target
 
 type result_ struct {
+	// Define instance attributes.
 	class_       ResultClassLike
 	abstraction_ AbstractionLike
 	parameters_  col.ListLike[ParameterLike]
@@ -78,7 +80,5 @@ func (v *result_) GetAbstraction() AbstractionLike {
 func (v *result_) GetParameters() col.ListLike[ParameterLike] {
 	return v.parameters_
 }
-
-// Public
 
 // Private

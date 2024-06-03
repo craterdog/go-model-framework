@@ -21,7 +21,7 @@ import (
 // Reference
 
 var classClass = &classClass_{
-	// Any private class constants should be initialized here.
+	// Initialize class constants.
 }
 
 // Function
@@ -35,9 +35,8 @@ func Class() ClassClassLike {
 // Target
 
 type classClass_ struct {
+	// Define class constants.
 }
-
-// Constants
 
 // Constructors
 
@@ -48,6 +47,8 @@ func (c *classClass_) MakeWithAttributes(
 	functions col.ListLike[FunctionLike],
 ) ClassLike {
 	return &class_{
+		// Initialize instance attributes.
+		class_:        c,
 		declaration_:  declaration,
 		constants_:    constants,
 		constructors_: constructors,
@@ -55,13 +56,12 @@ func (c *classClass_) MakeWithAttributes(
 	}
 }
 
-// Functions
-
 // INSTANCE METHODS
 
 // Target
 
 type class_ struct {
+	// Define instance attributes.
 	class_        ClassClassLike
 	declaration_  DeclarationLike
 	constants_    col.ListLike[ConstantLike]
@@ -90,7 +90,5 @@ func (v *class_) GetConstructors() col.ListLike[ConstructorLike] {
 func (v *class_) GetFunctions() col.ListLike[FunctionLike] {
 	return v.functions_
 }
-
-// Public
 
 // Private

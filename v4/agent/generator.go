@@ -462,10 +462,6 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 	var formatter = Formatter().Make()
 	var constants string
 	var classConstants = class.GetConstants()
-	if classConstants == nil {
-		constants = "\n\t// This class has no private constants.\n"
-		return constants
-	}
 	var iterator = classConstants.GetIterator()
 	for iterator.HasNext() {
 		var classConstant = iterator.GetNext()
