@@ -242,12 +242,12 @@ func Set[V any]() SetClassLike[V] {
 
 type setClass_[V any] struct {
 	// Define class constants.
-	defaultRanker_ RankingFunction
+	defaultRanker_ RankingFunction[V]
 }
 
 // Constants
 
-func (c *setClass_[V]) DefaultRanker() RankingFunction {
+func (c *setClass_[V]) DefaultRanker() RankingFunction[V] {
 	return c.defaultRanker_
 }
 
@@ -274,7 +274,7 @@ func (c *setClass_[V]) MakeFromSequence(values Sequential[V]) SetLike[V] {
 	}
 }
 
-func (c *setClass_[V]) MakeWithRanker(ranker RankingFunction) SetLike[V] {
+func (c *setClass_[V]) MakeWithRanker(ranker RankingFunction[V]) SetLike[V] {
 	return &set_[V]{
 		// Initialize instance attributes.
 		class_: c,
@@ -327,7 +327,7 @@ func (c *setClass_[V]) Xor(
 type set_[V any] struct {
 	// Define instance attributes.
 	class_ SetClassLike[V]
-	ranker_ RankingFunction
+	ranker_ RankingFunction[V]
 }
 
 // Attributes
@@ -336,7 +336,7 @@ func (v *set_[V]) GetClass() SetClassLike[V] {
 	return v.class_
 }
 
-func (v *set_[V]) SetRanker(ranker RankingFunction) {
+func (v *set_[V]) SetRanker(ranker RankingFunction[V]) {
 	v.ranker_ = ranker
 }
 

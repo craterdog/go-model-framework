@@ -348,13 +348,13 @@ set or the second specified set but not both.
 */
 type SetClassLike[V any] interface {
 	// Constants
-	DefaultRanker() RankingFunction
+	DefaultRanker() RankingFunction[V]
 
 	// Constructors
 	Make() SetLike[V]
 	MakeFromArray(values []V) SetLike[V]
 	MakeFromSequence(values Sequential[V]) SetLike[V]
-	MakeWithRanker(ranker RankingFunction) SetLike[V]
+	MakeWithRanker(ranker RankingFunction[V]) SetLike[V]
 
 	// Functions
 	And(
@@ -391,7 +391,7 @@ The order of the values is determined by a configurable ranking function.
 type SetLike[V any] interface {
 	// Attributes
 	GetClass() SetClassLike[V]
-	SetRanker(ranker RankingFunction)
+	SetRanker(ranker RankingFunction[V])
 
 	// Abstractions
 	Sequential[V]
