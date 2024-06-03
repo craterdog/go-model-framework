@@ -32,7 +32,7 @@ const classAccessTemplate_ = `
 
 const classReferenceTemplate_ = `
 var <TargetName>Class = &<TargetName>Class_{
-	// Any private class constants should be initialized here.
+	// Initialize class constants.
 }
 `
 
@@ -63,7 +63,7 @@ func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
 	default:
 		// Add a new bound class type.
 		result_ = &<TargetName>Class_[<Arguments>]{
-			// Any private class constants should be initialized here.
+			// Initialize class constants.
 		}
 		<TargetName>Class[name] = result_
 	}
@@ -81,10 +81,13 @@ const classMethodsTemplate_ = `
 <Target><Constants><Constructors><Functions>`
 
 const classTargetTemplate_ = `
-type <TargetName>Class_[<Parameters>] struct {<Constants>}
+type <TargetName>Class_[<Parameters>] struct {
+	// Define class constants.<Constants>
+}
 `
 
-const classConstantTemplate_ = `	<ConstantName>_ <ConstantType>`
+const classConstantTemplate_ = `
+	<ConstantName>_ <ConstantType>`
 
 const classMethodTemplate_ = `
 func (c *<TargetName>Class_[<Arguments>]) <MethodName>(<Parameters>)<ResultType> {<Body>}
@@ -95,10 +98,14 @@ const constantBodyTemplate_ = `
 `
 
 const constructorBodyTemplate_ = `
-	return &<TargetName>_[<Arguments>]{<Assignments>}
+	return &<TargetName>_[<Arguments>]{
+		// Initialize instance attributes.
+		class_: c,<Assignments>
+	}
 `
 
-const attributeAssignmentTemplate_ = `	<AttributeName>_: <ParameterName>,`
+const attributeAssignmentTemplate_ = `
+		<AttributeName>_: <ParameterName>,`
 
 const functionBodyTemplate_ = `
 	var result_<ResultType>
@@ -115,10 +122,13 @@ const instanceMethodsTemplate_ = `
 `
 
 const instanceTargetTemplate_ = `
-type <TargetName>_[<Parameters>] struct {<Attributes>}
+type <TargetName>_[<Parameters>] struct {
+	// Define instance attributes.<Attributes>
+}
 `
 
-const instanceAttributeTemplate_ = `	<AttributeName>_ <AttributeType>`
+const instanceAttributeTemplate_ = `
+	<AttributeName>_ <AttributeType>`
 
 const instanceAspectTemplate_ = `
 // <AspectName>
@@ -252,13 +262,13 @@ set or the second specified set but not both.
 */
 type SetClassLike[V any] interface {
 	// Constants
-	Ranker() RankingFunction
+	DefaultRanker() RankingFunction
 
 	// Constructors
 	Make() SetLike[V]
 	MakeFromArray(values []V) SetLike[V]
 	MakeFromSequence(values Sequential[V]) SetLike[V]
-	MakeFromSource(source string) SetLike[V]
+	MakeWithRanker(ranker RankingFunction) SetLike[V]
 
 	// Functions
 	And(
@@ -295,15 +305,13 @@ The order of the values is determined by a configurable ranking function.
 type SetLike[V any] interface {
 	// Attributes
 	GetClass() SetClassLike[V]
-	SetPassword(password []rune)
+	SetRanker(ranker RankingFunction)
 
 	// Abstractions
 	Sequential[V]
 
 	// Methods
 	AddValue(value V)
-	AddValues(values Sequential[V])
-	RemoveAll()
 	RemoveValue(value V)
-	RemoveValues(values Sequential[V])
+	RemoveAll()
 }`

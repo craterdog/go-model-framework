@@ -314,7 +314,6 @@ func (v *generator_) generateAttributeAssignments(
 	if !sts.HasPrefix(identifier, "MakeWith") {
 		return assignments
 	}
-	assignments = "\n\t"
 	var parameters = constructor.GetParameters()
 	var iterator = parameters.GetIterator()
 	for iterator.HasNext() {
@@ -324,7 +323,7 @@ func (v *generator_) generateAttributeAssignments(
 		var assignment = attributeAssignmentTemplate_
 		assignment = sts.ReplaceAll(assignment, "<AttributeName>", attributeName)
 		assignment = sts.ReplaceAll(assignment, "<ParameterName>", parameterName)
-		assignments += assignment + "\n\t"
+		assignments += assignment
 	}
 	return assignments
 }
@@ -455,7 +454,6 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 		constants = "\n\t// This class has no private constants.\n"
 		return constants
 	}
-	constants = "\n"
 	var iterator = classConstants.GetIterator()
 	for iterator.HasNext() {
 		var classConstant = iterator.GetNext()
@@ -466,7 +464,7 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 		var constant = classConstantTemplate_
 		constant = sts.ReplaceAll(constant, "<ConstantName>", constantName)
 		constant = sts.ReplaceAll(constant, "<ConstantType>", constantType)
-		constants += constant + "\n"
+		constants += constant
 	}
 	return constants
 }
@@ -626,7 +624,6 @@ func (v *generator_) generateInstanceAttributes(
 		attributes = "\n\t// TBA - Add private instance attributes.\n"
 		return attributes
 	}
-	attributes = "\n"
 	var iterator = catalog.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -635,7 +632,7 @@ func (v *generator_) generateInstanceAttributes(
 		var attribute = instanceAttributeTemplate_
 		attribute = sts.ReplaceAll(attribute, "<AttributeName>", attributeName)
 		attribute = sts.ReplaceAll(attribute, "<AttributeType>", attributeType)
-		attributes += attribute + "\n"
+		attributes += attribute
 	}
 	return attributes
 }

@@ -168,13 +168,13 @@ set or the second specified set but not both.
 */
 type SetClassLike[V any] interface {
 	// Constants
-	Ranker() RankingFunction
+	DefaultRanker() RankingFunction
 
 	// Constructors
 	Make() SetLike[V]
 	MakeFromArray(values []V) SetLike[V]
 	MakeFromSequence(values Sequential[V]) SetLike[V]
-	MakeFromSource(source string) SetLike[V]
+	MakeWithRanker(ranker RankingFunction) SetLike[V]
 
 	// Functions
 	And(
@@ -211,17 +211,15 @@ The order of the values is determined by a configurable ranking function.
 type SetLike[V any] interface {
 	// Attributes
 	GetClass() SetClassLike[V]
-	SetPassword(password []rune)
+	SetRanker(ranker RankingFunction)
 
 	// Abstractions
 	Sequential[V]
 
 	// Methods
 	AddValue(value V)
-	AddValues(values Sequential[V])
-	RemoveAll()
 	RemoveValue(value V)
-	RemoveValues(values Sequential[V])
+	RemoveAll()
 }
 `
 
@@ -268,7 +266,7 @@ func Set[V any]() SetClassLike[V] {
 	default:
 		// Add a new bound class type.
 		result_ = &setClass_[V]{
-			// Any private class constants should be initialized here.
+			// Initialize class constants.
 		}
 		setClass[name] = result_
 	}
@@ -283,31 +281,45 @@ func Set[V any]() SetClassLike[V] {
 // Target
 
 type setClass_[V any] struct {
-	ranker_ RankingFunction
+	// Define class constants.
+	defaultRanker_ RankingFunction
 }
 
 // Constants
 
-func (c *setClass_[V]) Ranker() RankingFunction {
-	return c.ranker_
+func (c *setClass_[V]) DefaultRanker() RankingFunction {
+	return c.defaultRanker_
 }
 
 // Constructors
 
 func (c *setClass_[V]) Make() SetLike[V] {
-	return &set_[V]{}
+	return &set_[V]{
+		// Initialize instance attributes.
+		class_: c,
+	}
 }
 
 func (c *setClass_[V]) MakeFromArray(values []V) SetLike[V] {
-	return &set_[V]{}
+	return &set_[V]{
+		// Initialize instance attributes.
+		class_: c,
+	}
 }
 
 func (c *setClass_[V]) MakeFromSequence(values Sequential[V]) SetLike[V] {
-	return &set_[V]{}
+	return &set_[V]{
+		// Initialize instance attributes.
+		class_: c,
+	}
 }
 
-func (c *setClass_[V]) MakeFromSource(source string) SetLike[V] {
-	return &set_[V]{}
+func (c *setClass_[V]) MakeWithRanker(ranker RankingFunction) SetLike[V] {
+	return &set_[V]{
+		// Initialize instance attributes.
+		class_: c,
+		ranker_: ranker,
+	}
 }
 
 // Functions
@@ -353,8 +365,9 @@ func (c *setClass_[V]) Xor(
 // Target
 
 type set_[V any] struct {
+	// Define instance attributes.
 	class_ SetClassLike[V]
-	password_ []rune
+	ranker_ RankingFunction
 }
 
 // Attributes
@@ -363,8 +376,8 @@ func (v *set_[V]) GetClass() SetClassLike[V] {
 	return v.class_
 }
 
-func (v *set_[V]) SetPassword(password []rune) {
-	v.password_ = password
+func (v *set_[V]) SetRanker(ranker RankingFunction) {
+	v.ranker_ = ranker
 }
 
 // Sequential[V]
@@ -393,19 +406,11 @@ func (v *set_[V]) AddValue(value V) {
 	// TBA - Implement the method.
 }
 
-func (v *set_[V]) AddValues(values Sequential[V]) {
-	// TBA - Implement the method.
-}
-
-func (v *set_[V]) RemoveAll() {
-	// TBA - Implement the method.
-}
-
 func (v *set_[V]) RemoveValue(value V) {
 	// TBA - Implement the method.
 }
 
-func (v *set_[V]) RemoveValues(values Sequential[V]) {
+func (v *set_[V]) RemoveAll() {
 	// TBA - Implement the method.
 }
 
