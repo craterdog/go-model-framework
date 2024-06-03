@@ -12,8 +12,6 @@
 
 package agent
 
-import ()
-
 // CLASS ACCESS
 
 // Reference
@@ -88,5 +86,3 @@ func (v *token_) GetType() TokenType {
 func (v *token_) GetValue() string {
 	return v.value_
 }
-
-// Private

@@ -70,6 +70,8 @@ func (c *scannerClass_) Make(
 	tokens col.QueueLike[TokenLike],
 ) ScannerLike {
 	var scanner = &scanner_{
+		// Initialize instance attributes.
+		class_:    c,
 		line_:     1,
 		position_: 1,
 		runes_:    []rune(source),
