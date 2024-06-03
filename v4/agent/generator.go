@@ -80,6 +80,18 @@ func (v *generator_) CreateModel(
 	return model
 }
 
+func (v *generator_) CreateGeneric(
+	name string,
+	copyright string,
+) ast.ModelLike {
+	copyright = v.expandCopyright(copyright)
+	var source = sts.ReplaceAll(genericTemplate_, "<Copyright>", copyright)
+	source = sts.ReplaceAll(source, "<name>", name)
+	var parser = Parser().Make()
+	var model = parser.ParseSource(source)
+	return model
+}
+
 func (v *generator_) GenerateClass(
 	model ast.ModelLike,
 	name string,

@@ -178,6 +178,10 @@ type GeneratorLike interface {
 		name string,
 		copyright string,
 	) ast.ModelLike
+	CreateGeneric(
+		name string,
+		copyright string,
+	) ast.ModelLike
 	GenerateClass(
 		model ast.ModelLike,
 		name string,

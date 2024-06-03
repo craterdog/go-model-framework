@@ -18,7 +18,7 @@ import (
 	tes "testing"
 )
 
-func TestLifecycle(t *tes.T) {
+func TestModelLifecycle(t *tes.T) {
 	var generator = mod.Generator()
 	var name = "example"
 
@@ -39,7 +39,33 @@ func TestLifecycle(t *tes.T) {
 	model = parser.ParseSource(source)
 
 	// Generate a concrete class for the class model.
+	name = "angle"
+	source = generator.GenerateClass(model, name)
+	fmt.Printf("ANGLE SOURCE:\n %v\n", source)
+}
+
+func TestGenericLifecycle(t *tes.T) {
+	var generator = mod.Generator()
+	var name = "example"
+
+	// Generate a new generic model with a default copyright.
+	var copyright string
+	var model = generator.CreateGeneric(name, copyright)
+
+	// Validate the generic model.
+	var validator = mod.Validator()
+	validator.ValidateModel(model)
+
+	// Format the generic model.
+	var formatter = mod.Formatter()
+	var source = formatter.FormatModel(model)
+
+	// Parse the source code for the generic model.
+	var parser = mod.Parser()
+	model = parser.ParseSource(source)
+
+	// Generate a concrete class for the generic model.
 	name = "set"
 	source = generator.GenerateClass(model, name)
-	fmt.Printf("CLASS SOURCE:\n %v\n", source)
+	fmt.Printf("SET SOURCE:\n %v\n", source)
 }

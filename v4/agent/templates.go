@@ -190,41 +190,127 @@ package <name>
 // Types
 
 /*
-TokenType is a constrained type representing any token type recognized by a
-scanner.
+Units is a constrained type representing the possible units for an angle.
 */
-type TokenType uint8
+type Units uint8
 
 const (
-	ErrorToken TokenType = iota
-	CommentToken
-	DelimiterToken
-	EOFToken
-	EOLToken
-	IdentifierToken
-	NoteToken
-	SpaceToken
-	TextToken
+	Degrees Units = iota
+	Radians
+	Gradians
+)
+
+// Functionals
+
+/*
+TrigonometricFunction is a functional type that defines the signature for any
+trigonometric function.
+*/
+type TrigonometricFunction func(angle AngleLike) float64
+
+// Aspects
+
+/*
+Angular is an aspect interface that defines a set of method signatures that
+must be supported by each instance of an angular concrete class.
+*/
+type Angular interface {
+	// Methods
+	AsNormalized() AngleLike
+	InUnits(units Units) float64
+}
+
+// Classes
+
+/*
+AngleClassLike is a class interface that defines the set of class constants,
+constructors and functions that must be supported by each angle-like concrete
+class.
+*/
+type AngleClassLike interface {
+	// Constants
+	Pi() AngleLike
+	Tau() AngleLike
+
+	// Constructors
+	MakeFromFloat(value float64) AngleLike
+	MakeFromString(value string) AngleLike
+
+	// Functions
+	Apply(function TrigonometricFunction, angle AngleLike) float64
+	Sine(angle AngleLike) float64
+	Cosine(angle AngleLike) float64
+	Tangent(angle AngleLike) float64
+}
+
+// Instances
+
+/*
+AngleLike is an instance interface that defines the complete set of attributes,
+abstractions and methods that must be supported by each instance of a concrete
+angle-like class.
+*/
+type AngleLike interface {
+	// Attributes
+	GetClass() AngleClassLike
+
+	// Abstractions
+	Angular
+
+	// Methods
+	IsZero() bool
+	AsFloat() float64
+}`
+
+const genericTemplate_ = `/*
+................................................................................
+<Copyright>
+................................................................................
+.  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
+.                                                                              .
+.  This code is free software; you can redistribute it and/or modify it under  .
+.  the terms of The MIT License (MIT), as published by the Open Source         .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
+................................................................................
+*/
+
+/*
+Package "<name>" provides...
+
+This package follows the Crater Dog Technologies™ Go Coding Conventions located
+here:
+  - https://github.com/craterdog/go-model-framework/wiki
+
+Additional implementations of the concrete classes provided by this package can
+be developed and used seamlessly since the interface definitions only depend on
+other interfaces and primitive types—and the class implementations only depend
+on interfaces, not on each other.
+*/
+package <name>
+
+// Types
+
+/*
+Rank is a constrained type representing the possible rankings for two values.
+*/
+type Rank uint8
+
+const (
+	LesserRank Rank = iota
+	EqualRank
+	GreaterRank
 )
 
 // Functionals
 
 /*
 RankingFunction[V any] is a functional type that defines the signature for any
-function that can determine the relative ordering of two values. The result must
-be one of the following:
-
-	-1: The first value is less than the second value.
-	 0: The first value is equal to the second value.
-	 1: The first value is more than the second value.
-
-The meaning of "less" and "more" is determined by the specific function that
-implements this signature.
+function that can determine the relative ranking of two values.
 */
 type RankingFunction[V any] func(
 	first V,
 	second V,
-) int
+) Rank
 
 // Aspects
 
