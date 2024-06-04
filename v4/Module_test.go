@@ -41,7 +41,7 @@ func TestModelLifecycle(t *tes.T) {
 	// Generate a concrete class for the class model.
 	name = "angle"
 	source = generator.GenerateClass(model, name)
-	fmt.Printf("ANGLE SOURCE:\n %v\n", source)
+	fmt.Printf("ANGLE SOURCE:\n%v\n", source)
 }
 
 func TestGenericLifecycle(t *tes.T) {
@@ -67,5 +67,5 @@ func TestGenericLifecycle(t *tes.T) {
 	// Generate a concrete class for the generic model.
 	name = "set"
 	source = generator.GenerateClass(model, name)
-	fmt.Printf("SET SOURCE:\n %v\n", source)
+	fmt.Printf("SET SOURCE:\n%v\n", source)
 }
