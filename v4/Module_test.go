@@ -18,13 +18,13 @@ import (
 	tes "testing"
 )
 
-func TestModelLifecycle(t *tes.T) {
+func TestSimpleModelLifecycle(t *tes.T) {
 	var generator = mod.Generator()
 	var name = "example"
 
 	// Generate a new class model with a default copyright.
 	var copyright string
-	var model = generator.CreateModel(name, copyright)
+	var model = generator.CreateSimpleModel(name, copyright)
 
 	// Validate the class model.
 	var validator = mod.Validator()
@@ -44,13 +44,39 @@ func TestModelLifecycle(t *tes.T) {
 	fmt.Printf("ANGLE SOURCE:\n%v\n", source)
 }
 
-func TestGenericLifecycle(t *tes.T) {
+func TestCompoundModelLifecycle(t *tes.T) {
+	var generator = mod.Generator()
+	var name = "example"
+
+	// Generate a new class model with a default copyright.
+	var copyright string
+	var model = generator.CreateCompoundModel(name, copyright)
+
+	// Validate the class model.
+	var validator = mod.Validator()
+	validator.ValidateModel(model)
+
+	// Format the class model.
+	var formatter = mod.Formatter()
+	var source = formatter.FormatModel(model)
+
+	// Parse the source code for the class model.
+	var parser = mod.Parser()
+	model = parser.ParseSource(source)
+
+	// Generate a concrete class for the class model.
+	name = "complex"
+	source = generator.GenerateClass(model, name)
+	fmt.Printf("COMPLEX SOURCE:\n%v\n", source)
+}
+
+func TestGenericModelLifecycle(t *tes.T) {
 	var generator = mod.Generator()
 	var name = "example"
 
 	// Generate a new generic model with a default copyright.
 	var copyright string
-	var model = generator.CreateGeneric(name, copyright)
+	var model = generator.CreateGenericModel(name, copyright)
 
 	// Validate the generic model.
 	var validator = mod.Validator()

@@ -18,31 +18,43 @@ import (
 	tes "testing"
 )
 
-func TestCreateModel(t *tes.T) {
-	// Create a new model.
+func TestCreateSimpleModel(t *tes.T) {
+	// Create a new simple model.
 	var generator = age.Generator().Make()
 	var name = "example"
 	var copyright = "Copyright (c) ACME Inc.  All Rights Reserved."
-	var model = generator.CreateModel(name, copyright)
+	var model = generator.CreateSimpleModel(name, copyright)
 
-	// Generate a class from the model.
+	// Generate a class from the simple model.
 	var source = generator.GenerateClass(model, "angle")
-	ass.Equal(t, angle, source)
+	ass.Equal(t, simple, source)
 }
 
-func TestCreateGeneric(t *tes.T) {
+func TestCreateCompoundModel(t *tes.T) {
+	// Create a new compound model.
+	var generator = age.Generator().Make()
+	var name = "example"
+	var copyright = "Copyright (c) ACME Inc.  All Rights Reserved."
+	var model = generator.CreateCompoundModel(name, copyright)
+
+	// Generate a class from the compound model.
+	var source = generator.GenerateClass(model, "complex")
+	ass.Equal(t, compound, source)
+}
+
+func TestCreateGenericModel(t *tes.T) {
 	// Create a new generic model.
 	var generator = age.Generator().Make()
 	var name = "example"
 	var copyright string
-	var generic = generator.CreateGeneric(name, copyright)
+	var model = generator.CreateGenericModel(name, copyright)
 
-	// Generate a generic class from the model.
-	var source = generator.GenerateClass(generic, "set")
-	ass.Equal(t, set, source)
+	// Generate a class from the generic model.
+	var source = generator.GenerateClass(model, "set")
+	ass.Equal(t, generic, source)
 }
 
-const angle = `/*
+const simple = `/*
 ................................................................................
 .                 Copyright (c) ACME Inc.  All Rights Reserved.                .
 ................................................................................
@@ -94,11 +106,10 @@ func (c *angleClass_) Tau() AngleLike {
 
 // Constructors
 
-func (c *angleClass_) MakeWithValue(value float64) AngleLike {
+func (c *angleClass_) MakeFromValue(value float64) AngleLike {
 	return &angle_{
 		// Initialize instance attributes.
 		class_: c,
-		value_: value,
 	}
 }
 
@@ -142,31 +153,23 @@ func (c *angleClass_) Tangent(angle AngleLike) float64 {
 
 // Target
 
-type angle_ struct {
-	// Define instance attributes.
-	class_ AngleClassLike
-	value_ float64
-}
+type angle_ float64
 
 // Attributes
 
-func (v *angle_) GetClass() AngleClassLike {
+func (v angle_) GetClass() AngleClassLike {
 	return v.class_
-}
-
-func (v *angle_) GetValue() float64 {
-	return v.value_
 }
 
 // Angular
 
-func (v *angle_) AsNormalized() AngleLike {
+func (v angle_) AsNormalized() AngleLike {
 	var result_ AngleLike
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *angle_) InUnits(units Units) float64 {
+func (v angle_) AsUnits(units Units) float64 {
 	var result_ float64
 	// TBA - Implement the method.
 	return result_
@@ -174,13 +177,19 @@ func (v *angle_) InUnits(units Units) float64 {
 
 // Public
 
-func (v *angle_) IsZero() bool {
+func (v angle_) IsZero() bool {
 	var result_ bool
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v *angle_) AsString() string {
+func (v angle_) AsFloat() float64 {
+	var result_ float64
+	// TBA - Implement the method.
+	return result_
+}
+
+func (v angle_) AsString() string {
 	var result_ string
 	// TBA - Implement the method.
 	return result_
@@ -189,7 +198,210 @@ func (v *angle_) AsString() string {
 // Private
 `
 
-const set = `/*
+const compound = `/*
+................................................................................
+.                 Copyright (c) ACME Inc.  All Rights Reserved.                .
+................................................................................
+.  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
+.                                                                              .
+.  This code is free software; you can redistribute it and/or modify it under  .
+.  the terms of The MIT License (MIT), as published by the Open Source         .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
+................................................................................
+*/
+
+package example
+
+import ()
+
+// CLASS ACCESS
+
+// Reference
+
+var complexClass = &complexClass_{
+	// Initialize class constants.
+}
+
+// Function
+
+func Complex() ComplexClassLike {
+	return complexClass
+}
+
+// CLASS METHODS
+
+// Target
+
+type complexClass_ struct {
+	// Define class constants.
+	zero_ ComplexLike
+	infinity_ ComplexLike
+}
+
+// Constants
+
+func (c *complexClass_) Zero() ComplexLike {
+	return c.zero_
+}
+
+func (c *complexClass_) Infinity() ComplexLike {
+	return c.infinity_
+}
+
+// Constructors
+
+func (c *complexClass_) MakeWithAttributes(
+	realPart float64,
+	imaginaryPart float64,
+	form Form,
+) ComplexLike {
+	return &complex_{
+		// Initialize instance attributes.
+		class_: c,
+		realPart_: realPart,
+		imaginaryPart_: imaginaryPart,
+		form_: form,
+	}
+}
+
+func (c *complexClass_) MakeFromValue(value complex128) ComplexLike {
+	return &complex_{
+		// Initialize instance attributes.
+		class_: c,
+	}
+}
+
+// Functions
+
+func (c *complexClass_) Inverse(value ComplexLike) ComplexLike {
+	var result_ ComplexLike
+	// TBA - Implement the function.
+	return result_
+}
+
+func (c *complexClass_) Sum(
+	first ComplexLike,
+	second ComplexLike,
+) ComplexLike {
+	var result_ ComplexLike
+	// TBA - Implement the function.
+	return result_
+}
+
+func (c *complexClass_) Difference(
+	first ComplexLike,
+	second ComplexLike,
+) ComplexLike {
+	var result_ ComplexLike
+	// TBA - Implement the function.
+	return result_
+}
+
+func (c *complexClass_) Reciprocal(value ComplexLike) ComplexLike {
+	var result_ ComplexLike
+	// TBA - Implement the function.
+	return result_
+}
+
+func (c *complexClass_) Product(
+	first ComplexLike,
+	second ComplexLike,
+) ComplexLike {
+	var result_ ComplexLike
+	// TBA - Implement the function.
+	return result_
+}
+
+func (c *complexClass_) Quotient(
+	first ComplexLike,
+	second ComplexLike,
+) ComplexLike {
+	var result_ ComplexLike
+	// TBA - Implement the function.
+	return result_
+}
+
+func (c *complexClass_) Norm(
+	function NormFunction[ComplexLike],
+	value ComplexLike,
+) float64 {
+	var result_ float64
+	// TBA - Implement the function.
+	return result_
+}
+
+// INSTANCE METHODS
+
+// Target
+
+type complex_ struct {
+	// Define instance attributes.
+	class_ ComplexClassLike
+	realPart_ float64
+	imaginaryPart_ float64
+	form_ Form
+}
+
+// Attributes
+
+func (v *complex_) GetClass() ComplexClassLike {
+	return v.class_
+}
+
+func (v *complex_) GetRealPart() float64 {
+	return v.realPart_
+}
+
+func (v *complex_) GetImaginaryPart() float64 {
+	return v.imaginaryPart_
+}
+
+func (v *complex_) GetForm() Form {
+	return v.form_
+}
+
+func (v *complex_) SetForm(form Form) {
+	v.form_ = form
+}
+
+// Continuous
+
+func (v *complex_) IsZero() bool {
+	var result_ bool
+	// TBA - Implement the method.
+	return result_
+}
+
+func (v *complex_) IsDiscrete() bool {
+	var result_ bool
+	// TBA - Implement the method.
+	return result_
+}
+
+func (v *complex_) IsInfinity() bool {
+	var result_ bool
+	// TBA - Implement the method.
+	return result_
+}
+
+// Public
+
+func (v *complex_) IsReal() bool {
+	var result_ bool
+	// TBA - Implement the method.
+	return result_
+}
+
+func (v *complex_) IsImaginary() bool {
+	var result_ bool
+	// TBA - Implement the method.
+	return result_
+}
+
+// Private
+`
+
+const generic = `/*
 ................................................................................
 .                   Copyright (c) 2024.  All Rights Reserved.                  .
 ................................................................................

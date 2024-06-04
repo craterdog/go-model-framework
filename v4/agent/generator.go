@@ -70,19 +70,31 @@ func (v *generator_) GetClass() GeneratorClassLike {
 
 // Public
 
-func (v *generator_) CreateModel(
+func (v *generator_) CreateSimpleModel(
 	name string,
 	copyright string,
 ) ast.ModelLike {
 	copyright = v.expandCopyright(copyright)
-	var source = sts.ReplaceAll(modelTemplate_, "<Copyright>", copyright)
+	var source = sts.ReplaceAll(simpleTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
 	var parser = Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
 }
 
-func (v *generator_) CreateGeneric(
+func (v *generator_) CreateCompoundModel(
+	name string,
+	copyright string,
+) ast.ModelLike {
+	copyright = v.expandCopyright(copyright)
+	var source = sts.ReplaceAll(compoundTemplate_, "<Copyright>", copyright)
+	source = sts.ReplaceAll(source, "<name>", name)
+	var parser = Parser().Make()
+	var model = parser.ParseSource(source)
+	return model
+}
+
+func (v *generator_) CreateGenericModel(
 	name string,
 	copyright string,
 ) ast.ModelLike {
@@ -229,6 +241,7 @@ func (v *generator_) extractParameterAttributes(
 }
 
 func (v *generator_) generateAbstractionMethods(
+	isSimple bool,
 	aspect ast.AspectLike,
 	abstraction ast.AbstractionLike,
 ) string {
@@ -280,6 +293,9 @@ func (v *generator_) generateAbstractionMethods(
 			}
 		}
 		var method = instanceMethodTemplate_
+		if isSimple {
+			method = simpleMethodTemplate_
+		}
 		method = sts.ReplaceAll(method, "<Body>", body)
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
@@ -290,6 +306,7 @@ func (v *generator_) generateAbstractionMethods(
 }
 
 func (v *generator_) generateAbstractions(
+	isSimple bool,
 	model ast.ModelLike,
 	instance ast.InstanceLike,
 ) string {
@@ -309,7 +326,7 @@ func (v *generator_) generateAbstractions(
 		if prefix == nil {
 			// We only know the method signatures for the local aspects.
 			var aspect = v.retrieveAspect(model, identifier)
-			methods = v.generateAbstractionMethods(aspect, abstraction)
+			methods = v.generateAbstractionMethods(isSimple, aspect, abstraction)
 		}
 		var instanceAspect = instanceAspectTemplate_
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<AspectName>", aspectName)
@@ -342,7 +359,10 @@ func (v *generator_) generateAttributeAssignments(
 	return assignments
 }
 
-func (v *generator_) generateAttributeMethods(instance ast.InstanceLike) string {
+func (v *generator_) generateAttributeMethods(
+	isSimple bool,
+	instance ast.InstanceLike,
+) string {
 	var formatter = Formatter().Make()
 	var methods string
 	var instanceAttributes = instance.GetAttributes()
@@ -388,6 +408,9 @@ func (v *generator_) generateAttributeMethods(instance ast.InstanceLike) string 
 		body = sts.ReplaceAll(body, "<AttributeName>", attributeName)
 		body = sts.ReplaceAll(body, "<ParameterName>", parameterName)
 		var method = instanceMethodTemplate_
+		if isSimple {
+			method = simpleMethodTemplate_
+		}
 		method = sts.ReplaceAll(method, "<Body>", body)
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameter)
@@ -655,23 +678,55 @@ func (v *generator_) generateInstanceMethods(
 	class ast.ClassLike,
 	instance ast.InstanceLike,
 ) string {
+	var isSimple bool
+	if instance.GetAttributes().GetSize() == 1 {
+		isSimple = true
+	}
 	var instanceMethods = instanceMethodsTemplate_
-	var target = v.generateInstanceTarget(class, instance)
-	instanceMethods = sts.ReplaceAll(instanceMethods, "<Target>", target)
-	var attributes = v.generateAttributeMethods(instance)
+	var attributes = v.generateAttributeMethods(isSimple, instance)
 	instanceMethods = sts.ReplaceAll(instanceMethods, "<Attributes>", attributes)
-	var abstractions = v.generateAbstractions(model, instance)
+	var abstractions = v.generateAbstractions(isSimple, model, instance)
 	instanceMethods = sts.ReplaceAll(instanceMethods, "<Abstractions>", abstractions)
-	var methods = v.generatePublicMethods(instance)
+	var methods = v.generatePublicMethods(isSimple, instance)
 	instanceMethods = sts.ReplaceAll(instanceMethods, "<Methods>", methods)
+	var target = v.generateInstanceTarget(isSimple, class, instance)
+	instanceMethods = sts.ReplaceAll(instanceMethods, "<Target>", target)
 	return instanceMethods
 }
 
 func (v *generator_) generateInstanceTarget(
+	isSimple bool,
 	class ast.ClassLike,
 	instance ast.InstanceLike,
 ) string {
+	var identifier string
+	var targetType string
 	var target = instanceTargetTemplate_
+	if isSimple {
+		target = simpleTargetTemplate_
+		var iterator = class.GetConstructors().GetIterator()
+		for iterator.HasNext() {
+			var constructor = iterator.GetNext()
+			identifier = constructor.GetIdentifier()
+			if identifier == "MakeFromValue" {
+				var parameter = constructor.GetParameters().GetValue(1)
+				var abstraction = parameter.GetAbstraction()
+				var formatter = Formatter().Make()
+				targetType = formatter.FormatAbstraction(abstraction)
+				break
+			}
+		}
+		if len(targetType) == 0 {
+			var declaration = class.GetDeclaration()
+			identifier = sts.TrimSuffix(declaration.GetIdentifier(), "ClassLike")
+			var message = fmt.Sprintf(
+				"The simple class %v is missing a MakeFromValue() constructor.",
+				identifier,
+			)
+			panic(message)
+		}
+		target = sts.ReplaceAll(target, "<TargetType>", targetType)
+	}
 	var attributes = v.generateInstanceAttributes(class, instance)
 	target = sts.ReplaceAll(target, "<Attributes>", attributes)
 	return target
@@ -682,7 +737,10 @@ func (v *generator_) generateNotice(model ast.ModelLike) string {
 	return notice
 }
 
-func (v *generator_) generatePublicMethods(instance ast.InstanceLike) string {
+func (v *generator_) generatePublicMethods(
+	isSimple bool,
+	instance ast.InstanceLike,
+) string {
 	var formatter = Formatter().Make()
 	var publicMethods string
 	var instanceMethods = instance.GetMethods()
@@ -711,6 +769,9 @@ func (v *generator_) generatePublicMethods(instance ast.InstanceLike) string {
 			resultType = " " + formatter.FormatResult(result)
 		}
 		var method = instanceMethodTemplate_
+		if isSimple {
+			method = simpleMethodTemplate_
+		}
 		method = sts.ReplaceAll(method, "<Body>", body)
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)

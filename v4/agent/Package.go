@@ -174,11 +174,15 @@ type GeneratorLike interface {
 	GetClass() GeneratorClassLike
 
 	// Methods
-	CreateModel(
+	CreateSimpleModel(
 		name string,
 		copyright string,
 	) ast.ModelLike
-	CreateGeneric(
+	CreateCompoundModel(
+		name string,
+		copyright string,
+	) ast.ModelLike
+	CreateGenericModel(
 		name string,
 		copyright string,
 	) ast.ModelLike
