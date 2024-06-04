@@ -94,10 +94,11 @@ func (c *angleClass_) Tau() AngleLike {
 
 // Constructors
 
-func (c *angleClass_) MakeFromFloat(value float64) AngleLike {
+func (c *angleClass_) MakeWithValue(value float64) AngleLike {
 	return &angle_{
 		// Initialize instance attributes.
 		class_: c,
+		value_: value,
 	}
 }
 
@@ -144,12 +145,17 @@ func (c *angleClass_) Tangent(angle AngleLike) float64 {
 type angle_ struct {
 	// Define instance attributes.
 	class_ AngleClassLike
+	value_ float64
 }
 
 // Attributes
 
 func (v *angle_) GetClass() AngleClassLike {
 	return v.class_
+}
+
+func (v *angle_) GetValue() float64 {
+	return v.value_
 }
 
 // Angular
@@ -174,8 +180,8 @@ func (v *angle_) IsZero() bool {
 	return result_
 }
 
-func (v *angle_) AsFloat() float64 {
-	var result_ float64
+func (v *angle_) AsString() string {
+	var result_ string
 	// TBA - Implement the method.
 	return result_
 }
