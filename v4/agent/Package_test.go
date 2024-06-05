@@ -281,7 +281,7 @@ func (c *arrayClass_[V]) DefaultRanker() RankingFunction[V] {
 
 func (c *arrayClass_[V]) MakeFromValue(value []V) ArrayLike[V] {
 	// TBA - Validate the value.
-	return array_(value)
+	return array_[V](value)
 }
 
 func (c *arrayClass_[V]) MakeFromSequence(values Sequential[V]) ArrayLike[V] {

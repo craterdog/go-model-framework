@@ -99,7 +99,7 @@ const constantBodyTemplate_ = `
 
 const typeBodyTemplate_ = `
 	// TBA - Validate the value.
-	return <TargetName>_(value)
+	return <TargetName>_[<Arguments>](value)
 `
 
 const constructorBodyTemplate_ = `
