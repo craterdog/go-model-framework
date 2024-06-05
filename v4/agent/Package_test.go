@@ -107,17 +107,14 @@ func (c *angleClass_) Tau() AngleLike {
 // Constructors
 
 func (c *angleClass_) MakeFromValue(value float64) AngleLike {
-	return &angle_{
-		// Initialize instance attributes.
-		class_: c,
-	}
+	// TBA - Validate the value.
+	return angle_(value)
 }
 
 func (c *angleClass_) MakeFromString(value string) AngleLike {
-	return &angle_{
-		// Initialize instance attributes.
-		class_: c,
-	}
+	var result_ AngleLike
+	// TBA - Implement the method.
+	return result_
 }
 
 // Functions

@@ -425,6 +425,22 @@ func (v *generator_) generateClass(
 	class ast.ClassLike,
 	instance ast.InstanceLike,
 ) string {
+	var targetType string
+	if instance.GetAttributes().GetSize() == 1 {
+		var iterator = class.GetConstructors().GetIterator()
+		for iterator.HasNext() {
+			var constructor = iterator.GetNext()
+			var identifier = constructor.GetIdentifier()
+			if identifier == "MakeFromValue" {
+				var parameter = constructor.GetParameters().GetValue(1)
+				var abstraction = parameter.GetAbstraction()
+				var formatter = Formatter().Make()
+				targetType = formatter.FormatAbstraction(abstraction)
+				break
+			}
+		}
+	}
+
 	var template = classTemplate_
 
 	var notice = v.generateNotice(model)
@@ -436,10 +452,11 @@ func (v *generator_) generateClass(
 	var classAccess = v.generateClassAccess(class)
 	template = sts.ReplaceAll(template, "<Access>", classAccess)
 
-	var classMethods = v.generateClassMethods(class)
+	var classMethods = v.generateClassMethods(targetType, class)
 	template = sts.ReplaceAll(template, "<Class>", classMethods)
 
 	var instanceMethods = v.generateInstanceMethods(
+		targetType,
 		model,
 		class,
 		instance,
@@ -505,13 +522,16 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 	return constants
 }
 
-func (v *generator_) generateClassMethods(class ast.ClassLike) string {
+func (v *generator_) generateClassMethods(
+	targetType string,
+	class ast.ClassLike,
+) string {
 	var methods = classMethodsTemplate_
 	var target = v.generateClassTarget(class)
 	methods = sts.ReplaceAll(methods, "<Target>", target)
 	var constantMethods = v.generateConstantMethods(class)
 	methods = sts.ReplaceAll(methods, "<Constants>", constantMethods)
-	var constructorMethods = v.generateConstructorMethods(class)
+	var constructorMethods = v.generateConstructorMethods(targetType, class)
 	methods = sts.ReplaceAll(methods, "<Constructors>", constructorMethods)
 	var functionMethods = v.generateFunctionMethods(class)
 	methods = sts.ReplaceAll(methods, "<Functions>", functionMethods)
@@ -552,7 +572,10 @@ func (v *generator_) generateConstantMethods(class ast.ClassLike) string {
 	return methods
 }
 
-func (v *generator_) generateConstructorMethods(class ast.ClassLike) string {
+func (v *generator_) generateConstructorMethods(
+	targetType string,
+	class ast.ClassLike,
+) string {
 	var formatter = Formatter().Make()
 	var methods string
 	var classConstructors = class.GetConstructors()
@@ -573,6 +596,14 @@ func (v *generator_) generateConstructorMethods(class ast.ClassLike) string {
 		var resultType = " " + formatter.FormatAbstraction(abstraction)
 		var assignments = v.generateAttributeAssignments(class, constructor)
 		var body = constructorBodyTemplate_
+		if len(targetType) > 0 {
+			if methodName == "MakeFromValue" {
+				body = simpleBodyTemplate_
+				body = sts.ReplaceAll(body, "<TargetType>", targetType)
+			} else {
+				body = resultBodyTemplate_
+			}
+		}
 		body = sts.ReplaceAll(body, "<Assignments>", assignments)
 		var method = classMethodTemplate_
 		method = sts.ReplaceAll(method, "<Body>", body)
@@ -674,25 +705,11 @@ func (v *generator_) generateInstanceAttributes(
 }
 
 func (v *generator_) generateInstanceMethods(
+	targetType string,
 	model ast.ModelLike,
 	class ast.ClassLike,
 	instance ast.InstanceLike,
 ) string {
-	var targetType string
-	if instance.GetAttributes().GetSize() == 1 {
-		var iterator = class.GetConstructors().GetIterator()
-		for iterator.HasNext() {
-			var constructor = iterator.GetNext()
-			var identifier = constructor.GetIdentifier()
-			if identifier == "MakeFromValue" {
-				var parameter = constructor.GetParameters().GetValue(1)
-				var abstraction = parameter.GetAbstraction()
-				var formatter = Formatter().Make()
-				targetType = formatter.FormatAbstraction(abstraction)
-				break
-			}
-		}
-	}
 	var instanceMethods = instanceMethodsTemplate_
 	var attributes = v.generateAttributeMethods(targetType, instance)
 	instanceMethods = sts.ReplaceAll(instanceMethods, "<Attributes>", attributes)

@@ -97,6 +97,11 @@ const constantBodyTemplate_ = `
 	return c.<ConstantName>_
 `
 
+const simpleBodyTemplate_ = `
+	// TBA - Validate the value.
+	return <TargetName>_(value)
+`
+
 const constructorBodyTemplate_ = `
 	return &<TargetName>_[<Arguments>]{
 		// Initialize instance attributes.
