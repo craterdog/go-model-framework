@@ -234,7 +234,7 @@ must be supported by each instance of an angular concrete class.
 type Angular interface {
 	// Methods
 	AsNormalized() AngleLike
-	AsUnits(units Units) float64
+	InUnits(units Units) float64
 }
 
 // Classes
@@ -275,9 +275,8 @@ type AngleLike interface {
 	Angular
 
 	// Methods
-	IsZero() bool
 	AsFloat() float64
-	AsString() string
+	IsZero() bool
 }`
 
 const arrayTemplate_ = `/*

@@ -180,7 +180,7 @@ func (v angle_) AsNormalized() AngleLike {
 	return result_
 }
 
-func (v angle_) AsUnits(units Units) float64 {
+func (v angle_) InUnits(units Units) float64 {
 	var result_ float64
 	// TBA - Implement the method.
 	return result_
@@ -188,20 +188,14 @@ func (v angle_) AsUnits(units Units) float64 {
 
 // Public
 
-func (v angle_) IsZero() bool {
-	var result_ bool
-	// TBA - Implement the method.
-	return result_
-}
-
 func (v angle_) AsFloat() float64 {
 	var result_ float64
 	// TBA - Implement the method.
 	return result_
 }
 
-func (v angle_) AsString() string {
-	var result_ string
+func (v angle_) IsZero() bool {
+	var result_ bool
 	// TBA - Implement the method.
 	return result_
 }
