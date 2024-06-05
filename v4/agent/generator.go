@@ -70,36 +70,48 @@ func (v *generator_) GetClass() GeneratorClassLike {
 
 // Public
 
-func (v *generator_) CreateSimpleModel(
+func (v *generator_) CreateClassType(
 	name string,
 	copyright string,
 ) ast.ModelLike {
 	copyright = v.expandCopyright(copyright)
-	var source = sts.ReplaceAll(simpleTemplate_, "<Copyright>", copyright)
+	var source = sts.ReplaceAll(angleTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
 	var parser = Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
 }
 
-func (v *generator_) CreateCompoundModel(
+func (v *generator_) CreateGenericType(
 	name string,
 	copyright string,
 ) ast.ModelLike {
 	copyright = v.expandCopyright(copyright)
-	var source = sts.ReplaceAll(compoundTemplate_, "<Copyright>", copyright)
+	var source = sts.ReplaceAll(arrayTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
 	var parser = Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
 }
 
-func (v *generator_) CreateGenericModel(
+func (v *generator_) CreateClassStructure(
 	name string,
 	copyright string,
 ) ast.ModelLike {
 	copyright = v.expandCopyright(copyright)
-	var source = sts.ReplaceAll(genericTemplate_, "<Copyright>", copyright)
+	var source = sts.ReplaceAll(complexTemplate_, "<Copyright>", copyright)
+	source = sts.ReplaceAll(source, "<name>", name)
+	var parser = Parser().Make()
+	var model = parser.ParseSource(source)
+	return model
+}
+
+func (v *generator_) CreateGenericStructure(
+	name string,
+	copyright string,
+) ast.ModelLike {
+	copyright = v.expandCopyright(copyright)
+	var source = sts.ReplaceAll(catalogTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
 	var parser = Parser().Make()
 	var model = parser.ParseSource(source)
@@ -294,7 +306,7 @@ func (v *generator_) generateAbstractionMethods(
 		}
 		var method = instanceMethodTemplate_
 		if len(targetType) > 0 {
-			method = simpleMethodTemplate_
+			method = typeMethodTemplate_
 		}
 		method = sts.ReplaceAll(method, "<Body>", body)
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
@@ -361,6 +373,7 @@ func (v *generator_) generateAttributeAssignments(
 
 func (v *generator_) generateAttributeMethods(
 	targetType string,
+	class ast.ClassLike,
 	instance ast.InstanceLike,
 ) string {
 	var formatter = Formatter().Make()
@@ -402,6 +415,9 @@ func (v *generator_) generateAttributeMethods(
 			}
 			resultType = " " + formatter.FormatAbstraction(abstraction)
 			body = getterBodyTemplate_
+			if len(targetType) > 0 {
+				body = getterClassTemplate_
+			}
 		}
 
 		attributeName = v.makePrivate(attributeName)
@@ -409,7 +425,7 @@ func (v *generator_) generateAttributeMethods(
 		body = sts.ReplaceAll(body, "<ParameterName>", parameterName)
 		var method = instanceMethodTemplate_
 		if len(targetType) > 0 {
-			method = simpleMethodTemplate_
+			method = typeMethodTemplate_
 		}
 		method = sts.ReplaceAll(method, "<Body>", body)
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
@@ -598,7 +614,7 @@ func (v *generator_) generateConstructorMethods(
 		var body = constructorBodyTemplate_
 		if len(targetType) > 0 {
 			if methodName == "MakeFromValue" {
-				body = simpleBodyTemplate_
+				body = typeBodyTemplate_
 				body = sts.ReplaceAll(body, "<TargetType>", targetType)
 			} else {
 				body = resultBodyTemplate_
@@ -711,7 +727,7 @@ func (v *generator_) generateInstanceMethods(
 	instance ast.InstanceLike,
 ) string {
 	var instanceMethods = instanceMethodsTemplate_
-	var attributes = v.generateAttributeMethods(targetType, instance)
+	var attributes = v.generateAttributeMethods(targetType, class, instance)
 	instanceMethods = sts.ReplaceAll(instanceMethods, "<Attributes>", attributes)
 	var abstractions = v.generateAbstractions(targetType, model, instance)
 	instanceMethods = sts.ReplaceAll(instanceMethods, "<Abstractions>", abstractions)
@@ -729,7 +745,7 @@ func (v *generator_) generateInstanceTarget(
 ) string {
 	var target = instanceTargetTemplate_
 	if len(targetType) > 0 {
-		target = simpleTargetTemplate_
+		target = typeTargetTemplate_
 		target = sts.ReplaceAll(target, "<TargetType>", targetType)
 	}
 	var attributes = v.generateInstanceAttributes(class, instance)
@@ -775,7 +791,7 @@ func (v *generator_) generatePublicMethods(
 		}
 		var method = instanceMethodTemplate_
 		if len(targetType) > 0 {
-			method = simpleMethodTemplate_
+			method = typeMethodTemplate_
 		}
 		method = sts.ReplaceAll(method, "<Body>", body)
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)

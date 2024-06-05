@@ -97,7 +97,7 @@ const constantBodyTemplate_ = `
 	return c.<ConstantName>_
 `
 
-const simpleBodyTemplate_ = `
+const typeBodyTemplate_ = `
 	// TBA - Validate the value.
 	return <TargetName>_(value)
 `
@@ -126,7 +126,7 @@ const instanceMethodsTemplate_ = `
 // Private
 `
 
-const simpleTargetTemplate_ = `
+const typeTargetTemplate_ = `
 type <TargetName>_[<Parameters>] <TargetType>
 `
 
@@ -143,7 +143,7 @@ const instanceAspectTemplate_ = `
 // <AspectName>
 <Methods>`
 
-const simpleMethodTemplate_ = `
+const typeMethodTemplate_ = `
 func (v <TargetName>_[<Arguments>]) <MethodName>(<Parameters>)<ResultType> {<Body>}
 `
 
@@ -166,6 +166,10 @@ const returnBodyTemplate_ = `
 	return
 `
 
+const getterClassTemplate_ = `
+	return <ClassName>[<Arguments>]()
+`
+
 const getterBodyTemplate_ = `
 	return v.<AttributeName>_
 `
@@ -174,7 +178,7 @@ const setterBodyTemplate_ = `
 	v.<AttributeName>_ = <ParameterName>
 `
 
-const simpleTemplate_ = `/*
+const angleTemplate_ = `/*
 ................................................................................
 <Copyright>
 ................................................................................
@@ -276,7 +280,154 @@ type AngleLike interface {
 	AsString() string
 }`
 
-const compoundTemplate_ = `/*
+const arrayTemplate_ = `/*
+................................................................................
+<Copyright>
+................................................................................
+.  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
+.                                                                              .
+.  This code is free software; you can redistribute it and/or modify it under  .
+.  the terms of The MIT License (MIT), as published by the Open Source         .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
+................................................................................
+*/
+
+/*
+Package "<name>" provides...
+
+This package follows the Crater Dog Technologies™ Go Coding Conventions located
+here:
+  - https://github.com/craterdog/go-model-framework/wiki
+
+Additional implementations of the concrete classes provided by this package can
+be developed and used seamlessly since the interface definitions only depend on
+other interfaces and primitive types—and the class implementations only depend
+on interfaces, not on each other.
+*/
+package <name>
+
+// Types
+
+/*
+Rank is a constrained type representing the possible rankings for two values.
+*/
+type Rank uint8
+
+const (
+	LesserRank Rank = iota
+	EqualRank
+	GreaterRank
+)
+
+// Functionals
+
+/*
+RankingFunction[V any] is a functional type that defines the signature for any
+function that can determine the relative ranking of two values.
+*/
+type RankingFunction[V any] func(
+	first V,
+	second V,
+) Rank
+
+// Aspects
+
+/*
+Accessible[V any] is an aspect interface that defines a set of method signatures
+that must be supported by each instance of an accessible concrete class.
+The values in an accessible class are accessed using indices. The indices of an
+accessible class are ORDINAL rather than ZERO based—which never really made
+sense except for pointer offsets.
+
+This approach allows for positive indices starting at the beginning of the
+sequence as follows:
+
+	    1           2           3             N
+	[value 1] . [value 2] . [value 3] ... [value N]
+
+Notice that because the indices are ordinal based, the index actually matches
+the position in the sequence.
+*/
+type Accessible[V any] interface {
+	// Methods
+	GetValue(index uint) V
+	GetValues(
+		first uint,
+		last uint,
+	) Sequential[V]
+}
+
+/*
+Sequential[V any] is an aspect interface that defines a set of method signatures
+that must be supported by each instance of a sequential concrete class.
+*/
+type Sequential[V any] interface {
+	// Methods
+	AsArray() []V
+	GetSize() int
+	IsEmpty() bool
+}
+
+/*
+Updatable[V any] is an aspect interface that defines a set of method signatures
+that must be supported by each instance of an updatable concrete class.
+*/
+type Updatable[V any] interface {
+	// Methods
+	SetValue(
+		index uint,
+		value V,
+	)
+	SetValues(
+		index uint,
+		values Sequential[V],
+	)
+}
+
+// Classes
+
+/*
+ArrayClassLike[V any] is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete array-like class.
+*/
+type ArrayClassLike[V any] interface {
+	// Constants
+	DefaultRanker() RankingFunction[V]
+
+	// Constructors
+	MakeFromValue(value []V) ArrayLike[V]
+	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+	MakeFromSize(size int) ArrayLike[V]
+}
+
+// Instances
+
+/*
+ArrayLike[V any] is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete array-like class.
+
+An array-like class maintains a fixed length indexed sequence of values.  Each
+value is associated with an implicit positive integer index. An array-like class
+uses ORDINAL based indexing rather than the more common—and nonsensical—ZERO
+based indexing scheme.
+*/
+type ArrayLike[V any] interface {
+	// Attributes
+	GetClass() ArrayClassLike[V]
+
+	// Abstractions
+	Accessible[V]
+	Sequential[V]
+	Updatable[V]
+
+	// Methods
+	SortValues()
+	SortValuesWithRanker(ranker RankingFunction[V])
+}`
+
+const complexTemplate_ = `/*
 ................................................................................
 <Copyright>
 ................................................................................
@@ -404,7 +555,7 @@ type ComplexLike interface {
 	IsImaginary() bool
 }`
 
-const genericTemplate_ = `/*
+const catalogTemplate_ = `/*
 ................................................................................
 <Copyright>
 ................................................................................
@@ -457,6 +608,21 @@ type RankingFunction[V any] func(
 // Aspects
 
 /*
+Associative[K comparable, V any] defines the set of method signatures that
+must be supported by all sequences of key-value associations.
+*/
+type Associative[K comparable, V any] interface {
+	// Methods
+	GetKeys() Sequential[K]
+	GetValue(key K) V
+	RemoveValue(key K) V
+	SetValue(
+		key K,
+		value V,
+	)
+}
+
+/*
 Sequential[V any] is an aspect interface that defines a set of method signatures
 that must be supported by each instance of a sequential concrete class.
 */
@@ -470,76 +636,84 @@ type Sequential[V any] interface {
 // Classes
 
 /*
-SetClassLike[V any] is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete set-like class.
+AssociationClassLike[K comparable, V any] is a class interface that defines
+the complete set of class constants, constructors and functions that must be
+supported by each concrete association-like class.
+*/
+type AssociationClassLike[K comparable, V any] interface {
+	// Constructors
+	MakeWithAttributes(
+		key K,
+		value V,
+	) AssociationLike[K, V]
+}
+
+/*
+CatalogClassLike[K comparable, V any] is a class interface that defines the
+complete set of class constants, constructors and functions that must be
+supported by each concrete catalog-like class.
 
 The following functions are supported:
 
-And() returns a new set containing the values that are both of the specified
-sets.
+Extract() returns a new catalog containing only the associations that are in
+the specified catalog that have the specified keys.  The associations in the
+resulting catalog will be in the same order as the specified keys.
 
-Or() returns a new set containing the values that are in either of the specified
-sets.
-
-Sans() returns a new set containing the values that are in the first specified
-set but not in the second specified set.
-
-Xor() returns a new set containing the values that are in the first specified
-set or the second specified set but not both.
+Merge() returns a new catalog containing all of the associations that are in
+the specified catalogs in the order that they appear in each catalog.  If a
+key is present in both catalogs, the value of the key from the second
+catalog takes precedence.
 */
-type SetClassLike[V any] interface {
+type CatalogClassLike[K comparable, V any] interface {
 	// Constants
-	DefaultRanker() RankingFunction[V]
+	DefaultRanker() RankingFunction[AssociationLike[K, V]]
 
 	// Constructors
-	Make() SetLike[V]
-	MakeFromArray(values []V) SetLike[V]
-	MakeFromSequence(values Sequential[V]) SetLike[V]
-	MakeWithRanker(ranker RankingFunction[V]) SetLike[V]
+	Make() CatalogLike[K, V]
+	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
+	MakeFromMap(associations map[K]V) CatalogLike[K, V]
+	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
 
 	// Functions
-	And(
-		first SetLike[V],
-		second SetLike[V],
-	) SetLike[V]
-	Or(
-		first SetLike[V],
-		second SetLike[V],
-	) SetLike[V]
-	Sans(
-		first SetLike[V],
-		second SetLike[V],
-	) SetLike[V]
-	Xor(
-		first SetLike[V],
-		second SetLike[V],
-	) SetLike[V]
+	Extract(
+		catalog CatalogLike[K, V],
+		keys Sequential[K],
+	) CatalogLike[K, V]
+	Merge(
+		first CatalogLike[K, V],
+		second CatalogLike[K, V],
+	) CatalogLike[K, V]
 }
 
 // Instances
 
 /*
-SetLike[V any] is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete set-like class.  A set-like class maintains an ordered
-sequence of values which can grow or shrink as needed.
-
-This type is parameterized as follows:
-  - V is any type of value.
-
-The order of the values is determined by a configurable ranking function.
+AssociationLike[K comparable, V any] is an instance interface that defines the
+complete set of instance attributes, abstractions and methods that must be
+supported by each instance of a concrete association-like class.
 */
-type SetLike[V any] interface {
+type AssociationLike[K comparable, V any] interface {
 	// Attributes
-	GetClass() SetClassLike[V]
-	SetRanker(ranker RankingFunction[V])
+	GetClass() AssociationClassLike[K, V]
+	GetKey() K
+	GetValue() V
+	SetValue(value V)
+}
+
+/*
+CatalogLike[K comparable, V any] is an instance interface that defines the
+complete set of instance attributes, abstractions and methods that must be
+supported by each instance of a concrete catalog-like class.
+*/
+type CatalogLike[K comparable, V any] interface {
+	// Attributes
+	GetClass() CatalogClassLike[K, V]
 
 	// Abstractions
-	Sequential[V]
+	Associative[K, V]
+	Sequential[AssociationLike[K, V]]
 
 	// Methods
-	AddValue(value V)
-	RemoveValue(value V)
-	RemoveAll()
+	SortValues()
+	SortValuesWithRanker(ranker RankingFunction[AssociationLike[K, V]])
 }`

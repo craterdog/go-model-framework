@@ -18,80 +18,109 @@ import (
 	tes "testing"
 )
 
-func TestSimpleModelLifecycle(t *tes.T) {
+func TestClassType(t *tes.T) {
 	var generator = mod.Generator()
 	var name = "example"
 
-	// Generate a new class model with a default copyright.
+	// Generate a new class type model with a default copyright.
 	var copyright string
-	var model = generator.CreateSimpleModel(name, copyright)
+	var model = generator.CreateClassType(name, copyright)
 
-	// Validate the class model.
+	// Validate the class type model.
 	var validator = mod.Validator()
 	validator.ValidateModel(model)
 
-	// Format the class model.
+	// Format the class type model.
 	var formatter = mod.Formatter()
 	var source = formatter.FormatModel(model)
 
-	// Parse the source code for the class model.
+	// Parse the source code for the class type model.
 	var parser = mod.Parser()
 	model = parser.ParseSource(source)
 
-	// Generate a concrete class for the class model.
+	// Generate a concrete class for the class type model.
 	name = "angle"
 	source = generator.GenerateClass(model, name)
 	fmt.Printf("ANGLE SOURCE:\n%v\n", source)
 }
 
-func TestCompoundModelLifecycle(t *tes.T) {
+func TestGenericType(t *tes.T) {
 	var generator = mod.Generator()
 	var name = "example"
 
-	// Generate a new class model with a default copyright.
+	// Generate a new generic type model with a default copyright.
 	var copyright string
-	var model = generator.CreateCompoundModel(name, copyright)
+	var model = generator.CreateGenericType(name, copyright)
 
-	// Validate the class model.
+	// Validate the generic type model.
 	var validator = mod.Validator()
 	validator.ValidateModel(model)
 
-	// Format the class model.
+	// Format the generic type model.
 	var formatter = mod.Formatter()
 	var source = formatter.FormatModel(model)
 
-	// Parse the source code for the class model.
+	// Parse the source code for the generic type model.
 	var parser = mod.Parser()
 	model = parser.ParseSource(source)
 
-	// Generate a concrete class for the class model.
+	// Generate the concrete classes for the generic type model.
+	name = "array"
+	source = generator.GenerateClass(model, name)
+	fmt.Printf("ARRAY SOURCE:\n%v\n", source)
+}
+
+func TestClassStructure(t *tes.T) {
+	var generator = mod.Generator()
+	var name = "example"
+
+	// Generate a new class structure model with a default copyright.
+	var copyright string
+	var model = generator.CreateClassStructure(name, copyright)
+
+	// Validate the class structure model.
+	var validator = mod.Validator()
+	validator.ValidateModel(model)
+
+	// Format the class structure model.
+	var formatter = mod.Formatter()
+	var source = formatter.FormatModel(model)
+
+	// Parse the source code for the class structure model.
+	var parser = mod.Parser()
+	model = parser.ParseSource(source)
+
+	// Generate a concrete class for the class structure model.
 	name = "complex"
 	source = generator.GenerateClass(model, name)
 	fmt.Printf("COMPLEX SOURCE:\n%v\n", source)
 }
 
-func TestGenericModelLifecycle(t *tes.T) {
+func TestGenericStructure(t *tes.T) {
 	var generator = mod.Generator()
 	var name = "example"
 
-	// Generate a new generic model with a default copyright.
+	// Generate a new generic structure model with a default copyright.
 	var copyright string
-	var model = generator.CreateGenericModel(name, copyright)
+	var model = generator.CreateGenericStructure(name, copyright)
 
-	// Validate the generic model.
+	// Validate the generic structure model.
 	var validator = mod.Validator()
 	validator.ValidateModel(model)
 
-	// Format the generic model.
+	// Format the generic structure model.
 	var formatter = mod.Formatter()
 	var source = formatter.FormatModel(model)
 
-	// Parse the source code for the generic model.
+	// Parse the source code for the generic structure model.
 	var parser = mod.Parser()
 	model = parser.ParseSource(source)
 
-	// Generate a concrete class for the generic model.
-	name = "set"
+	// Generate the concrete classes for the generic structure model.
+	name = "association"
 	source = generator.GenerateClass(model, name)
-	fmt.Printf("SET SOURCE:\n%v\n", source)
+	fmt.Printf("ASSOCIATION SOURCE:\n%v\n", source)
+	name = "catalog"
+	source = generator.GenerateClass(model, name)
+	fmt.Printf("CATALOG SOURCE:\n%v\n", source)
 }
