@@ -321,8 +321,8 @@ func (v array_[V]) GetValues(
 
 // Sequential[V]
 
-func (v array_[V]) AsArray() []V {
-	var result_ []V
+func (v array_[V]) IsEmpty() bool {
+	var result_ bool
 	// TBA - Implement the method.
 	return result_
 }
@@ -333,8 +333,8 @@ func (v array_[V]) GetSize() int {
 	return result_
 }
 
-func (v array_[V]) IsEmpty() bool {
-	var result_ bool
+func (v array_[V]) AsArray() []V {
+	var result_ []V
 	// TBA - Implement the method.
 	return result_
 }

@@ -362,9 +362,9 @@ that must be supported by each instance of a sequential concrete class.
 */
 type Sequential[V any] interface {
 	// Methods
-	AsArray() []V
-	GetSize() int
 	IsEmpty() bool
+	GetSize() int
+	AsArray() []V
 }
 
 /*
