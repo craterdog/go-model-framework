@@ -332,10 +332,11 @@ type RankingFunction[V any] func(
 // Aspects
 
 /*
-Accessible[V any] defines the set of method signatures that must be
-supported by all sequences whose values can be accessed using indices. The
-indices of an accessible sequence are ORDINAL rather than ZERO based—which
-never really made sense except for pointer offsets.
+Accessible[V any] is an aspect interface that defines a set of method signatures
+that must be supported by each instance of an accessible concrete class.  The
+values in an accessible class are accessed using indices. The indices of an
+accessible class are ORDINAL rather than ZERO based—which never really made
+sense except for pointer offsets.
 
 This approach allows for positive indices starting at the beginning of the
 sequence, and negative indices starting at the end of the sequence as follows:
