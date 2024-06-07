@@ -332,33 +332,37 @@ type RankingFunction[V any] func(
 // Aspects
 
 /*
-Accessible[V any] is an aspect interface that defines a set of method signatures
-that must be supported by each instance of an accessible concrete class.
-The values in an accessible class are accessed using indices. The indices of an
-accessible class are ORDINAL rather than ZERO based—which never really made
-sense except for pointer offsets.
+Accessible[V any] defines the set of method signatures that must be
+supported by all sequences whose values can be accessed using indices. The
+indices of an accessible sequence are ORDINAL rather than ZERO based—which
+never really made sense except for pointer offsets.
 
 This approach allows for positive indices starting at the beginning of the
-sequence as follows:
+sequence, and negative indices starting at the end of the sequence as follows:
 
 	    1           2           3             N
 	[value 1] . [value 2] . [value 3] ... [value N]
+	   -N        -(N-1)      -(N-2)          -1
 
-Notice that because the indices are ordinal based, the index actually matches
-the position in the sequence.
+Notice that because the indices are ordinal based, the positive and negative
+indices are symmetrical.
 */
 type Accessible[V any] interface {
 	// Methods
-	GetValue(index uint) V
+	GetValue(index int) V
 	GetValues(
-		first uint,
-		last uint,
+		first int,
+		last int,
 	) Sequential[V]
 }
 
 /*
 Sequential[V any] is an aspect interface that defines a set of method signatures
 that must be supported by each instance of a sequential concrete class.
+
+NOTE: that sizes should be of type "uint" but the Go language does not allow
+arithmetic and comparison operations between "int" and "uint" so we us "int" for
+the return type to make it easier to use.
 */
 type Sequential[V any] interface {
 	// Methods
@@ -374,11 +378,11 @@ that must be supported by each instance of an updatable concrete class.
 type Updatable[V any] interface {
 	// Methods
 	SetValue(
-		index uint,
+		index int,
 		value V,
 	)
 	SetValues(
-		index uint,
+		index int,
 		values Sequential[V],
 	)
 }
@@ -395,9 +399,9 @@ type ArrayClassLike[V any] interface {
 	DefaultRanker() RankingFunction[V]
 
 	// Constructors
+	MakeWithSize(size uint) ArrayLike[V]
 	MakeFromValue(value []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
-	MakeFromSize(size int) ArrayLike[V]
 }
 
 // Instances
@@ -624,6 +628,10 @@ type Associative[K comparable, V any] interface {
 /*
 Sequential[V any] is an aspect interface that defines a set of method signatures
 that must be supported by each instance of a sequential concrete class.
+
+NOTE: that sizes should be of type "uint" but the Go language does not allow
+arithmetic and comparison operations between "int" and "uint" so we us "int" for
+the return type to make it easier to use.
 */
 type Sequential[V any] interface {
 	// Methods
