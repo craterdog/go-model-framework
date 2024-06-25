@@ -233,8 +233,8 @@ var arrayMutex syn.Mutex
 
 func Array[V any]() ArrayClassLike[V] {
 	// Generate the name of the bound class type.
-	var result_ ArrayClassLike[V]
-	var name = fmt.Sprintf("%T", result_)
+	var class *arrayClass_[V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	arrayMutex.Lock()
@@ -242,18 +242,18 @@ func Array[V any]() ArrayClassLike[V] {
 	switch actual := value.(type) {
 	case *arrayClass_[V]:
 		// This bound class type already exists.
-		result_ = actual
+		class = actual
 	default:
 		// Add a new bound class type.
-		result_ = &arrayClass_[V]{
+		class = &arrayClass_[V]{
 			// Initialize class constants.
 		}
-		arrayClass[name] = result_
+		arrayClass[name] = class
 	}
 	arrayMutex.Unlock()
 
 	// Return a reference to the bound class type.
-	return result_
+	return class
 }
 
 // CLASS METHODS
@@ -601,8 +601,8 @@ var associationMutex syn.Mutex
 
 func Association[K comparable, V any]() AssociationClassLike[K, V] {
 	// Generate the name of the bound class type.
-	var result_ AssociationClassLike[K, V]
-	var name = fmt.Sprintf("%T", result_)
+	var class *associationClass_[K, V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	associationMutex.Lock()
@@ -610,18 +610,18 @@ func Association[K comparable, V any]() AssociationClassLike[K, V] {
 	switch actual := value.(type) {
 	case *associationClass_[K, V]:
 		// This bound class type already exists.
-		result_ = actual
+		class = actual
 	default:
 		// Add a new bound class type.
-		result_ = &associationClass_[K, V]{
+		class = &associationClass_[K, V]{
 			// Initialize class constants.
 		}
-		associationClass[name] = result_
+		associationClass[name] = class
 	}
 	associationMutex.Unlock()
 
 	// Return a reference to the bound class type.
-	return result_
+	return class
 }
 
 // CLASS METHODS
@@ -708,8 +708,8 @@ var catalogMutex syn.Mutex
 
 func Catalog[K comparable, V any]() CatalogClassLike[K, V] {
 	// Generate the name of the bound class type.
-	var result_ CatalogClassLike[K, V]
-	var name = fmt.Sprintf("%T", result_)
+	var class *catalogClass_[K, V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	catalogMutex.Lock()
@@ -717,18 +717,18 @@ func Catalog[K comparable, V any]() CatalogClassLike[K, V] {
 	switch actual := value.(type) {
 	case *catalogClass_[K, V]:
 		// This bound class type already exists.
-		result_ = actual
+		class = actual
 	default:
 		// Add a new bound class type.
-		result_ = &catalogClass_[K, V]{
+		class = &catalogClass_[K, V]{
 			// Initialize class constants.
 		}
-		catalogClass[name] = result_
+		catalogClass[name] = class
 	}
 	catalogMutex.Unlock()
 
 	// Return a reference to the bound class type.
-	return result_
+	return class
 }
 
 // CLASS METHODS

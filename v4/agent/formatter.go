@@ -13,7 +13,7 @@
 package agent
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	fmt "fmt"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 	reg "regexp"
 	sts "strings"
@@ -24,8 +24,7 @@ import (
 // Reference
 
 var formatterClass = &formatterClass_{
-	// Initialize class constants.
-	defaultMaximum_: 8,
+	// Initialize the class constants.
 }
 
 // Function
@@ -39,34 +38,15 @@ func Formatter() FormatterClassLike {
 // Target
 
 type formatterClass_ struct {
-	// Define class constants.
-	defaultMaximum_ int
-}
-
-// Constants
-
-func (c *formatterClass_) DefaultMaximum() int {
-	return c.defaultMaximum_
+	// Define the class constants.
 }
 
 // Constructors
 
 func (c *formatterClass_) Make() FormatterLike {
 	return &formatter_{
-		// Initialize instance attributes.
-		class_:   c,
-		maximum_: c.defaultMaximum_,
-	}
-}
-
-func (c *formatterClass_) MakeWithMaximum(maximum int) FormatterLike {
-	if maximum < 0 {
-		maximum = c.defaultMaximum_
-	}
-	return &formatter_{
-		// Initialize instance attributes.
-		class_:   c,
-		maximum_: maximum,
+		// Initialize the instance attributes.
+		class_: c,
 	}
 }
 
@@ -75,11 +55,10 @@ func (c *formatterClass_) MakeWithMaximum(maximum int) FormatterLike {
 // Target
 
 type formatter_ struct {
-	// Define instance attributes.
-	class_   FormatterClassLike
-	depth_   int
-	maximum_ int
-	result_  sts.Builder
+	// Define the instance attributes.
+	class_  FormatterClassLike
+	depth_  int
+	result_ sts.Builder
 }
 
 // Attributes
@@ -92,10 +71,6 @@ func (v *formatter_) GetDepth() int {
 	return v.depth_
 }
 
-func (v *formatter_) GetMaximum() int {
-	return v.maximum_
-}
-
 // Public
 
 func (v *formatter_) FormatAbstraction(abstraction ast.AbstractionLike) string {
@@ -103,13 +78,8 @@ func (v *formatter_) FormatAbstraction(abstraction ast.AbstractionLike) string {
 	return v.getResult()
 }
 
-func (v *formatter_) FormatArguments(arguments col.ListLike[ast.AbstractionLike]) string {
+func (v *formatter_) FormatArguments(arguments ast.ArgumentsLike) string {
 	v.formatArguments(arguments)
-	return v.getResult()
-}
-
-func (v *formatter_) FormatGenerics(parameters col.ListLike[ast.ParameterLike]) string {
-	v.formatGenerics(parameters)
 	return v.getResult()
 }
 
@@ -128,12 +98,7 @@ func (v *formatter_) FormatParameter(parameter ast.ParameterLike) string {
 	return v.getResult()
 }
 
-func (v *formatter_) FormatParameterNames(parameters col.ListLike[ast.ParameterLike]) string {
-	v.formatParameterNames(parameters)
-	return v.getResult()
-}
-
-func (v *formatter_) FormatParameters(parameters col.ListLike[ast.ParameterLike]) string {
+func (v *formatter_) FormatParameters(parameters ast.ParametersLike) string {
 	v.formatParameters(parameters)
 	return v.getResult()
 }
@@ -146,12 +111,12 @@ func (v *formatter_) FormatResult(result ast.ResultLike) string {
 // Private
 
 func (v *formatter_) appendNewline() {
-	var separator = "\n"
+	var newline = "\n"
 	var indentation = "\t"
 	for level := 0; level < v.depth_; level++ {
-		separator += indentation
+		newline += indentation
 	}
-	v.appendString(separator)
+	v.appendString(newline)
 }
 
 func (v *formatter_) appendString(s string) {
@@ -171,73 +136,127 @@ func (v *formatter_) formatAbstraction(abstraction ast.AbstractionLike) {
 	}
 	var identifier = abstraction.GetIdentifier()
 	v.appendString(identifier)
-	var arguments = abstraction.GetArguments()
-	if arguments != nil {
-		v.appendString("[")
-		v.formatArguments(arguments)
-		v.appendString("]")
+	var genericArguments = abstraction.GetGenericArguments()
+	if genericArguments != nil {
+		v.formatGenericArguments(genericArguments)
 	}
 }
 
-func (v *formatter_) formatAbstractions(abstractions col.ListLike[ast.AbstractionLike]) {
+func (v *formatter_) formatAbstractions(abstractions ast.AbstractionsLike) {
 	v.appendNewline()
 	v.appendString("// Abstractions")
-	var iterator = abstractions.GetIterator()
+	var iterator = abstractions.GetAbstractions().GetIterator()
 	for iterator.HasNext() {
 		var abstraction = iterator.GetNext()
-		v.appendNewline()
 		v.formatAbstraction(abstraction)
 	}
 }
 
-func (v *formatter_) formatArguments(arguments col.ListLike[ast.AbstractionLike]) {
-	var size = arguments.GetSize()
-	if size > 2 {
+func (v *formatter_) formatAdditionalArgument(
+	additionalArgument ast.AdditionalArgumentLike,
+) {
+	v.appendNewline()
+	var argument = additionalArgument.GetArgument()
+	v.formatArgument(argument)
+	v.appendString(",")
+}
+
+func (v *formatter_) formatAdditionalArguments(
+	additionalArguments ast.AdditionalArgumentsLike,
+) {
+	v.appendString(",")
+	var iterator = additionalArguments.GetAdditionalArguments().GetIterator()
+	for iterator.HasNext() {
+		var additionalArgument = iterator.GetNext()
+		v.formatAdditionalArgument(additionalArgument)
+	}
+	v.appendNewline()
+}
+
+func (v *formatter_) formatAdditionalParameter(
+	additionalParameter ast.AdditionalParameterLike,
+) {
+	v.appendNewline()
+	var parameter = additionalParameter.GetParameter()
+	v.formatParameter(parameter)
+	v.appendString(",")
+}
+
+func (v *formatter_) formatAdditionalParameters(
+	additionalParameters ast.AdditionalParametersLike,
+) {
+	v.appendString(",")
+	var iterator = additionalParameters.GetAdditionalParameters().GetIterator()
+	for iterator.HasNext() {
+		var additionalParameter = iterator.GetNext()
+		v.formatAdditionalParameter(additionalParameter)
+	}
+	v.appendNewline()
+}
+
+func (v *formatter_) formatAdditionalValue(
+	additionalValue ast.AdditionalValueLike,
+) {
+	v.appendNewline()
+	var identifier = additionalValue.GetIdentifier()
+	v.appendString(identifier)
+}
+
+func (v *formatter_) formatAlias(alias ast.AliasLike) {
+	var identifier = alias.GetIdentifier()
+	v.appendString(identifier)
+	v.appendString(".")
+}
+
+func (v *formatter_) formatArgument(argument ast.ArgumentLike) {
+	var abstraction = argument.GetAbstraction()
+	v.formatAbstraction(abstraction)
+}
+
+func (v *formatter_) formatArguments(arguments ast.ArgumentsLike) {
+	var additionalArguments = arguments.GetAdditionalArguments()
+	if additionalArguments != nil {
 		v.depth_++
 		v.appendNewline()
 	}
-	var iterator = arguments.GetIterator()
-	var abstraction = iterator.GetNext()
-	v.formatAbstraction(abstraction)
-	for iterator.HasNext() {
-		abstraction = iterator.GetNext()
-		v.appendString(",")
-		if size > 2 {
-			v.appendNewline()
-		} else {
-			v.appendString(" ")
-		}
-		v.formatAbstraction(abstraction)
-	}
-	if size > 2 {
-		v.appendString(",")
+	var argument = arguments.GetArgument()
+	v.formatArgument(argument)
+	if additionalArguments != nil {
+		v.formatAdditionalArguments(additionalArguments)
 		v.depth_--
 		v.appendNewline()
 	}
 }
 
+func (v *formatter_) formatArray(array ast.ArrayLike) {
+	v.appendString("[]")
+}
+
 func (v *formatter_) formatAspect(aspect ast.AspectLike) {
+	v.appendNewline()
 	var declaration = aspect.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" interface {")
 	v.depth_++
+	v.appendNewline()
 	var methods = aspect.GetMethods()
 	v.formatMethods(methods)
 	v.depth_--
 	v.appendNewline()
 	v.appendString("}")
+	v.appendNewline()
 }
 
-func (v *formatter_) formatAspects(aspects col.ListLike[ast.AspectLike]) {
+func (v *formatter_) formatAspects(aspects ast.AspectsLike) {
 	v.appendNewline()
 	v.appendString("// Aspects")
 	v.appendNewline()
-	var iterator = aspects.GetIterator()
+	var iterator = aspects.GetAspects().GetIterator()
 	for iterator.HasNext() {
 		var aspect = iterator.GetNext()
 		v.formatAspect(aspect)
-		v.appendNewline()
 	}
+	v.appendNewline()
 }
 
 func (v *formatter_) formatAttribute(attribute ast.AttributeLike) {
@@ -256,61 +275,59 @@ func (v *formatter_) formatAttribute(attribute ast.AttributeLike) {
 	}
 }
 
-func (v *formatter_) formatAttributes(attributes col.ListLike[ast.AttributeLike]) {
+func (v *formatter_) formatAttributes(attributes ast.AttributesLike) {
 	v.appendNewline()
 	v.appendString("// Attributes")
-	var iterator = attributes.GetIterator()
+	var iterator = attributes.GetAttributes().GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
-		v.appendNewline()
 		v.formatAttribute(attribute)
 	}
 }
 
+func (v *formatter_) formatChannel(channel ast.ChannelLike) {
+	v.appendString("chan ")
+}
+
 func (v *formatter_) formatClass(class ast.ClassLike) {
+	v.appendNewline()
 	var declaration = class.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" interface {")
 	v.depth_++
-	var hasContent bool
+	v.appendNewline()
 	var constants = class.GetConstants()
 	if constants != nil {
 		v.formatConstants(constants)
-		hasContent = true
 	}
 	var constructors = class.GetConstructors()
 	if constructors != nil {
-		if hasContent {
-			v.appendString("\n")
-		}
 		v.formatConstructors(constructors)
-		hasContent = true
 	}
 	var functions = class.GetFunctions()
 	if functions != nil {
-		if hasContent {
-			v.appendString("\n")
-		}
 		v.formatFunctions(functions)
 	}
 	v.depth_--
 	v.appendNewline()
 	v.appendString("}")
+	v.appendNewline()
 }
 
-func (v *formatter_) formatClasses(classes col.ListLike[ast.ClassLike]) {
+func (v *formatter_) formatClasses(classes ast.ClassesLike) {
 	v.appendNewline()
 	v.appendString("// Classes")
 	v.appendNewline()
-	var iterator = classes.GetIterator()
+	var iterator = classes.GetClasses().GetIterator()
 	for iterator.HasNext() {
 		var class = iterator.GetNext()
 		v.formatClass(class)
-		v.appendNewline()
 	}
+	v.appendNewline()
 }
 
 func (v *formatter_) formatConstant(constant ast.ConstantLike) {
+	v.appendNewline()
 	var identifier = constant.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("() ")
@@ -318,18 +335,18 @@ func (v *formatter_) formatConstant(constant ast.ConstantLike) {
 	v.formatAbstraction(abstraction)
 }
 
-func (v *formatter_) formatConstants(constants col.ListLike[ast.ConstantLike]) {
+func (v *formatter_) formatConstants(constants ast.ConstantsLike) {
 	v.appendNewline()
 	v.appendString("// Constants")
-	var iterator = constants.GetIterator()
+	var iterator = constants.GetConstants().GetIterator()
 	for iterator.HasNext() {
 		var constant = iterator.GetNext()
-		v.appendNewline()
 		v.formatConstant(constant)
 	}
 }
 
 func (v *formatter_) formatConstructor(constructor ast.ConstructorLike) {
+	v.appendNewline()
 	var identifier = constructor.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("(")
@@ -342,31 +359,26 @@ func (v *formatter_) formatConstructor(constructor ast.ConstructorLike) {
 	v.formatAbstraction(abstraction)
 }
 
-func (v *formatter_) formatConstructors(constructors col.ListLike[ast.ConstructorLike]) {
+func (v *formatter_) formatConstructors(constructors ast.ConstructorsLike) {
 	v.appendNewline()
 	v.appendString("// Constructors")
-	var iterator = constructors.GetIterator()
+	var iterator = constructors.GetConstructors().GetIterator()
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
-		v.appendNewline()
 		v.formatConstructor(constructor)
 	}
 }
 
 func (v *formatter_) formatDeclaration(declaration ast.DeclarationLike) {
-	v.appendNewline()
 	var comment = declaration.GetComment()
 	comment = v.fixComment(comment)
 	v.appendString(comment)
-	v.appendNewline()
 	v.appendString("type ")
 	var identifier = declaration.GetIdentifier()
 	v.appendString(identifier)
-	var parameters = declaration.GetParameters()
-	if parameters != nil {
-		v.appendString("[")
-		v.formatGenerics(parameters)
-		v.appendString("]")
+	var genericParameters = declaration.GetGenericParameters()
+	if genericParameters != nil {
+		v.formatGenericParameters(genericParameters)
 	}
 }
 
@@ -375,14 +387,12 @@ func (v *formatter_) formatEnumeration(enumeration ast.EnumerationLike) {
 	v.appendString("const (")
 	v.depth_++
 	v.appendNewline()
-	var parameter = enumeration.GetParameter()
-	v.formatParameter(parameter)
-	v.appendString(" = iota")
-	var iterator = enumeration.GetIdentifiers().GetIterator()
+	var value = enumeration.GetValue()
+	v.formatValue(value)
+	var iterator = enumeration.GetAdditionalValues().GetIterator()
 	for iterator.HasNext() {
-		var identifier = iterator.GetNext()
-		v.appendNewline()
-		v.appendString(identifier)
+		var additionalValue = iterator.GetNext()
+		v.formatAdditionalValue(additionalValue)
 	}
 	v.depth_--
 	v.appendNewline()
@@ -390,6 +400,7 @@ func (v *formatter_) formatEnumeration(enumeration ast.EnumerationLike) {
 }
 
 func (v *formatter_) formatFunction(function ast.FunctionLike) {
+	v.appendNewline()
 	var identifier = function.GetIdentifier()
 	v.appendString(identifier)
 	v.appendString("(")
@@ -403,6 +414,7 @@ func (v *formatter_) formatFunction(function ast.FunctionLike) {
 }
 
 func (v *formatter_) formatFunctional(functional ast.FunctionalLike) {
+	v.appendNewline()
 	var declaration = functional.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" func(")
@@ -413,47 +425,54 @@ func (v *formatter_) formatFunctional(functional ast.FunctionalLike) {
 	v.appendString(") ")
 	var result = functional.GetResult()
 	v.formatResult(result)
+	v.appendNewline()
 }
 
-func (v *formatter_) formatFunctionals(functionals col.ListLike[ast.FunctionalLike]) {
+func (v *formatter_) formatFunctionals(functionals ast.FunctionalsLike) {
 	v.appendNewline()
 	v.appendString("// Functionals")
 	v.appendNewline()
-	var iterator = functionals.GetIterator()
+	var iterator = functionals.GetFunctionals().GetIterator()
 	for iterator.HasNext() {
 		var functional = iterator.GetNext()
 		v.formatFunctional(functional)
-		v.appendNewline()
 	}
+	v.appendNewline()
 }
 
-func (v *formatter_) formatFunctions(functions col.ListLike[ast.FunctionLike]) {
+func (v *formatter_) formatFunctions(functions ast.FunctionsLike) {
 	v.appendNewline()
 	v.appendString("// Functions")
-	var iterator = functions.GetIterator()
+	var iterator = functions.GetFunctions().GetIterator()
 	for iterator.HasNext() {
 		var function = iterator.GetNext()
-		v.appendNewline()
 		v.formatFunction(function)
 	}
 }
 
-func (v *formatter_) formatGenerics(parameters col.ListLike[ast.ParameterLike]) {
-	var iterator = parameters.GetIterator()
-	var parameter = iterator.GetNext()
-	v.formatParameter(parameter)
-	for iterator.HasNext() {
-		parameter = iterator.GetNext()
-		v.appendString(", ")
-		v.formatParameter(parameter)
-	}
+func (v *formatter_) formatGenericArguments(
+	genericArguments ast.GenericArgumentsLike,
+) {
+	v.appendString("[")
+	var arguments = genericArguments.GetArguments()
+	v.formatArguments(arguments)
+	v.appendString("]")
+}
+
+func (v *formatter_) formatGenericParameters(
+	genericParameters ast.GenericParametersLike,
+) {
+	v.appendString("[")
+	var parameters = genericParameters.GetParameters()
+	v.formatParameters(parameters)
+	v.appendString("]")
 }
 
 func (v *formatter_) formatHeader(header ast.HeaderLike) {
+	v.appendNewline()
 	var comment = header.GetComment()
 	comment = v.fixComment(comment)
 	v.appendString(comment)
-	v.appendNewline()
 	v.appendString("package ")
 	var identifier = header.GetIdentifier()
 	v.appendString(identifier)
@@ -461,46 +480,47 @@ func (v *formatter_) formatHeader(header ast.HeaderLike) {
 }
 
 func (v *formatter_) formatInstance(instance ast.InstanceLike) {
+	v.appendNewline()
 	var declaration = instance.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" interface {")
 	v.depth_++
-	var hasContent bool
+	v.appendNewline()
 	var attributes = instance.GetAttributes()
 	if attributes != nil {
 		v.formatAttributes(attributes)
-		hasContent = true
 	}
 	var abstractions = instance.GetAbstractions()
 	if abstractions != nil {
-		if hasContent {
-			v.appendString("\n")
-		}
 		v.formatAbstractions(abstractions)
-		hasContent = true
 	}
 	var methods = instance.GetMethods()
 	if methods != nil {
-		if hasContent {
-			v.appendString("\n")
-		}
 		v.formatMethods(methods)
 	}
 	v.depth_--
 	v.appendNewline()
 	v.appendString("}")
+	v.appendNewline()
 }
 
-func (v *formatter_) formatInstances(instances col.ListLike[ast.InstanceLike]) {
+func (v *formatter_) formatInstances(instances ast.InstancesLike) {
 	v.appendNewline()
 	v.appendString("// Instances")
 	v.appendNewline()
-	var iterator = instances.GetIterator()
+	var iterator = instances.GetInstances().GetIterator()
 	for iterator.HasNext() {
 		var instance = iterator.GetNext()
 		v.formatInstance(instance)
-		v.appendNewline()
 	}
+	v.appendNewline()
+}
+
+func (v *formatter_) formatMap(map_ ast.MapLike) {
+	var identifier = map_.GetIdentifier()
+	v.appendString("map[")
+	v.appendString(identifier)
+	v.appendString("]")
 }
 
 func (v *formatter_) formatMethod(method ast.MethodLike) {
@@ -519,47 +539,14 @@ func (v *formatter_) formatMethod(method ast.MethodLike) {
 	}
 }
 
-func (v *formatter_) formatMethods(methods col.ListLike[ast.MethodLike]) {
+func (v *formatter_) formatMethods(methods ast.MethodsLike) {
 	v.appendNewline()
 	v.appendString("// Methods")
-	var iterator = methods.GetIterator()
+	var iterator = methods.GetMethods().GetIterator()
 	for iterator.HasNext() {
 		var method = iterator.GetNext()
-		v.appendNewline()
 		v.formatMethod(method)
 	}
-}
-
-func (v *formatter_) formatModule(module ast.ModuleLike) {
-	var identifier = module.GetIdentifier()
-	v.appendString(identifier)
-	v.appendString(" ")
-	var text = module.GetText()
-	v.appendString(text)
-}
-
-func (v *formatter_) formatModules(modules col.ListLike[ast.ModuleLike]) {
-	v.appendNewline()
-	v.appendString("import (")
-	v.depth_++
-	var iterator = modules.GetIterator()
-	for iterator.HasNext() {
-		var module = iterator.GetNext()
-		v.appendNewline()
-		v.formatModule(module)
-	}
-	v.depth_--
-	v.appendNewline()
-	v.appendString(")")
-	v.appendNewline()
-}
-
-func (v *formatter_) formatNotice(notice ast.NoticeLike) {
-	var comment = notice.GetComment()
-	comment = v.fixComment(comment)
-	v.appendString(comment)
-	v.appendNewline()
-	v.appendNewline()
 }
 
 func (v *formatter_) formatModel(model ast.ModelLike) {
@@ -593,6 +580,36 @@ func (v *formatter_) formatModel(model ast.ModelLike) {
 	}
 }
 
+func (v *formatter_) formatModule(module ast.ModuleLike) {
+	v.appendNewline()
+	var identifier = module.GetIdentifier()
+	v.appendString(identifier)
+	v.appendString(" ")
+	var text = module.GetText()
+	v.appendString(text)
+}
+
+func (v *formatter_) formatModules(modules ast.ModulesLike) {
+	v.appendNewline()
+	v.appendString("import (")
+	v.depth_++
+	var iterator = modules.GetModules().GetIterator()
+	for iterator.HasNext() {
+		var module = iterator.GetNext()
+		v.formatModule(module)
+	}
+	v.depth_--
+	v.appendNewline()
+	v.appendString(")")
+	v.appendNewline()
+}
+
+func (v *formatter_) formatNotice(notice ast.NoticeLike) {
+	var comment = notice.GetComment()
+	comment = v.fixComment(comment)
+	v.appendString(comment)
+}
+
 func (v *formatter_) formatParameter(parameter ast.ParameterLike) {
 	var identifier = parameter.GetIdentifier()
 	v.appendString(identifier)
@@ -601,93 +618,64 @@ func (v *formatter_) formatParameter(parameter ast.ParameterLike) {
 	v.formatAbstraction(abstraction)
 }
 
-func (v *formatter_) formatParameterName(parameter ast.ParameterLike) {
-	var identifier = parameter.GetIdentifier()
-	v.appendString(identifier)
+func (v *formatter_) formatParameterized(result ast.ParameterizedLike) {
+	v.appendString("(")
+	var parameters = result.GetParameters()
+	v.formatParameters(parameters)
+	v.appendString(")")
 }
 
-func (v *formatter_) formatParameterNames(parameters col.ListLike[ast.ParameterLike]) {
-	var size = parameters.GetSize()
-	if size > 2 {
+func (v *formatter_) formatParameters(parameters ast.ParametersLike) {
+	var additionalParameters = parameters.GetAdditionalParameters()
+	if additionalParameters != nil {
 		v.depth_++
 		v.appendNewline()
 	}
-	var iterator = parameters.GetIterator()
-	var parameter = iterator.GetNext()
-	v.formatParameterName(parameter)
-	for iterator.HasNext() {
-		parameter = iterator.GetNext()
-		v.appendString(",")
-		if size > 2 {
-			v.appendNewline()
-		} else {
-			v.appendString(" ")
-		}
-		v.formatParameterName(parameter)
-	}
-	if size > 2 {
-		v.appendString(",")
-		v.depth_--
-		v.appendNewline()
-	}
-}
-
-func (v *formatter_) formatParameters(parameters col.ListLike[ast.ParameterLike]) {
-	var size = parameters.GetSize()
-	if size > 1 {
-		v.depth_++
-		v.appendNewline()
-	}
-	var iterator = parameters.GetIterator()
-	var parameter = iterator.GetNext()
+	var parameter = parameters.GetParameter()
 	v.formatParameter(parameter)
-	for iterator.HasNext() {
-		parameter = iterator.GetNext()
-		v.appendString(",")
-		if size > 1 {
-			v.appendNewline()
-		} else {
-			v.appendString(" ")
-		}
-		v.formatParameter(parameter)
-	}
-	if size > 1 {
-		v.appendString(",")
+	if additionalParameters != nil {
+		v.formatAdditionalParameters(additionalParameters)
 		v.depth_--
 		v.appendNewline()
 	}
 }
 
 func (v *formatter_) formatPrefix(prefix ast.PrefixLike) {
-	var identifier = prefix.GetIdentifier()
-	switch prefix.GetType() {
-	case ast.AliasPrefix:
-		v.appendString(identifier)
-		v.appendString(".")
-	case ast.ArrayPrefix:
-		v.appendString("[]")
-	case ast.ChannelPrefix:
-		v.appendString("chan ")
-	case ast.MapPrefix:
-		v.appendString("map[")
-		v.appendString(identifier)
-		v.appendString("]")
+	switch actual := prefix.GetAny().(type) {
+	case ast.ArrayLike:
+		v.formatArray(actual)
+	case ast.MapLike:
+		v.formatMap(actual)
+	case ast.ChannelLike:
+		v.formatChannel(actual)
+	case ast.AliasLike:
+		v.formatAlias(actual)
+	default:
+		var message = fmt.Sprintf(
+			"Attempted to format an unknown prefix type: %T",
+			actual,
+		)
+		panic(message)
 	}
 }
 
 func (v *formatter_) formatResult(result ast.ResultLike) {
-	var abstraction = result.GetAbstraction()
-	if abstraction != nil {
-		v.formatAbstraction(abstraction)
-	} else {
-		v.appendString("(")
-		var parameters = result.GetParameters()
-		v.formatParameters(parameters)
-		v.appendString(")")
+	switch actual := result.GetAny().(type) {
+	case ast.AbstractionLike:
+		v.formatAbstraction(actual)
+	case ast.ParameterizedLike:
+		v.formatParameterized(actual)
+	default:
+		var message = fmt.Sprintf(
+			"Attempted to format an unknown result type: %T",
+			actual,
+		)
+		panic(message)
 	}
 }
 
 func (v *formatter_) formatType(type_ ast.TypeLike) {
+	v.appendNewline()
 	var declaration = type_.GetDeclaration()
 	v.formatDeclaration(declaration)
 	v.appendString(" ")
@@ -695,21 +683,31 @@ func (v *formatter_) formatType(type_ ast.TypeLike) {
 	v.formatAbstraction(abstraction)
 	var enumeration = type_.GetEnumeration()
 	if enumeration != nil {
-		v.appendNewline()
 		v.formatEnumeration(enumeration)
 	}
+	v.appendNewline()
 }
 
-func (v *formatter_) formatTypes(types col.ListLike[ast.TypeLike]) {
+func (v *formatter_) formatTypes(types ast.TypesLike) {
 	v.appendNewline()
 	v.appendString("// Types")
 	v.appendNewline()
-	var iterator = types.GetIterator()
+	var iterator = types.GetTypes().GetIterator()
 	for iterator.HasNext() {
 		var type_ = iterator.GetNext()
 		v.formatType(type_)
-		v.appendNewline()
 	}
+	v.appendNewline()
+}
+
+func (v *formatter_) formatValue(value ast.ValueLike) {
+	v.appendNewline()
+	var identifier = value.GetIdentifier()
+	v.appendString(identifier)
+	v.appendString(" ")
+	var abstraction = value.GetAbstraction()
+	v.formatAbstraction(abstraction)
+	v.appendString(" = iota")
 }
 
 func (v *formatter_) getResult() string {

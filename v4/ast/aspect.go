@@ -12,9 +12,7 @@
 
 package ast
 
-import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
-)
+import ()
 
 // CLASS ACCESS
 
@@ -40,15 +38,13 @@ type aspectClass_ struct {
 
 // Constructors
 
-func (c *aspectClass_) MakeWithAttributes(
+func (c *aspectClass_) Make(
 	declaration DeclarationLike,
-	methods col.ListLike[MethodLike],
+	methods MethodsLike,
 ) AspectLike {
 	return &aspect_{
 		// Initialize instance attributes.
-		class_:       c,
-		declaration_: declaration,
-		methods_:     methods,
+		class_: c,
 	}
 }
 
@@ -60,7 +56,7 @@ type aspect_ struct {
 	// Define instance attributes.
 	class_       AspectClassLike
 	declaration_ DeclarationLike
-	methods_     col.ListLike[MethodLike]
+	methods_     MethodsLike
 }
 
 // Attributes
@@ -73,7 +69,7 @@ func (v *aspect_) GetDeclaration() DeclarationLike {
 	return v.declaration_
 }
 
-func (v *aspect_) GetMethods() col.ListLike[MethodLike] {
+func (v *aspect_) GetMethods() MethodsLike {
 	return v.methods_
 }
 

@@ -18,31 +18,28 @@ import ()
 
 // Reference
 
-var parameterClass = &parameterClass_{
+var additionalParameterClass = &additionalParameterClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Parameter() ParameterClassLike {
-	return parameterClass
+func AdditionalParameter() AdditionalParameterClassLike {
+	return additionalParameterClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type parameterClass_ struct {
+type additionalParameterClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *parameterClass_) Make(
-	identifier string,
-	abstraction AbstractionLike,
-) ParameterLike {
-	return &parameter_{
+func (c *additionalParameterClass_) Make(parameter ParameterLike) AdditionalParameterLike {
+	return &additionalParameter_{
 		// Initialize instance attributes.
 		class_: c,
 	}
@@ -52,25 +49,20 @@ func (c *parameterClass_) Make(
 
 // Target
 
-type parameter_ struct {
+type additionalParameter_ struct {
 	// Define instance attributes.
-	class_       ParameterClassLike
-	identifier_  string
-	abstraction_ AbstractionLike
+	class_     AdditionalParameterClassLike
+	parameter_ ParameterLike
 }
 
 // Attributes
 
-func (v *parameter_) GetClass() ParameterClassLike {
+func (v *additionalParameter_) GetClass() AdditionalParameterClassLike {
 	return v.class_
 }
 
-func (v *parameter_) GetIdentifier() string {
-	return v.identifier_
-}
-
-func (v *parameter_) GetAbstraction() AbstractionLike {
-	return v.abstraction_
+func (v *additionalParameter_) GetParameter() ParameterLike {
+	return v.parameter_
 }
 
 // Private

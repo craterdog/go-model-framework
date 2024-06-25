@@ -38,11 +38,10 @@ type noticeClass_ struct {
 
 // Constructors
 
-func (c *noticeClass_) MakeWithComment(comment string) NoticeLike {
+func (c *noticeClass_) Make(comment string) NoticeLike {
 	return &notice_{
 		// Initialize instance attributes.
-		class_:   c,
-		comment_: comment,
+		class_: c,
 	}
 }
 

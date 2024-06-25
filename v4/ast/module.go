@@ -38,15 +38,13 @@ type moduleClass_ struct {
 
 // Constructors
 
-func (c *moduleClass_) MakeWithAttributes(
+func (c *moduleClass_) Make(
 	identifier string,
 	text string,
 ) ModuleLike {
 	return &module_{
 		// Initialize instance attributes.
-		class_:      c,
-		identifier_: identifier,
-		text_:       text,
+		class_: c,
 	}
 }
 

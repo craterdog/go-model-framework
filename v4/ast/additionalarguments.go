@@ -12,37 +12,36 @@
 
 package ast
 
-import ()
+import (
+	col "github.com/craterdog/go-collection-framework/v4/collection"
+)
 
 // CLASS ACCESS
 
 // Reference
 
-var parameterClass = &parameterClass_{
+var additionalArgumentsClass = &additionalArgumentsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Parameter() ParameterClassLike {
-	return parameterClass
+func AdditionalArguments() AdditionalArgumentsClassLike {
+	return additionalArgumentsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type parameterClass_ struct {
+type additionalArgumentsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *parameterClass_) Make(
-	identifier string,
-	abstraction AbstractionLike,
-) ParameterLike {
-	return &parameter_{
+func (c *additionalArgumentsClass_) Make(additionalArguments col.ListLike[AdditionalArgumentLike]) AdditionalArgumentsLike {
+	return &additionalArguments_{
 		// Initialize instance attributes.
 		class_: c,
 	}
@@ -52,25 +51,20 @@ func (c *parameterClass_) Make(
 
 // Target
 
-type parameter_ struct {
+type additionalArguments_ struct {
 	// Define instance attributes.
-	class_       ParameterClassLike
-	identifier_  string
-	abstraction_ AbstractionLike
+	class_               AdditionalArgumentsClassLike
+	additionalArguments_ col.ListLike[AdditionalArgumentLike]
 }
 
 // Attributes
 
-func (v *parameter_) GetClass() ParameterClassLike {
+func (v *additionalArguments_) GetClass() AdditionalArgumentsClassLike {
 	return v.class_
 }
 
-func (v *parameter_) GetIdentifier() string {
-	return v.identifier_
-}
-
-func (v *parameter_) GetAbstraction() AbstractionLike {
-	return v.abstraction_
+func (v *additionalArguments_) GetAdditionalArguments() col.ListLike[AdditionalArgumentLike] {
+	return v.additionalArguments_
 }
 
 // Private

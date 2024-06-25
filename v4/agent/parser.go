@@ -190,71 +190,30 @@ func (v *parser_) parseAbstraction() (
 	ok bool,
 ) {
 	// Attempt to parse an optional prefix.
-	var prefix ast.PrefixLike
-	prefix, _, ok = v.parsePrefix()
+	var prefix, _, _ = v.parsePrefix()
+
+	// Attempt to parse an identifier.
 	var identifier string
-	if ok {
-		// Attempt to parse an identifier.
-		identifier, token, ok = v.parseToken(IdentifierToken, "")
-		if !ok {
+	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	if !ok {
+		if prefix != nil {
 			var message = v.formatError(token)
-			message += v.generateSyntax("Arguments",
+			message += v.generateSyntax("GenericArguments",
 				"Abstraction",
 				"Prefix",
-				"Arguments",
+				"GenericArguments",
 			)
 			panic(message)
 		}
-	} else {
-		// Attempt to parse an identifier.
-		var identifierToken TokenLike
-		identifier, identifierToken, ok = v.parseToken(IdentifierToken, "")
-		if !ok {
-			// This is not an abstraction.
-			return abstraction, identifierToken, false
-		}
-		var delimiterToken TokenLike
-		_, delimiterToken, ok = v.parseToken(DelimiterToken, "(")
-		if ok {
-			// The identifier is the next method name not an abstraction.
-			v.putBack(delimiterToken)
-			v.putBack(identifierToken)
-			return abstraction, identifierToken, false
-		}
-
+		// This is not an abstraction.
+		return abstraction, token, false
 	}
 
-	// Attempt to parse a delimiter.
-	_, token, ok = v.parseToken(DelimiterToken, "[")
-	var arguments col.ListLike[ast.AbstractionLike]
-	if ok {
-		// Attempt to parse a sequence of arguments.
-		arguments, token, ok = v.parseArguments()
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("Arguments",
-				"Abstraction",
-				"Prefix",
-				"Arguments",
-			)
-			panic(message)
-		}
-
-		// Attempt to parse a delimiter.
-		_, token, ok = v.parseToken(DelimiterToken, "]")
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("]",
-				"Abstraction",
-				"Prefix",
-				"Arguments",
-			)
-			panic(message)
-		}
-	}
+	// Attempt to parse optional generic arguments.
+	var genericArguments, _, _ = v.parseGenericArguments()
 
 	// Found an abstraction.
-	abstraction = ast.Abstraction().MakeWithAttributes(prefix, identifier, arguments)
+	abstraction = ast.Abstraction().Make(prefix, identifier, arguments)
 	return abstraction, token, true
 }
 
@@ -381,7 +340,7 @@ func (v *parser_) parseAspect() (
 	}
 
 	// Found an aspect.
-	aspect = ast.Aspect().MakeWithAttributes(declaration, methods)
+	aspect = ast.Aspect().Make(declaration, methods)
 	return aspect, token, true
 }
 
@@ -463,7 +422,7 @@ func (v *parser_) parseAttribute() (
 	var abstraction, _, _ = v.parseAbstraction()
 
 	// Found a attribute.
-	attribute = ast.Attribute().MakeWithAttributes(identifier, parameter, abstraction)
+	attribute = ast.Attribute().Make(identifier, parameter, abstraction)
 	return attribute, token, true
 }
 
@@ -566,7 +525,7 @@ func (v *parser_) parseClass() (
 	}
 
 	// Found a class.
-	class = ast.Class().MakeWithAttributes(declaration, constants, constructors, functions)
+	class = ast.Class().Make(declaration, constants, constructors, functions)
 	return class, token, true
 }
 
@@ -652,7 +611,7 @@ func (v *parser_) parseConstant() (
 	}
 
 	// Found a constant.
-	constant = ast.Constant().MakeWithAttributes(identifier, abstraction)
+	constant = ast.Constant().Make(identifier, abstraction)
 	return constant, token, true
 }
 
@@ -744,7 +703,7 @@ func (v *parser_) parseConstructor() (
 	}
 
 	// Found a constructor.
-	constructor = ast.Constructor().MakeWithAttributes(identifier, parameters, abstraction)
+	constructor = ast.Constructor().Make(identifier, parameters, abstraction)
 	return constructor, token, true
 }
 
@@ -843,7 +802,7 @@ func (v *parser_) parseDeclaration() (
 	}
 
 	// Found a declaration.
-	declaration = ast.Declaration().MakeWithAttributes(comment, identifier, parameters)
+	declaration = ast.Declaration().Make(comment, identifier, parameters)
 	return declaration, token, true
 }
 
@@ -926,7 +885,7 @@ func (v *parser_) parseEnumeration() (
 	}
 
 	// Found an enumeration.
-	enumeration = ast.Enumeration().MakeWithAttributes(parameter, identifiers)
+	enumeration = ast.Enumeration().Make(parameter, identifiers)
 	return enumeration, token, true
 }
 
@@ -984,7 +943,7 @@ func (v *parser_) parseFunction() (
 	}
 
 	// Found a function.
-	function = ast.Function().MakeWithAttributes(identifier, parameters, result)
+	function = ast.Function().Make(identifier, parameters, result)
 	return function, token, true
 }
 
@@ -1058,7 +1017,7 @@ func (v *parser_) parseFunctional() (
 	}
 
 	// Found a functional.
-	functional = ast.Functional().MakeWithAttributes(declaration, parameters, result)
+	functional = ast.Functional().Make(declaration, parameters, result)
 	return functional, token, true
 }
 
@@ -1165,7 +1124,7 @@ func (v *parser_) parseHeader() (
 	}
 
 	// Found a header.
-	header = ast.Header().MakeWithAttributes(comment, identifier)
+	header = ast.Header().Make(comment, identifier)
 	return header, token, true
 }
 
@@ -1234,7 +1193,7 @@ func (v *parser_) parseInstance() (
 	}
 
 	// Found an instance.
-	instance = ast.Instance().MakeWithAttributes(declaration, attributes, abstractions, methods)
+	instance = ast.Instance().Make(declaration, attributes, abstractions, methods)
 	return instance, token, true
 }
 
@@ -1316,7 +1275,7 @@ func (v *parser_) parseMethod() (
 	var result, _, _ = v.parseResult()
 
 	// Found a method.
-	method = ast.Method().MakeWithAttributes(identifier, parameters, result)
+	method = ast.Method().Make(identifier, parameters, result)
 	return method, token, true
 }
 
@@ -1405,7 +1364,7 @@ func (v *parser_) parseModel() (
 	var instances, _, _ = v.parseInstances()
 
 	// Found a model.
-	model = ast.Model().MakeWithAttributes(
+	model = ast.Model().Make(
 		notice,
 		header,
 		modules,
@@ -1443,7 +1402,7 @@ func (v *parser_) parseModule() (
 	}
 
 	// Found a module.
-	module = ast.Module().MakeWithAttributes(identifier, text)
+	module = ast.Module().Make(identifier, text)
 	return module, token, true
 }
 
@@ -1517,7 +1476,7 @@ func (v *parser_) parseNotice() (
 	}
 
 	// Found a notice.
-	notice = ast.Notice().MakeWithComment(comment)
+	notice = ast.Notice().Make(comment)
 	return notice, token, true
 }
 
@@ -1547,7 +1506,7 @@ func (v *parser_) parseParameter() (
 	}
 
 	// Found a parameter.
-	parameter = ast.Parameter().MakeWithAttributes(identifier, abstraction)
+	parameter = ast.Parameter().Make(identifier, abstraction)
 	return parameter, token, true
 }
 
@@ -1593,7 +1552,7 @@ func (v *parser_) parsePrefix() (
 		_, token, ok = v.parseToken(DelimiterToken, "]")
 		if ok {
 			prefixType = ast.ArrayPrefix
-			prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
+			prefix = ast.Prefix().Make(identifier, prefixType)
 			return prefix, token, true
 		}
 		v.putBack(delimiterToken)
@@ -1628,7 +1587,7 @@ func (v *parser_) parsePrefix() (
 			panic(message)
 		}
 		prefixType = ast.MapPrefix
-		prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
+		prefix = ast.Prefix().Make(identifier, prefixType)
 		return prefix, token, true
 	}
 
@@ -1636,7 +1595,7 @@ func (v *parser_) parsePrefix() (
 	_, token, ok = v.parseToken(IdentifierToken, "chan")
 	if ok {
 		prefixType = ast.ChannelPrefix
-		prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
+		prefix = ast.Prefix().Make(identifier, prefixType)
 		return prefix, token, true
 	}
 
@@ -1650,7 +1609,7 @@ func (v *parser_) parsePrefix() (
 			return prefix, token, false
 		}
 		prefixType = ast.AliasPrefix
-		prefix = ast.Prefix().MakeWithAttributes(identifier, prefixType)
+		prefix = ast.Prefix().Make(identifier, prefixType)
 		return prefix, token, true
 	}
 
@@ -1668,7 +1627,7 @@ func (v *parser_) parseResult() (
 	abstraction, token, ok = v.parseAbstraction()
 	if ok {
 		// Found an abstraction result.
-		result = ast.Result().MakeWithAbstraction(abstraction)
+		result = ast.Result().Make(abstraction)
 		return result, token, true
 	}
 
@@ -1698,7 +1657,7 @@ func (v *parser_) parseResult() (
 		}
 
 		// Found a named parameters result.
-		result = ast.Result().MakeWithParameters(parameters)
+		result = ast.Result().Make(parameters)
 		return result, token, true
 	}
 
@@ -1759,7 +1718,7 @@ func (v *parser_) parseType() (
 	enumeration, token, _ = v.parseEnumeration()
 
 	// Found a type.
-	type_ = ast.Type().MakeWithAttributes(declaration, abstraction, enumeration)
+	type_ = ast.Type().Make(declaration, abstraction, enumeration)
 	return type_, token, true
 }
 

@@ -40,15 +40,13 @@ type enumerationClass_ struct {
 
 // Constructors
 
-func (c *enumerationClass_) MakeWithAttributes(
-	parameter ParameterLike,
-	identifiers col.ListLike[string],
+func (c *enumerationClass_) Make(
+	value ValueLike,
+	additionalValues col.ListLike[AdditionalValueLike],
 ) EnumerationLike {
 	return &enumeration_{
 		// Initialize instance attributes.
-		class_:       c,
-		parameter_:   parameter,
-		identifiers_: identifiers,
+		class_: c,
 	}
 }
 
@@ -58,9 +56,9 @@ func (c *enumerationClass_) MakeWithAttributes(
 
 type enumeration_ struct {
 	// Define instance attributes.
-	class_       EnumerationClassLike
-	parameter_   ParameterLike
-	identifiers_ col.ListLike[string]
+	class_            EnumerationClassLike
+	value_            ValueLike
+	additionalValues_ col.ListLike[AdditionalValueLike]
 }
 
 // Attributes
@@ -69,12 +67,12 @@ func (v *enumeration_) GetClass() EnumerationClassLike {
 	return v.class_
 }
 
-func (v *enumeration_) GetParameter() ParameterLike {
-	return v.parameter_
+func (v *enumeration_) GetValue() ValueLike {
+	return v.value_
 }
 
-func (v *enumeration_) GetIdentifiers() col.ListLike[string] {
-	return v.identifiers_
+func (v *enumeration_) GetAdditionalValues() col.ListLike[AdditionalValueLike] {
+	return v.additionalValues_
 }
 
 // Private

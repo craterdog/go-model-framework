@@ -12,37 +12,39 @@
 
 package ast
 
-import ()
+import (
+	col "github.com/craterdog/go-collection-framework/v4/collection"
+)
 
 // CLASS ACCESS
 
 // Reference
 
-var parameterClass = &parameterClass_{
+var aspectsClass = &aspectsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Parameter() ParameterClassLike {
-	return parameterClass
+func Aspects() AspectsClassLike {
+	return aspectsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type parameterClass_ struct {
+type aspectsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *parameterClass_) Make(
-	identifier string,
-	abstraction AbstractionLike,
-) ParameterLike {
-	return &parameter_{
+func (c *aspectsClass_) Make(
+	note string,
+	aspects col.ListLike[AspectLike],
+) AspectsLike {
+	return &aspects_{
 		// Initialize instance attributes.
 		class_: c,
 	}
@@ -52,25 +54,25 @@ func (c *parameterClass_) Make(
 
 // Target
 
-type parameter_ struct {
+type aspects_ struct {
 	// Define instance attributes.
-	class_       ParameterClassLike
-	identifier_  string
-	abstraction_ AbstractionLike
+	class_   AspectsClassLike
+	note_    string
+	aspects_ col.ListLike[AspectLike]
 }
 
 // Attributes
 
-func (v *parameter_) GetClass() ParameterClassLike {
+func (v *aspects_) GetClass() AspectsClassLike {
 	return v.class_
 }
 
-func (v *parameter_) GetIdentifier() string {
-	return v.identifier_
+func (v *aspects_) GetNote() string {
+	return v.note_
 }
 
-func (v *parameter_) GetAbstraction() AbstractionLike {
-	return v.abstraction_
+func (v *aspects_) GetAspects() col.ListLike[AspectLike] {
+	return v.aspects_
 }
 
 // Private

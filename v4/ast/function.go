@@ -12,9 +12,7 @@
 
 package ast
 
-import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
-)
+import ()
 
 // CLASS ACCESS
 
@@ -40,17 +38,14 @@ type functionClass_ struct {
 
 // Constructors
 
-func (c *functionClass_) MakeWithAttributes(
+func (c *functionClass_) Make(
 	identifier string,
-	parameters col.ListLike[ParameterLike],
+	parameters ParametersLike,
 	result ResultLike,
 ) FunctionLike {
 	return &function_{
 		// Initialize instance attributes.
-		class_:      c,
-		identifier_: identifier,
-		parameters_: parameters,
-		result_:     result,
+		class_: c,
 	}
 }
 
@@ -62,7 +57,7 @@ type function_ struct {
 	// Define instance attributes.
 	class_      FunctionClassLike
 	identifier_ string
-	parameters_ col.ListLike[ParameterLike]
+	parameters_ ParametersLike
 	result_     ResultLike
 }
 
@@ -76,7 +71,7 @@ func (v *function_) GetIdentifier() string {
 	return v.identifier_
 }
 
-func (v *function_) GetParameters() col.ListLike[ParameterLike] {
+func (v *function_) GetParameters() ParametersLike {
 	return v.parameters_
 }
 

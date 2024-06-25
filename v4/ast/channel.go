@@ -18,31 +18,28 @@ import ()
 
 // Reference
 
-var parameterClass = &parameterClass_{
+var channelClass = &channelClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Parameter() ParameterClassLike {
-	return parameterClass
+func Channel() ChannelClassLike {
+	return channelClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type parameterClass_ struct {
+type channelClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *parameterClass_) Make(
-	identifier string,
-	abstraction AbstractionLike,
-) ParameterLike {
-	return &parameter_{
+func (c *channelClass_) Make() ChannelLike {
+	return &channel_{
 		// Initialize instance attributes.
 		class_: c,
 	}
@@ -52,25 +49,15 @@ func (c *parameterClass_) Make(
 
 // Target
 
-type parameter_ struct {
+type channel_ struct {
 	// Define instance attributes.
-	class_       ParameterClassLike
-	identifier_  string
-	abstraction_ AbstractionLike
+	class_ ChannelClassLike
 }
 
 // Attributes
 
-func (v *parameter_) GetClass() ParameterClassLike {
+func (v *channel_) GetClass() ChannelClassLike {
 	return v.class_
-}
-
-func (v *parameter_) GetIdentifier() string {
-	return v.identifier_
-}
-
-func (v *parameter_) GetAbstraction() AbstractionLike {
-	return v.abstraction_
 }
 
 // Private

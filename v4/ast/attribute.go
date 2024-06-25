@@ -38,17 +38,14 @@ type attributeClass_ struct {
 
 // Constructors
 
-func (c *attributeClass_) MakeWithAttributes(
+func (c *attributeClass_) Make(
 	identifier string,
 	parameter ParameterLike,
 	abstraction AbstractionLike,
 ) AttributeLike {
 	return &attribute_{
 		// Initialize instance attributes.
-		class_:       c,
-		identifier_:  identifier,
-		parameter_:   parameter,
-		abstraction_: abstraction,
+		class_: c,
 	}
 }
 

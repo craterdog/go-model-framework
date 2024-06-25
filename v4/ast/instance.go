@@ -12,9 +12,7 @@
 
 package ast
 
-import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
-)
+import ()
 
 // CLASS ACCESS
 
@@ -40,19 +38,15 @@ type instanceClass_ struct {
 
 // Constructors
 
-func (c *instanceClass_) MakeWithAttributes(
+func (c *instanceClass_) Make(
 	declaration DeclarationLike,
-	attributes col.ListLike[AttributeLike],
-	abstractions col.ListLike[AbstractionLike],
-	methods col.ListLike[MethodLike],
+	attributes AttributesLike,
+	abstractions AbstractionsLike,
+	methods MethodsLike,
 ) InstanceLike {
 	return &instance_{
 		// Initialize instance attributes.
-		class_:        c,
-		declaration_:  declaration,
-		attributes_:   attributes,
-		abstractions_: abstractions,
-		methods_:      methods,
+		class_: c,
 	}
 }
 
@@ -64,9 +58,9 @@ type instance_ struct {
 	// Define instance attributes.
 	class_        InstanceClassLike
 	declaration_  DeclarationLike
-	attributes_   col.ListLike[AttributeLike]
-	abstractions_ col.ListLike[AbstractionLike]
-	methods_      col.ListLike[MethodLike]
+	attributes_   AttributesLike
+	abstractions_ AbstractionsLike
+	methods_      MethodsLike
 }
 
 // Attributes
@@ -79,15 +73,15 @@ func (v *instance_) GetDeclaration() DeclarationLike {
 	return v.declaration_
 }
 
-func (v *instance_) GetAttributes() col.ListLike[AttributeLike] {
+func (v *instance_) GetAttributes() AttributesLike {
 	return v.attributes_
 }
 
-func (v *instance_) GetAbstractions() col.ListLike[AbstractionLike] {
+func (v *instance_) GetAbstractions() AbstractionsLike {
 	return v.abstractions_
 }
 
-func (v *instance_) GetMethods() col.ListLike[MethodLike] {
+func (v *instance_) GetMethods() MethodsLike {
 	return v.methods_
 }
 

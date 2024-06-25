@@ -38,15 +38,10 @@ type prefixClass_ struct {
 
 // Constructors
 
-func (c *prefixClass_) MakeWithAttributes(
-	identifier string,
-	type_ PrefixType,
-) PrefixLike {
+func (c *prefixClass_) Make(any any) PrefixLike {
 	return &prefix_{
 		// Initialize instance attributes.
-		class_:      c,
-		identifier_: identifier,
-		type_:       type_,
+		class_: c,
 	}
 }
 
@@ -56,9 +51,8 @@ func (c *prefixClass_) MakeWithAttributes(
 
 type prefix_ struct {
 	// Define instance attributes.
-	class_      PrefixClassLike
-	type_       PrefixType
-	identifier_ string
+	class_ PrefixClassLike
+	any_   any
 }
 
 // Attributes
@@ -67,12 +61,8 @@ func (v *prefix_) GetClass() PrefixClassLike {
 	return v.class_
 }
 
-func (v *prefix_) GetType() PrefixType {
-	return v.type_
-}
-
-func (v *prefix_) GetIdentifier() string {
-	return v.identifier_
+func (v *prefix_) GetAny() any {
+	return v.any_
 }
 
 // Private

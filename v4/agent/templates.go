@@ -50,8 +50,8 @@ func <ClassName>() <ClassName>ClassLike {
 const genericFunctionTemplate_ = `
 func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
 	// Generate the name of the bound class type.
-	var result_ <ClassName>ClassLike[<Arguments>]
-	var name = fmt.Sprintf("%T", result_)
+	var class *<TargetName>Class_[<Arguments>]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	<TargetName>Mutex.Lock()
@@ -59,18 +59,18 @@ func <ClassName>[<Parameters>]() <ClassName>ClassLike[<Arguments>] {
 	switch actual := value.(type) {
 	case *<TargetName>Class_[<Arguments>]:
 		// This bound class type already exists.
-		result_ = actual
+		class = actual
 	default:
 		// Add a new bound class type.
-		result_ = &<TargetName>Class_[<Arguments>]{
+		class = &<TargetName>Class_[<Arguments>]{
 			// Initialize class constants.
 		}
-		<TargetName>Class[name] = result_
+		<TargetName>Class[name] = class
 	}
 	<TargetName>Mutex.Unlock()
 
 	// Return a reference to the bound class type.
-	return result_
+	return class
 }
 `
 

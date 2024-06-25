@@ -38,15 +38,13 @@ type constantClass_ struct {
 
 // Constructors
 
-func (c *constantClass_) MakeWithAttributes(
+func (c *constantClass_) Make(
 	identifier string,
 	abstraction AbstractionLike,
 ) ConstantLike {
 	return &constant_{
 		// Initialize instance attributes.
-		class_:       c,
-		identifier_:  identifier,
-		abstraction_: abstraction,
+		class_: c,
 	}
 }
 
