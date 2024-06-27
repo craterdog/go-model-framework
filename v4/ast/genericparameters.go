@@ -41,7 +41,8 @@ type genericParametersClass_ struct {
 func (c *genericParametersClass_) Make(parameters ParametersLike) GenericParametersLike {
 	return &genericParameters_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:      c,
+		parameters_: parameters,
 	}
 }
 

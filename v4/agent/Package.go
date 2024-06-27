@@ -44,11 +44,10 @@ const (
 	CommentToken
 	DelimiterToken
 	EOFToken
-	EOLToken
-	IdentifierToken
+	NameToken
 	NoteToken
+	PathToken
 	SpaceToken
-	TextToken
 )
 
 // Classes

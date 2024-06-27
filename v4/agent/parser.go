@@ -95,11 +95,6 @@ func (v *parser_) ParseSource(source string) ast.ModelLike {
 		panic(message)
 	}
 
-	// Attempt to parse optional end-of-line characters.
-	for ok {
-		_, _, ok = v.parseToken(EOLToken, "")
-	}
-
 	// Attempt to parse the end-of-file marker.
 	_, token, ok = v.parseToken(EOFToken, "")
 	if !ok {
@@ -192,9 +187,9 @@ func (v *parser_) parseAbstraction() (
 	// Attempt to parse an optional prefix.
 	var prefix, _, _ = v.parsePrefix()
 
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the abstraction.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		if prefix != nil {
 			var message = v.formatError(token)
@@ -213,23 +208,24 @@ func (v *parser_) parseAbstraction() (
 	var genericArguments, _, _ = v.parseGenericArguments()
 
 	// Found an abstraction.
-	abstraction = ast.Abstraction().Make(prefix, identifier, arguments)
+	abstraction = ast.Abstraction().Make(prefix, name, genericArguments)
 	return abstraction, token, true
 }
 
 func (v *parser_) parseAbstractions() (
-	abstractions col.ListLike[ast.AbstractionLike],
+	abstractions ast.AbstractionsLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Abstractions")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Abstractions")
 	if !ok {
 		// This is not a sequence of abstractions.
 		return abstractions, token, false
 	}
 
-	// Attempt to parse at least one abstraction.
+	// Attempt to parse one or more abstractions.
 	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
@@ -241,40 +237,284 @@ func (v *parser_) parseAbstractions() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	abstractions = col.List[ast.AbstractionLike](notation).Make()
+	var list = col.List[ast.AbstractionLike](notation).Make()
 	for ok {
-		abstractions.AppendValue(abstraction)
+		list.AppendValue(abstraction)
 		abstraction, token, ok = v.parseAbstraction()
 	}
 
 	// Found a sequence of abstractions.
+	abstractions = ast.Abstractions().Make(note, list)
 	return abstractions, token, true
 }
 
-func (v *parser_) parseArguments() (
-	arguments col.ListLike[ast.AbstractionLike],
+func (v *parser_) parseAdditionalArgument() (
+	additionalArgument ast.AdditionalArgumentLike,
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse at least one abstraction.
+	// Attempt to parse an argument.
+	var argument ast.ArgumentLike
+	argument, token, ok = v.parseArgument()
+	if !ok {
+		// This is not an additional argument.
+		return additionalArgument, token, false
+	}
+
+	// Attempt to parse a trailing ",".
+	_, token, ok = v.parseToken(DelimiterToken, ",")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax(",",
+			"AdditionalArgument",
+			"Argument",
+		)
+		panic(message)
+	}
+
+	// Found an additional argument.
+	additionalArgument = ast.AdditionalArgument().Make(argument)
+	return additionalArgument, token, true
+}
+
+func (v *parser_) parseAdditionalArguments() (
+	additionalArguments ast.AdditionalArgumentsLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the trailing "," for the first argument.
+	_, token, ok = v.parseToken(DelimiterToken, ",")
+	if !ok {
+		// This is not a sequence of additional arguments.
+		return additionalArguments, token, false
+	}
+
+	// Attempt to parse one or more additional arguments.
+	var additionalArgument ast.AdditionalArgumentLike
+	additionalArgument, token, ok = v.parseAdditionalArgument()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("AdditionalArgument",
+			"AdditionalArguments",
+			"AdditionalArgument",
+		)
+		panic(message)
+	}
+	var notation = cdc.Notation().Make()
+	var arguments = col.List[ast.AdditionalArgumentLike](notation).Make()
+	for ok {
+		arguments.AppendValue(additionalArgument)
+		additionalArgument, token, ok = v.parseAdditionalArgument()
+	}
+
+	// Found a sequence of additional arguments.
+	additionalArguments = ast.AdditionalArguments().Make(arguments)
+	return additionalArguments, token, true
+}
+
+func (v *parser_) parseAdditionalParameter() (
+	additionalParameter ast.AdditionalParameterLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a parameter.
+	var parameter ast.ParameterLike
+	parameter, token, ok = v.parseParameter()
+	if !ok {
+		// This is not an additional parameter.
+		return additionalParameter, token, false
+	}
+
+	// Attempt to parse the trailing ",".
+	_, token, ok = v.parseToken(DelimiterToken, ",")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax(",",
+			"AdditionalParameter",
+			"Parameter",
+		)
+		panic(message)
+	}
+
+	// Found an additional parameter.
+	additionalParameter = ast.AdditionalParameter().Make(parameter)
+	return additionalParameter, token, true
+}
+
+func (v *parser_) parseAdditionalParameters() (
+	additionalParameters ast.AdditionalParametersLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the trailing "," for the first parameter.
+	_, token, ok = v.parseToken(DelimiterToken, ",")
+	if !ok {
+		// This is not a sequence of additional parameters.
+		return additionalParameters, token, false
+	}
+
+	// Attempt to parse one or more additional parameters.
+	var additionalParameter ast.AdditionalParameterLike
+	additionalParameter, token, ok = v.parseAdditionalParameter()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("AdditionalParameter",
+			"AdditionalParameters",
+			"AdditionalParameter",
+		)
+		panic(message)
+	}
+	var notation = cdc.Notation().Make()
+	var parameters = col.List[ast.AdditionalParameterLike](notation).Make()
+	for ok {
+		parameters.AppendValue(additionalParameter)
+		additionalParameter, token, ok = v.parseAdditionalParameter()
+	}
+
+	// Found a sequence of additional parameters.
+	additionalParameters = ast.AdditionalParameters().Make(parameters)
+	return additionalParameters, token, true
+}
+
+func (v *parser_) parseAdditionalValue() (
+	additionalValue ast.AdditionalValueLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the name of the value.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
+	if !ok {
+		// This is not an additional value.
+		return additionalValue, token, false
+	}
+
+	// Found an additional value.
+	additionalValue = ast.AdditionalValue().Make(name)
+	return additionalValue, token, true
+}
+
+func (v *parser_) parseAdditionalValues() (
+	additionalValues ast.AdditionalValuesLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse one or more additional values.
+	var additionalValue ast.AdditionalValueLike
+	additionalValue, token, ok = v.parseAdditionalValue()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("AdditionalValue",
+			"AdditionalValues",
+			"AdditionalValue",
+		)
+		panic(message)
+	}
+	var notation = cdc.Notation().Make()
+	var values = col.List[ast.AdditionalValueLike](notation).Make()
+	for ok {
+		values.AppendValue(additionalValue)
+		additionalValue, token, ok = v.parseAdditionalValue()
+	}
+
+	// Found a sequence of additional values.
+	additionalValues = ast.AdditionalValues().Make(values)
+	return additionalValues, token, true
+}
+
+func (v *parser_) parseAlias() (
+	alias ast.AliasLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a module name abbreviation.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
+	if !ok {
+		// This is not an alias.
+		return alias, token, false
+	}
+
+	// Attempt to parse the trailing ".".
+	_, token, ok = v.parseToken(DelimiterToken, ".")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax(".",
+			"Alias",
+		)
+		panic(message)
+	}
+
+	// Found an alias.
+	alias = ast.Alias().Make(name)
+	return alias, token, true
+}
+
+func (v *parser_) parseArgument() (
+	argument ast.ArgumentLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse an abstraction.
 	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		// This is not an argument.
+		return argument, token, false
+	}
+
+	// Found an argument.
+	argument = ast.Argument().Make(abstraction)
+	return argument, token, true
+}
+
+func (v *parser_) parseArguments() (
+	arguments ast.ArgumentsLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse an argument.
+	var argument ast.ArgumentLike
+	argument, token, ok = v.parseArgument()
 	if !ok {
 		// This is not a sequence of arguments.
 		return arguments, token, false
 	}
-	var notation = cdc.Notation().Make()
-	arguments = col.List[ast.AbstractionLike](notation).Make()
-	for ok {
-		arguments.AppendValue(abstraction)
-		_, token, ok = v.parseToken(DelimiterToken, ",")
-		if ok {
-			abstraction, token, ok = v.parseAbstraction()
-		}
-	}
+
+	// Attempt to parse optional additional arguments.
+	var additionalArguments ast.AdditionalArgumentsLike
+	additionalArguments, _, _ = v.parseAdditionalArguments()
 
 	// Found a sequence of arguments.
+	arguments = ast.Arguments().Make(argument, additionalArguments)
 	return arguments, token, true
+}
+
+func (v *parser_) parseArray() (
+	array ast.ArrayLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the opening "[" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "[")
+	if !ok {
+		// This is not an array.
+		return array, token, false
+	}
+
+	// Attempt to parse the closing "]" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "]")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("]",
+			"Array",
+		)
+		panic(message)
+	}
+
+	// Found an array.
+	array = ast.Array().Make()
+	return array, token, true
 }
 
 func (v *parser_) parseAspect() (
@@ -291,7 +531,7 @@ func (v *parser_) parseAspect() (
 	}
 
 	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "interface")
+	_, token, ok = v.parseToken(NameToken, "interface")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(`"interface"`,
@@ -302,7 +542,7 @@ func (v *parser_) parseAspect() (
 		panic(message)
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "{" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "{")
 	if !ok {
 		var message = v.formatError(token)
@@ -315,7 +555,7 @@ func (v *parser_) parseAspect() (
 	}
 
 	// Attempt to parse a sequence of methods.
-	var methods col.ListLike[ast.MethodLike]
+	var methods ast.MethodsLike
 	methods, token, ok = v.parseMethods()
 	if !ok {
 		var message = v.formatError(token)
@@ -327,7 +567,7 @@ func (v *parser_) parseAspect() (
 		panic(message)
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing "}" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "}")
 	if !ok {
 		var message = v.formatError(token)
@@ -345,18 +585,19 @@ func (v *parser_) parseAspect() (
 }
 
 func (v *parser_) parseAspects() (
-	aspects col.ListLike[ast.AspectLike],
+	aspects ast.AspectsLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Aspects")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Aspects")
 	if !ok {
 		// This is not a sequence of aspects.
 		return aspects, token, false
 	}
 
-	// Attempt to parse at least one aspect.
+	// Attempt to parse one or more aspects.
 	var aspect ast.AspectLike
 	aspect, token, ok = v.parseAspect()
 	if !ok {
@@ -368,13 +609,14 @@ func (v *parser_) parseAspects() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	aspects = col.List[ast.AspectLike](notation).Make()
+	var list = col.List[ast.AspectLike](notation).Make()
 	for ok {
-		aspects.AppendValue(aspect)
+		list.AppendValue(aspect)
 		aspect, token, ok = v.parseAspect()
 	}
 
 	// Found a sequence of aspects.
+	aspects = ast.Aspects().Make(note, list)
 	return aspects, token, true
 }
 
@@ -383,15 +625,15 @@ func (v *parser_) parseAttribute() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the attribute.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
-		// This is not a attribute.
+		// This is not an attribute.
 		return attribute, token, false
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "(" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
@@ -406,7 +648,7 @@ func (v *parser_) parseAttribute() (
 	// Attempt to parse an optional parameter.
 	var parameter, _, _ = v.parseParameter()
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing ")" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
@@ -421,24 +663,25 @@ func (v *parser_) parseAttribute() (
 	// Attempt to parse an optional abstraction.
 	var abstraction, _, _ = v.parseAbstraction()
 
-	// Found a attribute.
-	attribute = ast.Attribute().Make(identifier, parameter, abstraction)
+	// Found an attribute.
+	attribute = ast.Attribute().Make(name, parameter, abstraction)
 	return attribute, token, true
 }
 
 func (v *parser_) parseAttributes() (
-	attributes col.ListLike[ast.AttributeLike],
+	attributes ast.AttributesLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Attributes")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Attributes")
 	if !ok {
 		// This is not a sequence of attributes.
 		return attributes, token, false
 	}
 
-	// Attempt to parse at least one attribute.
+	// Attempt to parse one or more attributes.
 	var attribute ast.AttributeLike
 	attribute, token, ok = v.parseAttribute()
 	if !ok {
@@ -450,14 +693,32 @@ func (v *parser_) parseAttributes() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	attributes = col.List[ast.AttributeLike](notation).Make()
+	var list = col.List[ast.AttributeLike](notation).Make()
 	for ok {
-		attributes.AppendValue(attribute)
+		list.AppendValue(attribute)
 		attribute, token, ok = v.parseAttribute()
 	}
 
 	// Found a sequence of attributes.
+	attributes = ast.Attributes().Make(note, list)
 	return attributes, token, true
+}
+
+func (v *parser_) parseChannel() (
+	channel ast.ChannelLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the "chan" keyword.
+	_, token, ok = v.parseToken(NameToken, "chan")
+	if !ok {
+		// This is not a channel.
+		return channel, token, false
+	}
+
+	// Found a channel.
+	channel = ast.Channel().Make()
+	return channel, token, true
 }
 
 func (v *parser_) parseClass() (
@@ -473,8 +734,8 @@ func (v *parser_) parseClass() (
 		return class, token, false
 	}
 
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "interface")
+	// Attempt to parse the "interface" keyword.
+	_, token, ok = v.parseToken(NameToken, "interface")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(`"interface"`,
@@ -487,7 +748,7 @@ func (v *parser_) parseClass() (
 		panic(message)
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "{" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "{")
 	if !ok {
 		var message = v.formatError(token)
@@ -510,7 +771,7 @@ func (v *parser_) parseClass() (
 	// Attempt to parse an optional sequence of functions.
 	var functions, _, _ = v.parseFunctions()
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing "}" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "}")
 	if !ok {
 		var message = v.formatError(token)
@@ -530,18 +791,19 @@ func (v *parser_) parseClass() (
 }
 
 func (v *parser_) parseClasses() (
-	classes col.ListLike[ast.ClassLike],
+	classes ast.ClassesLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Classes")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Classes")
 	if !ok {
 		// This is not a sequence of classes.
 		return classes, token, false
 	}
 
-	// Attempt to parse at least one class.
+	// Attempt to parse one or more classes.
 	var class ast.ClassLike
 	class, token, ok = v.parseClass()
 	if !ok {
@@ -553,13 +815,14 @@ func (v *parser_) parseClasses() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	classes = col.List[ast.ClassLike](notation).Make()
+	var list = col.List[ast.ClassLike](notation).Make()
 	for ok {
-		classes.AppendValue(class)
+		list.AppendValue(class)
 		class, token, ok = v.parseClass()
 	}
 
 	// Found a sequence of classes.
+	classes = ast.Classes().Make(note, list)
 	return classes, token, true
 }
 
@@ -568,15 +831,15 @@ func (v *parser_) parseConstant() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the constant.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		// This is not a constant.
 		return constant, token, false
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "(" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
@@ -587,7 +850,7 @@ func (v *parser_) parseConstant() (
 		panic(message)
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing ")" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
@@ -598,36 +861,28 @@ func (v *parser_) parseConstant() (
 		panic(message)
 	}
 
-	// Attempt to parse an abstraction.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Abstraction",
-			"Constant",
-			"Abstraction",
-		)
-		panic(message)
-	}
+	// Attempt to parse an optional abstraction.
+	var abstraction, _, _ = v.parseAbstraction()
 
 	// Found a constant.
-	constant = ast.Constant().Make(identifier, abstraction)
+	constant = ast.Constant().Make(name, abstraction)
 	return constant, token, true
 }
 
 func (v *parser_) parseConstants() (
-	constants col.ListLike[ast.ConstantLike],
+	constants ast.ConstantsLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Constants")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Constants")
 	if !ok {
 		// This is not a sequence of constants.
 		return constants, token, false
 	}
 
-	// Attempt to parse at least one constant.
+	// Attempt to parse one or more constants.
 	var constant ast.ConstantLike
 	constant, token, ok = v.parseConstant()
 	if !ok {
@@ -639,13 +894,14 @@ func (v *parser_) parseConstants() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	constants = col.List[ast.ConstantLike](notation).Make()
+	var list = col.List[ast.ConstantLike](notation).Make()
 	for ok {
-		constants.AppendValue(constant)
+		list.AppendValue(constant)
 		constant, token, ok = v.parseConstant()
 	}
 
 	// Found a sequence of constants.
+	constants = ast.Constants().Make(note, list)
 	return constants, token, true
 }
 
@@ -654,15 +910,15 @@ func (v *parser_) parseConstructor() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the constructor.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		// This is not a constructor.
 		return constructor, token, false
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "(" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
@@ -677,7 +933,7 @@ func (v *parser_) parseConstructor() (
 	// Attempt to parse an optional sequence of parameters.
 	var parameters, _, _ = v.parseParameters()
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing ")" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
@@ -689,37 +945,28 @@ func (v *parser_) parseConstructor() (
 		panic(message)
 	}
 
-	// Attempt to parse an abstraction.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Abstraction",
-			"Constructor",
-			"Parameters",
-			"Abstraction",
-		)
-		panic(message)
-	}
+	// Attempt to parse an optional abstraction.
+	var abstraction, _, _ = v.parseAbstraction()
 
 	// Found a constructor.
-	constructor = ast.Constructor().Make(identifier, parameters, abstraction)
+	constructor = ast.Constructor().Make(name, parameters, abstraction)
 	return constructor, token, true
 }
 
 func (v *parser_) parseConstructors() (
-	constructors col.ListLike[ast.ConstructorLike],
+	constructors ast.ConstructorsLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Constructors")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Constructors")
 	if !ok {
 		// This is not a sequence of constructors.
 		return constructors, token, false
 	}
 
-	// Attempt to parse at least one constructor.
+	// Attempt to parse one or more constructors.
 	var constructor ast.ConstructorLike
 	constructor, token, ok = v.parseConstructor()
 	if !ok {
@@ -731,13 +978,14 @@ func (v *parser_) parseConstructors() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	constructors = col.List[ast.ConstructorLike](notation).Make()
+	var list = col.List[ast.ConstructorLike](notation).Make()
 	for ok {
-		constructors.AppendValue(constructor)
+		list.AppendValue(constructor)
 		constructor, token, ok = v.parseConstructor()
 	}
 
 	// Found a sequence of constructors.
+	constructors = ast.Constructors().Make(note, list)
 	return constructors, token, true
 }
 
@@ -754,55 +1002,34 @@ func (v *parser_) parseDeclaration() (
 		return declaration, token, false
 	}
 
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "type")
+	// Attempt to parse the "type" keyword.
+	_, token, ok = v.parseToken(NameToken, "type")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(`"type"`,
 			"Declaration",
-			"Parameters",
+			"GenericParameters",
 		)
 		panic(message)
 	}
 
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the type declaration.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateSyntax("identifier",
+		message += v.generateSyntax("name",
 			"Declaration",
-			"Parameters",
+			"GenericParameters",
 		)
 		panic(message)
 	}
 
-	// Attempt to parse an optional sequence of parameters.
-	var parameters col.ListLike[ast.ParameterLike]
-	_, token, ok = v.parseToken(DelimiterToken, "[")
-	if ok {
-		parameters, token, ok = v.parseParameters()
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("Parameters",
-				"Declaration",
-				"Parameters",
-			)
-			panic(message)
-		}
-		_, token, ok = v.parseToken(DelimiterToken, "]")
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("]",
-				"Declaration",
-				"Parameters",
-			)
-			panic(message)
-		}
-	}
+	// Attempt to parse an optional sequence of generic parameters.
+	var genericParameters, _, _ = v.parseGenericParameters()
 
 	// Found a declaration.
-	declaration = ast.Declaration().Make(comment, identifier, parameters)
+	declaration = ast.Declaration().Make(comment, name, genericParameters)
 	return declaration, token, true
 }
 
@@ -811,81 +1038,49 @@ func (v *parser_) parseEnumeration() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "const")
+	// Attempt to parse the "const" keyword.
+	_, token, ok = v.parseToken(NameToken, "const")
 	if !ok {
 		// This is not an enumeration.
 		return enumeration, token, false
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "(" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("(",
 			"Enumeration",
-			"Parameter",
+			"Values",
 		)
 		panic(message)
 	}
 
-	// Attempt to parse a parameter.
-	var parameter ast.ParameterLike
-	parameter, token, ok = v.parseParameter()
+	// Attempt to parse the enumerated values.
+	var values ast.ValuesLike
+	values, token, ok = v.parseValues()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateSyntax("Parameter",
+		message += v.generateSyntax("Values",
 			"Enumeration",
-			"Parameter",
+			"Values",
 		)
 		panic(message)
 	}
 
-	// Attempt to parse a delimiter.
-	_, token, ok = v.parseToken(DelimiterToken, "=")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("=",
-			"Enumeration",
-			"Parameter",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an identifier.
-	_, token, ok = v.parseToken(IdentifierToken, "iota")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"iota"`,
-			"Enumeration",
-			"Parameter",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse a sequence of identifiers.
-	var identifier string
-	var notation = cdc.Notation().Make()
-	var identifiers = col.List[string](notation).Make()
-	identifier, _, ok = v.parseToken(IdentifierToken, "")
-	for ok {
-		identifiers.AppendValue(identifier)
-		identifier, _, ok = v.parseToken(IdentifierToken, "")
-	}
-
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing ")" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(")",
 			"Enumeration",
-			"Parameter",
+			"Values",
 		)
 		panic(message)
 	}
 
 	// Found an enumeration.
-	enumeration = ast.Enumeration().Make(parameter, identifiers)
+	enumeration = ast.Enumeration().Make(values)
 	return enumeration, token, true
 }
 
@@ -894,15 +1089,15 @@ func (v *parser_) parseFunction() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the function.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		// This is not a function.
 		return function, token, false
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "(" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
@@ -917,7 +1112,7 @@ func (v *parser_) parseFunction() (
 	// Attempt to parse an optional sequence of parameters.
 	var parameters, _, _ = v.parseParameters()
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing ")" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
@@ -943,7 +1138,7 @@ func (v *parser_) parseFunction() (
 	}
 
 	// Found a function.
-	function = ast.Function().Make(identifier, parameters, result)
+	function = ast.Function().Make(name, parameters, result)
 	return function, token, true
 }
 
@@ -960,8 +1155,8 @@ func (v *parser_) parseFunctional() (
 		return functional, token, false
 	}
 
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "func")
+	// Attempt to parse the "func" keyword.
+	_, token, ok = v.parseToken(NameToken, "func")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(`"func"`,
@@ -973,7 +1168,7 @@ func (v *parser_) parseFunctional() (
 		panic(message)
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "(" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
@@ -989,7 +1184,7 @@ func (v *parser_) parseFunctional() (
 	// Attempt to parse an optional sequence of parameters.
 	var parameters, _, _ = v.parseParameters()
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing ")" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
@@ -1022,18 +1217,19 @@ func (v *parser_) parseFunctional() (
 }
 
 func (v *parser_) parseFunctionals() (
-	functionals col.ListLike[ast.FunctionalLike],
+	functionals ast.FunctionalsLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Functionals")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Functionals")
 	if !ok {
 		// This is not a sequence of functionals.
 		return functionals, token, false
 	}
 
-	// Attempt to parse at least one functional.
+	// Attempt to parse one or more functionals.
 	var functional ast.FunctionalLike
 	functional, token, ok = v.parseFunctional()
 	if !ok {
@@ -1045,29 +1241,31 @@ func (v *parser_) parseFunctionals() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	functionals = col.List[ast.FunctionalLike](notation).Make()
+	var list = col.List[ast.FunctionalLike](notation).Make()
 	for ok {
-		functionals.AppendValue(functional)
+		list.AppendValue(functional)
 		functional, token, ok = v.parseFunctional()
 	}
 
 	// Found a sequence of functionals.
+	functionals = ast.Functionals().Make(note, list)
 	return functionals, token, true
 }
 
 func (v *parser_) parseFunctions() (
-	functions col.ListLike[ast.FunctionLike],
+	functions ast.FunctionsLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Functions")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Functions")
 	if !ok {
 		// This is not a sequence of functions.
 		return functions, token, false
 	}
 
-	// Attempt to parse at least one function.
+	// Attempt to parse one or more functions.
 	var function ast.FunctionLike
 	function, token, ok = v.parseFunction()
 	if !ok {
@@ -1079,14 +1277,95 @@ func (v *parser_) parseFunctions() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	functions = col.List[ast.FunctionLike](notation).Make()
+	var list = col.List[ast.FunctionLike](notation).Make()
 	for ok {
-		functions.AppendValue(function)
+		list.AppendValue(function)
 		function, token, ok = v.parseFunction()
 	}
 
 	// Found a sequence of functions.
+	functions = ast.Functions().Make(note, list)
 	return functions, token, true
+}
+
+func (v *parser_) parseGenericArguments() (
+	genericArguments ast.GenericArgumentsLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the opening "[" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "[")
+	if !ok {
+		// This is not a sequence of generic arguments.
+		return genericArguments, token, false
+	}
+
+	// Attempt to parse the arguments.
+	var arguments ast.ArgumentsLike
+	arguments, token, ok = v.parseArguments()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Arguments",
+			"GenericArguments",
+			"Arguments",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the closing "]" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "]")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("]",
+			"GenericArguments",
+			"Arguments",
+		)
+		panic(message)
+	}
+
+	// Found a sequence of generic arguments.
+	genericArguments = ast.GenericArguments().Make(arguments)
+	return genericArguments, token, true
+}
+
+func (v *parser_) parseGenericParameters() (
+	genericParameters ast.GenericParametersLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the opening "[" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "[")
+	if !ok {
+		// This is not a sequence of generic parameters.
+		return genericParameters, token, false
+	}
+
+	// Attempt to parse the parameters.
+	var parameters ast.ParametersLike
+	parameters, token, ok = v.parseParameters()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Parameters",
+			"GenericParameters",
+			"Parameters",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the closing "]" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "]")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("]",
+			"GenericParameters",
+			"Parameters",
+		)
+		panic(message)
+	}
+
+	// Found a sequence of generic parameters.
+	genericParameters = ast.GenericParameters().Make(parameters)
+	return genericParameters, token, true
 }
 
 func (v *parser_) parseHeader() (
@@ -1102,8 +1381,8 @@ func (v *parser_) parseHeader() (
 		return header, token, false
 	}
 
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "package")
+	// Attempt to parse the "package" keyword.
+	_, token, ok = v.parseToken(NameToken, "package")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(`"package"`,
@@ -1112,20 +1391,71 @@ func (v *parser_) parseHeader() (
 		panic(message)
 	}
 
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the package.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateSyntax("identifier",
+		message += v.generateSyntax("name",
 			"Header",
 		)
 		panic(message)
 	}
 
 	// Found a header.
-	header = ast.Header().Make(comment, identifier)
+	header = ast.Header().Make(comment, name)
 	return header, token, true
+}
+
+func (v *parser_) parseImports() (
+	imports ast.ImportsLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the "import" keyword.
+	_, token, ok = v.parseToken(NameToken, "import")
+	if !ok {
+		// This is not a sequence of imported modules.
+		return imports, token, false
+	}
+
+	// Attempt to parse the opening "(" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "(")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("(",
+			"Imports",
+			"Modules",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse a sequence of imported modules.
+	var modules ast.ModulesLike
+	modules, token, ok = v.parseModules()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Modules",
+			"Imports",
+			"Modules",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the closing ")" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, ")")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax(")",
+			"Imports",
+			"Modules",
+		)
+		panic(message)
+	}
+
+	// Found a sequence of imported modules.
+	imports = ast.Imports().Make(modules)
+	return imports, token, true
 }
 
 func (v *parser_) parseInstance() (
@@ -1141,8 +1471,8 @@ func (v *parser_) parseInstance() (
 		return instance, token, false
 	}
 
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "interface")
+	// Attempt to parse the "interface" keyword.
+	_, token, ok = v.parseToken(NameToken, "interface")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(`"interface"`,
@@ -1155,7 +1485,7 @@ func (v *parser_) parseInstance() (
 		panic(message)
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "{" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "{")
 	if !ok {
 		var message = v.formatError(token)
@@ -1178,7 +1508,7 @@ func (v *parser_) parseInstance() (
 	// Attempt to parse an optional sequence of methods.
 	var methods, _, _ = v.parseMethods()
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing "}" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "}")
 	if !ok {
 		var message = v.formatError(token)
@@ -1198,18 +1528,19 @@ func (v *parser_) parseInstance() (
 }
 
 func (v *parser_) parseInstances() (
-	instances col.ListLike[ast.InstanceLike],
+	instances ast.InstancesLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Instances")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Instances")
 	if !ok {
 		// This is not a sequence of instances.
 		return instances, token, false
 	}
 
-	// Attempt to parse at least one instance.
+	// Attempt to parse one or more instances.
 	var instance ast.InstanceLike
 	instance, token, ok = v.parseInstance()
 	if !ok {
@@ -1221,14 +1552,63 @@ func (v *parser_) parseInstances() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	instances = col.List[ast.InstanceLike](notation).Make()
+	var list = col.List[ast.InstanceLike](notation).Make()
 	for ok {
-		instances.AppendValue(instance)
+		list.AppendValue(instance)
 		instance, token, ok = v.parseInstance()
 	}
 
 	// Found a sequence of instances.
+	instances = ast.Instances().Make(note, list)
 	return instances, token, true
+}
+
+func (v *parser_) parseMap() (
+	map_ ast.MapLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the "map" keyword.
+	_, token, ok = v.parseToken(NameToken, "map")
+	if !ok {
+		// This is not a map.
+		return map_, token, false
+	}
+
+	// Attempt to parse the opening "[" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "[")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("[",
+			"Map",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the name of the map key type.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("name",
+			"Map",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the closing "]" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "]")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("]",
+			"Map",
+		)
+		panic(message)
+	}
+
+	// Found a map.
+	map_ = ast.Map().Make(name)
+	return map_, token, true
 }
 
 func (v *parser_) parseMethod() (
@@ -1236,15 +1616,15 @@ func (v *parser_) parseMethod() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the method.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		// This is not a method.
 		return method, token, false
 	}
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the opening "(" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
@@ -1259,7 +1639,7 @@ func (v *parser_) parseMethod() (
 	// Attempt to parse an optional sequence of parameters.
 	var parameters, _, _ = v.parseParameters()
 
-	// Attempt to parse a delimiter.
+	// Attempt to parse the closing ")" bracket.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
@@ -1272,26 +1652,28 @@ func (v *parser_) parseMethod() (
 	}
 
 	// Attempt to parse an optional result.
-	var result, _, _ = v.parseResult()
+	var result ast.ResultLike
+	result, _, _ = v.parseResult()
 
 	// Found a method.
-	method = ast.Method().Make(identifier, parameters, result)
+	method = ast.Method().Make(name, parameters, result)
 	return method, token, true
 }
 
 func (v *parser_) parseMethods() (
-	methods col.ListLike[ast.MethodLike],
+	methods ast.MethodsLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Methods")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Methods")
 	if !ok {
 		// This is not a sequence of methods.
 		return methods, token, false
 	}
 
-	// Attempt to parse at least one method.
+	// Attempt to parse one or more methods.
 	var method ast.MethodLike
 	method, token, ok = v.parseMethod()
 	if !ok {
@@ -1303,13 +1685,14 @@ func (v *parser_) parseMethods() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	methods = col.List[ast.MethodLike](notation).Make()
+	var list = col.List[ast.MethodLike](notation).Make()
 	for ok {
-		methods.AppendValue(method)
+		list.AppendValue(method)
 		method, token, ok = v.parseMethod()
 	}
 
 	// Found a sequence of methods.
+	methods = ast.Methods().Make(note, list)
 	return methods, token, true
 }
 
@@ -1322,7 +1705,7 @@ func (v *parser_) parseModel() (
 	var notice ast.NoticeLike
 	notice, token, ok = v.parseNotice()
 	if !ok {
-		// This is not model.
+		// This is not a model.
 		return model, token, false
 	}
 
@@ -1335,7 +1718,7 @@ func (v *parser_) parseModel() (
 			"Model",
 			"Notice",
 			"Header",
-			"Modules",
+			"Imports",
 			"Types",
 			"Functionals",
 			"Aspects",
@@ -1345,8 +1728,8 @@ func (v *parser_) parseModel() (
 		panic(message)
 	}
 
-	// Attempt to parse an optional sequence of modules.
-	var modules, _, _ = v.parseModules()
+	// Attempt to parse an optional sequence of imports.
+	var imports, _, _ = v.parseImports()
 
 	// Attempt to parse an optional sequence of types.
 	var types, _, _ = v.parseTypes()
@@ -1367,7 +1750,7 @@ func (v *parser_) parseModel() (
 	model = ast.Model().Make(
 		notice,
 		header,
-		modules,
+		imports,
 		types,
 		functionals,
 		aspects,
@@ -1382,83 +1765,47 @@ func (v *parser_) parseModule() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the module.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		// This is not a module.
 		return module, token, false
 	}
 
-	// Attempt to parse text.
-	var text string
-	text, token, ok = v.parseToken(TextToken, "")
+	// Attempt to parse the path of the module.
+	var path string
+	path, token, ok = v.parseToken(PathToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateSyntax("text",
+		message += v.generateSyntax("path",
 			"Module",
 		)
 		panic(message)
 	}
 
 	// Found a module.
-	module = ast.Module().Make(identifier, text)
+	module = ast.Module().Make(name, path)
 	return module, token, true
 }
 
 func (v *parser_) parseModules() (
-	modules col.ListLike[ast.ModuleLike],
+	modules ast.ModulesLike,
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(IdentifierToken, "import")
-	if !ok {
-		// This is not a sequence of modules.
-		return modules, token, false
-	}
-
-	// Attempt to parse a delimiter.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Modules",
-			"Module",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse one or more modules.
+	// Attempt to parse a sequence of modules.
+	var notation = cdc.Notation().Make()
+	var list = col.List[ast.ModuleLike](notation).Make()
 	var module ast.ModuleLike
 	module, token, ok = v.parseModule()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Module",
-			"Modules",
-			"Module",
-		)
-		panic(message)
-	}
-	var notation = cdc.Notation().Make()
-	modules = col.List[ast.ModuleLike](notation).Make()
 	for ok {
-		modules.AppendValue(module)
-		module, _, ok = v.parseModule()
-	}
-
-	// Attempt to parse a delimiter.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Modules",
-			"Module",
-		)
-		panic(message)
+		list.AppendValue(module)
+		module, token, ok = v.parseModule()
 	}
 
 	// Found a sequence of modules.
+	modules = ast.Modules().Make(list)
 	return modules, token, true
 }
 
@@ -1485,15 +1832,15 @@ func (v *parser_) parseParameter() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an identifier.
-	var identifier string
-	identifier, token, ok = v.parseToken(IdentifierToken, "")
+	// Attempt to parse the name of the parameter.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
 		// This is not a parameter.
 		return parameter, token, false
 	}
 
-	// Attempt to parse an abstraction.
+	// Attempt to parse the abstract type of the parameter.
 	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
@@ -1506,33 +1853,69 @@ func (v *parser_) parseParameter() (
 	}
 
 	// Found a parameter.
-	parameter = ast.Parameter().Make(identifier, abstraction)
+	parameter = ast.Parameter().Make(name, abstraction)
 	return parameter, token, true
 }
 
-func (v *parser_) parseParameters() (
-	parameters col.ListLike[ast.ParameterLike],
+func (v *parser_) parseParameterized() (
+	parameterized ast.ParameterizedLike,
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse at least one parameter.
+	// Attempt to parse the opening "(" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, "(")
+	if !ok {
+		// This is not a parameterized result.
+		return parameterized, token, false
+	}
+
+	// Attempt to parse a sequence of parameters.
+	var parameters ast.ParametersLike
+	parameters, token, ok = v.parseParameters()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Parameters",
+			"Parameterized",
+			"Parameters",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the closing ")" bracket.
+	_, token, ok = v.parseToken(DelimiterToken, ")")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax(")",
+			"Parameterized",
+			"Parameters",
+		)
+		panic(message)
+	}
+
+	// Found a parameterized result.
+	parameterized = ast.Parameterized().Make(parameters)
+	return parameterized, token, true
+}
+
+func (v *parser_) parseParameters() (
+	parameters ast.ParametersLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a parameter.
 	var parameter ast.ParameterLike
 	parameter, token, ok = v.parseParameter()
 	if !ok {
 		// This is not a sequence of parameters.
 		return parameters, token, false
 	}
-	var notation = cdc.Notation().Make()
-	parameters = col.List[ast.ParameterLike](notation).Make()
-	for ok {
-		parameters.AppendValue(parameter)
-		_, token, ok = v.parseToken(DelimiterToken, ",")
-		if ok {
-			parameter, token, ok = v.parseParameter()
-		}
-	}
+
+	// Attempt to parse optional additional parameters.
+	var additionalParameters ast.AdditionalParametersLike
+	additionalParameters, _, _ = v.parseAdditionalParameters()
 
 	// Found a sequence of parameters.
+	parameters = ast.Parameters().Make(parameter, additionalParameters)
 	return parameters, token, true
 }
 
@@ -1541,80 +1924,40 @@ func (v *parser_) parsePrefix() (
 	token TokenLike,
 	ok bool,
 ) {
-	var identifier string
-	var prefixType ast.PrefixType
-
 	// Attempt to parse an array prefix.
-	var delimiterToken TokenLike
-	_, delimiterToken, ok = v.parseToken(DelimiterToken, "[")
+	var array ast.ArrayLike
+	array, token, ok = v.parseArray()
 	if ok {
-		// Attempt to parse a delimiter.
-		_, token, ok = v.parseToken(DelimiterToken, "]")
-		if ok {
-			prefixType = ast.ArrayPrefix
-			prefix = ast.Prefix().Make(identifier, prefixType)
-			return prefix, token, true
-		}
-		v.putBack(delimiterToken)
-		return prefix, token, false
-	}
-
-	// Attempt to parse a map prefix.
-	_, _, ok = v.parseToken(IdentifierToken, "map")
-	if ok {
-		_, token, ok = v.parseToken(DelimiterToken, "[")
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("[",
-				"Prefix",
-			)
-			panic(message)
-		}
-		identifier, token, ok = v.parseToken(IdentifierToken, "")
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("identifier",
-				"Prefix",
-			)
-			panic(message)
-		}
-		_, token, ok = v.parseToken(DelimiterToken, "]")
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("]",
-				"Prefix",
-			)
-			panic(message)
-		}
-		prefixType = ast.MapPrefix
-		prefix = ast.Prefix().Make(identifier, prefixType)
+		prefix = ast.Prefix().Make(array)
 		return prefix, token, true
 	}
 
-	// Attempt to parse a channel prefix.
-	_, token, ok = v.parseToken(IdentifierToken, "chan")
+	// Attempt to parse an map prefix.
+	var map_ ast.MapLike
+	map_, token, ok = v.parseMap()
 	if ok {
-		prefixType = ast.ChannelPrefix
-		prefix = ast.Prefix().Make(identifier, prefixType)
+		prefix = ast.Prefix().Make(map_)
+		return prefix, token, true
+	}
+
+	// Attempt to parse an channel prefix.
+	var channel ast.ChannelLike
+	channel, token, ok = v.parseChannel()
+	if ok {
+		prefix = ast.Prefix().Make(channel)
 		return prefix, token, true
 	}
 
 	// Attempt to parse an alias prefix.
-	var identifierToken TokenLike
-	identifier, identifierToken, ok = v.parseToken(IdentifierToken, "")
+	var alias ast.AliasLike
+	alias, token, ok = v.parseAlias()
 	if ok {
-		_, token, ok = v.parseToken(DelimiterToken, ".")
-		if !ok {
-			v.putBack(identifierToken)
-			return prefix, token, false
-		}
-		prefixType = ast.AliasPrefix
-		prefix = ast.Prefix().Make(identifier, prefixType)
+		prefix = ast.Prefix().Make(alias)
 		return prefix, token, true
 	}
 
 	// This is not a prefix.
-	return prefix, identifierToken, false
+	return prefix, token, false
 }
 
 func (v *parser_) parseResult() (
@@ -1622,42 +1965,19 @@ func (v *parser_) parseResult() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an abstraction.
+	// Attempt to parse an abstract result type.
 	var abstraction ast.AbstractionLike
 	abstraction, token, ok = v.parseAbstraction()
 	if ok {
-		// Found an abstraction result.
 		result = ast.Result().Make(abstraction)
 		return result, token, true
 	}
 
-	// Attempt to parse a sequence of parameters.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	var parameters col.ListLike[ast.ParameterLike]
+	// Attempt to parse a parameterized result type.
+	var parameterized ast.ParameterizedLike
+	parameterized, token, ok = v.parseParameterized()
 	if ok {
-		parameters, token, ok = v.parseParameters()
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("Parameters",
-				"Result",
-				"Abstraction",
-				"Parameters",
-			)
-			panic(message)
-		}
-		_, token, ok = v.parseToken(DelimiterToken, ")")
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax(")",
-				"Result",
-				"Abstraction",
-				"Parameters",
-			)
-			panic(message)
-		}
-
-		// Found a named parameters result.
-		result = ast.Result().Make(parameters)
+		result = ast.Result().Make(parameterized)
 		return result, token, true
 	}
 
@@ -1670,13 +1990,14 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse a specific token.
+	// Attempt to parse a specific token type.
 	token = v.getNextToken()
 	if token.GetType() == expectedType {
+		// Found the right token type.
 		value = token.GetValue()
 		var notConstrained = len(expectedValue) == 0
 		if notConstrained || value == expectedValue {
-			// Found the right token.
+			// Found the right token value.
 			return value, token, true
 		}
 	}
@@ -1723,18 +2044,19 @@ func (v *parser_) parseType() (
 }
 
 func (v *parser_) parseTypes() (
-	types col.ListLike[ast.TypeLike],
+	types ast.TypesLike,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a note.
-	_, token, ok = v.parseToken(NoteToken, "// Types")
+	var note string
+	note, token, ok = v.parseToken(NoteToken, "// Types")
 	if !ok {
 		// This is not a sequence of types.
 		return types, token, false
 	}
 
-	// Attempt to parse at least one type.
+	// Attempt to parse one or more types.
 	var type_ ast.TypeLike
 	type_, token, ok = v.parseType()
 	if !ok {
@@ -1746,14 +2068,98 @@ func (v *parser_) parseTypes() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	types = col.List[ast.TypeLike](notation).Make()
+	var list = col.List[ast.TypeLike](notation).Make()
 	for ok {
-		types.AppendValue(type_)
+		list.AppendValue(type_)
 		type_, token, ok = v.parseType()
 	}
 
 	// Found a sequence of types.
+	types = ast.Types().Make(note, list)
 	return types, token, true
+}
+
+func (v *parser_) parseValue() (
+	value ast.ValueLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the name of the enumerated value.
+	var name string
+	name, token, ok = v.parseToken(NameToken, "")
+	if !ok {
+		// This is not an enumerated value.
+		return value, token, false
+	}
+
+	// Attempt to parse the abstract type of the enumerated value.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Abstraction",
+			"Value",
+			"Abstraction",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the "=" operator.
+	_, token, ok = v.parseToken(DelimiterToken, "=")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("=",
+			"Value",
+			"Abstraction",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the "iota" keyword.
+	_, token, ok = v.parseToken(NameToken, "iota")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax(`"iota"`,
+			"Value",
+			"Abstraction",
+		)
+		panic(message)
+	}
+
+	// Found an enumerated value.
+	value = ast.Value().Make(name, abstraction)
+	return value, token, true
+}
+
+func (v *parser_) parseValues() (
+	values ast.ValuesLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a value.
+	var value ast.ValueLike
+	value, token, ok = v.parseValue()
+	if !ok {
+		// This is not a sequence of values.
+		return values, token, false
+	}
+
+	// Attempt to parse additional values.
+	var additionalValues ast.AdditionalValuesLike
+	additionalValues, token, ok = v.parseAdditionalValues()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax(`"AdditionalValues"`,
+			"Values",
+			"Value",
+			"AdditionalValues",
+		)
+		panic(message)
+	}
+
+	// Found a sequence of values.
+	values = ast.Values().Make(value, additionalValues)
+	return values, token, true
 }
 
 func (v *parser_) putBack(token TokenLike) {
@@ -1762,43 +2168,60 @@ func (v *parser_) putBack(token TokenLike) {
 }
 
 var syntax = map[string]string{
-	"AST":         `Model EOL* EOF  ! Terminated with an end-of-file marker.`,
-	"Model":       `Notice Header Modules? Types? Functionals? Aspects? Classes? Instances?`,
-	"Notice":      `comment`,
-	"Header":      `comment "package" identifier`,
-	"Modules":     `"import" "(" Module* ")"`,
-	"Module":      `identifier text`,
-	"Types":       `"// Types" Type+`,
-	"Type":        `Declaration Abstraction Enumeration?`,
-	"Declaration": `comment "type" identifier ("[" Parameters "]")?`,
-	"Parameters":  `Parameter ("," Parameter)* ","?`,
-	"Parameter":   `identifier Abstraction`,
-	"Abstraction": `Prefix? identifier ("[" Arguments "]")?`,
+	"Model":                `Notice Header Imports? Types? Functionals? Aspects? Classes? Instances? EOF`,
+	"Notice":               `comment`,
+	"Header":               `comment "package" name`,
+	"Imports":              `"import" "(" Modules ")"`,
+	"Modules":              `Module*`,
+	"Module":               `name path`,
+	"Types":                `note Type+`,
+	"Type":                 `Declaration Abstraction Enumeration?`,
+	"Declaration":          `comment "type" name GenericParameters?`,
+	"GenericParameters":    `"[" Parameters "]"`,
+	"Parameters":           `Parameter AdditionalParameters?`,
+	"AdditionalParameters": `"," AdditionalParameter+`,
+	"AdditionalParameter":  `Parameter ","`,
+	"Parameter":            `name Abstraction`,
+	"Abstraction":          `Prefix? name GenericArguments?`,
 	"Prefix": `
-    "[" "]"
-    "map" "[" identifier "]"
-    "chan"
-    identifier "."`,
-	"Arguments":    `Abstraction ("," Abstraction)* ","?`,
-	"Enumeration":  `"const" "(" Parameter "=" "iota" identifier* ")"`,
-	"Functionals":  `"// Functionals" Functional+`,
-	"Functional":   `Declaration "func" "(" Parameters? ")" Result`,
-	"Result":       `Abstraction | "(" Parameters ")"`,
-	"Aspects":      `"// Aspects" Aspect+`,
-	"Aspect":       `Declaration "interface" "{" Methods "}"`,
-	"Classes":      `"// Classes" Class+`,
-	"Class":        `Declaration "interface" "{" Constants? Constructors? Functions? "}"`,
-	"Constants":    `"// Constants" Constant+`,
-	"Constant":     `identifier "(" ")" Abstraction`,
-	"Constructors": `"// Constructors" Constructor+`,
-	"Constructor":  `identifier "(" Parameters? ")" Abstraction`,
-	"Functions":    `"// Functions" Function+`,
-	"Function":     `identifier "(" Parameters? ")" Result`,
-	"Instances":    `"// Instances" Instance+`,
-	"Instance":     `Declaration "interface" "{" Attributes? Abstractions? Methods? "}"`,
-	"Attributes":   `"// Attributes" Attribute+`,
-	"Attribute":    `identifier "(" Parameter? ")" Abstraction?`,
-	"Abstractions": `"// Abstractions" Abstraction+`,
-	"Methods":      `"// Methods" Method+`,
-	"Method":       `identifier "(" Parameters? ")" Result?`,
+    Array
+    Map
+    Channel
+    Alias`,
+	"Array":               `"[" "]"`,
+	"Map":                 `"map" "[" name "]"`,
+	"Channel":             `"chan"`,
+	"Alias":               `name "."`,
+	"GenericArguments":    `"[" Arguments "]"`,
+	"Arguments":           `Argument AdditionalArguments?`,
+	"AdditionalArguments": `"," AdditionalArgument+`,
+	"AdditionalArgument":  `Argument ","`,
+	"Argument":            `Abstraction`,
+	"Enumeration":         `"const" "(" Values ")"`,
+	"Values":              `Value AdditionalValue+`,
+	"Value":               `name Abstraction "=" "iota"`,
+	"AdditionalValue":     `name`,
+	"Functionals":         `note Functional+`,
+	"Functional":          `Declaration "func" "(" Parameters? ")" Result`,
+	"Result": `
+    Abstraction
+    Parameterized`,
+	"Parameterized": `"(" Parameters ")"`,
+	"Aspects":       `note Aspect+`,
+	"Aspect":        `Declaration "interface" "{" Methods "}"`,
+	"Classes":       `note Class+`,
+	"Class":         `Declaration "interface" "{" Constants? Constructors? Functions? "}"`,
+	"Constants":     `note Constant+`,
+	"Constant":      `name "(" ")" Abstraction`,
+	"Constructors":  `note Constructor+`,
+	"Constructor":   `name "(" Parameters? ")" Abstraction`,
+	"Functions":     `note Function+`,
+	"Function":      `name "(" Parameters? ")" Result`,
+	"Instances":     `note Instance+`,
+	"Instance":      `Declaration "interface" "{" Attributes? Abstractions? Methods? "}"`,
+	"Attributes":    `note Attribute+`,
+	"Attribute":     `name "(" Parameter? ")" Abstraction?`,
+	"Abstractions":  `note Abstraction+`,
+	"Methods":       `note Method+`,
+	"Method":        `name "(" Parameters? ")" Result?`,
 }

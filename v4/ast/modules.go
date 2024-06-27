@@ -43,7 +43,8 @@ type modulesClass_ struct {
 func (c *modulesClass_) Make(modules col.ListLike[ModuleLike]) ModulesLike {
 	return &modules_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:   c,
+		modules_: modules,
 	}
 }
 

@@ -38,10 +38,11 @@ type mapClass_ struct {
 
 // Constructors
 
-func (c *mapClass_) Make(identifier string) MapLike {
+func (c *mapClass_) Make(name string) MapLike {
 	return &map_{
 		// Initialize instance attributes.
 		class_: c,
+		name_:  name,
 	}
 }
 
@@ -51,8 +52,8 @@ func (c *mapClass_) Make(identifier string) MapLike {
 
 type map_ struct {
 	// Define instance attributes.
-	class_      MapClassLike
-	identifier_ string
+	class_ MapClassLike
+	name_  string
 }
 
 // Attributes
@@ -61,8 +62,8 @@ func (v *map_) GetClass() MapClassLike {
 	return v.class_
 }
 
-func (v *map_) GetIdentifier() string {
-	return v.identifier_
+func (v *map_) GetName() string {
+	return v.name_
 }
 
 // Private

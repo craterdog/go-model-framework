@@ -40,10 +40,13 @@ type additionalParametersClass_ struct {
 
 // Constructors
 
-func (c *additionalParametersClass_) Make(additionalParameters col.ListLike[AdditionalParameterLike]) AdditionalParametersLike {
+func (c *additionalParametersClass_) Make(
+	additionalParameters col.ListLike[AdditionalParameterLike],
+) AdditionalParametersLike {
 	return &additionalParameters_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:                c,
+		additionalParameters_: additionalParameters,
 	}
 }
 

@@ -46,7 +46,9 @@ func (c *attributesClass_) Make(
 ) AttributesLike {
 	return &attributes_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:      c,
+		note_:       note,
+		attributes_: attributes,
 	}
 }
 

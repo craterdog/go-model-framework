@@ -27,23 +27,21 @@ import (
 var scannerClass = &scannerClass_{
 	// Initialize class constants.
 	tokens_: map[TokenType]string{
-		ErrorToken:      "error",
-		CommentToken:    "comment",
-		DelimiterToken:  "delimiter",
-		EOFToken:        "EOF",
-		EOLToken:        "EOL",
-		IdentifierToken: "identifier",
-		NoteToken:       "note",
-		SpaceToken:      "space",
-		TextToken:       "text",
+		ErrorToken:     "error",
+		CommentToken:   "comment",
+		DelimiterToken: "delimiter",
+		NameToken:      "name",
+		NoteToken:      "note",
+		PathToken:      "path",
+		SpaceToken:     "space",
 	},
 	matchers_: map[TokenType]*reg.Regexp{
-		CommentToken:    reg.MustCompile(`^(?:` + comment_ + `)`),
-		DelimiterToken:  reg.MustCompile(`^(?:` + delimiter_ + `)`),
-		IdentifierToken: reg.MustCompile(`^(?:` + identifier_ + `)`),
-		NoteToken:       reg.MustCompile(`^(?:` + note_ + `)`),
-		SpaceToken:      reg.MustCompile(`^(?:` + space_ + `)`),
-		TextToken:       reg.MustCompile(`^(?:` + text_ + `)`),
+		CommentToken:   reg.MustCompile(`^(?:` + comment_ + `)`),
+		DelimiterToken: reg.MustCompile(`^(?:` + delimiter_ + `)`),
+		NameToken:      reg.MustCompile(`^(?:` + name_ + `)`),
+		NoteToken:      reg.MustCompile(`^(?:` + note_ + `)`),
+		PathToken:      reg.MustCompile(`^(?:` + path_ + `)`),
+		SpaceToken:     reg.MustCompile(`^(?:` + space_ + `)`),
 	},
 }
 
@@ -156,10 +154,6 @@ func (v *scanner_) emitToken(type_ TokenType) {
 	v.tokens_.AddValue(token) // This will block if the queue is full.
 }
 
-func (v *scanner_) foundEOF() {
-	v.emitToken(EOFToken)
-}
-
 func (v *scanner_) foundError() {
 	v.next_++
 	v.emitToken(ErrorToken)
@@ -205,16 +199,15 @@ loop:
 		switch {
 		case v.foundToken(CommentToken):
 		case v.foundToken(DelimiterToken):
-		case v.foundToken(IdentifierToken):
+		case v.foundToken(NameToken):
 		case v.foundToken(NoteToken):
+		case v.foundToken(PathToken):
 		case v.foundToken(SpaceToken):
-		case v.foundToken(TextToken):
 		default:
 			v.foundError()
 			break loop
 		}
 	}
-	v.foundEOF()
 }
 
 /*
@@ -226,18 +219,17 @@ way.  We append an underscore to each name to lessen the chance of a name
 collision with other private Go class constants in this package.
 */
 const (
-	any_        = `.|` + eol_
-	comment_    = `/\*` + `((?:` + any_ + `)*?)` + `\*/`
-	control_    = `\p{Cc}`
-	delimiter_  = `[[\](){}\.,=]`
-	digit_      = `\p{Nd}`
-	eof_        = `\z`
-	eol_        = `\n`
-	identifier_ = `(?:` + letter_ + `)(?:` + letter_ + `|` + digit_ + `)*`
-	letter_     = lower_ + `|` + upper_ + `|_`
-	lower_      = `\p{Ll}`
-	note_       = `\/\/ [^` + control_ + `]*`
-	text_       = `"(?:` + any_ + `)*?"` // This returns the shortest match.
-	space_      = `[ \t\n]+`
-	upper_      = `\p{Lu}`
+	any_       = `.|\n`
+	comment_   = `/\*` + `((?:` + any_ + `)*?)` + `\*/`
+	control_   = `\p{Cc}`
+	delimiter_ = `[[\](){}\.,=]`
+	digit_     = `\p{Nd}`
+	eof_       = `\z`
+	letter_    = lower_ + `|` + upper_ + `|_`
+	lower_     = `\p{Ll}`
+	name_      = `(?:` + letter_ + `)(?:` + letter_ + `|` + digit_ + `)*_?`
+	note_      = `\/\/ [^` + control_ + `]*`
+	path_      = `"(?:` + any_ + `)*?"` // This returns the shortest match.
+	space_     = `[ \t\r\n]+`
+	upper_     = `\p{Lu}`
 )

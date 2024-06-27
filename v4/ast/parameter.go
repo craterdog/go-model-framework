@@ -39,12 +39,14 @@ type parameterClass_ struct {
 // Constructors
 
 func (c *parameterClass_) Make(
-	identifier string,
+	name string,
 	abstraction AbstractionLike,
 ) ParameterLike {
 	return &parameter_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:       c,
+		name_:        name,
+		abstraction_: abstraction,
 	}
 }
 
@@ -55,7 +57,7 @@ func (c *parameterClass_) Make(
 type parameter_ struct {
 	// Define instance attributes.
 	class_       ParameterClassLike
-	identifier_  string
+	name_        string
 	abstraction_ AbstractionLike
 }
 
@@ -65,8 +67,8 @@ func (v *parameter_) GetClass() ParameterClassLike {
 	return v.class_
 }
 
-func (v *parameter_) GetIdentifier() string {
-	return v.identifier_
+func (v *parameter_) GetName() string {
+	return v.name_
 }
 
 func (v *parameter_) GetAbstraction() AbstractionLike {

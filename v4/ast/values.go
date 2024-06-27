@@ -12,37 +12,39 @@
 
 package ast
 
-import ()
-
 // CLASS ACCESS
 
 // Reference
 
-var additionalArgumentClass = &additionalArgumentClass_{
+var valuesClass = &valuesClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func AdditionalArgument() AdditionalArgumentClassLike {
-	return additionalArgumentClass
+func Values() ValuesClassLike {
+	return valuesClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type additionalArgumentClass_ struct {
+type valuesClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
-	return &additionalArgument_{
+func (c *valuesClass_) Make(
+	value ValueLike,
+	additionalValues AdditionalValuesLike,
+) ValuesLike {
+	return &values_{
 		// Initialize instance attributes.
-		class_:    c,
-		argument_: argument,
+		class_:            c,
+		value_:            value,
+		additionalValues_: additionalValues,
 	}
 }
 
@@ -50,20 +52,25 @@ func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumen
 
 // Target
 
-type additionalArgument_ struct {
+type values_ struct {
 	// Define instance attributes.
-	class_    AdditionalArgumentClassLike
-	argument_ ArgumentLike
+	class_            ValuesClassLike
+	value_            ValueLike
+	additionalValues_ AdditionalValuesLike
 }
 
 // Attributes
 
-func (v *additionalArgument_) GetClass() AdditionalArgumentClassLike {
+func (v *values_) GetClass() ValuesClassLike {
 	return v.class_
 }
 
-func (v *additionalArgument_) GetArgument() ArgumentLike {
-	return v.argument_
+func (v *values_) GetValue() ValueLike {
+	return v.value_
+}
+
+func (v *values_) GetAdditionalValues() AdditionalValuesLike {
+	return v.additionalValues_
 }
 
 // Private

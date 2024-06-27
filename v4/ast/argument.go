@@ -41,7 +41,8 @@ type argumentClass_ struct {
 func (c *argumentClass_) Make(abstraction AbstractionLike) ArgumentLike {
 	return &argument_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:       c,
+		abstraction_: abstraction,
 	}
 }
 

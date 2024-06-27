@@ -38,10 +38,11 @@ type aliasClass_ struct {
 
 // Constructors
 
-func (c *aliasClass_) Make(identifier string) AliasLike {
+func (c *aliasClass_) Make(name string) AliasLike {
 	return &alias_{
 		// Initialize instance attributes.
 		class_: c,
+		name_:  name,
 	}
 }
 
@@ -51,8 +52,8 @@ func (c *aliasClass_) Make(identifier string) AliasLike {
 
 type alias_ struct {
 	// Define instance attributes.
-	class_      AliasClassLike
-	identifier_ string
+	class_ AliasClassLike
+	name_  string
 }
 
 // Attributes
@@ -61,8 +62,8 @@ func (v *alias_) GetClass() AliasClassLike {
 	return v.class_
 }
 
-func (v *alias_) GetIdentifier() string {
-	return v.identifier_
+func (v *alias_) GetName() string {
+	return v.name_
 }
 
 // Private

@@ -15,6 +15,9 @@ Package "ast" provides the ability to generate Go class files based on a
 Go Package.go file that follows the format shown in the following code template:
   - https://github.com/craterdog/go-model-framework/blob/main/models/Package.go
 
+For detailed documentation on this package refer to the wiki:
+  - https://github.com/craterdog/go-model-framework/wiki
+
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:
   - https://github.com/craterdog/go-model-framework/wiki
@@ -41,7 +44,7 @@ type AbstractionClassLike interface {
 	// Constructors
 	Make(
 		prefix PrefixLike,
-		identifier string,
+		name string,
 		genericArguments GenericArgumentsLike,
 	) AbstractionLike
 }
@@ -62,7 +65,7 @@ type AbstractionsClassLike interface {
 /*
 AdditionalArgumentClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete additionalargument-like class.
+concrete additional-argument-like class.
 */
 type AdditionalArgumentClassLike interface {
 	// Constructors
@@ -72,7 +75,7 @@ type AdditionalArgumentClassLike interface {
 /*
 AdditionalArgumentsClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete additionalarguments-like class.
+concrete additional-arguments-like class.
 */
 type AdditionalArgumentsClassLike interface {
 	// Constructors
@@ -82,7 +85,7 @@ type AdditionalArgumentsClassLike interface {
 /*
 AdditionalParameterClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete additionalparameter-like class.
+concrete additional-parameter-like class.
 */
 type AdditionalParameterClassLike interface {
 	// Constructors
@@ -92,7 +95,7 @@ type AdditionalParameterClassLike interface {
 /*
 AdditionalParametersClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete additionalparameters-like class.
+concrete additional-parameters-like class.
 */
 type AdditionalParametersClassLike interface {
 	// Constructors
@@ -102,11 +105,21 @@ type AdditionalParametersClassLike interface {
 /*
 AdditionalValueClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete additionalvalue-like class.
+concrete additional-value-like class.
 */
 type AdditionalValueClassLike interface {
 	// Constructors
-	Make(identifier string) AdditionalValueLike
+	Make(name string) AdditionalValueLike
+}
+
+/*
+AdditionalValuesClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete additional-values-like class.
+*/
+type AdditionalValuesClassLike interface {
+	// Constructors
+	Make(additionalValues col.ListLike[AdditionalValueLike]) AdditionalValuesLike
 }
 
 /*
@@ -116,7 +129,7 @@ concrete alias-like class.
 */
 type AliasClassLike interface {
 	// Constructors
-	Make(identifier string) AliasLike
+	Make(name string) AliasLike
 }
 
 /*
@@ -186,7 +199,7 @@ concrete attribute-like class.
 type AttributeClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
+		name string,
 		parameter ParameterLike,
 		abstraction AbstractionLike,
 	) AttributeLike
@@ -251,7 +264,7 @@ concrete constant-like class.
 type ConstantClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
+		name string,
 		abstraction AbstractionLike,
 	) ConstantLike
 }
@@ -277,7 +290,7 @@ concrete constructor-like class.
 type ConstructorClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
+		name string,
 		parameters ParametersLike,
 		abstraction AbstractionLike,
 	) ConstructorLike
@@ -305,7 +318,7 @@ type DeclarationClassLike interface {
 	// Constructors
 	Make(
 		comment string,
-		identifier string,
+		name string,
 		genericParameters GenericParametersLike,
 	) DeclarationLike
 }
@@ -317,10 +330,7 @@ concrete enumeration-like class.
 */
 type EnumerationClassLike interface {
 	// Constructors
-	Make(
-		value ValueLike,
-		additionalValues col.ListLike[AdditionalValueLike],
-	) EnumerationLike
+	Make(values ValuesLike) EnumerationLike
 }
 
 /*
@@ -331,7 +341,7 @@ concrete function-like class.
 type FunctionClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
+		name string,
 		parameters ParametersLike,
 		result ResultLike,
 	) FunctionLike
@@ -406,8 +416,18 @@ type HeaderClassLike interface {
 	// Constructors
 	Make(
 		comment string,
-		identifier string,
+		name string,
 	) HeaderLike
+}
+
+/*
+ImportsClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete imports-like class.
+*/
+type ImportsClassLike interface {
+	// Constructors
+	Make(modules ModulesLike) ImportsLike
 }
 
 /*
@@ -445,7 +465,7 @@ concrete map-like class.
 */
 type MapClassLike interface {
 	// Constructors
-	Make(identifier string) MapLike
+	Make(name string) MapLike
 }
 
 /*
@@ -456,7 +476,7 @@ concrete method-like class.
 type MethodClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
+		name string,
 		parameters ParametersLike,
 		result ResultLike,
 	) MethodLike
@@ -485,7 +505,7 @@ type ModelClassLike interface {
 	Make(
 		notice NoticeLike,
 		header HeaderLike,
-		modules ModulesLike,
+		imports ImportsLike,
 		types TypesLike,
 		functionals FunctionalsLike,
 		aspects AspectsLike,
@@ -502,8 +522,8 @@ concrete module-like class.
 type ModuleClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
-		text string,
+		name string,
+		path string,
 	) ModuleLike
 }
 
@@ -535,7 +555,7 @@ concrete parameter-like class.
 type ParameterClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
+		name string,
 		abstraction AbstractionLike,
 	) ParameterLike
 }
@@ -618,9 +638,22 @@ concrete value-like class.
 type ValueClassLike interface {
 	// Constructors
 	Make(
-		identifier string,
+		name string,
 		abstraction AbstractionLike,
 	) ValueLike
+}
+
+/*
+ValuesClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete values-like class.
+*/
+type ValuesClassLike interface {
+	// Constructors
+	Make(
+		value ValueLike,
+		additionalValues AdditionalValuesLike,
+	) ValuesLike
 }
 
 // Instances
@@ -634,7 +667,7 @@ type AbstractionLike interface {
 	// Attributes
 	GetClass() AbstractionClassLike
 	GetPrefix() PrefixLike
-	GetIdentifier() string
+	GetName() string
 	GetGenericArguments() GenericArgumentsLike
 }
 
@@ -653,7 +686,7 @@ type AbstractionsLike interface {
 /*
 AdditionalArgumentLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete additionalargument-like class.
+instance of a concrete additional-argument-like class.
 */
 type AdditionalArgumentLike interface {
 	// Attributes
@@ -664,7 +697,7 @@ type AdditionalArgumentLike interface {
 /*
 AdditionalArgumentsLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete additionalarguments-like class.
+instance of a concrete additional-arguments-like class.
 */
 type AdditionalArgumentsLike interface {
 	// Attributes
@@ -675,7 +708,7 @@ type AdditionalArgumentsLike interface {
 /*
 AdditionalParameterLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete additionalparameter-like class.
+instance of a concrete additional-parameter-like class.
 */
 type AdditionalParameterLike interface {
 	// Attributes
@@ -686,7 +719,7 @@ type AdditionalParameterLike interface {
 /*
 AdditionalParametersLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete additionalparameters-like class.
+instance of a concrete additional-parameters-like class.
 */
 type AdditionalParametersLike interface {
 	// Attributes
@@ -697,12 +730,23 @@ type AdditionalParametersLike interface {
 /*
 AdditionalValueLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete additionalvalue-like class.
+instance of a concrete additional-value-like class.
 */
 type AdditionalValueLike interface {
 	// Attributes
 	GetClass() AdditionalValueClassLike
-	GetIdentifier() string
+	GetName() string
+}
+
+/*
+AdditionalValuesLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete additional-values-like class.
+*/
+type AdditionalValuesLike interface {
+	// Attributes
+	GetClass() AdditionalValuesClassLike
+	GetAdditionalValues() col.ListLike[AdditionalValueLike]
 }
 
 /*
@@ -713,7 +757,7 @@ instance of a concrete alias-like class.
 type AliasLike interface {
 	// Attributes
 	GetClass() AliasClassLike
-	GetIdentifier() string
+	GetName() string
 }
 
 /*
@@ -781,7 +825,7 @@ instance of a concrete attribute-like class.
 type AttributeLike interface {
 	// Attributes
 	GetClass() AttributeClassLike
-	GetIdentifier() string
+	GetName() string
 	GetParameter() ParameterLike
 	GetAbstraction() AbstractionLike
 }
@@ -842,7 +886,7 @@ instance of a concrete constant-like class.
 type ConstantLike interface {
 	// Attributes
 	GetClass() ConstantClassLike
-	GetIdentifier() string
+	GetName() string
 	GetAbstraction() AbstractionLike
 }
 
@@ -866,7 +910,7 @@ instance of a concrete constructor-like class.
 type ConstructorLike interface {
 	// Attributes
 	GetClass() ConstructorClassLike
-	GetIdentifier() string
+	GetName() string
 	GetParameters() ParametersLike
 	GetAbstraction() AbstractionLike
 }
@@ -892,7 +936,7 @@ type DeclarationLike interface {
 	// Attributes
 	GetClass() DeclarationClassLike
 	GetComment() string
-	GetIdentifier() string
+	GetName() string
 	GetGenericParameters() GenericParametersLike
 }
 
@@ -904,8 +948,7 @@ instance of a concrete enumeration-like class.
 type EnumerationLike interface {
 	// Attributes
 	GetClass() EnumerationClassLike
-	GetValue() ValueLike
-	GetAdditionalValues() col.ListLike[AdditionalValueLike]
+	GetValues() ValuesLike
 }
 
 /*
@@ -916,7 +959,7 @@ instance of a concrete function-like class.
 type FunctionLike interface {
 	// Attributes
 	GetClass() FunctionClassLike
-	GetIdentifier() string
+	GetName() string
 	GetParameters() ParametersLike
 	GetResult() ResultLike
 }
@@ -989,7 +1032,18 @@ type HeaderLike interface {
 	// Attributes
 	GetClass() HeaderClassLike
 	GetComment() string
-	GetIdentifier() string
+	GetName() string
+}
+
+/*
+ImportsLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete imports-like class.
+*/
+type ImportsLike interface {
+	// Attributes
+	GetClass() ImportsClassLike
+	GetModules() ModulesLike
 }
 
 /*
@@ -1026,7 +1080,7 @@ instance of a concrete map-like class.
 type MapLike interface {
 	// Attributes
 	GetClass() MapClassLike
-	GetIdentifier() string
+	GetName() string
 }
 
 /*
@@ -1037,7 +1091,7 @@ instance of a concrete method-like class.
 type MethodLike interface {
 	// Attributes
 	GetClass() MethodClassLike
-	GetIdentifier() string
+	GetName() string
 	GetParameters() ParametersLike
 	GetResult() ResultLike
 }
@@ -1064,7 +1118,7 @@ type ModelLike interface {
 	GetClass() ModelClassLike
 	GetNotice() NoticeLike
 	GetHeader() HeaderLike
-	GetModules() ModulesLike
+	GetImports() ImportsLike
 	GetTypes() TypesLike
 	GetFunctionals() FunctionalsLike
 	GetAspects() AspectsLike
@@ -1080,8 +1134,8 @@ instance of a concrete module-like class.
 type ModuleLike interface {
 	// Attributes
 	GetClass() ModuleClassLike
-	GetIdentifier() string
-	GetText() string
+	GetName() string
+	GetPath() string
 }
 
 /*
@@ -1114,7 +1168,7 @@ instance of a concrete parameter-like class.
 type ParameterLike interface {
 	// Attributes
 	GetClass() ParameterClassLike
-	GetIdentifier() string
+	GetName() string
 	GetAbstraction() AbstractionLike
 }
 
@@ -1196,6 +1250,18 @@ instance of a concrete value-like class.
 type ValueLike interface {
 	// Attributes
 	GetClass() ValueClassLike
-	GetIdentifier() string
+	GetName() string
 	GetAbstraction() AbstractionLike
+}
+
+/*
+ValuesLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete values-like class.
+*/
+type ValuesLike interface {
+	// Attributes
+	GetClass() ValuesClassLike
+	GetValue() ValueLike
+	GetAdditionalValues() AdditionalValuesLike
 }

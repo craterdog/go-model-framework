@@ -44,7 +44,9 @@ func (c *argumentsClass_) Make(
 ) ArgumentsLike {
 	return &arguments_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:               c,
+		argument_:            argument,
+		additionalArguments_: additionalArguments,
 	}
 }
 

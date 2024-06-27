@@ -41,7 +41,8 @@ type genericArgumentsClass_ struct {
 func (c *genericArgumentsClass_) Make(arguments ArgumentsLike) GenericArgumentsLike {
 	return &genericArguments_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:     c,
+		arguments_: arguments,
 	}
 }
 

@@ -44,7 +44,9 @@ func (c *aspectClass_) Make(
 ) AspectLike {
 	return &aspect_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:       c,
+		declaration_: declaration,
+		methods_:     methods,
 	}
 }
 

@@ -45,7 +45,10 @@ func (c *functionalClass_) Make(
 ) FunctionalLike {
 	return &functional_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:       c,
+		declaration_: declaration,
+		parameters_:  parameters,
+		result_:      result,
 	}
 }
 

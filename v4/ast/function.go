@@ -39,13 +39,16 @@ type functionClass_ struct {
 // Constructors
 
 func (c *functionClass_) Make(
-	identifier string,
+	name string,
 	parameters ParametersLike,
 	result ResultLike,
 ) FunctionLike {
 	return &function_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:      c,
+		name_:       name,
+		parameters_: parameters,
+		result_:     result,
 	}
 }
 
@@ -56,7 +59,7 @@ func (c *functionClass_) Make(
 type function_ struct {
 	// Define instance attributes.
 	class_      FunctionClassLike
-	identifier_ string
+	name_       string
 	parameters_ ParametersLike
 	result_     ResultLike
 }
@@ -67,8 +70,8 @@ func (v *function_) GetClass() FunctionClassLike {
 	return v.class_
 }
 
-func (v *function_) GetIdentifier() string {
-	return v.identifier_
+func (v *function_) GetName() string {
+	return v.name_
 }
 
 func (v *function_) GetParameters() ParametersLike {

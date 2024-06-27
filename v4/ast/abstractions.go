@@ -46,7 +46,9 @@ func (c *abstractionsClass_) Make(
 ) AbstractionsLike {
 	return &abstractions_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:        c,
+		note_:         note,
+		abstractions_: abstractions,
 	}
 }
 

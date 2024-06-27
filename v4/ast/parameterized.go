@@ -41,7 +41,8 @@ type parameterizedClass_ struct {
 func (c *parameterizedClass_) Make(parameters ParametersLike) ParameterizedLike {
 	return &parameterized_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:      c,
+		parameters_: parameters,
 	}
 }
 

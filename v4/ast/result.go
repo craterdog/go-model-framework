@@ -38,10 +38,11 @@ type resultClass_ struct {
 
 // Constructors
 
-func (c *resultClass_) Make(any any) ResultLike {
+func (c *resultClass_) Make(any_ any) ResultLike {
 	return &result_{
 		// Initialize instance attributes.
 		class_: c,
+		any_:   any_,
 	}
 }
 

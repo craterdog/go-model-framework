@@ -38,10 +38,11 @@ type prefixClass_ struct {
 
 // Constructors
 
-func (c *prefixClass_) Make(any any) PrefixLike {
+func (c *prefixClass_) Make(any_ any) PrefixLike {
 	return &prefix_{
 		// Initialize instance attributes.
 		class_: c,
+		any_:   any_,
 	}
 }
 

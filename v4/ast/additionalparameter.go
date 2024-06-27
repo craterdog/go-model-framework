@@ -41,7 +41,8 @@ type additionalParameterClass_ struct {
 func (c *additionalParameterClass_) Make(parameter ParameterLike) AdditionalParameterLike {
 	return &additionalParameter_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:     c,
+		parameter_: parameter,
 	}
 }
 

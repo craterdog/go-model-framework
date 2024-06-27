@@ -41,7 +41,8 @@ type noticeClass_ struct {
 func (c *noticeClass_) Make(comment string) NoticeLike {
 	return &notice_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:   c,
+		comment_: comment,
 	}
 }
 

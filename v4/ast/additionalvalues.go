@@ -12,37 +12,41 @@
 
 package ast
 
-import ()
+import (
+	col "github.com/craterdog/go-collection-framework/v4/collection"
+)
 
 // CLASS ACCESS
 
 // Reference
 
-var additionalArgumentClass = &additionalArgumentClass_{
+var additionalValuesClass = &additionalValuesClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func AdditionalArgument() AdditionalArgumentClassLike {
-	return additionalArgumentClass
+func AdditionalValues() AdditionalValuesClassLike {
+	return additionalValuesClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type additionalArgumentClass_ struct {
+type additionalValuesClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
-	return &additionalArgument_{
+func (c *additionalValuesClass_) Make(
+	additionalValues col.ListLike[AdditionalValueLike],
+) AdditionalValuesLike {
+	return &additionalValues_{
 		// Initialize instance attributes.
-		class_:    c,
-		argument_: argument,
+		class_:            c,
+		additionalValues_: additionalValues,
 	}
 }
 
@@ -50,20 +54,20 @@ func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumen
 
 // Target
 
-type additionalArgument_ struct {
+type additionalValues_ struct {
 	// Define instance attributes.
-	class_    AdditionalArgumentClassLike
-	argument_ ArgumentLike
+	class_            AdditionalValuesClassLike
+	additionalValues_ col.ListLike[AdditionalValueLike]
 }
 
 // Attributes
 
-func (v *additionalArgument_) GetClass() AdditionalArgumentClassLike {
+func (v *additionalValues_) GetClass() AdditionalValuesClassLike {
 	return v.class_
 }
 
-func (v *additionalArgument_) GetArgument() ArgumentLike {
-	return v.argument_
+func (v *additionalValues_) GetAdditionalValues() col.ListLike[AdditionalValueLike] {
+	return v.additionalValues_
 }
 
 // Private

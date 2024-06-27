@@ -47,6 +47,8 @@ func (c *typesClass_) Make(
 	return &types_{
 		// Initialize instance attributes.
 		class_: c,
+		note_:  note,
+		types_: types,
 	}
 }
 

@@ -40,12 +40,15 @@ type abstractionClass_ struct {
 
 func (c *abstractionClass_) Make(
 	prefix PrefixLike,
-	identifier string,
+	name string,
 	genericArguments GenericArgumentsLike,
 ) AbstractionLike {
 	return &abstraction_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:            c,
+		prefix_:           prefix,
+		name_:             name,
+		genericArguments_: genericArguments,
 	}
 }
 
@@ -57,7 +60,7 @@ type abstraction_ struct {
 	// Define instance attributes.
 	class_            AbstractionClassLike
 	prefix_           PrefixLike
-	identifier_       string
+	name_             string
 	genericArguments_ GenericArgumentsLike
 }
 
@@ -71,8 +74,8 @@ func (v *abstraction_) GetPrefix() PrefixLike {
 	return v.prefix_
 }
 
-func (v *abstraction_) GetIdentifier() string {
-	return v.identifier_
+func (v *abstraction_) GetName() string {
+	return v.name_
 }
 
 func (v *abstraction_) GetGenericArguments() GenericArgumentsLike {

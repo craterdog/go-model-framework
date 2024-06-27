@@ -134,8 +134,8 @@ func (v *formatter_) formatAbstraction(abstraction ast.AbstractionLike) {
 	if prefix != nil {
 		v.formatPrefix(prefix)
 	}
-	var identifier = abstraction.GetIdentifier()
-	v.appendString(identifier)
+	var name = abstraction.GetName()
+	v.appendString(name)
 	var genericArguments = abstraction.GetGenericArguments()
 	if genericArguments != nil {
 		v.formatGenericArguments(genericArguments)
@@ -198,13 +198,13 @@ func (v *formatter_) formatAdditionalValue(
 	additionalValue ast.AdditionalValueLike,
 ) {
 	v.appendNewline()
-	var identifier = additionalValue.GetIdentifier()
-	v.appendString(identifier)
+	var name = additionalValue.GetName()
+	v.appendString(name)
 }
 
 func (v *formatter_) formatAlias(alias ast.AliasLike) {
-	var identifier = alias.GetIdentifier()
-	v.appendString(identifier)
+	var name = alias.GetName()
+	v.appendString(name)
 	v.appendString(".")
 }
 
@@ -260,8 +260,8 @@ func (v *formatter_) formatAspects(aspects ast.AspectsLike) {
 }
 
 func (v *formatter_) formatAttribute(attribute ast.AttributeLike) {
-	var identifier = attribute.GetIdentifier()
-	v.appendString(identifier)
+	var name = attribute.GetName()
+	v.appendString(name)
 	v.appendString("(")
 	var parameter = attribute.GetParameter()
 	if parameter != nil {
@@ -328,8 +328,8 @@ func (v *formatter_) formatClasses(classes ast.ClassesLike) {
 
 func (v *formatter_) formatConstant(constant ast.ConstantLike) {
 	v.appendNewline()
-	var identifier = constant.GetIdentifier()
-	v.appendString(identifier)
+	var name = constant.GetName()
+	v.appendString(name)
 	v.appendString("() ")
 	var abstraction = constant.GetAbstraction()
 	v.formatAbstraction(abstraction)
@@ -347,8 +347,8 @@ func (v *formatter_) formatConstants(constants ast.ConstantsLike) {
 
 func (v *formatter_) formatConstructor(constructor ast.ConstructorLike) {
 	v.appendNewline()
-	var identifier = constructor.GetIdentifier()
-	v.appendString(identifier)
+	var name = constructor.GetName()
+	v.appendString(name)
 	v.appendString("(")
 	var parameters = constructor.GetParameters()
 	if parameters != nil {
@@ -374,8 +374,8 @@ func (v *formatter_) formatDeclaration(declaration ast.DeclarationLike) {
 	comment = v.fixComment(comment)
 	v.appendString(comment)
 	v.appendString("type ")
-	var identifier = declaration.GetIdentifier()
-	v.appendString(identifier)
+	var name = declaration.GetName()
+	v.appendString(name)
 	var genericParameters = declaration.GetGenericParameters()
 	if genericParameters != nil {
 		v.formatGenericParameters(genericParameters)
@@ -385,24 +385,15 @@ func (v *formatter_) formatDeclaration(declaration ast.DeclarationLike) {
 func (v *formatter_) formatEnumeration(enumeration ast.EnumerationLike) {
 	v.appendNewline()
 	v.appendString("const (")
-	v.depth_++
-	v.appendNewline()
-	var value = enumeration.GetValue()
-	v.formatValue(value)
-	var iterator = enumeration.GetAdditionalValues().GetIterator()
-	for iterator.HasNext() {
-		var additionalValue = iterator.GetNext()
-		v.formatAdditionalValue(additionalValue)
-	}
-	v.depth_--
-	v.appendNewline()
+	var values = enumeration.GetValues()
+	v.formatValues(values)
 	v.appendString(")")
 }
 
 func (v *formatter_) formatFunction(function ast.FunctionLike) {
 	v.appendNewline()
-	var identifier = function.GetIdentifier()
-	v.appendString(identifier)
+	var name = function.GetName()
+	v.appendString(name)
 	v.appendString("(")
 	var parameters = function.GetParameters()
 	if parameters != nil {
@@ -474,8 +465,17 @@ func (v *formatter_) formatHeader(header ast.HeaderLike) {
 	comment = v.fixComment(comment)
 	v.appendString(comment)
 	v.appendString("package ")
-	var identifier = header.GetIdentifier()
-	v.appendString(identifier)
+	var name = header.GetName()
+	v.appendString(name)
+	v.appendNewline()
+}
+
+func (v *formatter_) formatImports(imports ast.ImportsLike) {
+	v.appendNewline()
+	v.appendString("import (")
+	var modules = imports.GetModules()
+	v.formatModules(modules)
+	v.appendString(")")
 	v.appendNewline()
 }
 
@@ -517,15 +517,15 @@ func (v *formatter_) formatInstances(instances ast.InstancesLike) {
 }
 
 func (v *formatter_) formatMap(map_ ast.MapLike) {
-	var identifier = map_.GetIdentifier()
+	var name = map_.GetName()
 	v.appendString("map[")
-	v.appendString(identifier)
+	v.appendString(name)
 	v.appendString("]")
 }
 
 func (v *formatter_) formatMethod(method ast.MethodLike) {
-	var identifier = method.GetIdentifier()
-	v.appendString(identifier)
+	var name = method.GetName()
+	v.appendString(name)
 	v.appendString("(")
 	var parameters = method.GetParameters()
 	if parameters != nil {
@@ -554,9 +554,9 @@ func (v *formatter_) formatModel(model ast.ModelLike) {
 	v.formatNotice(notice)
 	var header = model.GetHeader()
 	v.formatHeader(header)
-	var modules = model.GetModules()
-	if modules != nil {
-		v.formatModules(modules)
+	var imports = model.GetImports()
+	if imports != nil {
+		v.formatImports(imports)
 	}
 	var types = model.GetTypes()
 	if types != nil {
@@ -582,16 +582,14 @@ func (v *formatter_) formatModel(model ast.ModelLike) {
 
 func (v *formatter_) formatModule(module ast.ModuleLike) {
 	v.appendNewline()
-	var identifier = module.GetIdentifier()
-	v.appendString(identifier)
+	var name = module.GetName()
+	v.appendString(name)
 	v.appendString(" ")
-	var text = module.GetText()
-	v.appendString(text)
+	var path = module.GetPath()
+	v.appendString(path)
 }
 
 func (v *formatter_) formatModules(modules ast.ModulesLike) {
-	v.appendNewline()
-	v.appendString("import (")
 	v.depth_++
 	var iterator = modules.GetModules().GetIterator()
 	for iterator.HasNext() {
@@ -599,8 +597,6 @@ func (v *formatter_) formatModules(modules ast.ModulesLike) {
 		v.formatModule(module)
 	}
 	v.depth_--
-	v.appendNewline()
-	v.appendString(")")
 	v.appendNewline()
 }
 
@@ -611,8 +607,8 @@ func (v *formatter_) formatNotice(notice ast.NoticeLike) {
 }
 
 func (v *formatter_) formatParameter(parameter ast.ParameterLike) {
-	var identifier = parameter.GetIdentifier()
-	v.appendString(identifier)
+	var name = parameter.GetName()
+	v.appendString(name)
 	v.appendString(" ")
 	var abstraction = parameter.GetAbstraction()
 	v.formatAbstraction(abstraction)
@@ -702,12 +698,26 @@ func (v *formatter_) formatTypes(types ast.TypesLike) {
 
 func (v *formatter_) formatValue(value ast.ValueLike) {
 	v.appendNewline()
-	var identifier = value.GetIdentifier()
-	v.appendString(identifier)
+	var name = value.GetName()
+	v.appendString(name)
 	v.appendString(" ")
 	var abstraction = value.GetAbstraction()
 	v.formatAbstraction(abstraction)
 	v.appendString(" = iota")
+}
+
+func (v *formatter_) formatValues(values ast.ValuesLike) {
+	v.depth_++
+	v.appendNewline()
+	var value = values.GetValue()
+	v.formatValue(value)
+	var iterator = values.GetAdditionalValues().GetAdditionalValues().GetIterator()
+	for iterator.HasNext() {
+		var additionalValue = iterator.GetNext()
+		v.formatAdditionalValue(additionalValue)
+	}
+	v.depth_--
+	v.appendNewline()
 }
 
 func (v *formatter_) getResult() string {

@@ -43,7 +43,8 @@ type additionalArgumentsClass_ struct {
 func (c *additionalArgumentsClass_) Make(additionalArguments col.ListLike[AdditionalArgumentLike]) AdditionalArgumentsLike {
 	return &additionalArguments_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:               c,
+		additionalArguments_: additionalArguments,
 	}
 }
 

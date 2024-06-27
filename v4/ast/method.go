@@ -39,13 +39,16 @@ type methodClass_ struct {
 // Constructors
 
 func (c *methodClass_) Make(
-	identifier string,
+	name string,
 	parameters ParametersLike,
 	result ResultLike,
 ) MethodLike {
 	return &method_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:      c,
+		name_:       name,
+		parameters_: parameters,
+		result_:     result,
 	}
 }
 
@@ -56,7 +59,7 @@ func (c *methodClass_) Make(
 type method_ struct {
 	// Define instance attributes.
 	class_      MethodClassLike
-	identifier_ string
+	name_       string
 	parameters_ ParametersLike
 	result_     ResultLike
 }
@@ -67,8 +70,8 @@ func (v *method_) GetClass() MethodClassLike {
 	return v.class_
 }
 
-func (v *method_) GetIdentifier() string {
-	return v.identifier_
+func (v *method_) GetName() string {
+	return v.name_
 }
 
 func (v *method_) GetParameters() ParametersLike {

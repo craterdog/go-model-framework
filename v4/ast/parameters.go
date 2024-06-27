@@ -44,7 +44,9 @@ func (c *parametersClass_) Make(
 ) ParametersLike {
 	return &parameters_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:                c,
+		parameter_:            parameter,
+		additionalParameters_: additionalParameters,
 	}
 }
 

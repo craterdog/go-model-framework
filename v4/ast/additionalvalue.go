@@ -38,10 +38,11 @@ type additionalValueClass_ struct {
 
 // Constructors
 
-func (c *additionalValueClass_) Make(identifier string) AdditionalValueLike {
+func (c *additionalValueClass_) Make(name string) AdditionalValueLike {
 	return &additionalValue_{
 		// Initialize instance attributes.
 		class_: c,
+		name_:  name,
 	}
 }
 
@@ -51,8 +52,8 @@ func (c *additionalValueClass_) Make(identifier string) AdditionalValueLike {
 
 type additionalValue_ struct {
 	// Define instance attributes.
-	class_      AdditionalValueClassLike
-	identifier_ string
+	class_ AdditionalValueClassLike
+	name_  string
 }
 
 // Attributes
@@ -61,8 +62,8 @@ func (v *additionalValue_) GetClass() AdditionalValueClassLike {
 	return v.class_
 }
 
-func (v *additionalValue_) GetIdentifier() string {
-	return v.identifier_
+func (v *additionalValue_) GetName() string {
+	return v.name_
 }
 
 // Private

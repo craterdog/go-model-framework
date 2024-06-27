@@ -46,7 +46,11 @@ func (c *instanceClass_) Make(
 ) InstanceLike {
 	return &instance_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:        c,
+		declaration_:  declaration,
+		attributes_:   attributes,
+		abstractions_: abstractions,
+		methods_:      methods,
 	}
 }
 

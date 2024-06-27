@@ -41,7 +41,7 @@ type modelClass_ struct {
 func (c *modelClass_) Make(
 	notice NoticeLike,
 	header HeaderLike,
-	modules ModulesLike,
+	imports ImportsLike,
 	types TypesLike,
 	functionals FunctionalsLike,
 	aspects AspectsLike,
@@ -50,7 +50,15 @@ func (c *modelClass_) Make(
 ) ModelLike {
 	return &model_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:       c,
+		notice_:      notice,
+		header_:      header,
+		imports_:     imports,
+		types_:       types,
+		functionals_: functionals,
+		aspects_:     aspects,
+		classes_:     classes,
+		instances_:   instances,
 	}
 }
 
@@ -63,7 +71,7 @@ type model_ struct {
 	class_       ModelClassLike
 	notice_      NoticeLike
 	header_      HeaderLike
-	modules_     ModulesLike
+	imports_     ImportsLike
 	types_       TypesLike
 	functionals_ FunctionalsLike
 	aspects_     AspectsLike
@@ -85,8 +93,8 @@ func (v *model_) GetHeader() HeaderLike {
 	return v.header_
 }
 
-func (v *model_) GetModules() ModulesLike {
-	return v.modules_
+func (v *model_) GetImports() ImportsLike {
+	return v.imports_
 }
 
 func (v *model_) GetTypes() TypesLike {

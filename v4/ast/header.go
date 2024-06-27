@@ -40,11 +40,13 @@ type headerClass_ struct {
 
 func (c *headerClass_) Make(
 	comment string,
-	identifier string,
+	name string,
 ) HeaderLike {
 	return &header_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:   c,
+		comment_: comment,
+		name_:    name,
 	}
 }
 
@@ -54,9 +56,9 @@ func (c *headerClass_) Make(
 
 type header_ struct {
 	// Define instance attributes.
-	class_      HeaderClassLike
-	comment_    string
-	identifier_ string
+	class_   HeaderClassLike
+	comment_ string
+	name_    string
 }
 
 // Attributes
@@ -69,8 +71,8 @@ func (v *header_) GetComment() string {
 	return v.comment_
 }
 
-func (v *header_) GetIdentifier() string {
-	return v.identifier_
+func (v *header_) GetName() string {
+	return v.name_
 }
 
 // Private

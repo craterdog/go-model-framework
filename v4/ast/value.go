@@ -39,12 +39,14 @@ type valueClass_ struct {
 // Constructors
 
 func (c *valueClass_) Make(
-	identifier string,
+	name string,
 	abstraction AbstractionLike,
 ) ValueLike {
 	return &value_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:       c,
+		name_:        name,
+		abstraction_: abstraction,
 	}
 }
 
@@ -55,7 +57,7 @@ func (c *valueClass_) Make(
 type value_ struct {
 	// Define instance attributes.
 	class_       ValueClassLike
-	identifier_  string
+	name_        string
 	abstraction_ AbstractionLike
 }
 
@@ -65,8 +67,8 @@ func (v *value_) GetClass() ValueClassLike {
 	return v.class_
 }
 
-func (v *value_) GetIdentifier() string {
-	return v.identifier_
+func (v *value_) GetName() string {
+	return v.name_
 }
 
 func (v *value_) GetAbstraction() AbstractionLike {

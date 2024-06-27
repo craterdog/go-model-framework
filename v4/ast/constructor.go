@@ -39,13 +39,16 @@ type constructorClass_ struct {
 // Constructors
 
 func (c *constructorClass_) Make(
-	identifier string,
+	name string,
 	parameters ParametersLike,
 	abstraction AbstractionLike,
 ) ConstructorLike {
 	return &constructor_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:       c,
+		name_:        name,
+		parameters_:  parameters,
+		abstraction_: abstraction,
 	}
 }
 
@@ -56,7 +59,7 @@ func (c *constructorClass_) Make(
 type constructor_ struct {
 	// Define instance attributes.
 	class_       ConstructorClassLike
-	identifier_  string
+	name_        string
 	parameters_  ParametersLike
 	abstraction_ AbstractionLike
 }
@@ -67,8 +70,8 @@ func (v *constructor_) GetClass() ConstructorClassLike {
 	return v.class_
 }
 
-func (v *constructor_) GetIdentifier() string {
-	return v.identifier_
+func (v *constructor_) GetName() string {
+	return v.name_
 }
 
 func (v *constructor_) GetParameters() ParametersLike {

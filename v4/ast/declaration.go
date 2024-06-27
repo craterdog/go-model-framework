@@ -40,12 +40,15 @@ type declarationClass_ struct {
 
 func (c *declarationClass_) Make(
 	comment string,
-	identifier string,
+	name string,
 	genericParameters GenericParametersLike,
 ) DeclarationLike {
 	return &declaration_{
 		// Initialize instance attributes.
-		class_: c,
+		class_:             c,
+		comment_:           comment,
+		name_:              name,
+		genericParameters_: genericParameters,
 	}
 }
 
@@ -57,7 +60,7 @@ type declaration_ struct {
 	// Define instance attributes.
 	class_             DeclarationClassLike
 	comment_           string
-	identifier_        string
+	name_              string
 	genericParameters_ GenericParametersLike
 }
 
@@ -71,8 +74,8 @@ func (v *declaration_) GetComment() string {
 	return v.comment_
 }
 
-func (v *declaration_) GetIdentifier() string {
-	return v.identifier_
+func (v *declaration_) GetName() string {
+	return v.name_
 }
 
 func (v *declaration_) GetGenericParameters() GenericParametersLike {
