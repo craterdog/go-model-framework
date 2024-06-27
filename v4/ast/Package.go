@@ -237,8 +237,8 @@ type ClassClassLike interface {
 	// Constructors
 	Make(
 		declaration DeclarationLike,
-		constants ConstantsLike,
 		constructors ConstructorsLike,
+		constants ConstantsLike,
 		functions FunctionsLike,
 	) ClassLike
 }

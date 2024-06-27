@@ -111,11 +111,11 @@ func (v *validator_) extractAspects(model ast.ModelLike) {
 	if aspects == nil {
 		return
 	}
-	var iterator = aspects.GetIterator()
+	var iterator = aspects.GetAspects().GetIterator()
 	for iterator.HasNext() {
 		var aspect = iterator.GetNext()
-		var identifier = sts.ToLower(aspect.GetDeclaration().GetIdentifier())
-		v.aspects_.SetValue(identifier, aspect)
+		var name = sts.ToLower(aspect.GetDeclaration().GetName())
+		v.aspects_.SetValue(name, aspect)
 	}
 }
 
@@ -124,13 +124,13 @@ func (v *validator_) extractClasses(model ast.ModelLike) {
 	if classes == nil {
 		return
 	}
-	var iterator = classes.GetIterator()
+	var iterator = classes.GetClasses().GetIterator()
 	for iterator.HasNext() {
 		var class = iterator.GetNext()
-		var identifier = class.GetDeclaration().GetIdentifier()
-		identifier = sts.TrimSuffix(identifier, "ClassLike")
-		identifier = sts.ToLower(identifier)
-		v.classes_.SetValue(identifier, class)
+		var name = class.GetDeclaration().GetName()
+		name = sts.TrimSuffix(name, "ClassLike")
+		name = sts.ToLower(name)
+		v.classes_.SetValue(name, class)
 	}
 }
 
@@ -139,11 +139,11 @@ func (v *validator_) extractFunctionals(model ast.ModelLike) {
 	if functionals == nil {
 		return
 	}
-	var iterator = functionals.GetIterator()
+	var iterator = functionals.GetFunctionals().GetIterator()
 	for iterator.HasNext() {
 		var functional = iterator.GetNext()
-		var identifier = sts.ToLower(functional.GetDeclaration().GetIdentifier())
-		v.functionals_.SetValue(identifier, functional)
+		var name = sts.ToLower(functional.GetDeclaration().GetName())
+		v.functionals_.SetValue(name, functional)
 	}
 }
 
@@ -152,26 +152,26 @@ func (v *validator_) extractInstances(model ast.ModelLike) {
 	if instances == nil {
 		return
 	}
-	var iterator = instances.GetIterator()
+	var iterator = instances.GetInstances().GetIterator()
 	for iterator.HasNext() {
 		var instance = iterator.GetNext()
-		var identifier = instance.GetDeclaration().GetIdentifier()
-		identifier = sts.TrimSuffix(identifier, "Like")
-		identifier = sts.ToLower(identifier)
-		v.instances_.SetValue(identifier, instance)
+		var name = instance.GetDeclaration().GetName()
+		name = sts.TrimSuffix(name, "Like")
+		name = sts.ToLower(name)
+		v.instances_.SetValue(name, instance)
 	}
 }
 
 func (v *validator_) extractModules(model ast.ModelLike) {
-	var modules = model.GetModules()
-	if modules == nil {
+	var imports = model.GetImports()
+	if imports == nil {
 		return
 	}
-	var iterator = modules.GetIterator()
+	var iterator = imports.GetModules().GetModules().GetIterator()
 	for iterator.HasNext() {
 		var module = iterator.GetNext()
-		var text = module.GetText()
-		v.modules_.SetValue(text, module)
+		var path = module.GetPath()
+		v.modules_.SetValue(path, module)
 	}
 }
 
@@ -180,11 +180,11 @@ func (v *validator_) extractTypes(model ast.ModelLike) {
 	if types == nil {
 		return
 	}
-	var iterator = types.GetIterator()
+	var iterator = types.GetTypes().GetIterator()
 	for iterator.HasNext() {
 		var type_ = iterator.GetNext()
-		var identifier = sts.ToLower(type_.GetDeclaration().GetIdentifier())
-		v.types_.SetValue(identifier, type_)
+		var name = sts.ToLower(type_.GetDeclaration().GetName())
+		v.types_.SetValue(name, type_)
 	}
 }
 
@@ -193,27 +193,29 @@ func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 	if prefix != nil {
 		v.validatePrefix(prefix)
 	}
-	var identifier = abstraction.GetIdentifier()
-	v.abstractions_.SetValue(identifier, abstraction)
-	var arguments = abstraction.GetArguments()
+	var name = abstraction.GetName()
+	v.abstractions_.SetValue(name, abstraction)
+	var arguments = abstraction.GetGenericArguments().GetArguments()
 	if arguments != nil {
 		v.validateArguments(arguments)
 	}
 }
 
-func (v *validator_) validateAbstractions(abstractions col.ListLike[ast.AbstractionLike]) {
-	var iterator = abstractions.GetIterator()
+func (v *validator_) validateAbstractions(abstractions ast.AbstractionsLike) {
+	var iterator = abstractions.GetAbstractions().GetIterator()
 	for iterator.HasNext() {
 		var abstraction = iterator.GetNext()
 		v.validateAbstraction(abstraction)
 	}
 }
 
-func (v *validator_) validateArguments(arguments col.ListLike[ast.AbstractionLike]) {
-	var iterator = arguments.GetIterator()
+func (v *validator_) validateArguments(arguments ast.ArgumentsLike) {
+	var abstraction = arguments.GetArgument().GetAbstraction()
+	v.validateAbstraction(abstraction)
+	var iterator = arguments.GetAdditionalArguments().GetAdditionalArguments().GetIterator()
 	for iterator.HasNext() {
-		var argument = iterator.GetNext()
-		v.validateAbstraction(argument)
+		abstraction = iterator.GetNext().GetArgument().GetAbstraction()
+		v.validateAbstraction(abstraction)
 	}
 }
 
@@ -222,12 +224,12 @@ func (v *validator_) validateAspect(aspect ast.AspectLike) {
 	v.validateDeclaration(declaration)
 	var methods = aspect.GetMethods()
 	v.validateMethods(methods)
-	var identifier = declaration.GetIdentifier()
-	var abstraction = v.abstractions_.GetValue(identifier)
+	var name = declaration.GetName()
+	var abstraction = v.abstractions_.GetValue(name)
 	if abstraction == nil {
 		var message = fmt.Sprintf(
 			"The following aspect is never used in this package: %v",
-			identifier,
+			name,
 		)
 		panic(message)
 	}
@@ -241,7 +243,7 @@ func (v *validator_) validateAspects(model ast.ModelLike) {
 		var aspect = association.GetValue()
 		v.validateAspect(aspect)
 	}
-	var aspects = model.GetAspects()
+	var aspects = model.GetAspects().GetAspects()
 	if aspects != nil {
 		aspects.RemoveAll()
 		aspects.AppendValues(v.aspects_.GetValues(v.aspects_.GetKeys()))
@@ -249,37 +251,37 @@ func (v *validator_) validateAspects(model ast.ModelLike) {
 }
 
 func (v *validator_) validateAttribute(attribute ast.AttributeLike) {
-	var identifier = attribute.GetIdentifier()
+	var name = attribute.GetName()
 	var parameter = attribute.GetParameter()
 	var abstraction = attribute.GetAbstraction()
 	switch {
-	case sts.HasPrefix(identifier, "Get"):
+	case sts.HasPrefix(name, "Get"):
 		v.validateAbstraction(abstraction)
-	case sts.HasPrefix(identifier, "Set"):
+	case sts.HasPrefix(name, "Set"):
 		v.validateParameter(parameter)
-	case sts.HasPrefix(identifier, "Is"):
+	case sts.HasPrefix(name, "Is"):
 		v.validateBoolean(abstraction)
-	case sts.HasPrefix(identifier, "Are"):
+	case sts.HasPrefix(name, "Are"):
 		v.validateBoolean(abstraction)
-	case sts.HasPrefix(identifier, "Was"):
+	case sts.HasPrefix(name, "Was"):
 		v.validateBoolean(abstraction)
-	case sts.HasPrefix(identifier, "Were"):
+	case sts.HasPrefix(name, "Were"):
 		v.validateBoolean(abstraction)
-	case sts.HasPrefix(identifier, "Has"):
+	case sts.HasPrefix(name, "Has"):
 		v.validateBoolean(abstraction)
-	case sts.HasPrefix(identifier, "Had"):
+	case sts.HasPrefix(name, "Had"):
 		v.validateBoolean(abstraction)
 	default:
 		var message = fmt.Sprintf(
 			"Found an illegal attribute method name: %v",
-			identifier,
+			name,
 		)
 		panic(message)
 	}
 }
 
-func (v *validator_) validateAttributes(attributes col.ListLike[ast.AttributeLike]) {
-	var iterator = attributes.GetIterator()
+func (v *validator_) validateAttributes(attributes ast.AttributesLike) {
+	var iterator = attributes.GetAttributes().GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
 		v.validateAttribute(attribute)
@@ -291,11 +293,11 @@ func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 	if prefix != nil {
 		panic("A boolean type cannot have a prefix.")
 	}
-	var identifier = abstraction.GetIdentifier()
-	if identifier != "bool" {
+	var name = abstraction.GetName()
+	if name != "bool" {
 		panic("A question attribute must have a boolean type.")
 	}
-	var arguments = abstraction.GetArguments()
+	var arguments = abstraction.GetGenericArguments()
 	if arguments != nil {
 		panic("A boolean type cannot be a generic type.")
 	}
@@ -304,13 +306,13 @@ func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 func (v *validator_) validateClass(class ast.ClassLike) {
 	var declaration = class.GetDeclaration()
 	v.validateDeclaration(declaration)
-	var constants = class.GetConstants()
-	if constants != nil {
-		v.validateConstants(constants)
-	}
 	var constructors = class.GetConstructors()
 	if constructors != nil {
 		v.validateConstructors(constructors)
+	}
+	var constants = class.GetConstants()
+	if constants != nil {
+		v.validateConstants(constants)
 	}
 	var functions = class.GetFunctions()
 	if functions != nil {
@@ -326,7 +328,7 @@ func (v *validator_) validateClasses(model ast.ModelLike) {
 		var class = association.GetValue()
 		v.validateClass(class)
 	}
-	var classes = model.GetClasses()
+	var classes = model.GetClasses().GetClasses()
 	if classes != nil {
 		classes.RemoveAll()
 		classes.AppendValues(v.classes_.GetValues(v.classes_.GetKeys()))
@@ -338,8 +340,8 @@ func (v *validator_) validateConstant(constant ast.ConstantLike) {
 	v.validateAbstraction(abstraction)
 }
 
-func (v *validator_) validateConstants(constants col.ListLike[ast.ConstantLike]) {
-	var iterator = constants.GetIterator()
+func (v *validator_) validateConstants(constants ast.ConstantsLike) {
+	var iterator = constants.GetConstants().GetIterator()
 	for iterator.HasNext() {
 		var constant = iterator.GetNext()
 		v.validateConstant(constant)
@@ -355,8 +357,8 @@ func (v *validator_) validateConstructor(constructor ast.ConstructorLike) {
 	v.validateAbstraction(abstraction)
 }
 
-func (v *validator_) validateConstructors(constructors col.ListLike[ast.ConstructorLike]) {
-	var iterator = constructors.GetIterator()
+func (v *validator_) validateConstructors(constructors ast.ConstructorsLike) {
+	var iterator = constructors.GetConstructors().GetIterator()
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
 		v.validateConstructor(constructor)
@@ -364,15 +366,17 @@ func (v *validator_) validateConstructors(constructors col.ListLike[ast.Construc
 }
 
 func (v *validator_) validateDeclaration(declaration ast.DeclarationLike) {
-	var parameters = declaration.GetParameters()
+	var parameters = declaration.GetGenericParameters()
 	if parameters != nil {
-		v.validateParameters(parameters)
+		v.validateParameters(parameters.GetParameters())
 	}
 }
 
 func (v *validator_) validateEnumeration(enumeration ast.EnumerationLike) {
-	var parameter = enumeration.GetParameter()
-	v.validateParameter(parameter)
+	var values = enumeration.GetValues()
+	var value = values.GetValue()
+	var abstraction = value.GetAbstraction()
+	v.validateAbstraction(abstraction)
 }
 
 func (v *validator_) validateFunction(function ast.FunctionLike) {
@@ -393,12 +397,12 @@ func (v *validator_) validateFunctional(functional ast.FunctionalLike) {
 	}
 	var result = functional.GetResult()
 	v.validateResult(result)
-	var identifier = declaration.GetIdentifier()
-	var abstraction = v.abstractions_.GetValue(identifier)
+	var name = declaration.GetName()
+	var abstraction = v.abstractions_.GetValue(name)
 	if abstraction == nil {
 		var message = fmt.Sprintf(
 			"The following functional is never used in this package: %v",
-			identifier,
+			name,
 		)
 		panic(message)
 	}
@@ -414,13 +418,14 @@ func (v *validator_) validateFunctionals(model ast.ModelLike) {
 	}
 	var functionals = model.GetFunctionals()
 	if functionals != nil {
-		functionals.RemoveAll()
-		functionals.AppendValues(v.functionals_.GetValues(v.functionals_.GetKeys()))
+		var list = functionals.GetFunctionals()
+		list.RemoveAll()
+		list.AppendValues(v.functionals_.GetValues(v.functionals_.GetKeys()))
 	}
 }
 
-func (v *validator_) validateFunctions(functions col.ListLike[ast.FunctionLike]) {
-	var iterator = functions.GetIterator()
+func (v *validator_) validateFunctions(functions ast.FunctionsLike) {
+	var iterator = functions.GetFunctions().GetIterator()
 	for iterator.HasNext() {
 		var function = iterator.GetNext()
 		v.validateFunction(function)
@@ -431,13 +436,13 @@ func (v *validator_) validateGetClassMethod(class string) {
 	var instance = v.instances_.GetValue(class)
 	var attributes = instance.GetAttributes()
 	if attributes != nil {
-		var iterator = attributes.GetIterator()
+		var iterator = attributes.GetAttributes().GetIterator()
 		for iterator.HasNext() {
 			var attribute = iterator.GetNext()
-			var identifier = attribute.GetIdentifier()
-			if identifier == "GetClass" {
+			var name = attribute.GetName()
+			if name == "GetClass" {
 				var abstraction = attribute.GetAbstraction()
-				if class+"classlike" == sts.ToLower(abstraction.GetIdentifier()) {
+				if class+"classlike" == sts.ToLower(abstraction.GetName()) {
 					return
 				}
 			}
@@ -445,7 +450,7 @@ func (v *validator_) validateGetClassMethod(class string) {
 	}
 	fmt.Printf(
 		"The following class is missing a GetClass() instance method: %v\n",
-		sts.TrimSuffix(instance.GetDeclaration().GetIdentifier(), "Like"),
+		sts.TrimSuffix(instance.GetDeclaration().GetName(), "Like"),
 	)
 }
 
@@ -476,8 +481,9 @@ func (v *validator_) validateInstances(model ast.ModelLike) {
 	}
 	var instances = model.GetInstances()
 	if instances != nil {
-		instances.RemoveAll()
-		instances.AppendValues(v.instances_.GetValues(v.instances_.GetKeys()))
+		var list = instances.GetInstances()
+		list.RemoveAll()
+		list.AppendValues(v.instances_.GetValues(v.instances_.GetKeys()))
 	}
 }
 
@@ -492,8 +498,8 @@ func (v *validator_) validateMethod(method ast.MethodLike) {
 	}
 }
 
-func (v *validator_) validateMethods(methods col.ListLike[ast.MethodLike]) {
-	var iterator = methods.GetIterator()
+func (v *validator_) validateMethods(methods ast.MethodsLike) {
+	var iterator = methods.GetMethods().GetIterator()
 	for iterator.HasNext() {
 		var method = iterator.GetNext()
 		v.validateMethod(method)
@@ -501,11 +507,11 @@ func (v *validator_) validateMethods(methods col.ListLike[ast.MethodLike]) {
 }
 
 func (v *validator_) validateModule(module ast.ModuleLike) {
-	var identifier = module.GetIdentifier()
-	if len(identifier) != 3 {
+	var name = module.GetName()
+	if len(name) != 3 {
 		var message = fmt.Sprintf(
-			"The length of the identifier for an imported module must be 3: %v",
-			identifier,
+			"The length of the name for an imported module must be 3: %v",
+			name,
 		)
 		panic(message)
 	}
@@ -519,10 +525,11 @@ func (v *validator_) validateModules(model ast.ModelLike) {
 		var module = association.GetValue()
 		v.validateModule(module)
 	}
-	var modules = model.GetModules()
-	if modules != nil {
-		modules.RemoveAll()
-		modules.AppendValues(v.modules_.GetValues(v.modules_.GetKeys()))
+	var imports = model.GetImports()
+	if imports != nil {
+		var list = imports.GetModules().GetModules()
+		list.RemoveAll()
+		list.AppendValues(v.modules_.GetValues(v.modules_.GetKeys()))
 	}
 }
 
@@ -561,43 +568,55 @@ func (v *validator_) validateParameter(parameter ast.ParameterLike) {
 	v.validateAbstraction(abstraction)
 }
 
-func (v *validator_) validateParameters(parameters col.ListLike[ast.ParameterLike]) {
-	var iterator = parameters.GetIterator()
-	for iterator.HasNext() {
-		var parameter = iterator.GetNext()
-		v.validateParameter(parameter)
+func (v *validator_) validateParameters(parameters ast.ParametersLike) {
+	var parameter = parameters.GetParameter()
+	v.validateParameter(parameter)
+	var additionalParameters = parameters.GetAdditionalParameters()
+	if additionalParameters != nil {
+		var iterator = additionalParameters.GetAdditionalParameters().GetIterator()
+		for iterator.HasNext() {
+			var parameter = iterator.GetNext()
+			v.validateParameter(parameter.GetParameter())
+		}
 	}
 }
 
 func (v *validator_) validatePrefix(prefix ast.PrefixLike) {
-	if prefix.GetType() == ast.AliasPrefix {
-		var alias = prefix.GetIdentifier()
+	switch actual := prefix.GetAny().(type) {
+	case ast.AliasLike:
+		var name = actual.GetName()
 		var iterator = v.modules_.GetIterator()
 		for iterator.HasNext() {
 			var association = iterator.GetNext()
 			var module = association.GetValue()
-			if module.GetIdentifier() == alias {
+			if module.GetName() == name {
 				// Found a matching alias.
 				return
 			}
 		}
 		var message = fmt.Sprintf(
-			"Unknown module alias: %v",
-			alias,
+			"Unknown module alias name: %v",
+			name,
 		)
 		panic(message)
+	default:
+		// Ignore the other prefix types.
 	}
 }
 
 func (v *validator_) validateResult(result ast.ResultLike) {
-	if result != nil {
-		var abstraction = result.GetAbstraction()
-		if abstraction != nil {
-			v.validateAbstraction(abstraction)
-		} else {
-			var parameters = result.GetParameters()
-			v.validateParameters(parameters)
-		}
+	switch actual := result.GetAny().(type) {
+	case ast.AbstractionLike:
+		v.validateAbstraction(actual)
+	case ast.ParameterizedLike:
+		var parameters = actual.GetParameters()
+		v.validateParameters(parameters)
+	default:
+		var message = fmt.Sprintf(
+			"Found an unknown result type: %T",
+			actual,
+		)
+		panic(message)
 	}
 }
 
@@ -610,12 +629,12 @@ func (v *validator_) validateType(type_ ast.TypeLike) {
 	if enumeration != nil {
 		v.validateEnumeration(enumeration)
 	}
-	var identifier = declaration.GetIdentifier()
-	abstraction = v.abstractions_.GetValue(identifier)
+	var name = declaration.GetName()
+	abstraction = v.abstractions_.GetValue(name)
 	if abstraction == nil {
 		var message = fmt.Sprintf(
 			"The following type is never used in this package: %v",
-			identifier,
+			name,
 		)
 		panic(message)
 	}
@@ -631,7 +650,8 @@ func (v *validator_) validateTypes(model ast.ModelLike) {
 	}
 	var types = model.GetTypes()
 	if types != nil {
-		types.RemoveAll()
-		types.AppendValues(v.types_.GetValues(v.types_.GetKeys()))
+		var list = types.GetTypes()
+		list.RemoveAll()
+		list.AppendValues(v.types_.GetValues(v.types_.GetKeys()))
 	}
 }

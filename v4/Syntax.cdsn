@@ -133,15 +133,15 @@ Aspect: Declaration "interface" "{" Methods "}"
 
 Classes: note Class+
 
-Class: Declaration "interface" "{" Constants? Constructors? Functions? "}"
-
-Constants: note Constant+
-
-Constant: name "(" ")" Abstraction
+Class: Declaration "interface" "{" Constructors Constants? Functions? "}"
 
 Constructors: note Constructor+
 
 Constructor: name "(" Parameters? ")" Abstraction
+
+Constants: note Constant+
+
+Constant: name "(" ")" Abstraction
 
 Functions: note Function+
 
@@ -149,7 +149,7 @@ Function: name "(" Parameters? ")" Result
 
 Instances: note Instance+
 
-Instance: Declaration "interface" "{" Attributes? Abstractions? Methods? "}"
+Instance: Declaration "interface" "{" Attributes Abstractions? Methods? "}"
 
 Attributes: note Attribute+
 

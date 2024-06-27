@@ -40,16 +40,16 @@ type classClass_ struct {
 
 func (c *classClass_) Make(
 	declaration DeclarationLike,
-	constants ConstantsLike,
 	constructors ConstructorsLike,
+	constants ConstantsLike,
 	functions FunctionsLike,
 ) ClassLike {
 	return &class_{
 		// Initialize instance attributes.
 		class_:        c,
 		declaration_:  declaration,
-		constants_:    constants,
 		constructors_: constructors,
+		constants_:    constants,
 		functions_:    functions,
 	}
 }
@@ -62,8 +62,8 @@ type class_ struct {
 	// Define instance attributes.
 	class_        ClassClassLike
 	declaration_  DeclarationLike
-	constants_    ConstantsLike
 	constructors_ ConstructorsLike
+	constants_    ConstantsLike
 	functions_    FunctionsLike
 }
 
@@ -77,12 +77,12 @@ func (v *class_) GetDeclaration() DeclarationLike {
 	return v.declaration_
 }
 
-func (v *class_) GetConstants() ConstantsLike {
-	return v.constants_
-}
-
 func (v *class_) GetConstructors() ConstructorsLike {
 	return v.constructors_
+}
+
+func (v *class_) GetConstants() ConstantsLike {
+	return v.constants_
 }
 
 func (v *class_) GetFunctions() FunctionsLike {

@@ -429,20 +429,19 @@ func (v *parser_) parseAlias() (
 ) {
 	// Attempt to parse a module name abbreviation.
 	var name string
-	name, token, ok = v.parseToken(NameToken, "")
+	var nameToken TokenLike
+	name, nameToken, ok = v.parseToken(NameToken, "")
 	if !ok {
 		// This is not an alias.
-		return alias, token, false
+		return alias, nameToken, false
 	}
 
 	// Attempt to parse the trailing ".".
 	_, token, ok = v.parseToken(DelimiterToken, ".")
 	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(".",
-			"Alias",
-		)
-		panic(message)
+		// This is not an alias, put back the name token.
+		v.putBack(nameToken)
+		return alias, token, false
 	}
 
 	// Found an alias.
@@ -741,8 +740,8 @@ func (v *parser_) parseClass() (
 		message += v.generateSyntax(`"interface"`,
 			"Class",
 			"Declaration",
-			"Constants",
 			"Constructors",
+			"Constants",
 			"Functions",
 		)
 		panic(message)
@@ -755,8 +754,23 @@ func (v *parser_) parseClass() (
 		message += v.generateSyntax("{",
 			"Class",
 			"Declaration",
-			"Constants",
 			"Constructors",
+			"Constants",
+			"Functions",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse a sequence of constructors.
+	var constructors ast.ConstructorsLike
+	constructors, token, ok = v.parseConstructors()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Constructors",
+			"Class",
+			"Declaration",
+			"Constructors",
+			"Constants",
 			"Functions",
 		)
 		panic(message)
@@ -764,9 +778,6 @@ func (v *parser_) parseClass() (
 
 	// Attempt to parse an optional sequence of constants.
 	var constants, _, _ = v.parseConstants()
-
-	// Attempt to parse an optional sequence of constructors.
-	var constructors, _, _ = v.parseConstructors()
 
 	// Attempt to parse an optional sequence of functions.
 	var functions, _, _ = v.parseFunctions()
@@ -778,15 +789,15 @@ func (v *parser_) parseClass() (
 		message += v.generateSyntax("}",
 			"Class",
 			"Declaration",
-			"Constants",
 			"Constructors",
+			"Constants",
 			"Functions",
 		)
 		panic(message)
 	}
 
 	// Found a class.
-	class = ast.Class().Make(declaration, constants, constructors, functions)
+	class = ast.Class().Make(declaration, constructors, constants, functions)
 	return class, token, true
 }
 
@@ -1499,8 +1510,20 @@ func (v *parser_) parseInstance() (
 		panic(message)
 	}
 
-	// Attempt to parse an optional sequence of attributes.
-	var attributes, _, _ = v.parseAttributes()
+	// Attempt to parse a sequence of attributes.
+	var attributes ast.AttributesLike
+	attributes, token, ok = v.parseAttributes()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("{",
+			"Instance",
+			"Declaration",
+			"Attributes",
+			"Abstractions",
+			"Methods",
+		)
+		panic(message)
+	}
 
 	// Attempt to parse an optional sequence of abstractions.
 	var abstractions, _, _ = v.parseAbstractions()
@@ -2036,7 +2059,7 @@ func (v *parser_) parseType() (
 
 	// Attempt to parse an optional enumeration.
 	var enumeration ast.EnumerationLike
-	enumeration, token, _ = v.parseEnumeration()
+	enumeration, _, _ = v.parseEnumeration()
 
 	// Found a type.
 	type_ = ast.Type().Make(declaration, abstraction, enumeration)
@@ -2198,8 +2221,9 @@ var syntax = map[string]string{
 	"AdditionalArgument":  `Argument ","`,
 	"Argument":            `Abstraction`,
 	"Enumeration":         `"const" "(" Values ")"`,
-	"Values":              `Value AdditionalValue+`,
+	"Values":              `Value AdditionalValues`,
 	"Value":               `name Abstraction "=" "iota"`,
+	"AdditionalValues":    `AdditionalValue+`,
 	"AdditionalValue":     `name`,
 	"Functionals":         `note Functional+`,
 	"Functional":          `Declaration "func" "(" Parameters? ")" Result`,
@@ -2210,15 +2234,15 @@ var syntax = map[string]string{
 	"Aspects":       `note Aspect+`,
 	"Aspect":        `Declaration "interface" "{" Methods "}"`,
 	"Classes":       `note Class+`,
-	"Class":         `Declaration "interface" "{" Constants? Constructors? Functions? "}"`,
-	"Constants":     `note Constant+`,
-	"Constant":      `name "(" ")" Abstraction`,
+	"Class":         `Declaration "interface" "{" Constructors Constants? Functions? "}"`,
 	"Constructors":  `note Constructor+`,
 	"Constructor":   `name "(" Parameters? ")" Abstraction`,
+	"Constants":     `note Constant+`,
+	"Constant":      `name "(" ")" Abstraction`,
 	"Functions":     `note Function+`,
 	"Function":      `name "(" Parameters? ")" Result`,
 	"Instances":     `note Instance+`,
-	"Instance":      `Declaration "interface" "{" Attributes? Abstractions? Methods? "}"`,
+	"Instance":      `Declaration "interface" "{" Attributes Abstractions? Methods? "}"`,
 	"Attributes":    `note Attribute+`,
 	"Attribute":     `name "(" Parameter? ")" Abstraction?`,
 	"Abstractions":  `note Abstraction+`,

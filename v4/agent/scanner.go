@@ -30,6 +30,7 @@ var scannerClass = &scannerClass_{
 		ErrorToken:     "error",
 		CommentToken:   "comment",
 		DelimiterToken: "delimiter",
+		EOFToken:       "EOF",
 		NameToken:      "name",
 		NoteToken:      "note",
 		PathToken:      "path",
@@ -154,6 +155,10 @@ func (v *scanner_) emitToken(type_ TokenType) {
 	v.tokens_.AddValue(token) // This will block if the queue is full.
 }
 
+func (v *scanner_) foundEOF() {
+	v.emitToken(EOFToken)
+}
+
 func (v *scanner_) foundError() {
 	v.next_++
 	v.emitToken(ErrorToken)
@@ -208,6 +213,7 @@ loop:
 			break loop
 		}
 	}
+	v.foundEOF()
 }
 
 /*
@@ -220,7 +226,7 @@ collision with other private Go class constants in this package.
 */
 const (
 	any_       = `.|\n`
-	comment_   = `/\*` + `((?:` + any_ + `)*?)` + `\*/`
+	comment_   = `/\*` + `((?:` + any_ + `)*?)` + `\*/\n`
 	control_   = `\p{Cc}`
 	delimiter_ = `[[\](){}\.,=]`
 	digit_     = `\p{Nd}`
