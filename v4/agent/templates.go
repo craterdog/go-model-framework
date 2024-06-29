@@ -78,7 +78,7 @@ const classMethodsTemplate_ = `
 // CLASS METHODS
 
 // Target
-<Target><Constants><Constructors><Functions>`
+<Target><Constructors><Constants><Functions>`
 
 const classTargetTemplate_ = `
 type <TargetName>Class_[<Parameters>] struct {
@@ -245,16 +245,19 @@ constructors and functions that must be supported by each angle-like concrete
 class.
 */
 type AngleClassLike interface {
-	// Constants
-	Pi() AngleLike
-	Tau() AngleLike
-
 	// Constructors
 	MakeFromValue(value float64) AngleLike
 	MakeFromString(value string) AngleLike
 
+	// Constants
+	Pi() AngleLike
+	Tau() AngleLike
+
 	// Functions
-	Apply(function TrigonometricFunction, angle AngleLike) float64
+	Apply(
+		function TrigonometricFunction,
+		angle AngleLike,
+	) float64
 	Sine(angle AngleLike) float64
 	Cosine(angle AngleLike) float64
 	Tangent(angle AngleLike) float64
@@ -396,13 +399,13 @@ class constants, constructors and functions that must be supported by each
 concrete array-like class.
 */
 type ArrayClassLike[V any] interface {
-	// Constants
-	DefaultRanker() RankingFunction[V]
-
 	// Constructors
 	MakeWithSize(size uint) ArrayLike[V]
 	MakeFromValue(value []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+
+	// Constants
+	DefaultRanker() RankingFunction[V]
 }
 
 // Instances
@@ -499,10 +502,6 @@ constructors and functions that must be supported by each complex-like concrete
 class.
 */
 type ComplexClassLike interface {
-	// Constants
-	Zero() ComplexLike
-	Infinity() ComplexLike
-
 	// Constructors
 	MakeWithAttributes(
 		realPart float64,
@@ -510,6 +509,10 @@ type ComplexClassLike interface {
 		form Form,
 	) ComplexLike
 	MakeFromValue(value complex128) ComplexLike
+
+	// Constants
+	Zero() ComplexLike
+	Infinity() ComplexLike
 
 	// Functions
 	Inverse(value ComplexLike) ComplexLike
@@ -673,14 +676,14 @@ key is present in both catalogs, the value of the key from the second
 catalog takes precedence.
 */
 type CatalogClassLike[K comparable, V any] interface {
-	// Constants
-	DefaultRanker() RankingFunction[AssociationLike[K, V]]
-
 	// Constructors
 	Make() CatalogLike[K, V]
 	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
 	MakeFromMap(associations map[K]V) CatalogLike[K, V]
 	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
+
+	// Constants
+	DefaultRanker() RankingFunction[AssociationLike[K, V]]
 
 	// Functions
 	Extract(

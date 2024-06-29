@@ -13,7 +13,7 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 )
 
 // CLASS ACCESS
@@ -40,11 +40,11 @@ type additionalArgumentsClass_ struct {
 
 // Constructors
 
-func (c *additionalArgumentsClass_) Make(additionalArguments col.ListLike[AdditionalArgumentLike]) AdditionalArgumentsLike {
+func (c *additionalArgumentsClass_) Make(additionalArgumentIterator age.IteratorLike[AdditionalArgumentLike]) AdditionalArgumentsLike {
 	return &additionalArguments_{
 		// Initialize instance attributes.
-		class_:               c,
-		additionalArguments_: additionalArguments,
+		class_:                      c,
+		additionalArgumentIterator_: additionalArgumentIterator,
 	}
 }
 
@@ -54,8 +54,8 @@ func (c *additionalArgumentsClass_) Make(additionalArguments col.ListLike[Additi
 
 type additionalArguments_ struct {
 	// Define instance attributes.
-	class_               AdditionalArgumentsClassLike
-	additionalArguments_ col.ListLike[AdditionalArgumentLike]
+	class_                      AdditionalArgumentsClassLike
+	additionalArgumentIterator_ age.IteratorLike[AdditionalArgumentLike]
 }
 
 // Attributes
@@ -64,8 +64,8 @@ func (v *additionalArguments_) GetClass() AdditionalArgumentsClassLike {
 	return v.class_
 }
 
-func (v *additionalArguments_) GetAdditionalArguments() col.ListLike[AdditionalArgumentLike] {
-	return v.additionalArguments_
+func (v *additionalArguments_) GetAdditionalArgumentIterator() age.IteratorLike[AdditionalArgumentLike] {
+	return v.additionalArgumentIterator_
 }
 
 // Private

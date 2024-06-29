@@ -14,6 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
@@ -131,7 +132,7 @@ func (v *parser_) formatError(token TokenLike) string {
 	// Append an arrow pointing to the error.
 	message += " \033[32m>>>─"
 	var count = 0
-	for count < token.GetPosition() {
+	for count <= token.GetPosition() {
 		message += "─"
 		count++
 	}
@@ -244,7 +245,7 @@ func (v *parser_) parseAbstractions() (
 	}
 
 	// Found a sequence of abstractions.
-	abstractions = ast.Abstractions().Make(note, list)
+	abstractions = ast.Abstractions().Make(note, list.GetIterator())
 	return abstractions, token, true
 }
 
@@ -301,14 +302,14 @@ func (v *parser_) parseAdditionalArguments() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	var arguments = col.List[ast.AdditionalArgumentLike](notation).Make()
+	var list = col.List[ast.AdditionalArgumentLike](notation).Make()
 	for ok {
-		arguments.AppendValue(additionalArgument)
+		list.AppendValue(additionalArgument)
 		additionalArgument, token, ok = v.parseAdditionalArgument()
 	}
 
 	// Found a sequence of additional arguments.
-	additionalArguments = ast.AdditionalArguments().Make(arguments)
+	additionalArguments = ast.AdditionalArguments().Make(list.GetIterator())
 	return additionalArguments, token, true
 }
 
@@ -365,14 +366,14 @@ func (v *parser_) parseAdditionalParameters() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	var parameters = col.List[ast.AdditionalParameterLike](notation).Make()
+	var list = col.List[ast.AdditionalParameterLike](notation).Make()
 	for ok {
-		parameters.AppendValue(additionalParameter)
+		list.AppendValue(additionalParameter)
 		additionalParameter, token, ok = v.parseAdditionalParameter()
 	}
 
 	// Found a sequence of additional parameters.
-	additionalParameters = ast.AdditionalParameters().Make(parameters)
+	additionalParameters = ast.AdditionalParameters().Make(list.GetIterator())
 	return additionalParameters, token, true
 }
 
@@ -411,14 +412,14 @@ func (v *parser_) parseAdditionalValues() (
 		panic(message)
 	}
 	var notation = cdc.Notation().Make()
-	var values = col.List[ast.AdditionalValueLike](notation).Make()
+	var list = col.List[ast.AdditionalValueLike](notation).Make()
 	for ok {
-		values.AppendValue(additionalValue)
+		list.AppendValue(additionalValue)
 		additionalValue, token, ok = v.parseAdditionalValue()
 	}
 
 	// Found a sequence of additional values.
-	additionalValues = ast.AdditionalValues().Make(values)
+	additionalValues = ast.AdditionalValues().Make(list.GetIterator())
 	return additionalValues, token, true
 }
 
@@ -615,7 +616,19 @@ func (v *parser_) parseAspects() (
 	}
 
 	// Found a sequence of aspects.
-	aspects = ast.Aspects().Make(note, list)
+	list.SortValuesWithRanker(func (first, second ast.AspectLike) age.Rank {
+		var firstName = first.GetDeclaration().GetName()
+		var secondName = second.GetDeclaration().GetName()
+		switch {
+		case firstName < secondName:
+			return age.LesserRank
+		case firstName > secondName:
+			return age.GreaterRank
+		default:
+			return age.EqualRank
+		}
+	})
+	aspects = ast.Aspects().Make(note, list.GetIterator())
 	return aspects, token, true
 }
 
@@ -699,7 +712,7 @@ func (v *parser_) parseAttributes() (
 	}
 
 	// Found a sequence of attributes.
-	attributes = ast.Attributes().Make(note, list)
+	attributes = ast.Attributes().Make(note, list.GetIterator())
 	return attributes, token, true
 }
 
@@ -833,7 +846,19 @@ func (v *parser_) parseClasses() (
 	}
 
 	// Found a sequence of classes.
-	classes = ast.Classes().Make(note, list)
+	list.SortValuesWithRanker(func (first, second ast.ClassLike) age.Rank {
+		var firstName = first.GetDeclaration().GetName()
+		var secondName = second.GetDeclaration().GetName()
+		switch {
+		case firstName < secondName:
+			return age.LesserRank
+		case firstName > secondName:
+			return age.GreaterRank
+		default:
+			return age.EqualRank
+		}
+	})
+	classes = ast.Classes().Make(note, list.GetIterator())
 	return classes, token, true
 }
 
@@ -912,7 +937,7 @@ func (v *parser_) parseConstants() (
 	}
 
 	// Found a sequence of constants.
-	constants = ast.Constants().Make(note, list)
+	constants = ast.Constants().Make(note, list.GetIterator())
 	return constants, token, true
 }
 
@@ -996,7 +1021,7 @@ func (v *parser_) parseConstructors() (
 	}
 
 	// Found a sequence of constructors.
-	constructors = ast.Constructors().Make(note, list)
+	constructors = ast.Constructors().Make(note, list.GetIterator())
 	return constructors, token, true
 }
 
@@ -1259,7 +1284,19 @@ func (v *parser_) parseFunctionals() (
 	}
 
 	// Found a sequence of functionals.
-	functionals = ast.Functionals().Make(note, list)
+	list.SortValuesWithRanker(func (first, second ast.FunctionalLike) age.Rank {
+		var firstName = first.GetDeclaration().GetName()
+		var secondName = second.GetDeclaration().GetName()
+		switch {
+		case firstName < secondName:
+			return age.LesserRank
+		case firstName > secondName:
+			return age.GreaterRank
+		default:
+			return age.EqualRank
+		}
+	})
+	functionals = ast.Functionals().Make(note, list.GetIterator())
 	return functionals, token, true
 }
 
@@ -1295,7 +1332,7 @@ func (v *parser_) parseFunctions() (
 	}
 
 	// Found a sequence of functions.
-	functions = ast.Functions().Make(note, list)
+	functions = ast.Functions().Make(note, list.GetIterator())
 	return functions, token, true
 }
 
@@ -1582,7 +1619,19 @@ func (v *parser_) parseInstances() (
 	}
 
 	// Found a sequence of instances.
-	instances = ast.Instances().Make(note, list)
+	list.SortValuesWithRanker(func (first, second ast.InstanceLike) age.Rank {
+		var firstName = first.GetDeclaration().GetName()
+		var secondName = second.GetDeclaration().GetName()
+		switch {
+		case firstName < secondName:
+			return age.LesserRank
+		case firstName > secondName:
+			return age.GreaterRank
+		default:
+			return age.EqualRank
+		}
+	})
+	instances = ast.Instances().Make(note, list.GetIterator())
 	return instances, token, true
 }
 
@@ -1715,7 +1764,7 @@ func (v *parser_) parseMethods() (
 	}
 
 	// Found a sequence of methods.
-	methods = ast.Methods().Make(note, list)
+	methods = ast.Methods().Make(note, list.GetIterator())
 	return methods, token, true
 }
 
@@ -1828,7 +1877,19 @@ func (v *parser_) parseModules() (
 	}
 
 	// Found a sequence of modules.
-	modules = ast.Modules().Make(list)
+	list.SortValuesWithRanker(func (first, second ast.ModuleLike) age.Rank {
+		var firstPath = first.GetPath()
+		var secondPath = second.GetPath()
+		switch {
+		case firstPath < secondPath:
+			return age.LesserRank
+		case firstPath > secondPath:
+			return age.GreaterRank
+		default:
+			return age.EqualRank
+		}
+	})
+	modules = ast.Modules().Make(list.GetIterator())
 	return modules, token, true
 }
 
@@ -2098,7 +2159,19 @@ func (v *parser_) parseTypes() (
 	}
 
 	// Found a sequence of types.
-	types = ast.Types().Make(note, list)
+	list.SortValuesWithRanker(func (first, second ast.TypeLike) age.Rank {
+		var firstName = first.GetDeclaration().GetName()
+		var secondName = second.GetDeclaration().GetName()
+		switch {
+		case firstName < secondName:
+			return age.LesserRank
+		case firstName > secondName:
+			return age.GreaterRank
+		default:
+			return age.EqualRank
+		}
+	})
+	types = ast.Types().Make(note, list.GetIterator())
 	return types, token, true
 }
 

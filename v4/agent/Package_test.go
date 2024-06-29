@@ -16,7 +16,23 @@ import (
 	age "github.com/craterdog/go-model-framework/v4/agent"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
+	osx "os"
 )
+
+func TestRoundTrip(t *tes.T) {
+	var bytes, err = osx.ReadFile("./Package.go")
+	if err != nil {
+		panic(err)
+	}
+	var source = string(bytes)
+	var parser = age.Parser().Make()
+	var model = parser.ParseSource(source)
+	var formatter = age.Formatter().Make()
+	var actual = formatter.FormatModel(model)
+	ass.Equal(t, actual, source)
+	var validator = age.Validator().Make()
+	validator.ValidateModel(model)
+}
 
 func TestCreateClassType(t *tes.T) {
 	// Create a new class type model.

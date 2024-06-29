@@ -13,7 +13,7 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 )
 
 // CLASS ACCESS
@@ -41,12 +41,12 @@ type additionalValuesClass_ struct {
 // Constructors
 
 func (c *additionalValuesClass_) Make(
-	additionalValues col.ListLike[AdditionalValueLike],
+	additionalValueIterator age.IteratorLike[AdditionalValueLike],
 ) AdditionalValuesLike {
 	return &additionalValues_{
 		// Initialize instance attributes.
-		class_:            c,
-		additionalValues_: additionalValues,
+		class_:                   c,
+		additionalValueIterator_: additionalValueIterator,
 	}
 }
 
@@ -56,8 +56,8 @@ func (c *additionalValuesClass_) Make(
 
 type additionalValues_ struct {
 	// Define instance attributes.
-	class_            AdditionalValuesClassLike
-	additionalValues_ col.ListLike[AdditionalValueLike]
+	class_                   AdditionalValuesClassLike
+	additionalValueIterator_ age.IteratorLike[AdditionalValueLike]
 }
 
 // Attributes
@@ -66,8 +66,8 @@ func (v *additionalValues_) GetClass() AdditionalValuesClassLike {
 	return v.class_
 }
 
-func (v *additionalValues_) GetAdditionalValues() col.ListLike[AdditionalValueLike] {
-	return v.additionalValues_
+func (v *additionalValues_) GetAdditionalValueIterator() age.IteratorLike[AdditionalValueLike] {
+	return v.additionalValueIterator_
 }
 
 // Private

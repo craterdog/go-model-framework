@@ -30,7 +30,7 @@ on interfaces, not on each other.
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 )
 
 // Classes
@@ -58,7 +58,7 @@ type AbstractionsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		abstractions col.ListLike[AbstractionLike],
+		abstractionIterator age.IteratorLike[AbstractionLike],
 	) AbstractionsLike
 }
 
@@ -79,7 +79,9 @@ concrete additional-arguments-like class.
 */
 type AdditionalArgumentsClassLike interface {
 	// Constructors
-	Make(additionalArguments col.ListLike[AdditionalArgumentLike]) AdditionalArgumentsLike
+	Make(
+		additionalArgumentIterator age.IteratorLike[AdditionalArgumentLike],
+	) AdditionalArgumentsLike
 }
 
 /*
@@ -99,7 +101,9 @@ concrete additional-parameters-like class.
 */
 type AdditionalParametersClassLike interface {
 	// Constructors
-	Make(additionalParameters col.ListLike[AdditionalParameterLike]) AdditionalParametersLike
+	Make(
+		additionalParameterIterator age.IteratorLike[AdditionalParameterLike],
+	) AdditionalParametersLike
 }
 
 /*
@@ -119,7 +123,9 @@ concrete additional-values-like class.
 */
 type AdditionalValuesClassLike interface {
 	// Constructors
-	Make(additionalValues col.ListLike[AdditionalValueLike]) AdditionalValuesLike
+	Make(
+		additionalValueIterator age.IteratorLike[AdditionalValueLike],
+	) AdditionalValuesLike
 }
 
 /*
@@ -187,7 +193,7 @@ type AspectsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		aspects col.ListLike[AspectLike],
+		aspectIterator age.IteratorLike[AspectLike],
 	) AspectsLike
 }
 
@@ -214,7 +220,7 @@ type AttributesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		attributes col.ListLike[AttributeLike],
+		attributeIterator age.IteratorLike[AttributeLike],
 	) AttributesLike
 }
 
@@ -252,7 +258,7 @@ type ClassesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		classes col.ListLike[ClassLike],
+		classIterator age.IteratorLike[ClassLike],
 	) ClassesLike
 }
 
@@ -278,7 +284,7 @@ type ConstantsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		constants col.ListLike[ConstantLike],
+		constantIterator age.IteratorLike[ConstantLike],
 	) ConstantsLike
 }
 
@@ -305,7 +311,7 @@ type ConstructorsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		constructors col.ListLike[ConstructorLike],
+		constructorIterator age.IteratorLike[ConstructorLike],
 	) ConstructorsLike
 }
 
@@ -370,7 +376,7 @@ type FunctionalsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		functionals col.ListLike[FunctionalLike],
+		functionalIterator age.IteratorLike[FunctionalLike],
 	) FunctionalsLike
 }
 
@@ -383,7 +389,7 @@ type FunctionsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		functions col.ListLike[FunctionLike],
+		functionIterator age.IteratorLike[FunctionLike],
 	) FunctionsLike
 }
 
@@ -454,7 +460,7 @@ type InstancesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		instances col.ListLike[InstanceLike],
+		instanceIterator age.IteratorLike[InstanceLike],
 	) InstancesLike
 }
 
@@ -491,7 +497,7 @@ type MethodsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		methods col.ListLike[MethodLike],
+		methodIterator age.IteratorLike[MethodLike],
 	) MethodsLike
 }
 
@@ -534,7 +540,7 @@ concrete modules-like class.
 */
 type ModulesClassLike interface {
 	// Constructors
-	Make(modules col.ListLike[ModuleLike]) ModulesLike
+	Make(moduleIterator age.IteratorLike[ModuleLike]) ModulesLike
 }
 
 /*
@@ -626,7 +632,7 @@ type TypesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		types col.ListLike[TypeLike],
+		typeIterator age.IteratorLike[TypeLike],
 	) TypesLike
 }
 
@@ -680,7 +686,7 @@ type AbstractionsLike interface {
 	// Attributes
 	GetClass() AbstractionsClassLike
 	GetNote() string
-	GetAbstractions() col.ListLike[AbstractionLike]
+	GetAbstractionIterator() age.IteratorLike[AbstractionLike]
 }
 
 /*
@@ -702,7 +708,7 @@ instance of a concrete additional-arguments-like class.
 type AdditionalArgumentsLike interface {
 	// Attributes
 	GetClass() AdditionalArgumentsClassLike
-	GetAdditionalArguments() col.ListLike[AdditionalArgumentLike]
+	GetAdditionalArgumentIterator() age.IteratorLike[AdditionalArgumentLike]
 }
 
 /*
@@ -724,7 +730,7 @@ instance of a concrete additional-parameters-like class.
 type AdditionalParametersLike interface {
 	// Attributes
 	GetClass() AdditionalParametersClassLike
-	GetAdditionalParameters() col.ListLike[AdditionalParameterLike]
+	GetAdditionalParameterIterator() age.IteratorLike[AdditionalParameterLike]
 }
 
 /*
@@ -746,7 +752,7 @@ instance of a concrete additional-values-like class.
 type AdditionalValuesLike interface {
 	// Attributes
 	GetClass() AdditionalValuesClassLike
-	GetAdditionalValues() col.ListLike[AdditionalValueLike]
+	GetAdditionalValueIterator() age.IteratorLike[AdditionalValueLike]
 }
 
 /*
@@ -814,7 +820,7 @@ type AspectsLike interface {
 	// Attributes
 	GetClass() AspectsClassLike
 	GetNote() string
-	GetAspects() col.ListLike[AspectLike]
+	GetAspectIterator() age.IteratorLike[AspectLike]
 }
 
 /*
@@ -839,7 +845,7 @@ type AttributesLike interface {
 	// Attributes
 	GetClass() AttributesClassLike
 	GetNote() string
-	GetAttributes() col.ListLike[AttributeLike]
+	GetAttributeIterator() age.IteratorLike[AttributeLike]
 }
 
 /*
@@ -875,7 +881,7 @@ type ClassesLike interface {
 	// Attributes
 	GetClass() ClassesClassLike
 	GetNote() string
-	GetClasses() col.ListLike[ClassLike]
+	GetClassIterator() age.IteratorLike[ClassLike]
 }
 
 /*
@@ -899,7 +905,7 @@ type ConstantsLike interface {
 	// Attributes
 	GetClass() ConstantsClassLike
 	GetNote() string
-	GetConstants() col.ListLike[ConstantLike]
+	GetConstantIterator() age.IteratorLike[ConstantLike]
 }
 
 /*
@@ -924,7 +930,7 @@ type ConstructorsLike interface {
 	// Attributes
 	GetClass() ConstructorsClassLike
 	GetNote() string
-	GetConstructors() col.ListLike[ConstructorLike]
+	GetConstructorIterator() age.IteratorLike[ConstructorLike]
 }
 
 /*
@@ -986,7 +992,7 @@ type FunctionalsLike interface {
 	// Attributes
 	GetClass() FunctionalsClassLike
 	GetNote() string
-	GetFunctionals() col.ListLike[FunctionalLike]
+	GetFunctionalIterator() age.IteratorLike[FunctionalLike]
 }
 
 /*
@@ -998,7 +1004,7 @@ type FunctionsLike interface {
 	// Attributes
 	GetClass() FunctionsClassLike
 	GetNote() string
-	GetFunctions() col.ListLike[FunctionLike]
+	GetFunctionIterator() age.IteratorLike[FunctionLike]
 }
 
 /*
@@ -1069,7 +1075,7 @@ type InstancesLike interface {
 	// Attributes
 	GetClass() InstancesClassLike
 	GetNote() string
-	GetInstances() col.ListLike[InstanceLike]
+	GetInstanceIterator() age.IteratorLike[InstanceLike]
 }
 
 /*
@@ -1105,7 +1111,7 @@ type MethodsLike interface {
 	// Attributes
 	GetClass() MethodsClassLike
 	GetNote() string
-	GetMethods() col.ListLike[MethodLike]
+	GetMethodIterator() age.IteratorLike[MethodLike]
 }
 
 /*
@@ -1146,7 +1152,7 @@ instance of a concrete modules-like class.
 type ModulesLike interface {
 	// Attributes
 	GetClass() ModulesClassLike
-	GetModules() col.ListLike[ModuleLike]
+	GetModuleIterator() age.IteratorLike[ModuleLike]
 }
 
 /*
@@ -1239,7 +1245,7 @@ type TypesLike interface {
 	// Attributes
 	GetClass() TypesClassLike
 	GetNote() string
-	GetTypes() col.ListLike[TypeLike]
+	GetTypeIterator() age.IteratorLike[TypeLike]
 }
 
 /*
