@@ -179,6 +179,34 @@ func (v *generator_) expandCopyright(copyright string) string {
 	return copyright
 }
 
+func (v *generator_) extractArguments(
+	parameters ast.ParametersLike,
+) ast.ArgumentsLike {
+	var notation = cdc.Notation().Make()
+	var additionalArguments = col.List[ast.AdditionalArgumentLike](notation).Make()
+
+	// Extract the first argument.
+	var parameter = parameters.GetParameter()
+	var abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
+	var argument = ast.Argument().Make(abstraction)
+
+	// Extract any additional arguments.
+	var additionalParameters = parameters.GetAdditionalParameters()
+	if additionalParameters != nil {
+		var iterator = additionalParameters.GetIterator()
+		for iterator.HasNext() {
+			parameter = iterator.GetNext().GetParameter()
+			abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
+			var additionalArgument = ast.AdditionalArgument().Make(
+				ast.Argument().Make(abstraction),
+			)
+			additionalArguments.AppendValue(additionalArgument)
+		}
+	}
+	var arguments = ast.Arguments().Make(argument, additionalArguments)
+	return arguments
+}
+
 func (v *generator_) extractConcreteMappings(
 	parameters ast.ParametersLike,
 	arguments ast.ArgumentsLike,
@@ -296,6 +324,31 @@ func (v *generator_) extractParameterAttributes(
 	}
 }
 
+func (v *generator_) extractTargetType(
+	class ast.ClassLike,
+	instance ast.InstanceLike,
+) (
+	targetType string,
+) {
+	var sequence = instance.GetAttributes().GetAttributes()
+	if sequence.GetSize() == 1 {
+		// This class has no instance attributes.
+		var iterator = class.GetConstructors().GetConstructors().GetIterator()
+		for iterator.HasNext() {
+			var constructor = iterator.GetNext()
+			var name = constructor.GetName()
+			if name == "MakeFromValue" {
+				var parameter = constructor.GetParameters().GetParameter()
+				var abstraction = parameter.GetAbstraction()
+				var formatter = Formatter().Make()
+				targetType = formatter.FormatAbstraction(abstraction)
+				break
+			}
+		}
+	}
+	return targetType
+}
+
 func (v *generator_) generateAbstractionMethods(
 	targetType string,
 	aspect ast.AspectLike,
@@ -318,61 +371,6 @@ func (v *generator_) generateAbstractionMethods(
 		)
 		implementation += methodImplementation
 	}
-
-	return implementation
-}
-
-func (v *generator_) generateMethodImplementation(
-	targetType string,
-	method ast.MethodLike,
-	mappings col.CatalogLike[string, ast.AbstractionLike],
-) (
-	implementation string,
-) {
-	// Choose the right method template.
-	implementation = instanceMethodTemplate_
-	if len(targetType) > 0 {
-		implementation = typeMethodTemplate_
-	}
-	var methodName = method.GetName()
-	implementation = sts.ReplaceAll(implementation, "<MethodName>", methodName)
-
-	// Generate the right method body.
-	var body = methodBodyTemplate_
-	var methodResult = method.GetResult()
-	if methodResult != nil {
-		switch actual := methodResult.GetAny().(type) {
-		case ast.AbstractionLike:
-			body = resultBodyTemplate_
-		case ast.ParameterizedLike:
-			body = returnBodyTemplate_
-		default:
-			var message = fmt.Sprintf(
-				"An unknown method result type was found: %T",
-				actual,
-			)
-			panic(message)
-		}
-	}
-	implementation = sts.ReplaceAll(implementation, "<Body>", body)
-
-	// Generate the method parameters.
-	var parameters string
-	var formatter = Formatter().Make()
-	var methodParameters = method.GetParameters()
-	if methodParameters != nil {
-		methodParameters = v.replaceParameterTypes(methodParameters, mappings)
-		parameters = formatter.FormatParameters(methodParameters)
-	}
-	implementation = sts.ReplaceAll(implementation, "<Parameters>", parameters)
-
-	// Generate the method result type.
-	var resultType string
-	if methodResult != nil {
-		methodResult = v.replaceResultType(methodResult, mappings)
-		resultType = " " + formatter.FormatResult(methodResult)
-	}
-	implementation = sts.ReplaceAll(implementation, "<ResultType>", resultType)
 
 	return implementation
 }
@@ -526,34 +524,6 @@ func (v *generator_) generateAttributeMethods(
 	return implementation
 }
 
-func (v *generator_) extractArguments(
-	parameters ast.ParametersLike,
-) ast.ArgumentsLike {
-	var notation = cdc.Notation().Make()
-	var additionalArguments = col.List[ast.AdditionalArgumentLike](notation).Make()
-
-	// Extract the first argument.
-	var parameter = parameters.GetParameter()
-	var abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
-	var argument = ast.Argument().Make(abstraction)
-
-	// Extract any additional arguments.
-	var additionalParameters = parameters.GetAdditionalParameters()
-	if additionalParameters != nil {
-		var iterator = additionalParameters.GetIterator()
-		for iterator.HasNext() {
-			parameter = iterator.GetNext().GetParameter()
-			abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
-			var additionalArgument = ast.AdditionalArgument().Make(
-				ast.Argument().Make(abstraction),
-			)
-			additionalArguments.AppendValue(additionalArgument)
-		}
-	}
-	var arguments = ast.Arguments().Make(argument, additionalArguments)
-	return arguments
-}
-
 func (v *generator_) generateClass(
 	model ast.ModelLike,
 	class ast.ClassLike,
@@ -561,37 +531,21 @@ func (v *generator_) generateClass(
 ) (
 	implementation string,
 ) {
-	var targetType string
-	var sequence = instance.GetAttributes().GetAttributes()
-	if sequence.GetSize() == 1 {
-		var iterator = class.GetConstructors().GetConstructors().GetIterator()
-		for iterator.HasNext() {
-			var constructor = iterator.GetNext()
-			var name = constructor.GetName()
-			if name == "MakeFromValue" {
-				var parameter = constructor.GetParameters().GetParameter()
-				var abstraction = parameter.GetAbstraction()
-				var formatter = Formatter().Make()
-				targetType = formatter.FormatAbstraction(abstraction)
-				break
-			}
-		}
-	}
-
+	// Generate the class model template.
 	implementation = classTemplate_
-
 	var notice = v.generateNotice(model)
 	implementation = sts.ReplaceAll(implementation, "<Notice>", notice)
-
 	var header = v.generateHeader(model)
 	implementation = sts.ReplaceAll(implementation, "<Header>", header)
-
 	var classAccess = v.generateClassAccess(class)
 	implementation = sts.ReplaceAll(implementation, "<Access>", classAccess)
 
+	// Insert the class methods.
+	var targetType = v.extractTargetType(class, instance)
 	var classMethods = v.generateClassMethods(targetType, class)
 	implementation = sts.ReplaceAll(implementation, "<Class>", classMethods)
 
+	// Insert the instance methods.
 	var instanceMethods = v.generateInstanceMethods(
 		targetType,
 		model,
@@ -600,12 +554,14 @@ func (v *generator_) generateClass(
 	)
 	implementation = sts.ReplaceAll(implementation, "<Instance>", instanceMethods)
 
+	// Insert the actual class name into the template.
 	var classDeclaration = class.GetDeclaration()
 	var className = classDeclaration.GetName()
 	className = sts.TrimSuffix(className, "ClassLike")
 	implementation = sts.ReplaceAll(implementation, "<ClassName>", className)
 	implementation = sts.ReplaceAll(implementation, "<TargetName>", v.makePrivate(className))
 
+	// Insert any generic parameters and arguments into the template.
 	var parameters string
 	var arguments string
 	var genericParameters = classDeclaration.GetGenericParameters()
@@ -619,8 +575,11 @@ func (v *generator_) generateClass(
 	implementation = sts.ReplaceAll(implementation, "[<Parameters>]", parameters)
 	implementation = sts.ReplaceAll(implementation, "[<Arguments>]", arguments)
 
+	// Insert any imported modules into the template.
 	var imports = v.generateImports(model, implementation)
 	implementation = sts.ReplaceAll(implementation, "<Imports>", imports)
+
+	// Return the generated class implementation.
 	return implementation
 }
 
@@ -815,33 +774,6 @@ func (v *generator_) generateHeader(
 	return header
 }
 
-func (v *generator_) generateModules(
-	imports ast.ImportsLike,
-	class string,
-) (
-	implementation string,
-) {
-	if imports != nil {
-		var iterator = imports.GetModules().GetModules().GetIterator()
-		for iterator.HasNext() {
-			var packageModule = iterator.GetNext()
-			var name = packageModule.GetName()
-			var path = packageModule.GetPath()
-			if sts.Contains(class, name+".") {
-				implementation += "\n\t" + name + " " + path
-			}
-		}
-	}
-	if sts.Contains(class, "syn.") {
-		implementation += "\n\tfmt \"fmt\""
-		implementation += "\n\tsyn \"sync\""
-	}
-	if len(implementation) > 0 {
-		implementation += "\n"
-	}
-	return implementation
-}
-
 func (v *generator_) generateImports(
 	model ast.ModelLike,
 	class string,
@@ -914,6 +846,88 @@ func (v *generator_) generateInstanceTarget(
 	var attributes = v.generateInstanceAttributes(class, instance)
 	target = sts.ReplaceAll(target, "<Attributes>", attributes)
 	return target
+}
+
+func (v *generator_) generateMethodImplementation(
+	targetType string,
+	method ast.MethodLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) (
+	implementation string,
+) {
+	// Choose the right method template.
+	implementation = instanceMethodTemplate_
+	if len(targetType) > 0 {
+		implementation = typeMethodTemplate_
+	}
+	var methodName = method.GetName()
+	implementation = sts.ReplaceAll(implementation, "<MethodName>", methodName)
+
+	// Generate the right method body.
+	var body = methodBodyTemplate_
+	var methodResult = method.GetResult()
+	if methodResult != nil {
+		switch actual := methodResult.GetAny().(type) {
+		case ast.AbstractionLike:
+			body = resultBodyTemplate_
+		case ast.ParameterizedLike:
+			body = returnBodyTemplate_
+		default:
+			var message = fmt.Sprintf(
+				"An unknown method result type was found: %T",
+				actual,
+			)
+			panic(message)
+		}
+	}
+	implementation = sts.ReplaceAll(implementation, "<Body>", body)
+
+	// Generate the method parameters.
+	var parameters string
+	var formatter = Formatter().Make()
+	var methodParameters = method.GetParameters()
+	if methodParameters != nil {
+		methodParameters = v.replaceParameterTypes(methodParameters, mappings)
+		parameters = formatter.FormatParameters(methodParameters)
+	}
+	implementation = sts.ReplaceAll(implementation, "<Parameters>", parameters)
+
+	// Generate the method result type.
+	var resultType string
+	if methodResult != nil {
+		methodResult = v.replaceResultType(methodResult, mappings)
+		resultType = " " + formatter.FormatResult(methodResult)
+	}
+	implementation = sts.ReplaceAll(implementation, "<ResultType>", resultType)
+
+	return implementation
+}
+
+func (v *generator_) generateModules(
+	imports ast.ImportsLike,
+	class string,
+) (
+	implementation string,
+) {
+	if imports != nil {
+		var iterator = imports.GetModules().GetModules().GetIterator()
+		for iterator.HasNext() {
+			var packageModule = iterator.GetNext()
+			var name = packageModule.GetName()
+			var path = packageModule.GetPath()
+			if sts.Contains(class, name+".") {
+				implementation += "\n\t" + name + " " + path
+			}
+		}
+	}
+	if sts.Contains(class, "syn.") {
+		implementation += "\n\tfmt \"fmt\""
+		implementation += "\n\tsyn \"sync\""
+	}
+	if len(implementation) > 0 {
+		implementation += "\n"
+	}
+	return implementation
 }
 
 func (v *generator_) generateNotice(model ast.ModelLike) string {
