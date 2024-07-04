@@ -13,7 +13,7 @@
 package ast
 
 import (
-	age "github.com/craterdog/go-collection-framework/v4/agent"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -42,13 +42,13 @@ type functionsClass_ struct {
 
 func (c *functionsClass_) Make(
 	note string,
-	functionIterator age.IteratorLike[FunctionLike],
+	functions col.Sequential[FunctionLike],
 ) FunctionsLike {
 	return &functions_{
 		// Initialize instance attributes.
-		class_:            c,
-		note_:             note,
-		functionIterator_: functionIterator,
+		class_:     c,
+		note_:      note,
+		functions_: functions,
 	}
 }
 
@@ -58,9 +58,9 @@ func (c *functionsClass_) Make(
 
 type functions_ struct {
 	// Define instance attributes.
-	class_            FunctionsClassLike
-	note_             string
-	functionIterator_ age.IteratorLike[FunctionLike]
+	class_     FunctionsClassLike
+	note_      string
+	functions_ col.Sequential[FunctionLike]
 }
 
 // Attributes
@@ -73,8 +73,8 @@ func (v *functions_) GetNote() string {
 	return v.note_
 }
 
-func (v *functions_) GetFunctionIterator() age.IteratorLike[FunctionLike] {
-	return v.functionIterator_
+func (v *functions_) GetFunctions() col.Sequential[FunctionLike] {
+	return v.functions_
 }
 
 // Private

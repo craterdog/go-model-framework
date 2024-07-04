@@ -225,18 +225,6 @@ trigonometric function.
 */
 type TrigonometricFunction func(angle AngleLike) float64
 
-// Aspects
-
-/*
-Angular is an aspect interface that defines a set of method signatures that
-must be supported by each instance of an angular concrete class.
-*/
-type Angular interface {
-	// Methods
-	AsNormalized() AngleLike
-	InUnits(units Units) float64
-}
-
 // Classes
 
 /*
@@ -280,6 +268,18 @@ type AngleLike interface {
 	// Methods
 	AsFloat() float64
 	IsZero() bool
+}
+
+// Aspects
+
+/*
+Angular is an aspect interface that defines a set of method signatures that
+must be supported by each instance of an angular concrete class.
+*/
+type Angular interface {
+	// Methods
+	AsNormalized() AngleLike
+	InUnits(units Units) float64
 }`
 
 const arrayTemplate_ = `/*
@@ -331,6 +331,49 @@ type RankingFunction[V any] func(
 	first V,
 	second V,
 ) Rank
+
+// Classes
+
+/*
+ArrayClassLike[V any] is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete array-like class.
+*/
+type ArrayClassLike[V any] interface {
+	// Constructors
+	MakeWithSize(size uint) ArrayLike[V]
+	MakeFromValue(value []V) ArrayLike[V]
+	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+
+	// Constants
+	DefaultRanker() RankingFunction[V]
+}
+
+// Instances
+
+/*
+ArrayLike[V any] is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete array-like class.
+
+An array-like class maintains a fixed length indexed sequence of values.  Each
+value is associated with an implicit positive integer index. An array-like class
+uses ORDINAL based indexing rather than the more common—and nonsensical—ZERO
+based indexing scheme.
+*/
+type ArrayLike[V any] interface {
+	// Attributes
+	GetClass() ArrayClassLike[V]
+
+	// Abstractions
+	Accessible[V]
+	Sequential[V]
+	Updatable[V]
+
+	// Methods
+	SortValues()
+	SortValuesWithRanker(ranker RankingFunction[V])
+}
 
 // Aspects
 
@@ -389,49 +432,6 @@ type Updatable[V any] interface {
 		index int,
 		values Sequential[V],
 	)
-}
-
-// Classes
-
-/*
-ArrayClassLike[V any] is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete array-like class.
-*/
-type ArrayClassLike[V any] interface {
-	// Constructors
-	MakeWithSize(size uint) ArrayLike[V]
-	MakeFromValue(value []V) ArrayLike[V]
-	MakeFromSequence(values Sequential[V]) ArrayLike[V]
-
-	// Constants
-	DefaultRanker() RankingFunction[V]
-}
-
-// Instances
-
-/*
-ArrayLike[V any] is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete array-like class.
-
-An array-like class maintains a fixed length indexed sequence of values.  Each
-value is associated with an implicit positive integer index. An array-like class
-uses ORDINAL based indexing rather than the more common—and nonsensical—ZERO
-based indexing scheme.
-*/
-type ArrayLike[V any] interface {
-	// Attributes
-	GetClass() ArrayClassLike[V]
-
-	// Abstractions
-	Accessible[V]
-	Sequential[V]
-	Updatable[V]
-
-	// Methods
-	SortValues()
-	SortValuesWithRanker(ranker RankingFunction[V])
 }`
 
 const complexTemplate_ = `/*
@@ -481,19 +481,6 @@ mathematical norm function.
 */
 type NormFunction[V any] func(value V) float64
 
-// Aspects
-
-/*
-Continuous is an aspect interface that defines a set of method signatures
-that must be supported by each instance of a continuous concrete class.
-*/
-type Continuous interface {
-	// Methods
-	IsZero() bool
-	IsDiscrete() bool
-	IsInfinity() bool
-}
-
 // Classes
 
 /*
@@ -503,7 +490,7 @@ class.
 */
 type ComplexClassLike interface {
 	// Constructors
-	MakeWithAttributes(
+	Make(
 		realPart float64,
 		imaginaryPart float64,
 		form Form,
@@ -560,6 +547,19 @@ type ComplexLike interface {
 	// Methods
 	IsReal() bool
 	IsImaginary() bool
+}
+
+// Aspects
+
+/*
+Continuous is an aspect interface that defines a set of method signatures
+that must be supported by each instance of a continuous concrete class.
+*/
+type Continuous interface {
+	// Methods
+	IsZero() bool
+	IsDiscrete() bool
+	IsInfinity() bool
 }`
 
 const catalogTemplate_ = `/*
@@ -612,38 +612,6 @@ type RankingFunction[V any] func(
 	second V,
 ) Rank
 
-// Aspects
-
-/*
-Associative[K comparable, V any] defines the set of method signatures that
-must be supported by all sequences of key-value associations.
-*/
-type Associative[K comparable, V any] interface {
-	// Methods
-	GetKeys() Sequential[K]
-	GetValue(key K) V
-	RemoveValue(key K) V
-	SetValue(
-		key K,
-		value V,
-	)
-}
-
-/*
-Sequential[V any] is an aspect interface that defines a set of method signatures
-that must be supported by each instance of a sequential concrete class.
-
-NOTE: that sizes should be of type "uint" but the Go language does not allow
-arithmetic and comparison operations between "int" and "uint" so we us "int" for
-the return type to make it easier to use.
-*/
-type Sequential[V any] interface {
-	// Methods
-	AsArray() []V
-	GetSize() int
-	IsEmpty() bool
-}
-
 // Classes
 
 /*
@@ -653,7 +621,7 @@ supported by each concrete association-like class.
 */
 type AssociationClassLike[K comparable, V any] interface {
 	// Constructors
-	MakeWithAttributes(
+	Make(
 		key K,
 		value V,
 	) AssociationLike[K, V]
@@ -727,4 +695,36 @@ type CatalogLike[K comparable, V any] interface {
 	// Methods
 	SortValues()
 	SortValuesWithRanker(ranker RankingFunction[AssociationLike[K, V]])
+}
+
+// Aspects
+
+/*
+Associative[K comparable, V any] defines the set of method signatures that
+must be supported by all sequences of key-value associations.
+*/
+type Associative[K comparable, V any] interface {
+	// Methods
+	GetKeys() Sequential[K]
+	GetValue(key K) V
+	RemoveValue(key K) V
+	SetValue(
+		key K,
+		value V,
+	)
+}
+
+/*
+Sequential[V any] is an aspect interface that defines a set of method signatures
+that must be supported by each instance of a sequential concrete class.
+
+NOTE: that sizes should be of type "uint" but the Go language does not allow
+arithmetic and comparison operations between "int" and "uint" so we us "int" for
+the return type to make it easier to use.
+*/
+type Sequential[V any] interface {
+	// Methods
+	AsArray() []V
+	GetSize() int
+	IsEmpty() bool
 }`

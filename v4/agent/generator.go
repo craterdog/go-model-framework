@@ -121,9 +121,11 @@ func (v *generator_) CreateGenericStructure(
 func (v *generator_) GenerateClass(
 	model ast.ModelLike,
 	name string,
-) string {
-	var classIterator = model.GetClasses().GetClassIterator()
-	var instanceIterator = model.GetInstances().GetInstanceIterator()
+) (
+	implementation string,
+) {
+	var classIterator = model.GetClasses().GetClasses().GetIterator()
+	var instanceIterator = model.GetInstances().GetInstances().GetIterator()
 	for classIterator.HasNext() && instanceIterator.HasNext() {
 		var class = classIterator.GetNext()
 		var className = sts.ToLower(sts.TrimSuffix(
@@ -136,8 +138,8 @@ func (v *generator_) GenerateClass(
 			"Like",
 		))
 		if className == name && instanceName == name {
-			var source = v.generateClass(model, class, instance)
-			return source
+			implementation = v.generateClass(model, class, instance)
+			return implementation
 		}
 	}
 	var message = fmt.Sprintf(
@@ -177,6 +179,37 @@ func (v *generator_) expandCopyright(copyright string) string {
 	return copyright
 }
 
+func (v *generator_) extractConcreteMappings(
+	parameters ast.ParametersLike,
+	arguments ast.ArgumentsLike,
+) col.CatalogLike[string, ast.AbstractionLike] {
+	// Create the mappings catalog.
+	var notation = cdc.Notation().Make()
+	var mappings = col.Catalog[string, ast.AbstractionLike](notation).Make()
+
+	// Map the name of the first parameter to its concrete type.
+	var parameter = parameters.GetParameter()
+	var name = parameter.GetName()
+	var argument = arguments.GetArgument()
+	var concreteType = argument.GetAbstraction()
+	mappings.SetValue(name, concreteType)
+
+	// Map the name of the additional parameters to their concrete types.
+	var parameterIterator = parameters.GetAdditionalParameters().GetIterator()
+	var argumentIterator = arguments.GetAdditionalArguments().GetIterator()
+	for parameterIterator.HasNext() {
+		var additionalParameter = parameterIterator.GetNext()
+		parameter = additionalParameter.GetParameter()
+		name = parameter.GetName()
+		var additionalArgument = argumentIterator.GetNext()
+		argument = additionalArgument.GetArgument()
+		concreteType = argument.GetAbstraction()
+		mappings.SetValue(name, concreteType)
+	}
+
+	return mappings
+}
+
 func (v *generator_) extractConstructorAttributes(
 	class ast.ClassLike,
 	catalog col.CatalogLike[string, string],
@@ -185,13 +218,15 @@ func (v *generator_) extractConstructorAttributes(
 	if constructors == nil {
 		return
 	}
-	var iterator = constructors.GetConstructorIterator()
+	var iterator = constructors.GetConstructors().GetIterator()
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
 		var methodName = constructor.GetName()
-		if sts.HasPrefix(methodName, "MakeWith") {
+		if methodName == "Make" || sts.HasPrefix(methodName, "MakeWith") {
 			var parameters = constructor.GetParameters()
-			v.extractParameterAttributes(parameters, catalog)
+			if parameters != nil {
+				v.extractParameterAttributes(parameters, catalog)
+			}
 		}
 	}
 }
@@ -207,7 +242,7 @@ func (v *generator_) extractInstanceAttributes(
 	if attributes == nil {
 		return
 	}
-	var iterator = attributes.GetAttributeIterator()
+	var iterator = attributes.GetAttributes().GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
 		var name = attribute.GetName()
@@ -254,7 +289,7 @@ func (v *generator_) extractParameterAttributes(
 ) {
 	var parameter = parameters.GetParameter()
 	v.extractParameterAttribute(parameter, catalog)
-	var iterator = parameters.GetAdditionalParameters().GetAdditionalParameterIterator()
+	var iterator = parameters.GetAdditionalParameters().GetIterator()
 	for iterator.HasNext() {
 		parameter = iterator.GetNext().GetParameter()
 		v.extractParameterAttribute(parameter, catalog)
@@ -264,157 +299,181 @@ func (v *generator_) extractParameterAttributes(
 func (v *generator_) generateAbstractionMethods(
 	targetType string,
 	aspect ast.AspectLike,
-	abstraction ast.AbstractionLike,
-) string {
-	var formatter = Formatter().Make()
-	var aspectDeclaration = aspect.GetDeclaration()
-	var genericTypes = aspectDeclaration.GetGenericParameters()
-	var concreteTypes = abstraction.GetGenericArguments()
-	var abstractionMethods string
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) (implementation string) {
+	// Check for no aspect methods.
 	var aspectMethods = aspect.GetMethods()
 	if aspectMethods == nil {
-		return abstractionMethods
+		return implementation
 	}
-	var iterator = aspectMethods.GetMethodIterator()
+
+	// Generate the method implementations for the aspect.
+	var iterator = aspectMethods.GetMethods().GetIterator()
 	for iterator.HasNext() {
 		var aspectMethod = iterator.GetNext()
-		var methodName = aspectMethod.GetName()
-		var methodParameters = aspectMethod.GetParameters()
-		var parameters string
-		if methodParameters != nil {
-			if genericTypes != nil {
-				// Replace the generic type names from the aspect definition
-				// with the actual types defined in the instance interface.
-				methodParameters = v.replaceParameterTypes(
-					genericTypes,
-					concreteTypes,
-					methodParameters,
-				)
-			}
-			parameters = formatter.FormatParameters(methodParameters)
-		}
-		var resultType string
-		var body = methodBodyTemplate_
-		var methodResult = aspectMethod.GetResult()
-		if methodResult != nil {
-			if genericTypes != nil {
-				// Replace the generic type names from the aspect definition
-				// with the actual types defined in the instance interface.
-				methodResult = v.replaceResultTypes(
-					genericTypes,
-					concreteTypes,
-					methodResult,
-				)
-			}
-			resultType = " " + formatter.FormatResult(methodResult)
-			switch actual := methodResult.GetAny().(type) {
-			case ast.AbstractionLike:
-				body = resultBodyTemplate_
-			case ast.ParameterizedLike:
-				body = returnBodyTemplate_
-			default:
-				var message = fmt.Sprintf(
-					"An unknown result type was found: %T",
-					actual,
-				)
-				panic(message)
-			}
-		}
-		var method = instanceMethodTemplate_
-		if len(targetType) > 0 {
-			method = typeMethodTemplate_
-		}
-		method = sts.ReplaceAll(method, "<Body>", body)
-		method = sts.ReplaceAll(method, "<MethodName>", methodName)
-		method = sts.ReplaceAll(method, "<Parameters>", parameters)
-		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		abstractionMethods += method
+		var methodImplementation = v.generateMethodImplementation(
+			targetType,
+			aspectMethod,
+			mappings,
+		)
+		implementation += methodImplementation
 	}
-	return abstractionMethods
+
+	return implementation
+}
+
+func (v *generator_) generateMethodImplementation(
+	targetType string,
+	method ast.MethodLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) (
+	implementation string,
+) {
+	// Choose the right method template.
+	implementation = instanceMethodTemplate_
+	if len(targetType) > 0 {
+		implementation = typeMethodTemplate_
+	}
+	var methodName = method.GetName()
+	implementation = sts.ReplaceAll(implementation, "<MethodName>", methodName)
+
+	// Generate the right method body.
+	var body = methodBodyTemplate_
+	var methodResult = method.GetResult()
+	if methodResult != nil {
+		switch actual := methodResult.GetAny().(type) {
+		case ast.AbstractionLike:
+			body = resultBodyTemplate_
+		case ast.ParameterizedLike:
+			body = returnBodyTemplate_
+		default:
+			var message = fmt.Sprintf(
+				"An unknown method result type was found: %T",
+				actual,
+			)
+			panic(message)
+		}
+	}
+	implementation = sts.ReplaceAll(implementation, "<Body>", body)
+
+	// Generate the method parameters.
+	var parameters string
+	var formatter = Formatter().Make()
+	var methodParameters = method.GetParameters()
+	if methodParameters != nil {
+		methodParameters = v.replaceParameterTypes(methodParameters, mappings)
+		parameters = formatter.FormatParameters(methodParameters)
+	}
+	implementation = sts.ReplaceAll(implementation, "<Parameters>", parameters)
+
+	// Generate the method result type.
+	var resultType string
+	if methodResult != nil {
+		methodResult = v.replaceResultType(methodResult, mappings)
+		resultType = " " + formatter.FormatResult(methodResult)
+	}
+	implementation = sts.ReplaceAll(implementation, "<ResultType>", resultType)
+
+	return implementation
 }
 
 func (v *generator_) generateAbstractions(
 	targetType string,
 	model ast.ModelLike,
 	instance ast.InstanceLike,
-) string {
-	var formatter = Formatter().Make()
-	var aspects string
+) (
+	implementation string,
+) {
+	// Check for no aspect abstractions.
 	var abstractions = instance.GetAbstractions()
 	if abstractions == nil {
-		return aspects
+		return implementation
 	}
-	var iterator = abstractions.GetAbstractionIterator()
+
+	// Generate the methods for each aspect abstraction.
+	var formatter = Formatter().Make()
+	var iterator = abstractions.GetAbstractions().GetIterator()
 	for iterator.HasNext() {
+		// Each aspect abstraction binds to its own concrete arguments.
 		var abstraction = iterator.GetNext()
-		var prefix = abstraction.GetPrefix()
-		var name = abstraction.GetName()
 		var aspectName = formatter.FormatAbstraction(abstraction)
-		var methods string
-		if prefix == nil {
-			// We only know the method signatures for the local aspects.
-			var aspect = v.retrieveAspect(model, name)
-			methods = v.generateAbstractionMethods(targetType, aspect, abstraction)
-		}
 		var instanceAspect = instanceAspectTemplate_
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<AspectName>", aspectName)
+		var methods string
+		if abstraction.GetPrefix() == nil {
+			// We only know the method signatures for the local aspects.
+			var mappings col.CatalogLike[string, ast.AbstractionLike]
+			var aspect = v.retrieveAspect(model, abstraction.GetName())
+			var declaration = aspect.GetDeclaration()
+			if declaration.GetGenericParameters() != nil {
+				var parameters = declaration.GetGenericParameters().GetParameters()
+				var arguments = abstraction.GetGenericArguments().GetArguments()
+				mappings = v.extractConcreteMappings(parameters, arguments)
+			}
+			methods = v.generateAbstractionMethods(targetType, aspect, mappings)
+		}
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<Methods>", methods)
-		aspects += instanceAspect
+		implementation += instanceAspect
 	}
-	return aspects
+
+	return implementation
 }
 
 func (v *generator_) generateAttributeAssignment(
 	parameter ast.ParameterLike,
-) string {
+) (
+	implementation string,
+) {
 	var parameterName = parameter.GetName()
 	var attributeName = sts.TrimSuffix(parameterName, "_")
-	var assignment = attributeAssignmentTemplate_
-	assignment = sts.ReplaceAll(assignment, "<AttributeName>", attributeName)
-	assignment = sts.ReplaceAll(assignment, "<ParameterName>", parameterName)
-	return assignment
+	implementation = attributeAssignmentTemplate_
+	implementation = sts.ReplaceAll(implementation, "<AttributeName>", attributeName)
+	implementation = sts.ReplaceAll(implementation, "<ParameterName>", parameterName)
+	return implementation
 }
 
 func (v *generator_) generateAttributeAssignments(
 	class ast.ClassLike,
 	constructor ast.ConstructorLike,
-) string {
-	var assignments string
+) (
+	implementation string,
+) {
 	var name = constructor.GetName()
 	if sts.HasPrefix(name, "MakeFrom") {
-		return assignments
+		return implementation
 	}
 	var parameters = constructor.GetParameters()
 	if parameters == nil {
-		return assignments
+		return implementation
 	}
 	var parameter = parameters.GetParameter()
 	var assignment = v.generateAttributeAssignment(parameter)
-	assignments += assignment
+	implementation += assignment
 	var additionalParameters = parameters.GetAdditionalParameters()
-	var iterator = additionalParameters.GetAdditionalParameterIterator()
+	var iterator = additionalParameters.GetIterator()
 	for iterator.HasNext() {
 		var additionalParameter = iterator.GetNext()
 		parameter = additionalParameter.GetParameter()
 		assignment = v.generateAttributeAssignment(parameter)
-		assignments += assignment
+		implementation += assignment
 	}
-	return assignments
+	return implementation
 }
 
 func (v *generator_) generateAttributeMethods(
 	targetType string,
 	class ast.ClassLike,
 	instance ast.InstanceLike,
-) string {
+) (
+	implementation string,
+) {
 	var formatter = Formatter().Make()
-	var methods string
 	var instanceAttributes = instance.GetAttributes()
 	if instanceAttributes == nil {
-		return methods
+		return implementation
 	}
-	methods = "\n// Attributes\n"
-	var iterator = instanceAttributes.GetAttributeIterator()
+	implementation = "\n// Attributes\n"
+	var iterator = instanceAttributes.GetAttributes().GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
 		var methodName = attribute.GetName()
@@ -462,29 +521,35 @@ func (v *generator_) generateAttributeMethods(
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameter)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method
+		implementation += method
 	}
-	return methods
+	return implementation
 }
 
 func (v *generator_) extractArguments(
 	parameters ast.ParametersLike,
 ) ast.ArgumentsLike {
 	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AdditionalArgumentLike](notation).Make()
+	var additionalArguments = col.List[ast.AdditionalArgumentLike](notation).Make()
+
+	// Extract the first argument.
 	var parameter = parameters.GetParameter()
-	var iterator = parameters.GetAdditionalParameters().GetAdditionalParameterIterator()
 	var abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
 	var argument = ast.Argument().Make(abstraction)
-	for iterator.HasNext() {
-		parameter = iterator.GetNext().GetParameter()
-		abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
-		var additionalArgument = ast.AdditionalArgument().Make(
-			ast.Argument().Make(abstraction),
-		)
-		list.AppendValue(additionalArgument)
+
+	// Extract any additional arguments.
+	var additionalParameters = parameters.GetAdditionalParameters()
+	if additionalParameters != nil {
+		var iterator = additionalParameters.GetIterator()
+		for iterator.HasNext() {
+			parameter = iterator.GetNext().GetParameter()
+			abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
+			var additionalArgument = ast.AdditionalArgument().Make(
+				ast.Argument().Make(abstraction),
+			)
+			additionalArguments.AppendValue(additionalArgument)
+		}
 	}
-	var additionalArguments = ast.AdditionalArguments().Make(list.GetIterator())
 	var arguments = ast.Arguments().Make(argument, additionalArguments)
 	return arguments
 }
@@ -493,12 +558,13 @@ func (v *generator_) generateClass(
 	model ast.ModelLike,
 	class ast.ClassLike,
 	instance ast.InstanceLike,
-) string {
+) (
+	implementation string,
+) {
 	var targetType string
-	var attributeIterator = instance.GetAttributes().GetAttributeIterator()
-	attributeIterator.ToEnd()
-	if attributeIterator.GetSlot() == 1 {
-		var iterator = class.GetConstructors().GetConstructorIterator()
+	var sequence = instance.GetAttributes().GetAttributes()
+	if sequence.GetSize() == 1 {
+		var iterator = class.GetConstructors().GetConstructors().GetIterator()
 		for iterator.HasNext() {
 			var constructor = iterator.GetNext()
 			var name = constructor.GetName()
@@ -512,19 +578,19 @@ func (v *generator_) generateClass(
 		}
 	}
 
-	var template = classTemplate_
+	implementation = classTemplate_
 
 	var notice = v.generateNotice(model)
-	template = sts.ReplaceAll(template, "<Notice>", notice)
+	implementation = sts.ReplaceAll(implementation, "<Notice>", notice)
 
 	var header = v.generateHeader(model)
-	template = sts.ReplaceAll(template, "<Header>", header)
+	implementation = sts.ReplaceAll(implementation, "<Header>", header)
 
 	var classAccess = v.generateClassAccess(class)
-	template = sts.ReplaceAll(template, "<Access>", classAccess)
+	implementation = sts.ReplaceAll(implementation, "<Access>", classAccess)
 
 	var classMethods = v.generateClassMethods(targetType, class)
-	template = sts.ReplaceAll(template, "<Class>", classMethods)
+	implementation = sts.ReplaceAll(implementation, "<Class>", classMethods)
 
 	var instanceMethods = v.generateInstanceMethods(
 		targetType,
@@ -532,13 +598,13 @@ func (v *generator_) generateClass(
 		class,
 		instance,
 	)
-	template = sts.ReplaceAll(template, "<Instance>", instanceMethods)
+	implementation = sts.ReplaceAll(implementation, "<Instance>", instanceMethods)
 
 	var classDeclaration = class.GetDeclaration()
 	var className = classDeclaration.GetName()
 	className = sts.TrimSuffix(className, "ClassLike")
-	template = sts.ReplaceAll(template, "<ClassName>", className)
-	template = sts.ReplaceAll(template, "<TargetName>", v.makePrivate(className))
+	implementation = sts.ReplaceAll(implementation, "<ClassName>", className)
+	implementation = sts.ReplaceAll(implementation, "<TargetName>", v.makePrivate(className))
 
 	var parameters string
 	var arguments string
@@ -550,15 +616,19 @@ func (v *generator_) generateClass(
 		parameters = "[" + formatter.FormatParameters(classParameters) + "]"
 		arguments = "[" + formatter.FormatArguments(classArguments) + "]"
 	}
-	template = sts.ReplaceAll(template, "[<Parameters>]", parameters)
-	template = sts.ReplaceAll(template, "[<Arguments>]", arguments)
+	implementation = sts.ReplaceAll(implementation, "[<Parameters>]", parameters)
+	implementation = sts.ReplaceAll(implementation, "[<Arguments>]", arguments)
 
-	var imports = v.generateImports(model, template)
-	template = sts.ReplaceAll(template, "<Imports>", imports)
-	return template
+	var imports = v.generateImports(model, implementation)
+	implementation = sts.ReplaceAll(implementation, "<Imports>", imports)
+	return implementation
 }
 
-func (v *generator_) generateClassAccess(class ast.ClassLike) string {
+func (v *generator_) generateClassAccess(
+	class ast.ClassLike,
+) (
+	implementation string,
+) {
 	var declaration = class.GetDeclaration()
 	var genericParameters = declaration.GetGenericParameters()
 	var reference = classReferenceTemplate_
@@ -567,20 +637,23 @@ func (v *generator_) generateClassAccess(class ast.ClassLike) string {
 		reference = genericReferenceTemplate_
 		function = genericFunctionTemplate_
 	}
-	var access = classAccessTemplate_
-	access = sts.ReplaceAll(access, "<Reference>", reference)
-	access = sts.ReplaceAll(access, "<Function>", function)
-	return access
+	implementation = classAccessTemplate_
+	implementation = sts.ReplaceAll(implementation, "<Reference>", reference)
+	implementation = sts.ReplaceAll(implementation, "<Function>", function)
+	return implementation
 }
 
-func (v *generator_) generateClassConstants(class ast.ClassLike) string {
+func (v *generator_) generateClassConstants(
+	class ast.ClassLike,
+) (
+	implementation string,
+) {
 	var formatter = Formatter().Make()
-	var constants string
 	var classConstants = class.GetConstants()
 	if classConstants == nil {
-		return constants
+		return implementation
 	}
-	var iterator = classConstants.GetConstantIterator()
+	var iterator = classConstants.GetConstants().GetIterator()
 	for iterator.HasNext() {
 		var classConstant = iterator.GetNext()
 		var constantName = classConstant.GetName()
@@ -590,43 +663,52 @@ func (v *generator_) generateClassConstants(class ast.ClassLike) string {
 		var constant = classConstantTemplate_
 		constant = sts.ReplaceAll(constant, "<ConstantName>", constantName)
 		constant = sts.ReplaceAll(constant, "<ConstantType>", constantType)
-		constants += constant
+		implementation += constant
 	}
-	return constants
+	return implementation
 }
 
 func (v *generator_) generateClassMethods(
 	targetType string,
 	class ast.ClassLike,
-) string {
-	var methods = classMethodsTemplate_
+) (
+	implementation string,
+) {
+	implementation = classMethodsTemplate_
 	var target = v.generateClassTarget(class)
-	methods = sts.ReplaceAll(methods, "<Target>", target)
+	implementation = sts.ReplaceAll(implementation, "<Target>", target)
 	var constantMethods = v.generateConstantMethods(class)
-	methods = sts.ReplaceAll(methods, "<Constants>", constantMethods)
+	implementation = sts.ReplaceAll(implementation, "<Constants>", constantMethods)
 	var constructorMethods = v.generateConstructorMethods(targetType, class)
-	methods = sts.ReplaceAll(methods, "<Constructors>", constructorMethods)
+	implementation = sts.ReplaceAll(implementation, "<Constructors>", constructorMethods)
 	var functionMethods = v.generateFunctionMethods(class)
-	methods = sts.ReplaceAll(methods, "<Functions>", functionMethods)
-	return methods
+	implementation = sts.ReplaceAll(implementation, "<Functions>", functionMethods)
+	return implementation
 }
 
-func (v *generator_) generateClassTarget(class ast.ClassLike) string {
-	var target = classTargetTemplate_
+func (v *generator_) generateClassTarget(
+	class ast.ClassLike,
+) (
+	implementation string,
+) {
+	implementation = classTargetTemplate_
 	var constants = v.generateClassConstants(class)
-	target = sts.ReplaceAll(target, "<Constants>", constants)
-	return target
+	implementation = sts.ReplaceAll(implementation, "<Constants>", constants)
+	return implementation
 }
 
-func (v *generator_) generateConstantMethods(class ast.ClassLike) string {
+func (v *generator_) generateConstantMethods(
+	class ast.ClassLike,
+) (
+	implementation string,
+) {
 	var formatter = Formatter().Make()
-	var methods string
 	var classConstants = class.GetConstants()
 	if classConstants == nil {
-		return methods
+		return implementation
 	}
-	methods = "\n// Constants\n"
-	var iterator = classConstants.GetConstantIterator()
+	implementation = "\n// Constants\n"
+	var iterator = classConstants.GetConstants().GetIterator()
 	for iterator.HasNext() {
 		var constant = iterator.GetNext()
 		var methodName = constant.GetName()
@@ -640,23 +722,24 @@ func (v *generator_) generateConstantMethods(class ast.ClassLike) string {
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", "")
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method
+		implementation += method
 	}
-	return methods
+	return implementation
 }
 
 func (v *generator_) generateConstructorMethods(
 	targetType string,
 	class ast.ClassLike,
-) string {
+) (
+	implementation string,
+) {
 	var formatter = Formatter().Make()
-	var methods string
 	var classConstructors = class.GetConstructors()
 	if classConstructors == nil {
-		return methods
+		return implementation
 	}
-	methods = "\n// Constructors\n"
-	var iterator = classConstructors.GetConstructorIterator()
+	implementation = "\n// Constructors\n"
+	var iterator = classConstructors.GetConstructors().GetIterator()
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
 		var methodName = constructor.GetName()
@@ -683,20 +766,23 @@ func (v *generator_) generateConstructorMethods(
 		method = sts.ReplaceAll(method, "<MethodName>", methodName)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method
+		implementation += method
 	}
-	return methods
+	return implementation
 }
 
-func (v *generator_) generateFunctionMethods(class ast.ClassLike) string {
+func (v *generator_) generateFunctionMethods(
+	class ast.ClassLike,
+) (
+	implementation string,
+) {
 	var formatter = Formatter().Make()
-	var methods string
 	var classFunctions = class.GetFunctions()
 	if classFunctions == nil {
-		return methods
+		return implementation
 	}
-	methods = "\n// Functions\n"
-	var iterator = classFunctions.GetFunctionIterator()
+	implementation = "\n// Functions\n"
+	var iterator = classFunctions.GetFunctions().GetIterator()
 	for iterator.HasNext() {
 		var function = iterator.GetNext()
 		var name = function.GetName()
@@ -713,41 +799,62 @@ func (v *generator_) generateFunctionMethods(class ast.ClassLike) string {
 		method = sts.ReplaceAll(method, "<MethodName>", name)
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
-		methods += method
+		implementation += method
 	}
-	return methods
+	return implementation
 }
 
-func (v *generator_) generateHeader(model ast.ModelLike) string {
+func (v *generator_) generateHeader(
+	model ast.ModelLike,
+) (
+	implementation string,
+) {
 	var name = model.GetHeader().GetName()
 	var header = headerTemplate_
 	header = sts.ReplaceAll(header, "<Name>", name)
 	return header
 }
 
-func (v *generator_) generateImports(model ast.ModelLike, class string) string {
-	var modules string
-	if model.GetImports() != nil {
-		var iterator = model.GetImports().GetModules().GetModuleIterator()
+func (v *generator_) generateModules(
+	imports ast.ImportsLike,
+	class string,
+) (
+	implementation string,
+) {
+	if imports != nil {
+		var iterator = imports.GetModules().GetModules().GetIterator()
 		for iterator.HasNext() {
 			var packageModule = iterator.GetNext()
 			var name = packageModule.GetName()
 			var path = packageModule.GetPath()
 			if sts.Contains(class, name+".") {
-				modules += "\n\t" + name + " " + path
+				implementation += "\n\t" + name + " " + path
 			}
 		}
 	}
 	if sts.Contains(class, "syn.") {
-		modules += "\n\tfmt \"fmt\""
-		modules += "\n\tsyn \"sync\""
+		implementation += "\n\tfmt \"fmt\""
+		implementation += "\n\tsyn \"sync\""
 	}
-	if len(modules) > 0 {
-		modules += "\n"
+	if len(implementation) > 0 {
+		implementation += "\n"
 	}
-	var imports = importsTemplate_
-	imports = sts.ReplaceAll(imports, "<Modules>", modules)
-	return imports
+	return implementation
+}
+
+func (v *generator_) generateImports(
+	model ast.ModelLike,
+	class string,
+) (
+	implementation string,
+) {
+	var imports = model.GetImports()
+	if imports != nil || sts.Contains(class, "syn.") {
+		var modules = v.generateModules(imports, class)
+		implementation = importsTemplate_
+		implementation = sts.ReplaceAll(implementation, "<Modules>", modules)
+	}
+	return implementation
 }
 
 func (v *generator_) generateInstanceAttributes(
@@ -802,15 +909,15 @@ func (v *generator_) generateInstanceTarget(
 	var target = instanceTargetTemplate_
 	if len(targetType) > 0 {
 		target = typeTargetTemplate_
-		target = sts.ReplaceAll(target, "<TargetType>", targetType)
 	}
+	target = sts.ReplaceAll(target, "<TargetType>", targetType)
 	var attributes = v.generateInstanceAttributes(class, instance)
 	target = sts.ReplaceAll(target, "<Attributes>", attributes)
 	return target
 }
 
 func (v *generator_) generateNotice(model ast.ModelLike) string {
-	var notice = model.GetNotice().GetComment() + "\n"
+	var notice = model.GetNotice().GetComment()
 	return notice
 }
 
@@ -825,7 +932,7 @@ func (v *generator_) generatePublicMethods(
 		return publicMethods
 	}
 	publicMethods = "\n// Public\n"
-	var iterator = instanceMethods.GetMethodIterator()
+	var iterator = instanceMethods.GetMethods().GetIterator()
 	for iterator.HasNext() {
 		var publicMethod = iterator.GetNext()
 		var methodName = publicMethod.GetName()
@@ -871,109 +978,84 @@ func (v *generator_) makePrivate(name string) string {
 	return string(runes)
 }
 
-func (v *generator_) lookupConcreteType(
-	genericTypeName string,
-	genericParameters ast.GenericParametersLike,
-	concreteArguments ast.GenericArgumentsLike,
-) (
-	concreteType ast.AbstractionLike,
-) {
-	var parameters = genericParameters.GetParameters()
-	var genericParameter = parameters.GetParameter()
-	var arguments = concreteArguments.GetArguments()
-	var concreteArgument = arguments.GetArgument()
-	if genericTypeName == genericParameter.GetName() {
-		concreteType = concreteArgument.GetAbstraction()
-	} else {
-		var additionalParameters = parameters.GetAdditionalParameters()
-		var additionalArguments = arguments.GetAdditionalArguments()
-		if additionalParameters != nil && additionalArguments != nil {
-			var parameterIterator = additionalParameters.GetAdditionalParameterIterator()
-			var argumentIterator = additionalArguments.GetAdditionalArgumentIterator()
-			for parameterIterator.HasNext() {
-				genericParameter = parameterIterator.GetNext().GetParameter()
-				concreteArgument = argumentIterator.GetNext().GetArgument()
-				if genericTypeName == genericParameter.GetName() {
-					concreteType = concreteArgument.GetAbstraction()
-					break
-				}
-			}
-		}
+func (v *generator_) replaceParameterType(
+	parameter ast.ParameterLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) ast.ParameterLike {
+	var parameterName = parameter.GetName()
+	var abstraction = parameter.GetAbstraction()
+	var prefix = abstraction.GetPrefix()
+	var typeName = abstraction.GetName()
+	var concreteType = mappings.GetValue(typeName)
+	if concreteType != nil {
+		var name = concreteType.GetName()
+		var genericArguments = concreteType.GetGenericArguments()
+		abstraction = ast.Abstraction().Make(prefix, name, genericArguments)
+		parameter = ast.Parameter().Make(parameterName, abstraction)
 	}
-	if concreteType == nil {
-		var message = fmt.Sprintf(
-			"An unknown generic type name was passed: %q",
-			genericTypeName,
-		)
-		panic(message)
-	}
-	return concreteType
+	return parameter
 }
 
 func (v *generator_) replaceParameterTypes(
-	genericTypes ast.GenericParametersLike,
-	concreteTypes ast.GenericArgumentsLike,
-	methodParameters ast.ParametersLike,
+	parameters ast.ParametersLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.ParametersLike {
-	var parameter = methodParameters.GetParameter()
-	var parameterName = parameter.GetName()
-	var parameterType = v.lookupConcreteType(
-		parameterName,
-		genericTypes,
-		concreteTypes,
-	)
-	parameter = ast.Parameter().Make(parameterName, parameterType)
-
-	var additionalParameterIterator = methodParameters.GetAdditionalParameters().GetAdditionalParameterIterator()
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AdditionalParameterLike](notation).Make()
-	for additionalParameterIterator.HasNext() {
-		parameter = additionalParameterIterator.GetNext().GetParameter()
-		parameterName = parameter.GetName()
-		parameterType = v.lookupConcreteType(
-			parameterName,
-			genericTypes,
-			concreteTypes,
-		)
-		parameter = ast.Parameter().Make(parameterName, parameterType)
-		var additionalParameter = ast.AdditionalParameter().Make(parameter)
-		list.AppendValue(additionalParameter)
+	// Handle the non-generic case.
+	if mappings == nil {
+		return parameters
 	}
-	var additionalParameters = ast.AdditionalParameters().Make(list.GetIterator())
-	var parameters = ast.Parameters().Make(parameter, additionalParameters)
+
+	// Replace the first parameter.
+	var parameter = parameters.GetParameter()
+	parameter = v.replaceParameterType(parameter, mappings)
+
+	// Replace any additional parameters.
+	var notation = cdc.Notation().Make()
+	var additionalParameters = col.List[ast.AdditionalParameterLike](notation).Make()
+	var iterator = parameters.GetAdditionalParameters().GetIterator()
+	for iterator.HasNext() {
+		var additionalParameter = iterator.GetNext()
+		var parameter = additionalParameter.GetParameter()
+		parameter = v.replaceParameterType(parameter, mappings)
+		additionalParameter = ast.AdditionalParameter().Make(parameter)
+		additionalParameters.AppendValue(additionalParameter)
+	}
+
+	// Construct a new sequence of parameters.
+	parameters = ast.Parameters().Make(parameter, additionalParameters)
 	return parameters
 }
 
-func (v *generator_) replaceResultTypes(
-	genericTypes ast.GenericParametersLike,
-	concreteTypes ast.GenericArgumentsLike,
-	methodResult ast.ResultLike,
+func (v *generator_) replaceResultType(
+	result ast.ResultLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.ResultLike {
-	switch actual := methodResult.GetAny().(type) {
-	case ast.AbstractionLike:
-		var parameterName = actual.GetName()
-		var resultAbstraction = v.lookupConcreteType(
-			parameterName,
-			genericTypes,
-			concreteTypes,
-		)
-		methodResult = ast.Result().Make(resultAbstraction)
-	case ast.ParameterizedLike:
-		var resultParameters = actual.GetParameters()
-		resultParameters = v.replaceParameterTypes(
-			genericTypes,
-			concreteTypes,
-			resultParameters,
-		)
-		methodResult = ast.Result().Make(resultParameters)
-	default:
-		var message = fmt.Sprintf(
-			"An unknown result type was passed: %T",
-			actual,
-		)
-		panic(message)
+	// Handle the non-generic case.
+	if mappings == nil {
+		return result
 	}
-	return methodResult
+
+	// Handle the different kinds of results.
+	switch actual := result.GetAny().(type) {
+	case ast.AbstractionLike:
+		var abstraction = actual
+		var prefix = abstraction.GetPrefix()
+		var typeName = abstraction.GetName()
+		var concreteType = mappings.GetValue(typeName)
+		if concreteType != nil {
+			var name = concreteType.GetName()
+			var genericArguments = concreteType.GetGenericArguments()
+			abstraction = ast.Abstraction().Make(prefix, name, genericArguments)
+		}
+		result = ast.Result().Make(abstraction)
+	case ast.ParameterizedLike:
+		var parameterized = actual
+		var parameters = parameterized.GetParameters()
+		parameters = v.replaceParameterTypes(parameters, mappings)
+		parameterized = ast.Parameterized().Make(parameters)
+		result = ast.Result().Make(parameterized)
+	}
+	return result
 }
 
 func (v *generator_) retrieveAspect(
@@ -982,7 +1064,7 @@ func (v *generator_) retrieveAspect(
 ) ast.AspectLike {
 	var aspects = model.GetAspects()
 	if aspects != nil {
-		var iterator = aspects.GetAspectIterator()
+		var iterator = aspects.GetAspects().GetIterator()
 		for iterator.HasNext() {
 			var aspect = iterator.GetNext()
 			var declaration = aspect.GetDeclaration()

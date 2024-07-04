@@ -30,10 +30,10 @@ package module
 
 import (
 	fmt "fmt"
-	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	age "github.com/craterdog/go-model-framework/v4/agent"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
+	ref "reflect"
 )
 
 // TYPE ALIASES
@@ -41,38 +41,54 @@ import (
 // AST
 
 type (
-	PrefixType = ast.PrefixType
-)
-
-const (
-	ErrorPrefix   = ast.ErrorPrefix
-	AliasPrefix   = ast.AliasPrefix
-	ArrayPrefix   = ast.ArrayPrefix
-	ChannelPrefix = ast.ChannelPrefix
-	MapPrefix     = ast.MapPrefix
-)
-
-type (
-	AbstractionLike = ast.AbstractionLike
-	AspectLike      = ast.AspectLike
-	AttributeLike   = ast.AttributeLike
-	ClassLike       = ast.ClassLike
-	ConstantLike    = ast.ConstantLike
-	ConstructorLike = ast.ConstructorLike
-	DeclarationLike = ast.DeclarationLike
-	EnumerationLike = ast.EnumerationLike
-	FunctionLike    = ast.FunctionLike
-	FunctionalLike  = ast.FunctionalLike
-	HeaderLike      = ast.HeaderLike
-	InstanceLike    = ast.InstanceLike
-	MethodLike      = ast.MethodLike
-	ModelLike       = ast.ModelLike
-	ModuleLike      = ast.ModuleLike
-	NoticeLike      = ast.NoticeLike
-	ParameterLike   = ast.ParameterLike
-	PrefixLike      = ast.PrefixLike
-	ResultLike      = ast.ResultLike
-	TypeLike        = ast.TypeLike
+	AbstractionLike         = ast.AbstractionLike
+	AbstractionsLike        = ast.AbstractionsLike
+	AdditionalArgumentLike  = ast.AdditionalArgumentLike
+	AdditionalParameterLike = ast.AdditionalParameterLike
+	AdditionalValueLike     = ast.AdditionalValueLike
+	AliasLike               = ast.AliasLike
+	ArgumentLike            = ast.ArgumentLike
+	ArgumentsLike           = ast.ArgumentsLike
+	ArrayLike               = ast.ArrayLike
+	AspectLike              = ast.AspectLike
+	AspectsLike             = ast.AspectsLike
+	AttributeLike           = ast.AttributeLike
+	AttributesLike          = ast.AttributesLike
+	ChannelLike             = ast.ChannelLike
+	ClassLike               = ast.ClassLike
+	ClassesLike             = ast.ClassesLike
+	ConstantLike            = ast.ConstantLike
+	ConstantsLike           = ast.ConstantsLike
+	ConstructorLike         = ast.ConstructorLike
+	ConstructorsLike        = ast.ConstructorsLike
+	DeclarationLike         = ast.DeclarationLike
+	EnumerationLike         = ast.EnumerationLike
+	FunctionLike            = ast.FunctionLike
+	FunctionalLike          = ast.FunctionalLike
+	FunctionalsLike         = ast.FunctionalsLike
+	FunctionsLike           = ast.FunctionsLike
+	GenericArgumentsLike    = ast.GenericArgumentsLike
+	GenericParametersLike   = ast.GenericParametersLike
+	HeaderLike              = ast.HeaderLike
+	ImportsLike             = ast.ImportsLike
+	InstanceLike            = ast.InstanceLike
+	InstancesLike           = ast.InstancesLike
+	MapLike                 = ast.MapLike
+	MethodLike              = ast.MethodLike
+	MethodsLike             = ast.MethodsLike
+	ModelLike               = ast.ModelLike
+	ModuleLike              = ast.ModuleLike
+	ModulesLike             = ast.ModulesLike
+	NoticeLike              = ast.NoticeLike
+	ParameterizedLike       = ast.ParameterizedLike
+	ParameterLike           = ast.ParameterLike
+	ParametersLike          = ast.ParametersLike
+	PrefixLike              = ast.PrefixLike
+	ResultLike              = ast.ResultLike
+	TypeLike                = ast.TypeLike
+	TypesLike               = ast.TypesLike
+	ValueLike               = ast.ValueLike
+	ValuesLike              = ast.ValuesLike
 )
 
 // Agents
@@ -88,24 +104,24 @@ type (
 
 // AST
 
-func Abstraction(arguments ...any) AbstractionLike {
+func Abstraction(args ...any) AbstractionLike {
 	// Initialize the possible arguments.
 	var prefix PrefixLike
-	var identifier string
-	var arguments_ col.ListLike[AbstractionLike]
+	var name string
+	var genericArguments GenericArgumentsLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case PrefixLike:
 			prefix = actual
 		case string:
-			identifier = actual
-		case col.ListLike[AbstractionLike]:
-			arguments_ = actual
+			name = actual
+		case GenericArgumentsLike:
+			genericArguments = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the abstraction constructor: %T\n",
+				"An unknown argument type was passed into the abstraction constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -113,29 +129,61 @@ func Abstraction(arguments ...any) AbstractionLike {
 	}
 
 	// Call the constructor.
-	var abstraction = ast.Abstraction().MakeWithAttributes(
+	var abstraction = ast.Abstraction().Make(
 		prefix,
-		identifier,
-		arguments_,
+		name,
+		genericArguments,
 	)
 	return abstraction
 }
 
-func Aspect(arguments ...any) AspectLike {
+func Abstractions(args ...any) AbstractionsLike {
 	// Initialize the possible arguments.
-	var declaration DeclarationLike
-	var methods col.ListLike[MethodLike]
+	var note string
+	var sequence col.Sequential[AbstractionLike]
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
-		case DeclarationLike:
-			declaration = actual
-		case col.ListLike[MethodLike]:
-			methods = actual
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[AbstractionLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[AbstractionLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the abstractions constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var abstractions = ast.Abstractions().Make(
+		note,
+		sequence,
+	)
+	return abstractions
+}
+
+func AdditionalArgument(args ...any) AdditionalArgumentLike {
+	// Initialize the possible arguments.
+	var argument ArgumentLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ArgumentLike:
+			argument = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the aspect constructor: %T\n",
+				"An unknown argument type was passed into the additional argument constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -143,31 +191,239 @@ func Aspect(arguments ...any) AspectLike {
 	}
 
 	// Call the constructor.
-	var aspect = ast.Aspect().MakeWithAttributes(
+	var additionalArgument = ast.AdditionalArgument().Make(argument)
+	return additionalArgument
+}
+
+func AdditionalParameter(args ...any) AdditionalParameterLike {
+	// Initialize the possible arguments.
+	var parameter ParameterLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ParameterLike:
+			parameter = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the additional parameter constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var additionalParameter = ast.AdditionalParameter().Make(parameter)
+	return additionalParameter
+}
+
+func AdditionalValue(args ...any) AdditionalValueLike {
+	// Initialize the possible arguments.
+	var name string
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			name = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the additional value constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var additionalValue = ast.AdditionalValue().Make(name)
+	return additionalValue
+}
+
+func Alias(args ...any) AliasLike {
+	// Initialize the possible arguments.
+	var name string
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			name = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the alias constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var alias = ast.Alias().Make(name)
+	return alias
+}
+
+func Argument(args ...any) ArgumentLike {
+	// Initialize the possible arguments.
+	var abstraction AbstractionLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case AbstractionLike:
+			abstraction = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the argument constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var argument = ast.Argument().Make(abstraction)
+	return argument
+}
+
+func Arguments(args ...any) ArgumentsLike {
+	// Initialize the possible arguments.
+	var argument ArgumentLike
+	var additionalArguments col.Sequential[AdditionalArgumentLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ArgumentLike:
+			argument = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[AdditionalArgumentLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				additionalArguments = argument.(col.Sequential[AdditionalArgumentLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the additional arguments constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var arguments = ast.Arguments().Make(
+		argument,
+		additionalArguments,
+	)
+	return arguments
+}
+
+func Array(args ...any) ArrayLike {
+	// Initialize the possible arguments.
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the array constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var array = ast.Array().Make()
+	return array
+}
+
+func Aspect(args ...any) AspectLike {
+	// Initialize the possible arguments.
+	var declaration DeclarationLike
+	var methods MethodsLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case DeclarationLike:
+			declaration = actual
+		case MethodsLike:
+			methods = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the aspect constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var aspect = ast.Aspect().Make(
 		declaration,
 		methods,
 	)
 	return aspect
 }
 
-func Attribute(arguments ...any) AttributeLike {
+func Aspects(args ...any) AspectsLike {
 	// Initialize the possible arguments.
-	var identifier string
+	var note string
+	var sequence col.Sequential[AspectLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[AspectLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[AspectLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the aspects constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var aspects = ast.Aspects().Make(
+		note,
+		sequence,
+	)
+	return aspects
+}
+
+func Attribute(args ...any) AttributeLike {
+	// Initialize the possible arguments.
+	var name string
 	var parameter ParameterLike
 	var abstraction AbstractionLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
-			identifier = actual
+			name = actual
 		case ParameterLike:
 			parameter = actual
 		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the attribute constructor: %T\n",
+				"An unknown argument type was passed into the attribute constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -175,35 +431,58 @@ func Attribute(arguments ...any) AttributeLike {
 	}
 
 	// Call the constructor.
-	var attribute = ast.Attribute().MakeWithAttributes(
-		identifier,
+	var attribute = ast.Attribute().Make(
+		name,
 		parameter,
 		abstraction,
 	)
 	return attribute
 }
 
-func Class(arguments ...any) ClassLike {
+func Attributes(args ...any) AttributesLike {
 	// Initialize the possible arguments.
-	var declaration DeclarationLike
-	var constants col.ListLike[ConstantLike]
-	var constructors col.ListLike[ConstructorLike]
-	var functions col.ListLike[FunctionLike]
+	var note string
+	var sequence col.Sequential[AttributeLike]
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
-		case DeclarationLike:
-			declaration = actual
-		case col.ListLike[ConstantLike]:
-			constants = actual
-		case col.ListLike[ConstructorLike]:
-			constructors = actual
-		case col.ListLike[FunctionLike]:
-			functions = actual
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[AttributeLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[AttributeLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the attributes constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var attributes = ast.Attributes().Make(
+		note,
+		sequence,
+	)
+	return attributes
+}
+
+func Channel(args ...any) ChannelLike {
+	// Initialize the possible arguments.
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the class constructor: %T\n",
+				"An unknown argument type was passed into the channel constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -211,30 +490,97 @@ func Class(arguments ...any) ClassLike {
 	}
 
 	// Call the constructor.
-	var class = ast.Class().MakeWithAttributes(
+	var channel = ast.Channel().Make()
+	return channel
+}
+
+func Class(args ...any) ClassLike {
+	// Initialize the possible arguments.
+	var declaration DeclarationLike
+	var constructors ConstructorsLike
+	var constants ConstantsLike
+	var functions FunctionsLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case DeclarationLike:
+			declaration = actual
+		case ConstructorsLike:
+			constructors = actual
+		case ConstantsLike:
+			constants = actual
+		case FunctionsLike:
+			functions = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the class constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var class = ast.Class().Make(
 		declaration,
-		constants,
 		constructors,
+		constants,
 		functions,
 	)
 	return class
 }
 
-func Constant(arguments ...any) ConstantLike {
+func Classes(args ...any) ClassesLike {
 	// Initialize the possible arguments.
-	var identifier string
+	var note string
+	var sequence col.Sequential[ClassLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[ClassLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[ClassLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the classes constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var classes = ast.Classes().Make(
+		note,
+		sequence,
+	)
+	return classes
+}
+
+func Constant(args ...any) ConstantLike {
+	// Initialize the possible arguments.
+	var name string
 	var abstraction AbstractionLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
-			identifier = actual
+			name = actual
 		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the constant constructor: %T\n",
+				"An unknown argument type was passed into the constant constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -242,31 +588,66 @@ func Constant(arguments ...any) ConstantLike {
 	}
 
 	// Call the constructor.
-	var constant = ast.Constant().MakeWithAttributes(
-		identifier,
+	var constant = ast.Constant().Make(
+		name,
 		abstraction,
 	)
 	return constant
 }
 
-func Constructor(arguments ...any) ConstructorLike {
+func Constants(args ...any) ConstantsLike {
 	// Initialize the possible arguments.
-	var identifier string
-	var parameters col.ListLike[ParameterLike]
+	var note string
+	var sequence col.Sequential[ConstantLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[ConstantLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[ConstantLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the constants constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var constants = ast.Constants().Make(
+		note,
+		sequence,
+	)
+	return constants
+}
+
+func Constructor(args ...any) ConstructorLike {
+	// Initialize the possible arguments.
+	var name string
+	var parameters ParametersLike
 	var abstraction AbstractionLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
-			identifier = actual
-		case col.ListLike[ParameterLike]:
+			name = actual
+		case ParametersLike:
 			parameters = actual
 		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the constructor constructor: %T\n",
+				"An unknown argument type was passed into the constructor constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -274,34 +655,69 @@ func Constructor(arguments ...any) ConstructorLike {
 	}
 
 	// Call the constructor.
-	var constructor = ast.Constructor().MakeWithAttributes(
-		identifier,
+	var constructor = ast.Constructor().Make(
+		name,
 		parameters,
 		abstraction,
 	)
 	return constructor
 }
 
-func Declaration(arguments ...any) DeclarationLike {
+func Constructors(args ...any) ConstructorsLike {
 	// Initialize the possible arguments.
-	var comment string
-	var identifier string
-	var parameters col.ListLike[ParameterLike]
+	var note string
+	var sequence col.Sequential[ConstructorLike]
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[ConstructorLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[ConstructorLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the constructors constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var constructors = ast.Constructors().Make(
+		note,
+		sequence,
+	)
+	return constructors
+}
+
+func Declaration(args ...any) DeclarationLike {
+	// Initialize the possible arguments.
+	var comment string
+	var name string
+	var genericParameters GenericParametersLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
 			if len(comment) == 0 {
 				comment = actual
 			} else {
-				identifier = actual
+				name = actual
 			}
-		case col.ListLike[ParameterLike]:
-			parameters = actual
+		case GenericParametersLike:
+			genericParameters = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the declaration constructor: %T\n",
+				"An unknown argument type was passed into the declaration constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -309,30 +725,26 @@ func Declaration(arguments ...any) DeclarationLike {
 	}
 
 	// Call the constructor.
-	var declaration = ast.Declaration().MakeWithAttributes(
+	var declaration = ast.Declaration().Make(
 		comment,
-		identifier,
-		parameters,
+		name,
+		genericParameters,
 	)
 	return declaration
 }
 
-func Enumeration(arguments ...any) EnumerationLike {
+func Enumeration(args ...any) EnumerationLike {
 	// Initialize the possible arguments.
-	var parameter ParameterLike
-	var notation = cdc.Notation().Make()
-	var identifiers = col.List[string](notation).Make()
+	var values ValuesLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
-		case ParameterLike:
-			parameter = actual
-		case string:
-			identifiers.AppendValue(actual)
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ValuesLike:
+			values = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the enumeration constructor: %T\n",
+				"An unknown argument type was passed into the enumeration constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -340,31 +752,30 @@ func Enumeration(arguments ...any) EnumerationLike {
 	}
 
 	// Call the constructor.
-	var enumeration = ast.Enumeration().MakeWithAttributes(
-		parameter,
-		identifiers,
+	var enumeration = ast.Enumeration().Make(
+		values,
 	)
 	return enumeration
 }
 
-func Function(arguments ...any) FunctionLike {
+func Function(args ...any) FunctionLike {
 	// Initialize the possible arguments.
-	var identifier string
-	var parameters col.ListLike[ParameterLike]
+	var name string
+	var parameters ParametersLike
 	var result ResultLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
-			identifier = actual
-		case col.ListLike[ParameterLike]:
+			name = actual
+		case ParametersLike:
 			parameters = actual
 		case ResultLike:
 			result = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the function constructor: %T\n",
+				"An unknown argument type was passed into the function constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -372,32 +783,32 @@ func Function(arguments ...any) FunctionLike {
 	}
 
 	// Call the constructor.
-	var function = ast.Function().MakeWithAttributes(
-		identifier,
+	var function = ast.Function().Make(
+		name,
 		parameters,
 		result,
 	)
 	return function
 }
 
-func Functional(arguments ...any) FunctionalLike {
+func Functional(args ...any) FunctionalLike {
 	// Initialize the possible arguments.
 	var declaration DeclarationLike
-	var parameters col.ListLike[ParameterLike]
+	var parameters ParametersLike
 	var result ResultLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case DeclarationLike:
 			declaration = actual
-		case col.ListLike[ParameterLike]:
+		case ParametersLike:
 			parameters = actual
 		case ResultLike:
 			result = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the functional constructor: %T\n",
+				"An unknown argument type was passed into the functional constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -405,7 +816,7 @@ func Functional(arguments ...any) FunctionalLike {
 	}
 
 	// Call the constructor.
-	var functional = ast.Functional().MakeWithAttributes(
+	var functional = ast.Functional().Make(
 		declaration,
 		parameters,
 		result,
@@ -413,23 +824,139 @@ func Functional(arguments ...any) FunctionalLike {
 	return functional
 }
 
-func Header(arguments ...any) HeaderLike {
+func Functionals(args ...any) FunctionalsLike {
 	// Initialize the possible arguments.
-	var comment string
-	var identifier string
+	var note string
+	var sequence col.Sequential[FunctionalLike]
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[FunctionalLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[FunctionalLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the functionals constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var functionals = ast.Functionals().Make(
+		note,
+		sequence,
+	)
+	return functionals
+}
+
+func Functions(args ...any) FunctionsLike {
+	// Initialize the possible arguments.
+	var note string
+	var sequence col.Sequential[FunctionLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[FunctionLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[FunctionLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the functions constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var functions = ast.Functions().Make(
+		note,
+		sequence,
+	)
+	return functions
+}
+
+func GenericArguments(args ...any) GenericArgumentsLike {
+	// Initialize the possible arguments.
+	var arguments ArgumentsLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ArgumentsLike:
+			arguments = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the generic arguments constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var genericArguments = ast.GenericArguments().Make(arguments)
+	return genericArguments
+}
+
+func GenericParameters(args ...any) GenericParametersLike {
+	// Initialize the possible arguments.
+	var parameters ParametersLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ParametersLike:
+			parameters = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the generic parameters constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var genericParameters = ast.GenericParameters().Make(parameters)
+	return genericParameters
+}
+
+func Header(args ...any) HeaderLike {
+	// Initialize the possible arguments.
+	var comment string
+	var name string
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
 			if len(comment) == 0 {
 				comment = actual
 			} else {
-				identifier = actual
+				name = actual
 			}
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the header constructor: %T\n",
+				"An unknown argument type was passed into the header constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -437,34 +964,25 @@ func Header(arguments ...any) HeaderLike {
 	}
 
 	// Call the constructor.
-	var header = ast.Header().MakeWithAttributes(
+	var header = ast.Header().Make(
 		comment,
-		identifier,
+		name,
 	)
 	return header
 }
 
-func Instance(arguments ...any) InstanceLike {
+func Imports(args ...any) ImportsLike {
 	// Initialize the possible arguments.
-	var declaration DeclarationLike
-	var attributes col.ListLike[AttributeLike]
-	var abstractions col.ListLike[AbstractionLike]
-	var methods col.ListLike[MethodLike]
+	var modules ModulesLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
-		case DeclarationLike:
-			declaration = actual
-		case col.ListLike[AttributeLike]:
-			attributes = actual
-		case col.ListLike[AbstractionLike]:
-			abstractions = actual
-		case col.ListLike[MethodLike]:
-			methods = actual
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ModulesLike:
+			modules = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the instance constructor: %T\n",
+				"An unknown argument type was passed into the imports constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -472,7 +990,39 @@ func Instance(arguments ...any) InstanceLike {
 	}
 
 	// Call the constructor.
-	var instance = ast.Instance().MakeWithAttributes(
+	var imports = ast.Imports().Make(modules)
+	return imports
+}
+
+func Instance(args ...any) InstanceLike {
+	// Initialize the possible arguments.
+	var declaration DeclarationLike
+	var attributes AttributesLike
+	var abstractions AbstractionsLike
+	var methods MethodsLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case DeclarationLike:
+			declaration = actual
+		case AttributesLike:
+			attributes = actual
+		case AbstractionsLike:
+			abstractions = actual
+		case MethodsLike:
+			methods = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the instance constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var instance = ast.Instance().Make(
 		declaration,
 		attributes,
 		abstractions,
@@ -481,24 +1031,53 @@ func Instance(arguments ...any) InstanceLike {
 	return instance
 }
 
-func Method(arguments ...any) MethodLike {
+func Instances(args ...any) InstancesLike {
 	// Initialize the possible arguments.
-	var identifier string
-	var parameters col.ListLike[ParameterLike]
-	var result ResultLike
+	var note string
+	var sequence col.Sequential[InstanceLike]
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
-			identifier = actual
-		case col.ListLike[ParameterLike]:
-			parameters = actual
-		case ResultLike:
-			result = actual
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[InstanceLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[InstanceLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the instances constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var instances = ast.Instances().Make(
+		note,
+		sequence,
+	)
+	return instances
+}
+
+func Map(args ...any) MapLike {
+	// Initialize the possible arguments.
+	var name string
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			name = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the method constructor: %T\n",
+				"An unknown argument type was passed into the map constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -506,47 +1085,111 @@ func Method(arguments ...any) MethodLike {
 	}
 
 	// Call the constructor.
-	var method = ast.Method().MakeWithAttributes(
-		identifier,
+	var map_ = ast.Map().Make(name)
+	return map_
+}
+
+func Method(args ...any) MethodLike {
+	// Initialize the possible arguments.
+	var name string
+	var parameters ParametersLike
+	var result ResultLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			name = actual
+		case ParametersLike:
+			parameters = actual
+		case ResultLike:
+			result = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the method constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var method = ast.Method().Make(
+		name,
 		parameters,
 		result,
 	)
 	return method
 }
 
-func Model(arguments ...any) ModelLike {
+func Methods(args ...any) MethodsLike {
+	// Initialize the possible arguments.
+	var note string
+	var sequence col.Sequential[MethodLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[MethodLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[MethodLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the methods constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var methods = ast.Methods().Make(
+		note,
+		sequence,
+	)
+	return methods
+}
+
+func Model(args ...any) ModelLike {
 	// Initialize the possible arguments.
 	var notice NoticeLike
 	var header HeaderLike
-	var modules col.ListLike[ModuleLike]
-	var types col.ListLike[TypeLike]
-	var functionals col.ListLike[FunctionalLike]
-	var aspects col.ListLike[AspectLike]
-	var classes col.ListLike[ClassLike]
-	var instances col.ListLike[InstanceLike]
+	var imports ImportsLike
+	var types TypesLike
+	var functionals FunctionalsLike
+	var classes ClassesLike
+	var instances InstancesLike
+	var aspects AspectsLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case NoticeLike:
 			notice = actual
 		case HeaderLike:
 			header = actual
-		case col.ListLike[ModuleLike]:
-			modules = actual
-		case col.ListLike[TypeLike]:
+		case ImportsLike:
+			imports = actual
+		case TypesLike:
 			types = actual
-		case col.ListLike[FunctionalLike]:
+		case FunctionalsLike:
 			functionals = actual
-		case col.ListLike[AspectLike]:
-			aspects = actual
-		case col.ListLike[ClassLike]:
+		case ClassesLike:
 			classes = actual
-		case col.ListLike[InstanceLike]:
+		case InstancesLike:
 			instances = actual
+		case AspectsLike:
+			aspects = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the model constructor: %T\n",
+				"An unknown argument type was passed into the model constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -554,36 +1197,36 @@ func Model(arguments ...any) ModelLike {
 	}
 
 	// Call the constructor.
-	var model = ast.Model().MakeWithAttributes(
+	var model = ast.Model().Make(
 		notice,
 		header,
-		modules,
+		imports,
 		types,
 		functionals,
-		aspects,
 		classes,
 		instances,
+		aspects,
 	)
 	return model
 }
 
-func Module(arguments ...any) ModuleLike {
+func Module(args ...any) ModuleLike {
 	// Initialize the possible arguments.
-	var identifier string
+	var name string
 	var text string
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
-			if len(identifier) == 0 {
-				identifier = actual
+			if len(name) == 0 {
+				name = actual
 			} else {
 				text = actual
 			}
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the module constructor: %T\n",
+				"An unknown argument type was passed into the module constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -591,25 +1234,54 @@ func Module(arguments ...any) ModuleLike {
 	}
 
 	// Call the constructor.
-	var module = ast.Module().MakeWithAttributes(
-		identifier,
+	var module = ast.Module().Make(
+		name,
 		text,
 	)
 	return module
 }
 
-func Notice(arguments ...any) NoticeLike {
+func Modules(args ...any) ModulesLike {
+	// Initialize the possible arguments.
+	var sequence col.Sequential[ModuleLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[ModuleLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[ModuleLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the modules constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var modules = ast.Modules().Make(sequence)
+	return modules
+}
+
+func Notice(args ...any) NoticeLike {
 	// Initialize the possible arguments.
 	var comment string
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
 			comment = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the notice constructor: %T\n",
+				"An unknown argument type was passed into the notice constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -617,27 +1289,27 @@ func Notice(arguments ...any) NoticeLike {
 	}
 
 	// Call the constructor.
-	var notice = ast.Notice().MakeWithComment(
+	var notice = ast.Notice().Make(
 		comment,
 	)
 	return notice
 }
 
-func Parameter(arguments ...any) ParameterLike {
+func Parameter(args ...any) ParameterLike {
 	// Initialize the possible arguments.
-	var identifier string
+	var name string
 	var abstraction AbstractionLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case string:
-			identifier = actual
+			name = actual
 		case AbstractionLike:
 			abstraction = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the parameter constructor: %T\n",
+				"An unknown argument type was passed into the parameter constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -645,57 +1317,25 @@ func Parameter(arguments ...any) ParameterLike {
 	}
 
 	// Call the constructor.
-	var parameter = ast.Parameter().MakeWithAttributes(
-		identifier,
+	var parameter = ast.Parameter().Make(
+		name,
 		abstraction,
 	)
 	return parameter
 }
 
-func Prefix(arguments ...any) PrefixLike {
+func Parameterized(args ...any) ParameterizedLike {
 	// Initialize the possible arguments.
-	var identifier string
-	var type_ PrefixType
+	var parameters ParametersLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
-		case string:
-			identifier = actual
-		case PrefixType:
-			type_ = actual
-		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the prefix constructor: %T\n",
-				actual,
-			)
-			panic(message)
-		}
-	}
-
-	// Call the constructor.
-	var prefix = ast.Prefix().MakeWithAttributes(
-		identifier,
-		type_,
-	)
-	return prefix
-}
-
-func Result(arguments ...any) ResultLike {
-	// Initialize the possible arguments.
-	var abstraction AbstractionLike
-	var parameters col.ListLike[ParameterLike]
-
-	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
-		case AbstractionLike:
-			abstraction = actual
-		case col.ListLike[ParameterLike]:
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ParametersLike:
 			parameters = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the result constructor: %T\n",
+				"An unknown argument type was passed into the imports constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -703,27 +1343,132 @@ func Result(arguments ...any) ResultLike {
 	}
 
 	// Call the constructor.
-	var result ResultLike
+	var imports = ast.Parameterized().Make(parameters)
+	return imports
+}
+
+func Parameters(args ...any) ParametersLike {
+	// Initialize the possible arguments.
+	var parameter ParameterLike
+	var additionalParameters col.Sequential[AdditionalParameterLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ParameterLike:
+			parameter = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[AdditionalParameterLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(parameter)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				additionalParameters = parameter.(col.Sequential[AdditionalParameterLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the additional parameters constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var parameters = ast.Parameters().Make(
+		parameter,
+		additionalParameters,
+	)
+	return parameters
+}
+
+func Prefix(args ...any) PrefixLike {
+	// Initialize the possible arguments.
+	var array ast.ArrayLike
+	var map_ ast.MapLike
+	var channel ast.ChannelLike
+	var alias ast.AliasLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ast.ArrayLike:
+			array = actual
+		case ast.MapLike:
+			map_ = actual
+		case ast.ChannelLike:
+			channel = actual
+		case ast.AliasLike:
+			alias = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the prefix constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var prefix ast.PrefixLike
+	switch {
+	case array != nil:
+		prefix = ast.Prefix().Make(array)
+	case map_ != nil:
+		prefix = ast.Prefix().Make(map_)
+	case channel != nil:
+		prefix = ast.Prefix().Make(channel)
+	case alias != nil:
+		prefix = ast.Prefix().Make(alias)
+	default:
+		panic("The constructor for a result requires an argument.")
+	}
+	return prefix
+}
+
+func Result(args ...any) ResultLike {
+	// Initialize the possible arguments.
+	var abstraction AbstractionLike
+	var parameterized ParameterizedLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case AbstractionLike:
+			abstraction = actual
+		case ParameterizedLike:
+			parameterized = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the result constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var result ast.ResultLike
 	switch {
 	case abstraction != nil:
-		result = ast.Result().MakeWithAbstraction(abstraction)
-	case parameters != nil:
-		result = ast.Result().MakeWithParameters(parameters)
+		result = ast.Result().Make(abstraction)
+	case parameterized != nil:
+		result = ast.Result().Make(parameterized)
 	default:
 		panic("The constructor for a result requires an argument.")
 	}
 	return result
 }
 
-func Type(arguments ...any) TypeLike {
+func Type(args ...any) TypeLike {
 	// Initialize the possible arguments.
 	var declaration DeclarationLike
 	var abstraction AbstractionLike
 	var enumeration EnumerationLike
 
 	// Process the actual arguments.
-	for _, argument := range arguments {
-		switch actual := argument.(type) {
+	for _, arg := range args {
+		switch actual := arg.(type) {
 		case DeclarationLike:
 			declaration = actual
 		case AbstractionLike:
@@ -732,7 +1477,7 @@ func Type(arguments ...any) TypeLike {
 			enumeration = actual
 		default:
 			var message = fmt.Sprintf(
-				"Unknown argument type passed into the type constructor: %T\n",
+				"An unknown argument type was passed into the type constructor: %T\n",
 				actual,
 			)
 			panic(message)
@@ -740,7 +1485,7 @@ func Type(arguments ...any) TypeLike {
 	}
 
 	// Call the constructor.
-	var type_ = ast.Type().MakeWithAttributes(
+	var type_ = ast.Type().Make(
 		declaration,
 		abstraction,
 		enumeration,
@@ -748,34 +1493,133 @@ func Type(arguments ...any) TypeLike {
 	return type_
 }
 
+func Types(args ...any) TypesLike {
+	// Initialize the possible arguments.
+	var note string
+	var sequence col.Sequential[TypeLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			note = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[TypeLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				sequence = arg.(col.Sequential[TypeLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the types constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var types = ast.Types().Make(
+		note,
+		sequence,
+	)
+	return types
+}
+
+func Value(args ...any) ValueLike {
+	// Initialize the possible arguments.
+	var name string
+	var abstraction AbstractionLike
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case string:
+			name = actual
+		case AbstractionLike:
+			abstraction = actual
+		default:
+			var message = fmt.Sprintf(
+				"An unknown argument type was passed into the value constructor: %T\n",
+				actual,
+			)
+			panic(message)
+		}
+	}
+
+	// Call the constructor.
+	var value = ast.Value().Make(
+		name,
+		abstraction,
+	)
+	return value
+}
+
+func Values(args ...any) ValuesLike {
+	// Initialize the possible arguments.
+	var value ValueLike
+	var additionalValues col.Sequential[AdditionalValueLike]
+
+	// Process the actual arguments.
+	for _, arg := range args {
+		switch actual := arg.(type) {
+		case ValueLike:
+			value = actual
+		default:
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[AdditionalValueLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(value)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				additionalValues = value.(col.Sequential[AdditionalValueLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the additional values constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the constructor.
+	var values = ast.Values().Make(
+		value,
+		additionalValues,
+	)
+	return values
+}
+
 // Agents
 
-func Formatter(arguments ...any) FormatterLike {
-	if len(arguments) > 0 {
+func Formatter(args ...any) FormatterLike {
+	if len(args) > 0 {
 		panic("The formatter constructor does not take any arguments.")
 	}
 	var formatter = age.Formatter().Make()
 	return formatter
 }
 
-func Generator(arguments ...any) GeneratorLike {
-	if len(arguments) > 0 {
+func Generator(args ...any) GeneratorLike {
+	if len(args) > 0 {
 		panic("The generator constructor does not take any arguments.")
 	}
 	var generator = age.Generator().Make()
 	return generator
 }
 
-func Parser(arguments ...any) ParserLike {
-	if len(arguments) > 0 {
+func Parser(args ...any) ParserLike {
+	if len(args) > 0 {
 		panic("The parser constructor does not take any arguments.")
 	}
 	var parser = age.Parser().Make()
 	return parser
 }
 
-func Validator(arguments ...any) ValidatorLike {
-	if len(arguments) > 0 {
+func Validator(args ...any) ValidatorLike {
+	if len(args) > 0 {
 		panic("The validator constructor does not take any arguments.")
 	}
 	var validator = age.Validator().Make()

@@ -12,7 +12,9 @@
 
 package ast
 
-import ()
+import (
+	col "github.com/craterdog/go-collection-framework/v4/collection"
+)
 
 // CLASS ACCESS
 
@@ -40,7 +42,7 @@ type argumentsClass_ struct {
 
 func (c *argumentsClass_) Make(
 	argument ArgumentLike,
-	additionalArguments AdditionalArgumentsLike,
+	additionalArguments col.Sequential[AdditionalArgumentLike],
 ) ArgumentsLike {
 	return &arguments_{
 		// Initialize instance attributes.
@@ -58,7 +60,7 @@ type arguments_ struct {
 	// Define instance attributes.
 	class_               ArgumentsClassLike
 	argument_            ArgumentLike
-	additionalArguments_ AdditionalArgumentsLike
+	additionalArguments_ col.Sequential[AdditionalArgumentLike]
 }
 
 // Attributes
@@ -71,7 +73,7 @@ func (v *arguments_) GetArgument() ArgumentLike {
 	return v.argument_
 }
 
-func (v *arguments_) GetAdditionalArguments() AdditionalArgumentsLike {
+func (v *arguments_) GetAdditionalArguments() col.Sequential[AdditionalArgumentLike] {
 	return v.additionalArguments_
 }
 

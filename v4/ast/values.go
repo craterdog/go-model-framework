@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	col "github.com/craterdog/go-collection-framework/v4/collection"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -38,7 +42,7 @@ type valuesClass_ struct {
 
 func (c *valuesClass_) Make(
 	value ValueLike,
-	additionalValues AdditionalValuesLike,
+	additionalValues col.Sequential[AdditionalValueLike],
 ) ValuesLike {
 	return &values_{
 		// Initialize instance attributes.
@@ -56,7 +60,7 @@ type values_ struct {
 	// Define instance attributes.
 	class_            ValuesClassLike
 	value_            ValueLike
-	additionalValues_ AdditionalValuesLike
+	additionalValues_ col.Sequential[AdditionalValueLike]
 }
 
 // Attributes
@@ -69,7 +73,7 @@ func (v *values_) GetValue() ValueLike {
 	return v.value_
 }
 
-func (v *values_) GetAdditionalValues() AdditionalValuesLike {
+func (v *values_) GetAdditionalValues() col.Sequential[AdditionalValueLike] {
 	return v.additionalValues_
 }
 

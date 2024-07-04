@@ -15,23 +15,30 @@ package agent_test
 import (
 	age "github.com/craterdog/go-model-framework/v4/agent"
 	ass "github.com/stretchr/testify/assert"
-	tes "testing"
 	osx "os"
+	tes "testing"
 )
 
-func TestRoundTrip(t *tes.T) {
-	var bytes, err = osx.ReadFile("./Package.go")
-	if err != nil {
-		panic(err)
+var testModels = []string{
+	"./Package.go",
+	"../ast/Package.go",
+}
+
+func TestRoundTrips(t *tes.T) {
+	for _, modelfile := range testModels {
+		var bytes, err = osx.ReadFile(modelfile)
+		if err != nil {
+			panic(err)
+		}
+		var source = string(bytes)
+		var parser = age.Parser().Make()
+		var model = parser.ParseSource(source)
+		var formatter = age.Formatter().Make()
+		var actual = formatter.FormatModel(model)
+		ass.Equal(t, actual, source)
+		var validator = age.Validator().Make()
+		validator.ValidateModel(model)
 	}
-	var source = string(bytes)
-	var parser = age.Parser().Make()
-	var model = parser.ParseSource(source)
-	var formatter = age.Formatter().Make()
-	var actual = formatter.FormatModel(model)
-	ass.Equal(t, actual, source)
-	var validator = age.Validator().Make()
-	validator.ValidateModel(model)
 }
 
 func TestCreateClassType(t *tes.T) {
@@ -98,8 +105,6 @@ const angle = `/*
 
 package example
 
-import ()
-
 // CLASS ACCESS
 
 // Reference
@@ -124,16 +129,6 @@ type angleClass_ struct {
 	tau_ AngleLike
 }
 
-// Constants
-
-func (c *angleClass_) Pi() AngleLike {
-	return c.pi_
-}
-
-func (c *angleClass_) Tau() AngleLike {
-	return c.tau_
-}
-
 // Constructors
 
 func (c *angleClass_) MakeFromValue(value float64) AngleLike {
@@ -145,6 +140,16 @@ func (c *angleClass_) MakeFromString(value string) AngleLike {
 	var result_ AngleLike
 	// TBA - Implement the method.
 	return result_
+}
+
+// Constants
+
+func (c *angleClass_) Pi() AngleLike {
+	return c.pi_
+}
+
+func (c *angleClass_) Tau() AngleLike {
+	return c.tau_
 }
 
 // Functions
@@ -281,12 +286,6 @@ type arrayClass_[V any] struct {
 	defaultRanker_ RankingFunction[V]
 }
 
-// Constants
-
-func (c *arrayClass_[V]) DefaultRanker() RankingFunction[V] {
-	return c.defaultRanker_
-}
-
 // Constructors
 
 func (c *arrayClass_[V]) MakeWithSize(size uint) ArrayLike[V] {
@@ -304,6 +303,12 @@ func (c *arrayClass_[V]) MakeFromSequence(values Sequential[V]) ArrayLike[V] {
 	var result_ ArrayLike[V]
 	// TBA - Implement the method.
 	return result_
+}
+
+// Constants
+
+func (c *arrayClass_[V]) DefaultRanker() RankingFunction[V] {
+	return c.defaultRanker_
 }
 
 // INSTANCE METHODS
@@ -398,8 +403,6 @@ const complex_ = `/*
 
 package example
 
-import ()
-
 // CLASS ACCESS
 
 // Reference
@@ -424,19 +427,9 @@ type complexClass_ struct {
 	infinity_ ComplexLike
 }
 
-// Constants
-
-func (c *complexClass_) Zero() ComplexLike {
-	return c.zero_
-}
-
-func (c *complexClass_) Infinity() ComplexLike {
-	return c.infinity_
-}
-
 // Constructors
 
-func (c *complexClass_) MakeWithAttributes(
+func (c *complexClass_) Make(
 	realPart float64,
 	imaginaryPart float64,
 	form Form,
@@ -455,6 +448,16 @@ func (c *complexClass_) MakeFromValue(value complex128) ComplexLike {
 		// Initialize instance attributes.
 		class_: c,
 	}
+}
+
+// Constants
+
+func (c *complexClass_) Zero() ComplexLike {
+	return c.zero_
+}
+
+func (c *complexClass_) Infinity() ComplexLike {
+	return c.infinity_
 }
 
 // Functions
@@ -615,7 +618,10 @@ var associationMutex syn.Mutex
 
 // Function
 
-func Association[K comparable, V any]() AssociationClassLike[K, V] {
+func Association[
+	K comparable,
+	V any,
+]() AssociationClassLike[K, V] {
 	// Generate the name of the bound class type.
 	var class *associationClass_[K, V]
 	var name = fmt.Sprintf("%T", class)
@@ -644,13 +650,16 @@ func Association[K comparable, V any]() AssociationClassLike[K, V] {
 
 // Target
 
-type associationClass_[K comparable, V any] struct {
+type associationClass_[
+	K comparable,
+	V any,
+] struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *associationClass_[K, V]) MakeWithAttributes(
+func (c *associationClass_[K, V]) Make(
 	key K,
 	value V,
 ) AssociationLike[K, V] {
@@ -666,7 +675,10 @@ func (c *associationClass_[K, V]) MakeWithAttributes(
 
 // Target
 
-type association_[K comparable, V any] struct {
+type association_[
+	K comparable,
+	V any,
+] struct {
 	// Define instance attributes.
 	class_ AssociationClassLike[K, V]
 	key_ K
@@ -722,7 +734,10 @@ var catalogMutex syn.Mutex
 
 // Function
 
-func Catalog[K comparable, V any]() CatalogClassLike[K, V] {
+func Catalog[
+	K comparable,
+	V any,
+]() CatalogClassLike[K, V] {
 	// Generate the name of the bound class type.
 	var class *catalogClass_[K, V]
 	var name = fmt.Sprintf("%T", class)
@@ -751,15 +766,12 @@ func Catalog[K comparable, V any]() CatalogClassLike[K, V] {
 
 // Target
 
-type catalogClass_[K comparable, V any] struct {
+type catalogClass_[
+	K comparable,
+	V any,
+] struct {
 	// Define class constants.
 	defaultRanker_ RankingFunction[AssociationLike[K, V]]
-}
-
-// Constants
-
-func (c *catalogClass_[K, V]) DefaultRanker() RankingFunction[AssociationLike[K, V]] {
-	return c.defaultRanker_
 }
 
 // Constructors
@@ -792,6 +804,12 @@ func (c *catalogClass_[K, V]) MakeFromSequence(associations Sequential[Associati
 	}
 }
 
+// Constants
+
+func (c *catalogClass_[K, V]) DefaultRanker() RankingFunction[AssociationLike[K, V]] {
+	return c.defaultRanker_
+}
+
 // Functions
 
 func (c *catalogClass_[K, V]) Extract(
@@ -816,7 +834,10 @@ func (c *catalogClass_[K, V]) Merge(
 
 // Target
 
-type catalog_[K comparable, V any] struct {
+type catalog_[
+	K comparable,
+	V any,
+] struct {
 	// Define instance attributes.
 	class_ CatalogClassLike[K, V]
 }

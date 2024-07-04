@@ -53,7 +53,7 @@ tokens is greedy and will match as many repeated token types as possible. The
 sequence of factors within in a rule definition may be separated by spaces which
 are ignored by the parser.
 <!
-Model: Notice Header Imports? Types? Functionals? Aspects? Classes? Instances? EOF
+Model: Notice Header Imports? Types? Functionals? Classes? Instances? Aspects? EOF
 
 Notice: comment
 
@@ -61,7 +61,7 @@ Header: comment "package" name
 
 Imports: "import" "(" Modules ")"
 
-Modules: Module*
+Modules: Module+
 
 Module: name path
 
@@ -73,13 +73,11 @@ Declaration: comment "type" name GenericParameters?
 
 GenericParameters: "[" Parameters "]"
 
-Parameters: Parameter AdditionalParameters?
-
-AdditionalParameters: "," AdditionalParameter+
-
-AdditionalParameter: Parameter ","
+Parameters: Parameter AdditionalParameter* ","?
 
 Parameter: name Abstraction
+
+AdditionalParameter: "," Parameter
 
 Abstraction: Prefix? name GenericArguments?
 
@@ -99,21 +97,17 @@ Alias: name "."
 
 GenericArguments: "[" Arguments "]"
 
-Arguments: Argument AdditionalArguments?
-
-AdditionalArguments: "," AdditionalArgument+
-
-AdditionalArgument: Argument ","
+Arguments: Argument AdditionalArgument*
 
 Argument: Abstraction
 
+AdditionalArgument: "," Argument
+
 Enumeration: "const" "(" Values ")"
 
-Values: Value AdditionalValues
+Values: Value AdditionalValue*
 
 Value: name Abstraction "=" "iota"
-
-AdditionalValues: AdditionalValue+
 
 AdditionalValue: name
 
@@ -126,10 +120,6 @@ Result:
     Parameterized
 
 Parameterized: "(" Parameters ")"
-
-Aspects: note Aspect+
-
-Aspect: Declaration "interface" "{" Methods "}"
 
 Classes: note Class+
 
@@ -160,6 +150,10 @@ Abstractions: note Abstraction+
 Methods: note Method+
 
 Method: name "(" Parameters? ")" Result?
+
+Aspects: note Aspect+
+
+Aspect: Declaration "interface" "{" Methods "}"
 
 !>
 LEXIGRAM DEFINITIONS

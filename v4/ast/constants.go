@@ -13,7 +13,7 @@
 package ast
 
 import (
-	age "github.com/craterdog/go-collection-framework/v4/agent"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -42,13 +42,13 @@ type constantsClass_ struct {
 
 func (c *constantsClass_) Make(
 	note string,
-	constantIterator age.IteratorLike[ConstantLike],
+	constants col.Sequential[ConstantLike],
 ) ConstantsLike {
 	return &constants_{
 		// Initialize instance attributes.
-		class_:            c,
-		note_:             note,
-		constantIterator_: constantIterator,
+		class_:     c,
+		note_:      note,
+		constants_: constants,
 	}
 }
 
@@ -58,9 +58,9 @@ func (c *constantsClass_) Make(
 
 type constants_ struct {
 	// Define instance attributes.
-	class_            ConstantsClassLike
-	note_             string
-	constantIterator_ age.IteratorLike[ConstantLike]
+	class_     ConstantsClassLike
+	note_      string
+	constants_ col.Sequential[ConstantLike]
 }
 
 // Attributes
@@ -73,8 +73,8 @@ func (v *constants_) GetNote() string {
 	return v.note_
 }
 
-func (v *constants_) GetConstantIterator() age.IteratorLike[ConstantLike] {
-	return v.constantIterator_
+func (v *constants_) GetConstants() col.Sequential[ConstantLike] {
+	return v.constants_
 }
 
 // Private

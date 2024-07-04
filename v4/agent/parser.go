@@ -77,6 +77,7 @@ func (v *parser_) GetClass() ParserClassLike {
 // Public
 
 func (v *parser_) ParseSource(source string) ast.ModelLike {
+	source = sts.ReplaceAll(source, "\t", "    ")
 	v.source_ = source
 	var notation = cdc.Notation().Make()
 	v.tokens_ = col.Queue[TokenLike](notation).MakeWithCapacity(parserClass.queueSize_)
@@ -90,8 +91,15 @@ func (v *parser_) ParseSource(source string) ast.ModelLike {
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("Model",
-			"AST",
 			"Model",
+			"Notice",
+			"Header",
+			"Imports",
+			"Types",
+			"Functionals",
+			"Classes",
+			"Instances",
+			"Aspects",
 		)
 		panic(message)
 	}
@@ -101,8 +109,15 @@ func (v *parser_) ParseSource(source string) ast.ModelLike {
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("EOF",
-			"AST",
 			"Model",
+			"Notice",
+			"Header",
+			"Imports",
+			"Types",
+			"Functionals",
+			"Classes",
+			"Instances",
+			"Aspects",
 		)
 		panic(message)
 	}
@@ -132,7 +147,7 @@ func (v *parser_) formatError(token TokenLike) string {
 	// Append an arrow pointing to the error.
 	message += " \033[32m>>>─"
 	var count = 0
-	for count <= token.GetPosition() {
+	for count < token.GetPosition() {
 		message += "─"
 		count++
 	}
@@ -194,7 +209,7 @@ func (v *parser_) parseAbstraction() (
 	if !ok {
 		if prefix != nil {
 			var message = v.formatError(token)
-			message += v.generateSyntax("GenericArguments",
+			message += v.generateSyntax("name",
 				"Abstraction",
 				"Prefix",
 				"GenericArguments",
@@ -203,6 +218,18 @@ func (v *parser_) parseAbstraction() (
 		}
 		// This is not an abstraction.
 		return abstraction, token, false
+	}
+
+	// Check if the name is actually a method name for the next declaration.
+	if prefix == nil {
+		var delimiterToken TokenLike
+		_, delimiterToken, ok = v.parseToken(DelimiterToken, "(")
+		if ok {
+			// This is not an abstraction, put back the delimiter and name tokens.
+			v.putBack(delimiterToken)
+			v.putBack(token)
+			return abstraction, token, false
+		}
 	}
 
 	// Attempt to parse optional generic arguments.
@@ -245,7 +272,7 @@ func (v *parser_) parseAbstractions() (
 	}
 
 	// Found a sequence of abstractions.
-	abstractions = ast.Abstractions().Make(note, list.GetIterator())
+	abstractions = ast.Abstractions().Make(note, list)
 	return abstractions, token, true
 }
 
@@ -254,19 +281,19 @@ func (v *parser_) parseAdditionalArgument() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse an argument.
-	var argument ast.ArgumentLike
-	argument, token, ok = v.parseArgument()
+	// Attempt to parse the trailing "," for the previous argument.
+	_, token, ok = v.parseToken(DelimiterToken, ",")
 	if !ok {
 		// This is not an additional argument.
 		return additionalArgument, token, false
 	}
 
-	// Attempt to parse a trailing ",".
-	_, token, ok = v.parseToken(DelimiterToken, ",")
+	// Attempt to parse an additional argument.
+	var argument ast.ArgumentLike
+	argument, _, ok = v.parseArgument()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateSyntax(",",
+		message += v.generateSyntax("Argument",
 			"AdditionalArgument",
 			"Argument",
 		)
@@ -278,103 +305,30 @@ func (v *parser_) parseAdditionalArgument() (
 	return additionalArgument, token, true
 }
 
-func (v *parser_) parseAdditionalArguments() (
-	additionalArguments ast.AdditionalArgumentsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the trailing "," for the first argument.
-	_, token, ok = v.parseToken(DelimiterToken, ",")
-	if !ok {
-		// This is not a sequence of additional arguments.
-		return additionalArguments, token, false
-	}
-
-	// Attempt to parse one or more additional arguments.
-	var additionalArgument ast.AdditionalArgumentLike
-	additionalArgument, token, ok = v.parseAdditionalArgument()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("AdditionalArgument",
-			"AdditionalArguments",
-			"AdditionalArgument",
-		)
-		panic(message)
-	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AdditionalArgumentLike](notation).Make()
-	for ok {
-		list.AppendValue(additionalArgument)
-		additionalArgument, token, ok = v.parseAdditionalArgument()
-	}
-
-	// Found a sequence of additional arguments.
-	additionalArguments = ast.AdditionalArguments().Make(list.GetIterator())
-	return additionalArguments, token, true
-}
-
 func (v *parser_) parseAdditionalParameter() (
 	additionalParameter ast.AdditionalParameterLike,
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse a parameter.
-	var parameter ast.ParameterLike
-	parameter, token, ok = v.parseParameter()
+	// Attempt to parse the trailing "," for the previous parameter.
+	_, token, ok = v.parseToken(DelimiterToken, ",")
 	if !ok {
 		// This is not an additional parameter.
 		return additionalParameter, token, false
 	}
 
-	// Attempt to parse the trailing ",".
-	_, token, ok = v.parseToken(DelimiterToken, ",")
+	// Attempt to parse an additional parameter.
+	var parameter ast.ParameterLike
+	parameter, _, ok = v.parseParameter()
 	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(",",
-			"AdditionalParameter",
-			"Parameter",
-		)
-		panic(message)
+		// This is not an additional parameter, put back the comma token.
+		v.putBack(token)
+		return additionalParameter, token, false
 	}
 
 	// Found an additional parameter.
 	additionalParameter = ast.AdditionalParameter().Make(parameter)
 	return additionalParameter, token, true
-}
-
-func (v *parser_) parseAdditionalParameters() (
-	additionalParameters ast.AdditionalParametersLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the trailing "," for the first parameter.
-	_, token, ok = v.parseToken(DelimiterToken, ",")
-	if !ok {
-		// This is not a sequence of additional parameters.
-		return additionalParameters, token, false
-	}
-
-	// Attempt to parse one or more additional parameters.
-	var additionalParameter ast.AdditionalParameterLike
-	additionalParameter, token, ok = v.parseAdditionalParameter()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("AdditionalParameter",
-			"AdditionalParameters",
-			"AdditionalParameter",
-		)
-		panic(message)
-	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AdditionalParameterLike](notation).Make()
-	for ok {
-		list.AppendValue(additionalParameter)
-		additionalParameter, token, ok = v.parseAdditionalParameter()
-	}
-
-	// Found a sequence of additional parameters.
-	additionalParameters = ast.AdditionalParameters().Make(list.GetIterator())
-	return additionalParameters, token, true
 }
 
 func (v *parser_) parseAdditionalValue() (
@@ -393,34 +347,6 @@ func (v *parser_) parseAdditionalValue() (
 	// Found an additional value.
 	additionalValue = ast.AdditionalValue().Make(name)
 	return additionalValue, token, true
-}
-
-func (v *parser_) parseAdditionalValues() (
-	additionalValues ast.AdditionalValuesLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse one or more additional values.
-	var additionalValue ast.AdditionalValueLike
-	additionalValue, token, ok = v.parseAdditionalValue()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("AdditionalValue",
-			"AdditionalValues",
-			"AdditionalValue",
-		)
-		panic(message)
-	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AdditionalValueLike](notation).Make()
-	for ok {
-		list.AppendValue(additionalValue)
-		additionalValue, token, ok = v.parseAdditionalValue()
-	}
-
-	// Found a sequence of additional values.
-	additionalValues = ast.AdditionalValues().Make(list.GetIterator())
-	return additionalValues, token, true
 }
 
 func (v *parser_) parseAlias() (
@@ -481,9 +407,15 @@ func (v *parser_) parseArguments() (
 		return arguments, token, false
 	}
 
-	// Attempt to parse optional additional arguments.
-	var additionalArguments ast.AdditionalArgumentsLike
-	additionalArguments, _, _ = v.parseAdditionalArguments()
+	// Attempt to parse zero or more additional arguments.
+	var notation = cdc.Notation().Make()
+	var additionalArguments = col.List[ast.AdditionalArgumentLike](notation).Make()
+	var additionalArgument ast.AdditionalArgumentLike
+	additionalArgument, token, ok = v.parseAdditionalArgument()
+	for ok {
+		additionalArguments.AppendValue(additionalArgument)
+		additionalArgument, token, ok = v.parseAdditionalArgument()
+	}
 
 	// Found a sequence of arguments.
 	arguments = ast.Arguments().Make(argument, additionalArguments)
@@ -616,7 +548,7 @@ func (v *parser_) parseAspects() (
 	}
 
 	// Found a sequence of aspects.
-	list.SortValuesWithRanker(func (first, second ast.AspectLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.AspectLike) age.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
@@ -628,7 +560,7 @@ func (v *parser_) parseAspects() (
 			return age.EqualRank
 		}
 	})
-	aspects = ast.Aspects().Make(note, list.GetIterator())
+	aspects = ast.Aspects().Make(note, list)
 	return aspects, token, true
 }
 
@@ -712,7 +644,7 @@ func (v *parser_) parseAttributes() (
 	}
 
 	// Found a sequence of attributes.
-	attributes = ast.Attributes().Make(note, list.GetIterator())
+	attributes = ast.Attributes().Make(note, list)
 	return attributes, token, true
 }
 
@@ -779,7 +711,7 @@ func (v *parser_) parseClass() (
 	constructors, token, ok = v.parseConstructors()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateSyntax("Constructors",
+		message += v.generateSyntax("// Constructors",
 			"Class",
 			"Declaration",
 			"Constructors",
@@ -846,7 +778,7 @@ func (v *parser_) parseClasses() (
 	}
 
 	// Found a sequence of classes.
-	list.SortValuesWithRanker(func (first, second ast.ClassLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.ClassLike) age.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
@@ -858,7 +790,7 @@ func (v *parser_) parseClasses() (
 			return age.EqualRank
 		}
 	})
-	classes = ast.Classes().Make(note, list.GetIterator())
+	classes = ast.Classes().Make(note, list)
 	return classes, token, true
 }
 
@@ -937,7 +869,7 @@ func (v *parser_) parseConstants() (
 	}
 
 	// Found a sequence of constants.
-	constants = ast.Constants().Make(note, list.GetIterator())
+	constants = ast.Constants().Make(note, list)
 	return constants, token, true
 }
 
@@ -1021,7 +953,7 @@ func (v *parser_) parseConstructors() (
 	}
 
 	// Found a sequence of constructors.
-	constructors = ast.Constructors().Make(note, list.GetIterator())
+	constructors = ast.Constructors().Make(note, list)
 	return constructors, token, true
 }
 
@@ -1284,7 +1216,7 @@ func (v *parser_) parseFunctionals() (
 	}
 
 	// Found a sequence of functionals.
-	list.SortValuesWithRanker(func (first, second ast.FunctionalLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.FunctionalLike) age.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
@@ -1296,7 +1228,7 @@ func (v *parser_) parseFunctionals() (
 			return age.EqualRank
 		}
 	})
-	functionals = ast.Functionals().Make(note, list.GetIterator())
+	functionals = ast.Functionals().Make(note, list)
 	return functionals, token, true
 }
 
@@ -1332,7 +1264,7 @@ func (v *parser_) parseFunctions() (
 	}
 
 	// Found a sequence of functions.
-	functions = ast.Functions().Make(note, list.GetIterator())
+	functions = ast.Functions().Make(note, list)
 	return functions, token, true
 }
 
@@ -1619,7 +1551,7 @@ func (v *parser_) parseInstances() (
 	}
 
 	// Found a sequence of instances.
-	list.SortValuesWithRanker(func (first, second ast.InstanceLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.InstanceLike) age.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
@@ -1631,7 +1563,7 @@ func (v *parser_) parseInstances() (
 			return age.EqualRank
 		}
 	})
-	instances = ast.Instances().Make(note, list.GetIterator())
+	instances = ast.Instances().Make(note, list)
 	return instances, token, true
 }
 
@@ -1764,7 +1696,7 @@ func (v *parser_) parseMethods() (
 	}
 
 	// Found a sequence of methods.
-	methods = ast.Methods().Make(note, list.GetIterator())
+	methods = ast.Methods().Make(note, list)
 	return methods, token, true
 }
 
@@ -1793,9 +1725,9 @@ func (v *parser_) parseModel() (
 			"Imports",
 			"Types",
 			"Functionals",
-			"Aspects",
 			"Classes",
 			"Instances",
+			"Aspects",
 		)
 		panic(message)
 	}
@@ -1809,14 +1741,14 @@ func (v *parser_) parseModel() (
 	// Attempt to parse an optional sequence of functionals.
 	var functionals, _, _ = v.parseFunctionals()
 
-	// Attempt to parse an optional sequence of aspects.
-	var aspects, _, _ = v.parseAspects()
-
 	// Attempt to parse an optional sequence of classes.
 	var classes, _, _ = v.parseClasses()
 
 	// Attempt to parse an optional sequence of instances.
 	var instances, _, _ = v.parseInstances()
+
+	// Attempt to parse an optional sequence of aspects.
+	var aspects, _, _ = v.parseAspects()
 
 	// Found a model.
 	model = ast.Model().Make(
@@ -1825,9 +1757,9 @@ func (v *parser_) parseModel() (
 		imports,
 		types,
 		functionals,
-		aspects,
 		classes,
 		instances,
+		aspects,
 	)
 	return model, token, true
 }
@@ -1877,7 +1809,7 @@ func (v *parser_) parseModules() (
 	}
 
 	// Found a sequence of modules.
-	list.SortValuesWithRanker(func (first, second ast.ModuleLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.ModuleLike) age.Rank {
 		var firstPath = first.GetPath()
 		var secondPath = second.GetPath()
 		switch {
@@ -1889,7 +1821,7 @@ func (v *parser_) parseModules() (
 			return age.EqualRank
 		}
 	})
-	modules = ast.Modules().Make(list.GetIterator())
+	modules = ast.Modules().Make(list)
 	return modules, token, true
 }
 
@@ -1994,9 +1926,18 @@ func (v *parser_) parseParameters() (
 		return parameters, token, false
 	}
 
-	// Attempt to parse optional additional parameters.
-	var additionalParameters ast.AdditionalParametersLike
-	additionalParameters, _, _ = v.parseAdditionalParameters()
+	// Attempt to parse zero or more additional parameters.
+	var notation = cdc.Notation().Make()
+	var additionalParameters = col.List[ast.AdditionalParameterLike](notation).Make()
+	var additionalParameter ast.AdditionalParameterLike
+	additionalParameter, token, ok = v.parseAdditionalParameter()
+	for ok {
+		additionalParameters.AppendValue(additionalParameter)
+		additionalParameter, token, ok = v.parseAdditionalParameter()
+	}
+
+	// Attempt to parse an optional trailing "," for the last parameter.
+	v.parseToken(DelimiterToken, ",")
 
 	// Found a sequence of parameters.
 	parameters = ast.Parameters().Make(parameter, additionalParameters)
@@ -2159,7 +2100,7 @@ func (v *parser_) parseTypes() (
 	}
 
 	// Found a sequence of types.
-	list.SortValuesWithRanker(func (first, second ast.TypeLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.TypeLike) age.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
@@ -2171,7 +2112,7 @@ func (v *parser_) parseTypes() (
 			return age.EqualRank
 		}
 	})
-	types = ast.Types().Make(note, list.GetIterator())
+	types = ast.Types().Make(note, list)
 	return types, token, true
 }
 
@@ -2240,17 +2181,14 @@ func (v *parser_) parseValues() (
 		return values, token, false
 	}
 
-	// Attempt to parse additional values.
-	var additionalValues ast.AdditionalValuesLike
-	additionalValues, token, ok = v.parseAdditionalValues()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"AdditionalValues"`,
-			"Values",
-			"Value",
-			"AdditionalValues",
-		)
-		panic(message)
+	// Attempt to parse zero or more additional values.
+	var notation = cdc.Notation().Make()
+	var additionalValues = col.List[ast.AdditionalValueLike](notation).Make()
+	var additionalValue ast.AdditionalValueLike
+	additionalValue, token, ok = v.parseAdditionalValue()
+	for ok {
+		additionalValues.AppendValue(additionalValue)
+		additionalValue, token, ok = v.parseAdditionalValue()
 	}
 
 	// Found a sequence of values.
@@ -2264,48 +2202,43 @@ func (v *parser_) putBack(token TokenLike) {
 }
 
 var syntax = map[string]string{
-	"Model":                `Notice Header Imports? Types? Functionals? Aspects? Classes? Instances? EOF`,
-	"Notice":               `comment`,
-	"Header":               `comment "package" name`,
-	"Imports":              `"import" "(" Modules ")"`,
-	"Modules":              `Module*`,
-	"Module":               `name path`,
-	"Types":                `note Type+`,
-	"Type":                 `Declaration Abstraction Enumeration?`,
-	"Declaration":          `comment "type" name GenericParameters?`,
-	"GenericParameters":    `"[" Parameters "]"`,
-	"Parameters":           `Parameter AdditionalParameters?`,
-	"AdditionalParameters": `"," AdditionalParameter+`,
-	"AdditionalParameter":  `Parameter ","`,
-	"Parameter":            `name Abstraction`,
-	"Abstraction":          `Prefix? name GenericArguments?`,
+	"Model":               `Notice Header Imports? Types? Functionals? Classes? Instances? Aspects? EOF`,
+	"Notice":              `comment`,
+	"Header":              `comment "package" name`,
+	"Imports":             `"import" "(" Modules ")"`,
+	"Modules":             `Module+`,
+	"Module":              `name path`,
+	"Types":               `note Type+`,
+	"Type":                `Declaration Abstraction Enumeration?`,
+	"Declaration":         `comment "type" name GenericParameters?`,
+	"GenericParameters":   `"[" Parameters "]"`,
+	"Parameters":          `Parameter AdditionalParameter* ","?`,
+	"Parameter":           `name Abstraction`,
+	"AdditionalParameter": `"," Parameter`,
+	"Abstraction":         `Prefix? name GenericArguments?`,
 	"Prefix": `
     Array
     Map
     Channel
     Alias`,
-	"Array":               `"[" "]"`,
-	"Map":                 `"map" "[" name "]"`,
-	"Channel":             `"chan"`,
-	"Alias":               `name "."`,
-	"GenericArguments":    `"[" Arguments "]"`,
-	"Arguments":           `Argument AdditionalArguments?`,
-	"AdditionalArguments": `"," AdditionalArgument+`,
-	"AdditionalArgument":  `Argument ","`,
-	"Argument":            `Abstraction`,
-	"Enumeration":         `"const" "(" Values ")"`,
-	"Values":              `Value AdditionalValues`,
-	"Value":               `name Abstraction "=" "iota"`,
-	"AdditionalValues":    `AdditionalValue+`,
-	"AdditionalValue":     `name`,
-	"Functionals":         `note Functional+`,
-	"Functional":          `Declaration "func" "(" Parameters? ")" Result`,
+	"Array":              `"[" "]"`,
+	"Map":                `"map" "[" name "]"`,
+	"Channel":            `"chan"`,
+	"Alias":              `name "."`,
+	"GenericArguments":   `"[" Arguments "]"`,
+	"Arguments":          `Argument AdditionalArgument*`,
+	"Argument":           `Abstraction`,
+	"AdditionalArgument": `"," Argument`,
+	"Enumeration":        `"const" "(" Values ")"`,
+	"Values":             `Value AdditionalValue*`,
+	"Value":              `name Abstraction "=" "iota"`,
+	"AdditionalValue":    `name`,
+	"Functionals":        `note Functional+`,
+	"Functional":         `Declaration "func" "(" Parameters? ")" Result`,
 	"Result": `
     Abstraction
     Parameterized`,
 	"Parameterized": `"(" Parameters ")"`,
-	"Aspects":       `note Aspect+`,
-	"Aspect":        `Declaration "interface" "{" Methods "}"`,
 	"Classes":       `note Class+`,
 	"Class":         `Declaration "interface" "{" Constructors Constants? Functions? "}"`,
 	"Constructors":  `note Constructor+`,
@@ -2321,4 +2254,6 @@ var syntax = map[string]string{
 	"Abstractions":  `note Abstraction+`,
 	"Methods":       `note Method+`,
 	"Method":        `name "(" Parameters? ")" Result?`,
+	"Aspects":       `note Aspect+`,
+	"Aspect":        `Declaration "interface" "{" Methods "}"`,
 }

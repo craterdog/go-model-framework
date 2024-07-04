@@ -12,8 +12,6 @@
 
 package ast
 
-import ()
-
 // CLASS ACCESS
 
 // Reference
@@ -44,9 +42,9 @@ func (c *modelClass_) Make(
 	imports ImportsLike,
 	types TypesLike,
 	functionals FunctionalsLike,
-	aspects AspectsLike,
 	classes ClassesLike,
 	instances InstancesLike,
+	aspects AspectsLike,
 ) ModelLike {
 	return &model_{
 		// Initialize instance attributes.
@@ -56,9 +54,9 @@ func (c *modelClass_) Make(
 		imports_:     imports,
 		types_:       types,
 		functionals_: functionals,
-		aspects_:     aspects,
 		classes_:     classes,
 		instances_:   instances,
+		aspects_:     aspects,
 	}
 }
 
@@ -74,9 +72,9 @@ type model_ struct {
 	imports_     ImportsLike
 	types_       TypesLike
 	functionals_ FunctionalsLike
-	aspects_     AspectsLike
 	classes_     ClassesLike
 	instances_   InstancesLike
+	aspects_     AspectsLike
 }
 
 // Attributes
@@ -105,16 +103,16 @@ func (v *model_) GetFunctionals() FunctionalsLike {
 	return v.functionals_
 }
 
-func (v *model_) GetAspects() AspectsLike {
-	return v.aspects_
-}
-
 func (v *model_) GetClasses() ClassesLike {
 	return v.classes_
 }
 
 func (v *model_) GetInstances() InstancesLike {
 	return v.instances_
+}
+
+func (v *model_) GetAspects() AspectsLike {
+	return v.aspects_
 }
 
 // Private

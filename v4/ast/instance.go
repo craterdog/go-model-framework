@@ -12,8 +12,6 @@
 
 package ast
 
-import ()
-
 // CLASS ACCESS
 
 // Reference
