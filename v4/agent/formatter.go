@@ -145,10 +145,10 @@ func (v *formatter_) formatAbstraction(abstraction ast.AbstractionLike) {
 func (v *formatter_) formatAbstractions(abstractions ast.AbstractionsLike) {
 	v.appendNewline()
 	v.appendString("// Abstractions")
-	v.appendNewline()
 	var iterator = abstractions.GetAbstractions().GetIterator()
 	for iterator.HasNext() {
 		var abstraction = iterator.GetNext()
+		v.appendNewline()
 		v.formatAbstraction(abstraction)
 	}
 }
