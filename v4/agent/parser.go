@@ -203,11 +203,14 @@ func (v *parser_) parseAbstraction() (
 	// Attempt to parse an optional prefix.
 	var prefix, _, _ = v.parsePrefix()
 
+	// Attempt to parse an optional alias.
+	var alias, _, _ = v.parseAlias()
+
 	// Attempt to parse the name of the abstraction.
 	var name string
 	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
-		if prefix != nil {
+		if prefix != nil || alias != nil {
 			var message = v.formatError(token)
 			message += v.generateSyntax("name",
 				"Abstraction",
@@ -221,22 +224,20 @@ func (v *parser_) parseAbstraction() (
 	}
 
 	// Check if the name is actually a method name for the next declaration.
-	if prefix == nil {
-		var delimiterToken TokenLike
-		_, delimiterToken, ok = v.parseToken(DelimiterToken, "(")
-		if ok {
-			// This is not an abstraction, put back the delimiter and name tokens.
-			v.putBack(delimiterToken)
-			v.putBack(token)
-			return abstraction, token, false
-		}
+	var delimiterToken TokenLike
+	_, delimiterToken, ok = v.parseToken(DelimiterToken, "(")
+	if ok {
+		// This is not an abstraction, put back the delimiter and name tokens.
+		v.putBack(delimiterToken)
+		v.putBack(token)
+		return abstraction, token, false
 	}
 
 	// Attempt to parse optional generic arguments.
 	var genericArguments, _, _ = v.parseGenericArguments()
 
 	// Found an abstraction.
-	abstraction = ast.Abstraction().Make(prefix, name, genericArguments)
+	abstraction = ast.Abstraction().Make(prefix, alias, name, genericArguments)
 	return abstraction, token, true
 }
 
@@ -1973,14 +1974,6 @@ func (v *parser_) parsePrefix() (
 		return prefix, token, true
 	}
 
-	// Attempt to parse an alias prefix.
-	var alias ast.AliasLike
-	alias, token, ok = v.parseAlias()
-	if ok {
-		prefix = ast.Prefix().Make(alias)
-		return prefix, token, true
-	}
-
 	// This is not a prefix.
 	return prefix, token, false
 }
@@ -2215,12 +2208,11 @@ var syntax = map[string]string{
 	"Parameters":          `Parameter AdditionalParameter* ","?`,
 	"Parameter":           `name Abstraction`,
 	"AdditionalParameter": `"," Parameter`,
-	"Abstraction":         `Prefix? name GenericArguments?`,
+	"Abstraction":         `Prefix? Alias? name GenericArguments?`,
 	"Prefix": `
     Array
     Map
-    Channel
-    Alias`,
+    Channel`,
 	"Array":              `"[" "]"`,
 	"Map":                `"map" "[" name "]"`,
 	"Channel":            `"chan"`,

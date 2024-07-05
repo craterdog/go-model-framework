@@ -134,6 +134,10 @@ func (v *formatter_) formatAbstraction(abstraction ast.AbstractionLike) {
 	if prefix != nil {
 		v.formatPrefix(prefix)
 	}
+	var alias = abstraction.GetAlias()
+	if alias != nil {
+		v.formatAlias(alias)
+	}
 	var name = abstraction.GetName()
 	v.appendString(name)
 	var genericArguments = abstraction.GetGenericArguments()
@@ -634,8 +638,6 @@ func (v *formatter_) formatPrefix(prefix ast.PrefixLike) {
 		v.formatMap(actual)
 	case ast.ChannelLike:
 		v.formatChannel(actual)
-	case ast.AliasLike:
-		v.formatAlias(actual)
 	default:
 		var message = fmt.Sprintf(
 			"Attempted to format an unknown prefix type: %T",

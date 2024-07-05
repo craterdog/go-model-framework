@@ -79,13 +79,12 @@ Parameter: name Abstraction
 
 AdditionalParameter: "," Parameter
 
-Abstraction: Prefix? name GenericArguments?
+Abstraction: Prefix? Alias? name GenericArguments?
 
 Prefix:
     Array
     Map
     Channel
-    Alias
 
 Array: "[" "]"
 

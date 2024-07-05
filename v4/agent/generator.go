@@ -187,7 +187,7 @@ func (v *generator_) extractArguments(
 
 	// Extract the first argument.
 	var parameter = parameters.GetParameter()
-	var abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
+	var abstraction = ast.Abstraction().Make(nil, nil, parameter.GetName(), nil)
 	var argument = ast.Argument().Make(abstraction)
 
 	// Extract any additional arguments.
@@ -196,7 +196,7 @@ func (v *generator_) extractArguments(
 		var iterator = additionalParameters.GetIterator()
 		for iterator.HasNext() {
 			parameter = iterator.GetNext().GetParameter()
-			abstraction = ast.Abstraction().Make(nil, parameter.GetName(), nil)
+			abstraction = ast.Abstraction().Make(nil, nil, parameter.GetName(), nil)
 			var additionalArgument = ast.AdditionalArgument().Make(
 				ast.Argument().Make(abstraction),
 			)
@@ -276,17 +276,29 @@ func (v *generator_) extractInstanceAttributes(
 		var name = attribute.GetName()
 		var abstraction ast.AbstractionLike
 		switch {
-		case sts.HasPrefix(name, "Get"):
-			attributeName = sts.TrimPrefix(name, "Get")
-			abstraction = attribute.GetAbstraction()
 		case sts.HasPrefix(name, "Is"):
 			attributeName = sts.TrimPrefix(name, "Is")
 			abstraction = attribute.GetAbstraction()
 		case sts.HasPrefix(name, "Was"):
 			attributeName = sts.TrimPrefix(name, "Was")
 			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(name, "Are"):
+			attributeName = sts.TrimPrefix(name, "Are")
+			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(name, "Were"):
+			attributeName = sts.TrimPrefix(name, "Were")
+			abstraction = attribute.GetAbstraction()
 		case sts.HasPrefix(name, "Has"):
 			attributeName = sts.TrimPrefix(name, "Has")
+			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(name, "Had"):
+			attributeName = sts.TrimPrefix(name, "Had")
+			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(name, "Have"):
+			attributeName = sts.TrimPrefix(name, "Have")
+			abstraction = attribute.GetAbstraction()
+		case sts.HasPrefix(name, "Get"):
+			attributeName = sts.TrimPrefix(name, "Get")
 			abstraction = attribute.GetAbstraction()
 		case sts.HasPrefix(name, "Set"):
 			attributeName = sts.TrimPrefix(name, "Set")
@@ -398,7 +410,7 @@ func (v *generator_) generateAbstractions(
 		var instanceAspect = instanceAspectTemplate_
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<AspectName>", aspectName)
 		var methods string
-		if abstraction.GetPrefix() == nil {
+		if abstraction.GetAlias() == nil {
 			// We only know the method signatures for the local aspects.
 			var mappings col.CatalogLike[string, ast.AbstractionLike]
 			var aspect = v.retrieveAspect(model, abstraction.GetName())
@@ -992,21 +1004,44 @@ func (v *generator_) makePrivate(name string) string {
 	return string(runes)
 }
 
+func (v *generator_) replaceAbstractionType(
+	abstraction ast.AbstractionLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) ast.AbstractionLike {
+	// Skip any abstractions that are not generic arguments.
+	var prefix = abstraction.GetPrefix()
+	var alias = abstraction.GetAlias()
+	var genericArguments = abstraction.GetGenericArguments()
+	if alias != nil || genericArguments != nil {
+		return abstraction
+	}
+	var typeName = abstraction.GetName()
+	var concreteType = mappings.GetValue(typeName)
+	if concreteType == nil {
+		return abstraction
+	}
+
+	// Replace the generic argument with the concrete type.
+	alias = concreteType.GetAlias()
+	typeName = concreteType.GetName()
+	genericArguments = concreteType.GetGenericArguments()
+	abstraction = ast.Abstraction().Make(
+		prefix,
+		alias,
+		typeName,
+		genericArguments,
+	)
+	return abstraction
+}
+
 func (v *generator_) replaceParameterType(
 	parameter ast.ParameterLike,
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.ParameterLike {
 	var parameterName = parameter.GetName()
 	var abstraction = parameter.GetAbstraction()
-	var prefix = abstraction.GetPrefix()
-	var typeName = abstraction.GetName()
-	var concreteType = mappings.GetValue(typeName)
-	if concreteType != nil {
-		var name = concreteType.GetName()
-		var genericArguments = concreteType.GetGenericArguments()
-		abstraction = ast.Abstraction().Make(prefix, name, genericArguments)
-		parameter = ast.Parameter().Make(parameterName, abstraction)
-	}
+	abstraction = v.replaceAbstractionType(abstraction, mappings)
+	parameter = ast.Parameter().Make(parameterName, abstraction)
 	return parameter
 }
 
@@ -1053,14 +1088,7 @@ func (v *generator_) replaceResultType(
 	switch actual := result.GetAny().(type) {
 	case ast.AbstractionLike:
 		var abstraction = actual
-		var prefix = abstraction.GetPrefix()
-		var typeName = abstraction.GetName()
-		var concreteType = mappings.GetValue(typeName)
-		if concreteType != nil {
-			var name = concreteType.GetName()
-			var genericArguments = concreteType.GetGenericArguments()
-			abstraction = ast.Abstraction().Make(prefix, name, genericArguments)
-		}
+		abstraction = v.replaceAbstractionType(abstraction, mappings)
 		result = ast.Result().Make(abstraction)
 	case ast.ParameterizedLike:
 		var parameterized = actual

@@ -44,6 +44,7 @@ type AbstractionClassLike interface {
 	// Constructors
 	Make(
 		prefix PrefixLike,
+		alias AliasLike,
 		name string,
 		genericArguments GenericArgumentsLike,
 	) AbstractionLike
@@ -637,6 +638,7 @@ type AbstractionLike interface {
 	// Attributes
 	GetClass() AbstractionClassLike
 	GetPrefix() PrefixLike
+	GetAlias() AliasLike
 	GetName() string
 	GetGenericArguments() GenericArgumentsLike
 }

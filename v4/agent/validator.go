@@ -187,6 +187,12 @@ func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 		v.validatePrefix(prefix)
 	}
 
+	// Validate the optional alias.
+	var alias = abstraction.GetAlias()
+	if alias != nil {
+		v.validateAlias(alias)
+	}
+
 	// Record the name of the abstraction.
 	var name = abstraction.GetName()
 	v.abstractions_.SetValue(name, abstraction)
@@ -205,6 +211,24 @@ func (v *validator_) validateAbstractions(abstractions ast.AbstractionsLike) {
 		var abstraction = iterator.GetNext()
 		v.validateAbstraction(abstraction)
 	}
+}
+
+func (v *validator_) validateAlias(alias ast.AliasLike) {
+	var name = alias.GetName()
+	var iterator = v.imports_.GetIterator()
+	for iterator.HasNext() {
+		var association = iterator.GetNext()
+		var module = association.GetValue()
+		if module.GetName() == name {
+			// Found a matching alias.
+			return
+		}
+	}
+	var message = fmt.Sprintf(
+		"Found an unknown module alias name: %v",
+		name,
+	)
+	panic(message)
 }
 
 func (v *validator_) validateArgument(argument ast.ArgumentLike) {
@@ -310,6 +334,10 @@ func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 	var prefix = abstraction.GetPrefix()
 	if prefix != nil {
 		panic("A boolean type does not have a prefix.")
+	}
+	var alias = abstraction.GetAlias()
+	if alias != nil {
+		panic("A boolean type does not have an alias.")
 	}
 	var name = abstraction.GetName()
 	if name != "bool" {
@@ -572,26 +600,7 @@ func (v *validator_) validateParameters(parameters ast.ParametersLike) {
 }
 
 func (v *validator_) validatePrefix(prefix ast.PrefixLike) {
-	switch actual := prefix.GetAny().(type) {
-	case ast.AliasLike:
-		var name = actual.GetName()
-		var iterator = v.imports_.GetIterator()
-		for iterator.HasNext() {
-			var association = iterator.GetNext()
-			var module = association.GetValue()
-			if module.GetName() == name {
-				// Found a matching alias.
-				return
-			}
-		}
-		var message = fmt.Sprintf(
-			"Found an unknown module alias name: %v",
-			name,
-		)
-		panic(message)
-	default:
-		// Ignore the other prefix types.
-	}
+	// Nothing to validate.
 }
 
 func (v *validator_) validateResult(result ast.ResultLike) {

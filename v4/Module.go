@@ -107,6 +107,7 @@ type (
 func Abstraction(args ...any) AbstractionLike {
 	// Initialize the possible arguments.
 	var prefix PrefixLike
+	var alias AliasLike
 	var name string
 	var genericArguments GenericArgumentsLike
 
@@ -115,6 +116,8 @@ func Abstraction(args ...any) AbstractionLike {
 		switch actual := arg.(type) {
 		case PrefixLike:
 			prefix = actual
+		case AliasLike:
+			alias = actual
 		case string:
 			name = actual
 		case GenericArgumentsLike:
@@ -131,6 +134,7 @@ func Abstraction(args ...any) AbstractionLike {
 	// Call the constructor.
 	var abstraction = ast.Abstraction().Make(
 		prefix,
+		alias,
 		name,
 		genericArguments,
 	)
@@ -1387,7 +1391,6 @@ func Prefix(args ...any) PrefixLike {
 	var array ast.ArrayLike
 	var map_ ast.MapLike
 	var channel ast.ChannelLike
-	var alias ast.AliasLike
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -1398,8 +1401,6 @@ func Prefix(args ...any) PrefixLike {
 			map_ = actual
 		case ast.ChannelLike:
 			channel = actual
-		case ast.AliasLike:
-			alias = actual
 		default:
 			var message = fmt.Sprintf(
 				"An unknown argument type was passed into the prefix constructor: %T\n",
@@ -1418,8 +1419,6 @@ func Prefix(args ...any) PrefixLike {
 		prefix = ast.Prefix().Make(map_)
 	case channel != nil:
 		prefix = ast.Prefix().Make(channel)
-	case alias != nil:
-		prefix = ast.Prefix().Make(alias)
 	default:
 		panic("The constructor for a result requires an argument.")
 	}
