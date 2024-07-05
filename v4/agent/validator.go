@@ -515,7 +515,7 @@ func (v *validator_) validateInstance(instance ast.InstanceLike) {
 	// Validate the instance public methods.
 	var methods = instance.GetMethods()
 	if methods != nil {
-		v.validateMethods(methods)
+		v.validateMethods(methods.GetMethods())
 	}
 }
 
@@ -550,8 +550,8 @@ func (v *validator_) validateMethod(method ast.MethodLike) {
 	}
 }
 
-func (v *validator_) validateMethods(methods ast.MethodsLike) {
-	var iterator = methods.GetMethods().GetIterator()
+func (v *validator_) validateMethods(methods col.Sequential[ast.MethodLike]) {
+	var iterator = methods.GetIterator()
 	for iterator.HasNext() {
 		var method = iterator.GetNext()
 		v.validateMethod(method)

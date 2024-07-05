@@ -152,7 +152,7 @@ Method: name "(" Parameters? ")" Result?
 
 Aspects: note Aspect+
 
-Aspect: Declaration "interface" "{" Methods "}"
+Aspect: Declaration "interface" "{" Method+ "}"
 
 !>
 LEXIGRAM DEFINITIONS

@@ -366,14 +366,8 @@ func (v *generator_) generateAbstractionMethods(
 	aspect ast.AspectLike,
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) (implementation string) {
-	// Check for no aspect methods.
-	var aspectMethods = aspect.GetMethods()
-	if aspectMethods == nil {
-		return implementation
-	}
-
 	// Generate the method implementations for the aspect.
-	var iterator = aspectMethods.GetMethods().GetIterator()
+	var iterator = aspect.GetMethods().GetIterator()
 	for iterator.HasNext() {
 		var aspectMethod = iterator.GetNext()
 		var methodImplementation = v.generateMethodImplementation(

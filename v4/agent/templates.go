@@ -277,7 +277,6 @@ Angular is an aspect interface that defines a set of method signatures that
 must be supported by each instance of an angular concrete class.
 */
 type Angular interface {
-	// Methods
 	AsNormalized() AngleLike
 	InUnits(units Units) float64
 }`
@@ -395,7 +394,6 @@ Notice that because the indices are ordinal based, the positive and negative
 indices are symmetrical.
 */
 type Accessible[V any] interface {
-	// Methods
 	GetValue(index int) V
 	GetValues(
 		first int,
@@ -412,7 +410,6 @@ arithmetic and comparison operations between "int" and "uint" so we us "int" for
 the return type to make it easier to use.
 */
 type Sequential[V any] interface {
-	// Methods
 	IsEmpty() bool
 	GetSize() int
 	AsArray() []V
@@ -423,7 +420,6 @@ Updatable[V any] is an aspect interface that defines a set of method signatures
 that must be supported by each instance of an updatable concrete class.
 */
 type Updatable[V any] interface {
-	// Methods
 	SetValue(
 		index int,
 		value V,
@@ -556,7 +552,6 @@ Continuous is an aspect interface that defines a set of method signatures
 that must be supported by each instance of a continuous concrete class.
 */
 type Continuous interface {
-	// Methods
 	IsZero() bool
 	IsDiscrete() bool
 	IsInfinity() bool
@@ -704,7 +699,6 @@ Associative[K comparable, V any] defines the set of method signatures that
 must be supported by all sequences of key-value associations.
 */
 type Associative[K comparable, V any] interface {
-	// Methods
 	GetKeys() Sequential[K]
 	GetValue(key K) V
 	RemoveValue(key K) V
@@ -723,7 +717,6 @@ arithmetic and comparison operations between "int" and "uint" so we us "int" for
 the return type to make it easier to use.
 */
 type Sequential[V any] interface {
-	// Methods
 	AsArray() []V
 	GetSize() int
 	IsEmpty() bool

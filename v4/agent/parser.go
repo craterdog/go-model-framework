@@ -470,7 +470,7 @@ func (v *parser_) parseAspect() (
 		message += v.generateSyntax(`"interface"`,
 			"Aspect",
 			"Declaration",
-			"Methods",
+			"Method",
 		)
 		panic(message)
 	}
@@ -482,22 +482,28 @@ func (v *parser_) parseAspect() (
 		message += v.generateSyntax("{",
 			"Aspect",
 			"Declaration",
-			"Methods",
+			"Method",
 		)
 		panic(message)
 	}
 
-	// Attempt to parse a sequence of methods.
-	var methods ast.MethodsLike
-	methods, token, ok = v.parseMethods()
+	// Attempt to parse one or more methods.
+	var method ast.MethodLike
+	method, token, ok = v.parseMethod()
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("Methods",
 			"Aspect",
 			"Declaration",
-			"Methods",
+			"Method",
 		)
 		panic(message)
+	}
+	var notation = cdc.Notation().Make()
+	var methods = col.List[ast.MethodLike](notation).Make()
+	for ok {
+		methods.AppendValue(method)
+		method, _, ok = v.parseMethod()
 	}
 
 	// Attempt to parse the closing "}" bracket.
@@ -507,7 +513,7 @@ func (v *parser_) parseAspect() (
 		message += v.generateSyntax("}",
 			"Aspect",
 			"Declaration",
-			"Methods",
+			"Method",
 		)
 		panic(message)
 	}
@@ -2247,5 +2253,5 @@ var syntax = map[string]string{
 	"Methods":       `note Method+`,
 	"Method":        `name "(" Parameters? ")" Result?`,
 	"Aspects":       `note Aspect+`,
-	"Aspect":        `Declaration "interface" "{" Methods "}"`,
+	"Aspect":        `Declaration "interface" "{" Method+ "}"`,
 }

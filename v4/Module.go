@@ -349,21 +349,27 @@ func Array(args ...any) ArrayLike {
 func Aspect(args ...any) AspectLike {
 	// Initialize the possible arguments.
 	var declaration DeclarationLike
-	var methods MethodsLike
+	var methods col.Sequential[MethodLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
 		switch actual := arg.(type) {
 		case DeclarationLike:
 			declaration = actual
-		case MethodsLike:
-			methods = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the aspect constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			// Unfortunately generic types must be handled reflectively.
+			var sequenceType = ref.TypeOf((*col.Sequential[MethodLike])(nil)).Elem()
+			var reflectedType = ref.TypeOf(arg)
+			switch {
+			case reflectedType.Implements(sequenceType):
+				methods = arg.(col.Sequential[MethodLike])
+			default:
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the aspect constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 

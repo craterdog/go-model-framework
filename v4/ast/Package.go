@@ -145,7 +145,7 @@ type AspectClassLike interface {
 	// Constructors
 	Make(
 		declaration DeclarationLike,
-		methods MethodsLike,
+		methods col.Sequential[MethodLike],
 	) AspectLike
 }
 
@@ -741,7 +741,7 @@ type AspectLike interface {
 	// Attributes
 	GetClass() AspectClassLike
 	GetDeclaration() DeclarationLike
-	GetMethods() MethodsLike
+	GetMethods() col.Sequential[MethodLike]
 }
 
 /*
