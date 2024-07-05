@@ -214,7 +214,6 @@ func (v *formatter_) formatAspect(aspect ast.AspectLike) {
 	v.formatDeclaration(declaration)
 	v.appendString(" interface {")
 	v.depth_++
-	v.appendNewline()
 	var methods = aspect.GetMethods()
 	var iterator = methods.GetIterator()
 	for iterator.HasNext() {
