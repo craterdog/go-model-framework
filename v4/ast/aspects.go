@@ -44,11 +44,18 @@ func (c *aspectsClass_) Make(
 	note string,
 	aspects col.Sequential[AspectLike],
 ) AspectsLike {
-	return &aspects_{
-		// Initialize instance attributes.
-		class_:   c,
-		note_:    note,
-		aspects_: aspects,
+	switch {
+	case len(note) == 0:
+		panic("The note attribute is required for each sequence of aspects.")
+	case aspects == nil || aspects.IsEmpty():
+		panic("At least one aspect is required for each sequence of aspects.")
+	default:
+		return &aspects_{
+			// Initialize instance attributes.
+			class_:   c,
+			note_:    note,
+			aspects_: aspects,
+		}
 	}
 }
 

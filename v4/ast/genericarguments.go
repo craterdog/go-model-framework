@@ -37,10 +37,15 @@ type genericArgumentsClass_ struct {
 // Constructors
 
 func (c *genericArgumentsClass_) Make(arguments ArgumentsLike) GenericArgumentsLike {
-	return &genericArguments_{
-		// Initialize instance attributes.
-		class_:     c,
-		arguments_: arguments,
+	switch {
+	case arguments == nil:
+		panic("The arguments attribute is required for each generic arguments.")
+	default:
+		return &genericArguments_{
+			// Initialize instance attributes.
+			class_:     c,
+			arguments_: arguments,
+		}
 	}
 }
 

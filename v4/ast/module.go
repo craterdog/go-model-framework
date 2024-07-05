@@ -40,11 +40,18 @@ func (c *moduleClass_) Make(
 	name string,
 	path string,
 ) ModuleLike {
-	return &module_{
-		// Initialize instance attributes.
-		class_: c,
-		name_:  name,
-		path_:  path,
+	switch {
+	case len(name) == 0:
+		panic("The name attribute is required for each module.")
+	case len(path) == 0:
+		panic("The path attribute is required for each module.")
+	default:
+		return &module_{
+			// Initialize instance attributes.
+			class_: c,
+			name_:  name,
+			path_:  path,
+		}
 	}
 }
 

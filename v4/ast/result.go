@@ -37,10 +37,15 @@ type resultClass_ struct {
 // Constructors
 
 func (c *resultClass_) Make(any_ any) ResultLike {
-	return &result_{
-		// Initialize instance attributes.
-		class_: c,
-		any_:   any_,
+	switch {
+	case any_ == nil:
+		panic("The any_ attribute is required for each result.")
+	default:
+		return &result_{
+			// Initialize instance attributes.
+			class_: c,
+			any_:   any_,
+		}
 	}
 }
 

@@ -42,13 +42,18 @@ func (c *abstractionClass_) Make(
 	name string,
 	genericArguments GenericArgumentsLike,
 ) AbstractionLike {
-	return &abstraction_{
-		// Initialize instance attributes.
-		class_:            c,
-		prefix_:           prefix,
-		alias_:            alias,
-		name_:             name,
-		genericArguments_: genericArguments,
+	switch {
+	case len(name) == 0:
+		panic("The name attribute is required for each abstraction.")
+	default:
+		return &abstraction_{
+			// Initialize instance attributes.
+			class_:            c,
+			prefix_:           prefix,
+			alias_:            alias,
+			name_:             name,
+			genericArguments_: genericArguments,
+		}
 	}
 }
 
@@ -71,11 +76,11 @@ func (v *abstraction_) GetClass() AbstractionClassLike {
 	return v.class_
 }
 
-func (v *abstraction_) GetPrefix() PrefixLike {
+func (v *abstraction_) GetOptionalPrefix() PrefixLike {
 	return v.prefix_
 }
 
-func (v *abstraction_) GetAlias() AliasLike {
+func (v *abstraction_) GetOptionalAlias() AliasLike {
 	return v.alias_
 }
 
@@ -83,7 +88,7 @@ func (v *abstraction_) GetName() string {
 	return v.name_
 }
 
-func (v *abstraction_) GetGenericArguments() GenericArgumentsLike {
+func (v *abstraction_) GetOptionalGenericArguments() GenericArgumentsLike {
 	return v.genericArguments_
 }
 

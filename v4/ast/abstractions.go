@@ -44,11 +44,18 @@ func (c *abstractionsClass_) Make(
 	note string,
 	abstractions col.Sequential[AbstractionLike],
 ) AbstractionsLike {
-	return &abstractions_{
-		// Initialize instance attributes.
-		class_:        c,
-		note_:         note,
-		abstractions_: abstractions,
+	switch {
+	case len(note) == 0:
+		panic("The note attribute is required for each sequence of abstractions.")
+	case abstractions == nil || abstractions.IsEmpty():
+		panic("At least one abstraction is required for each sequence of abstractions.")
+	default:
+		return &abstractions_{
+			// Initialize instance attributes.
+			class_:        c,
+			note_:         note,
+			abstractions_: abstractions,
+		}
 	}
 }
 

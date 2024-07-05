@@ -44,11 +44,18 @@ func (c *functionalsClass_) Make(
 	note string,
 	functionals col.Sequential[FunctionalLike],
 ) FunctionalsLike {
-	return &functionals_{
-		// Initialize instance attributes.
-		class_:       c,
-		note_:        note,
-		functionals_: functionals,
+	switch {
+	case len(note) == 0:
+		panic("The note attribute is required for each sequence of functionals.")
+	case functionals == nil || functionals.IsEmpty():
+		panic("At least one functional is required for each sequence of functionals.")
+	default:
+		return &functionals_{
+			// Initialize instance attributes.
+			class_:       c,
+			note_:        note,
+			functionals_: functionals,
+		}
 	}
 }
 

@@ -40,11 +40,18 @@ func (c *headerClass_) Make(
 	comment string,
 	name string,
 ) HeaderLike {
-	return &header_{
-		// Initialize instance attributes.
-		class_:   c,
-		comment_: comment,
-		name_:    name,
+	switch {
+	case len(comment) == 0:
+		panic("The comment attribute is required for each header.")
+	case len(name) == 0:
+		panic("The name attribute is required for each header.")
+	default:
+		return &header_{
+			// Initialize instance attributes.
+			class_:   c,
+			comment_: comment,
+			name_:    name,
+		}
 	}
 }
 

@@ -42,13 +42,20 @@ func (c *classClass_) Make(
 	constants ConstantsLike,
 	functions FunctionsLike,
 ) ClassLike {
-	return &class_{
-		// Initialize instance attributes.
-		class_:        c,
-		declaration_:  declaration,
-		constructors_: constructors,
-		constants_:    constants,
-		functions_:    functions,
+	switch {
+	case declaration == nil:
+		panic("The declaration attribute is required for each class.")
+	case constructors == nil:
+		panic("At least one constructor is required for each class.")
+	default:
+		return &class_{
+			// Initialize instance attributes.
+			class_:        c,
+			declaration_:  declaration,
+			constructors_: constructors,
+			constants_:    constants,
+			functions_:    functions,
+		}
 	}
 }
 
@@ -79,11 +86,11 @@ func (v *class_) GetConstructors() ConstructorsLike {
 	return v.constructors_
 }
 
-func (v *class_) GetConstants() ConstantsLike {
+func (v *class_) GetOptionalConstants() ConstantsLike {
 	return v.constants_
 }
 
-func (v *class_) GetFunctions() FunctionsLike {
+func (v *class_) GetOptionalFunctions() FunctionsLike {
 	return v.functions_
 }
 

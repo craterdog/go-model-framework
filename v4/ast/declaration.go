@@ -41,12 +41,19 @@ func (c *declarationClass_) Make(
 	name string,
 	genericParameters GenericParametersLike,
 ) DeclarationLike {
-	return &declaration_{
-		// Initialize instance attributes.
-		class_:             c,
-		comment_:           comment,
-		name_:              name,
-		genericParameters_: genericParameters,
+	switch {
+	case len(comment) == 0:
+		panic("The comment attribute is required for each declaration.")
+	case len(name) == 0:
+		panic("The name attribute is required for each declaration.")
+	default:
+		return &declaration_{
+			// Initialize instance attributes.
+			class_:             c,
+			comment_:           comment,
+			name_:              name,
+			genericParameters_: genericParameters,
+		}
 	}
 }
 
@@ -76,7 +83,7 @@ func (v *declaration_) GetName() string {
 	return v.name_
 }
 
-func (v *declaration_) GetGenericParameters() GenericParametersLike {
+func (v *declaration_) GetOptionalGenericParameters() GenericParametersLike {
 	return v.genericParameters_
 }
 

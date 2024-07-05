@@ -2201,7 +2201,7 @@ func (v *parser_) putBack(token TokenLike) {
 }
 
 var syntax = map[string]string{
-	"Model":               `Notice Header Imports? Types? Functionals? Classes? Instances? Aspects? EOF`,
+	"Model":               `Notice Header Imports? Types? Functionals? Classes Instances Aspects? EOF`,
 	"Notice":              `comment`,
 	"Header":              `comment "package" name`,
 	"Imports":             `"import" "(" Modules ")"`,

@@ -44,11 +44,18 @@ func (c *aspectClass_) Make(
 	declaration DeclarationLike,
 	methods col.Sequential[MethodLike],
 ) AspectLike {
-	return &aspect_{
-		// Initialize instance attributes.
-		class_:       c,
-		declaration_: declaration,
-		methods_:     methods,
+	switch {
+	case declaration == nil:
+		panic("The declaration attribute is required for each aspect.")
+	case methods == nil:
+		panic("The methods attribute is required for each aspect.")
+	default:
+		return &aspect_{
+			// Initialize instance attributes.
+			class_:       c,
+			declaration_: declaration,
+			methods_:     methods,
+		}
 	}
 }
 

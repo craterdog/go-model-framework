@@ -44,11 +44,18 @@ func (c *attributesClass_) Make(
 	note string,
 	attributes col.Sequential[AttributeLike],
 ) AttributesLike {
-	return &attributes_{
-		// Initialize instance attributes.
-		class_:      c,
-		note_:       note,
-		attributes_: attributes,
+	switch {
+	case len(note) == 0:
+		panic("The note attribute is required for each sequence of attributes.")
+	case attributes == nil || attributes.IsEmpty():
+		panic("At least one attribute is required for each sequence of attributes.")
+	default:
+		return &attributes_{
+			// Initialize instance attributes.
+			class_:      c,
+			note_:       note,
+			attributes_: attributes,
+		}
 	}
 }
 

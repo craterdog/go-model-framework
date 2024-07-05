@@ -41,12 +41,19 @@ func (c *functionClass_) Make(
 	parameters ParametersLike,
 	result ResultLike,
 ) FunctionLike {
-	return &function_{
-		// Initialize instance attributes.
-		class_:      c,
-		name_:       name,
-		parameters_: parameters,
-		result_:     result,
+	switch {
+	case len(name) == 0:
+		panic("The name attribute is required for each function.")
+	case result == nil:
+		panic("The result attribute is required for each function.")
+	default:
+		return &function_{
+			// Initialize instance attributes.
+			class_:      c,
+			name_:       name,
+			parameters_: parameters,
+			result_:     result,
+		}
 	}
 }
 
@@ -72,7 +79,7 @@ func (v *function_) GetName() string {
 	return v.name_
 }
 
-func (v *function_) GetParameters() ParametersLike {
+func (v *function_) GetOptionalParameters() ParametersLike {
 	return v.parameters_
 }
 

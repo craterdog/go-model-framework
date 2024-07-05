@@ -44,11 +44,18 @@ func (c *constructorsClass_) Make(
 	note string,
 	constructors col.Sequential[ConstructorLike],
 ) ConstructorsLike {
-	return &constructors_{
-		// Initialize instance attributes.
-		class_:        c,
-		note_:         note,
-		constructors_: constructors,
+	switch {
+	case len(note) == 0:
+		panic("The note attribute is required for each sequence of constructors.")
+	case constructors == nil || constructors.IsEmpty():
+		panic("At least one constructor is required for each sequence of constructors.")
+	default:
+		return &constructors_{
+			// Initialize instance attributes.
+			class_:        c,
+			note_:         note,
+			constructors_: constructors,
+		}
 	}
 }
 

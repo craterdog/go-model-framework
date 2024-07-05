@@ -53,7 +53,7 @@ tokens is greedy and will match as many repeated token types as possible. The
 sequence of factors within in a rule definition may be separated by spaces which
 are ignored by the parser.
 <!
-Model: Notice Header Imports? Types? Functionals? Classes? Instances? Aspects? EOF
+Model: Notice Header Imports? Types? Functionals? Classes Instances Aspects? EOF
 
 Notice: comment
 

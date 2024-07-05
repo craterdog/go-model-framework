@@ -44,11 +44,18 @@ func (c *argumentsClass_) Make(
 	argument ArgumentLike,
 	additionalArguments col.Sequential[AdditionalArgumentLike],
 ) ArgumentsLike {
-	return &arguments_{
-		// Initialize instance attributes.
-		class_:               c,
-		argument_:            argument,
-		additionalArguments_: additionalArguments,
+	switch {
+	case argument == nil:
+		panic("The argument attribute is required for each sequence of arguments.")
+	case additionalArguments == nil:
+		panic("The additional arguments attribute is required for each sequence of arguments.")
+	default:
+		return &arguments_{
+			// Initialize instance attributes.
+			class_:               c,
+			argument_:            argument,
+			additionalArguments_: additionalArguments,
+		}
 	}
 }
 

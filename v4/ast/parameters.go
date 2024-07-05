@@ -44,11 +44,18 @@ func (c *parametersClass_) Make(
 	parameter ParameterLike,
 	additionalParameters col.Sequential[AdditionalParameterLike],
 ) ParametersLike {
-	return &parameters_{
-		// Initialize instance attributes.
-		class_:                c,
-		parameter_:            parameter,
-		additionalParameters_: additionalParameters,
+	switch {
+	case parameter == nil:
+		panic("The parameter attribute is required for each sequence of parameters.")
+	case additionalParameters == nil:
+		panic("The additionalParameters attribute is required for each sequence of parameters.")
+	default:
+		return &parameters_{
+			// Initialize instance attributes.
+			class_:                c,
+			parameter_:            parameter,
+			additionalParameters_: additionalParameters,
+		}
 	}
 }
 

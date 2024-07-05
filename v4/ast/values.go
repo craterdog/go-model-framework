@@ -44,11 +44,18 @@ func (c *valuesClass_) Make(
 	value ValueLike,
 	additionalValues col.Sequential[AdditionalValueLike],
 ) ValuesLike {
-	return &values_{
-		// Initialize instance attributes.
-		class_:            c,
-		value_:            value,
-		additionalValues_: additionalValues,
+	switch {
+	case value == nil:
+		panic("The value attribute is required for each sequence of values.")
+	case additionalValues == nil:
+		panic("The additionalValues attribute is required for each sequence of values.")
+	default:
+		return &values_{
+			// Initialize instance attributes.
+			class_:            c,
+			value_:            value,
+			additionalValues_: additionalValues,
+		}
 	}
 }
 

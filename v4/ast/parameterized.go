@@ -37,10 +37,15 @@ type parameterizedClass_ struct {
 // Constructors
 
 func (c *parameterizedClass_) Make(parameters ParametersLike) ParameterizedLike {
-	return &parameterized_{
-		// Initialize instance attributes.
-		class_:      c,
-		parameters_: parameters,
+	switch {
+	case parameters == nil:
+		panic("The parameters attribute is required for each parameterized.")
+	default:
+		return &parameterized_{
+			// Initialize instance attributes.
+			class_:      c,
+			parameters_: parameters,
+		}
 	}
 }
 

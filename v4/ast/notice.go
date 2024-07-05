@@ -37,10 +37,15 @@ type noticeClass_ struct {
 // Constructors
 
 func (c *noticeClass_) Make(comment string) NoticeLike {
-	return &notice_{
-		// Initialize instance attributes.
-		class_:   c,
-		comment_: comment,
+	switch {
+	case len(comment) == 0:
+		panic("The comment attribute is required for each notice.")
+	default:
+		return &notice_{
+			// Initialize instance attributes.
+			class_:   c,
+			comment_: comment,
+		}
 	}
 }
 

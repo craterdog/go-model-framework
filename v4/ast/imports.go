@@ -37,10 +37,15 @@ type importsClass_ struct {
 // Constructors
 
 func (c *importsClass_) Make(modules ModulesLike) ImportsLike {
-	return &imports_{
-		// Initialize instance attributes.
-		class_:   c,
-		modules_: modules,
+	switch {
+	case modules == nil:
+		panic("The modules attribute is required for each sequence of imports.")
+	default:
+		return &imports_{
+			// Initialize instance attributes.
+			class_:   c,
+			modules_: modules,
+		}
 	}
 }
 

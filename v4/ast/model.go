@@ -46,17 +46,28 @@ func (c *modelClass_) Make(
 	instances InstancesLike,
 	aspects AspectsLike,
 ) ModelLike {
-	return &model_{
-		// Initialize instance attributes.
-		class_:       c,
-		notice_:      notice,
-		header_:      header,
-		imports_:     imports,
-		types_:       types,
-		functionals_: functionals,
-		classes_:     classes,
-		instances_:   instances,
-		aspects_:     aspects,
+	switch {
+	case notice == nil:
+		panic("The notice attribute is required for each model.")
+	case header == nil:
+		panic("The header attribute is required for each model.")
+	case classes == nil:
+		panic("The classes attribute is required for each model.")
+	case instances == nil:
+		panic("The instances attribute is required for each model.")
+	default:
+		return &model_{
+			// Initialize instance attributes.
+			class_:       c,
+			notice_:      notice,
+			header_:      header,
+			imports_:     imports,
+			types_:       types,
+			functionals_: functionals,
+			classes_:     classes,
+			instances_:   instances,
+			aspects_:     aspects,
+		}
 	}
 }
 
@@ -91,15 +102,15 @@ func (v *model_) GetHeader() HeaderLike {
 	return v.header_
 }
 
-func (v *model_) GetImports() ImportsLike {
+func (v *model_) GetOptionalImports() ImportsLike {
 	return v.imports_
 }
 
-func (v *model_) GetTypes() TypesLike {
+func (v *model_) GetOptionalTypes() TypesLike {
 	return v.types_
 }
 
-func (v *model_) GetFunctionals() FunctionalsLike {
+func (v *model_) GetOptionalFunctionals() FunctionalsLike {
 	return v.functionals_
 }
 
@@ -111,7 +122,7 @@ func (v *model_) GetInstances() InstancesLike {
 	return v.instances_
 }
 
-func (v *model_) GetAspects() AspectsLike {
+func (v *model_) GetOptionalAspects() AspectsLike {
 	return v.aspects_
 }
 

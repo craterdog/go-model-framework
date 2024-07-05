@@ -37,10 +37,15 @@ type aliasClass_ struct {
 // Constructors
 
 func (c *aliasClass_) Make(name string) AliasLike {
-	return &alias_{
-		// Initialize instance attributes.
-		class_: c,
-		name_:  name,
+	switch {
+	case len(name) == 0:
+		panic("The name attribute is required for each alias.")
+	default:
+		return &alias_{
+			// Initialize instance attributes.
+			class_: c,
+			name_:  name,
+		}
 	}
 }
 

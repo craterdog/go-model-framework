@@ -37,10 +37,15 @@ type prefixClass_ struct {
 // Constructors
 
 func (c *prefixClass_) Make(any_ any) PrefixLike {
-	return &prefix_{
-		// Initialize instance attributes.
-		class_: c,
-		any_:   any_,
+	switch {
+	case any_ == nil:
+		panic("The any_ attribute is required for each prefix.")
+	default:
+		return &prefix_{
+			// Initialize instance attributes.
+			class_: c,
+			any_:   any_,
+		}
 	}
 }
 

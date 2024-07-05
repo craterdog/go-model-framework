@@ -41,12 +41,17 @@ func (c *attributeClass_) Make(
 	parameter ParameterLike,
 	abstraction AbstractionLike,
 ) AttributeLike {
-	return &attribute_{
-		// Initialize instance attributes.
-		class_:       c,
-		name_:        name,
-		parameter_:   parameter,
-		abstraction_: abstraction,
+	switch {
+	case len(name) == 0:
+		panic("The name attribute is required for each attribute.")
+	default:
+		return &attribute_{
+			// Initialize instance attributes.
+			class_:       c,
+			name_:        name,
+			parameter_:   parameter,
+			abstraction_: abstraction,
+		}
 	}
 }
 
@@ -72,11 +77,11 @@ func (v *attribute_) GetName() string {
 	return v.name_
 }
 
-func (v *attribute_) GetParameter() ParameterLike {
+func (v *attribute_) GetOptionalParameter() ParameterLike {
 	return v.parameter_
 }
 
-func (v *attribute_) GetAbstraction() AbstractionLike {
+func (v *attribute_) GetOptionalAbstraction() AbstractionLike {
 	return v.abstraction_
 }
 

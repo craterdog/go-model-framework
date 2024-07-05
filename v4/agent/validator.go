@@ -106,7 +106,7 @@ func (v *validator_) ValidateModel(model ast.ModelLike) {
 // Private
 
 func (v *validator_) extractAspects(model ast.ModelLike) {
-	var aspects = model.GetAspects()
+	var aspects = model.GetOptionalAspects()
 	if aspects != nil {
 		var iterator = aspects.GetAspects().GetIterator()
 		for iterator.HasNext() {
@@ -131,7 +131,7 @@ func (v *validator_) extractClasses(model ast.ModelLike) {
 }
 
 func (v *validator_) extractFunctionals(model ast.ModelLike) {
-	var functionals = model.GetFunctionals()
+	var functionals = model.GetOptionalFunctionals()
 	if functionals != nil {
 		var iterator = functionals.GetFunctionals().GetIterator()
 		for iterator.HasNext() {
@@ -156,7 +156,7 @@ func (v *validator_) extractInstances(model ast.ModelLike) {
 }
 
 func (v *validator_) extractModules(model ast.ModelLike) {
-	var imports = model.GetImports()
+	var imports = model.GetOptionalImports()
 	if imports != nil {
 		var iterator = imports.GetModules().GetModules().GetIterator()
 		for iterator.HasNext() {
@@ -169,7 +169,7 @@ func (v *validator_) extractModules(model ast.ModelLike) {
 }
 
 func (v *validator_) extractTypes(model ast.ModelLike) {
-	var types = model.GetTypes()
+	var types = model.GetOptionalTypes()
 	if types != nil {
 		var iterator = types.GetTypes().GetIterator()
 		for iterator.HasNext() {
@@ -182,13 +182,13 @@ func (v *validator_) extractTypes(model ast.ModelLike) {
 
 func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 	// Validate the optional prefix.
-	var prefix = abstraction.GetPrefix()
+	var prefix = abstraction.GetOptionalPrefix()
 	if prefix != nil {
 		v.validatePrefix(prefix)
 	}
 
 	// Validate the optional alias.
-	var alias = abstraction.GetAlias()
+	var alias = abstraction.GetOptionalAlias()
 	if alias != nil {
 		v.validateAlias(alias)
 	}
@@ -198,7 +198,7 @@ func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 	v.abstractions_.SetValue(name, abstraction)
 
 	// Validate any generic arguments.
-	var genericArguments = abstraction.GetGenericArguments()
+	var genericArguments = abstraction.GetOptionalGenericArguments()
 	if genericArguments != nil {
 		var arguments = genericArguments.GetArguments()
 		v.validateArguments(arguments)
@@ -283,8 +283,8 @@ func (v *validator_) validateAspects(model ast.ModelLike) {
 
 func (v *validator_) validateAttribute(attribute ast.AttributeLike) {
 	var name = attribute.GetName()
-	var parameter = attribute.GetParameter()
-	var result = attribute.GetAbstraction()
+	var parameter = attribute.GetOptionalParameter()
+	var result = attribute.GetOptionalAbstraction()
 	switch {
 	case sts.HasPrefix(name, "Set"):
 		// An attribute "setter" has only a parameter.
@@ -320,7 +320,7 @@ func (v *validator_) validateAttributes(
 		)
 		panic(message)
 	}
-	var abstraction = attribute.GetAbstraction()
+	var abstraction = attribute.GetOptionalAbstraction()
 	if classname+"ClassLike" != abstraction.GetName() {
 		var message = fmt.Sprintf(
 			"The GetClass() method for the %v class has the wrong result type.",
@@ -331,11 +331,11 @@ func (v *validator_) validateAttributes(
 }
 
 func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
-	var prefix = abstraction.GetPrefix()
+	var prefix = abstraction.GetOptionalPrefix()
 	if prefix != nil {
 		panic("A boolean type does not have a prefix.")
 	}
-	var alias = abstraction.GetAlias()
+	var alias = abstraction.GetOptionalAlias()
 	if alias != nil {
 		panic("A boolean type does not have an alias.")
 	}
@@ -343,7 +343,7 @@ func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 	if name != "bool" {
 		panic("A question attribute must have a boolean type.")
 	}
-	var arguments = abstraction.GetGenericArguments()
+	var arguments = abstraction.GetOptionalGenericArguments()
 	if arguments != nil {
 		panic("A boolean type is not a generic type.")
 	}
@@ -361,13 +361,13 @@ func (v *validator_) validateClass(class ast.ClassLike) {
 	}
 
 	// Validate the constants.
-	var constants = class.GetConstants()
+	var constants = class.GetOptionalConstants()
 	if constants != nil {
 		v.validateConstants(constants)
 	}
 
 	// Validate the functions.
-	var functions = class.GetFunctions()
+	var functions = class.GetOptionalFunctions()
 	if functions != nil {
 		v.validateFunctions(functions)
 	}
@@ -405,7 +405,7 @@ func (v *validator_) validateConstants(constants ast.ConstantsLike) {
 
 func (v *validator_) validateConstructor(constructor ast.ConstructorLike) {
 	// Validate any parameters.
-	var parameters = constructor.GetParameters()
+	var parameters = constructor.GetOptionalParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
 	}
@@ -425,7 +425,7 @@ func (v *validator_) validateConstructors(constructors ast.ConstructorsLike) {
 
 func (v *validator_) validateDeclaration(declaration ast.DeclarationLike) {
 	// Validate any generic parameters.
-	var genericParameters = declaration.GetGenericParameters()
+	var genericParameters = declaration.GetOptionalGenericParameters()
 	if genericParameters != nil {
 		var parameters = genericParameters.GetParameters()
 		v.validateParameters(parameters)
@@ -442,7 +442,7 @@ func (v *validator_) validateEnumeration(enumeration ast.EnumerationLike) {
 
 func (v *validator_) validateFunction(function ast.FunctionLike) {
 	// Validate any parameters.
-	var parameters = function.GetParameters()
+	var parameters = function.GetOptionalParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
 	}
@@ -458,7 +458,7 @@ func (v *validator_) validateFunctional(functional ast.FunctionalLike) {
 	v.validateDeclaration(declaration)
 
 	// Validate any parameters.
-	var parameters = functional.GetParameters()
+	var parameters = functional.GetOptionalParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
 	}
@@ -507,13 +507,13 @@ func (v *validator_) validateInstance(instance ast.InstanceLike) {
 	v.validateAttributes(classname, attributes)
 
 	// Validate the instance abstraction methods.
-	var abstractions = instance.GetAbstractions()
+	var abstractions = instance.GetOptionalAbstractions()
 	if abstractions != nil {
 		v.validateAbstractions(abstractions)
 	}
 
 	// Validate the instance public methods.
-	var methods = instance.GetMethods()
+	var methods = instance.GetOptionalMethods()
 	if methods != nil {
 		v.validateMethods(methods.GetMethods())
 	}
@@ -538,13 +538,13 @@ func (v *validator_) validateInstances(model ast.ModelLike) {
 
 func (v *validator_) validateMethod(method ast.MethodLike) {
 	// Validate any method parameters.
-	var parameters = method.GetParameters()
+	var parameters = method.GetOptionalParameters()
 	if parameters != nil {
 		v.validateParameters(parameters)
 	}
 
 	// Validate any method results.
-	var result = method.GetResult()
+	var result = method.GetOptionalResult()
 	if result != nil {
 		v.validateResult(result)
 	}
@@ -629,7 +629,7 @@ func (v *validator_) validateType(type_ ast.TypeLike) {
 	v.validateAbstraction(abstraction)
 
 	// Validate any enumeration values.
-	var enumeration = type_.GetEnumeration()
+	var enumeration = type_.GetOptionalEnumeration()
 	if enumeration != nil {
 		v.validateEnumeration(enumeration)
 	}

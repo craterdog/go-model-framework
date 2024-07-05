@@ -41,12 +41,19 @@ func (c *typeClass_) Make(
 	abstraction AbstractionLike,
 	enumeration EnumerationLike,
 ) TypeLike {
-	return &type_{
-		// Initialize instance attributes.
-		class_:       c,
-		declaration_: declaration,
-		abstraction_: abstraction,
-		enumeration_: enumeration,
+	switch {
+	case declaration == nil:
+		panic("The declaration attribute is required for each type.")
+	case abstraction == nil:
+		panic("The abstraction attribute is required for each type.")
+	default:
+		return &type_{
+			// Initialize instance attributes.
+			class_:       c,
+			declaration_: declaration,
+			abstraction_: abstraction,
+			enumeration_: enumeration,
+		}
 	}
 }
 
@@ -76,7 +83,7 @@ func (v *type_) GetAbstraction() AbstractionLike {
 	return v.abstraction_
 }
 
-func (v *type_) GetEnumeration() EnumerationLike {
+func (v *type_) GetOptionalEnumeration() EnumerationLike {
 	return v.enumeration_
 }
 

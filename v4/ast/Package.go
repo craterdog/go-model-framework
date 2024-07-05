@@ -637,10 +637,10 @@ instance of a concrete abstraction-like class.
 type AbstractionLike interface {
 	// Attributes
 	GetClass() AbstractionClassLike
-	GetPrefix() PrefixLike
-	GetAlias() AliasLike
+	GetOptionalPrefix() PrefixLike
+	GetOptionalAlias() AliasLike
 	GetName() string
-	GetGenericArguments() GenericArgumentsLike
+	GetOptionalGenericArguments() GenericArgumentsLike
 }
 
 /*
@@ -765,8 +765,8 @@ type AttributeLike interface {
 	// Attributes
 	GetClass() AttributeClassLike
 	GetName() string
-	GetParameter() ParameterLike
-	GetAbstraction() AbstractionLike
+	GetOptionalParameter() ParameterLike
+	GetOptionalAbstraction() AbstractionLike
 }
 
 /*
@@ -801,8 +801,8 @@ type ClassLike interface {
 	GetClass() ClassClassLike
 	GetDeclaration() DeclarationLike
 	GetConstructors() ConstructorsLike
-	GetConstants() ConstantsLike
-	GetFunctions() FunctionsLike
+	GetOptionalConstants() ConstantsLike
+	GetOptionalFunctions() FunctionsLike
 }
 
 /*
@@ -850,7 +850,7 @@ type ConstructorLike interface {
 	// Attributes
 	GetClass() ConstructorClassLike
 	GetName() string
-	GetParameters() ParametersLike
+	GetOptionalParameters() ParametersLike
 	GetAbstraction() AbstractionLike
 }
 
@@ -876,7 +876,7 @@ type DeclarationLike interface {
 	GetClass() DeclarationClassLike
 	GetComment() string
 	GetName() string
-	GetGenericParameters() GenericParametersLike
+	GetOptionalGenericParameters() GenericParametersLike
 }
 
 /*
@@ -899,7 +899,7 @@ type FunctionLike interface {
 	// Attributes
 	GetClass() FunctionClassLike
 	GetName() string
-	GetParameters() ParametersLike
+	GetOptionalParameters() ParametersLike
 	GetResult() ResultLike
 }
 
@@ -912,7 +912,7 @@ type FunctionalLike interface {
 	// Attributes
 	GetClass() FunctionalClassLike
 	GetDeclaration() DeclarationLike
-	GetParameters() ParametersLike
+	GetOptionalParameters() ParametersLike
 	GetResult() ResultLike
 }
 
@@ -995,8 +995,8 @@ type InstanceLike interface {
 	GetClass() InstanceClassLike
 	GetDeclaration() DeclarationLike
 	GetAttributes() AttributesLike
-	GetAbstractions() AbstractionsLike
-	GetMethods() MethodsLike
+	GetOptionalAbstractions() AbstractionsLike
+	GetOptionalMethods() MethodsLike
 }
 
 /*
@@ -1031,8 +1031,8 @@ type MethodLike interface {
 	// Attributes
 	GetClass() MethodClassLike
 	GetName() string
-	GetParameters() ParametersLike
-	GetResult() ResultLike
+	GetOptionalParameters() ParametersLike
+	GetOptionalResult() ResultLike
 }
 
 /*
@@ -1057,12 +1057,12 @@ type ModelLike interface {
 	GetClass() ModelClassLike
 	GetNotice() NoticeLike
 	GetHeader() HeaderLike
-	GetImports() ImportsLike
-	GetTypes() TypesLike
-	GetFunctionals() FunctionalsLike
+	GetOptionalImports() ImportsLike
+	GetOptionalTypes() TypesLike
+	GetOptionalFunctionals() FunctionalsLike
 	GetClasses() ClassesLike
 	GetInstances() InstancesLike
-	GetAspects() AspectsLike
+	GetOptionalAspects() AspectsLike
 }
 
 /*
@@ -1166,7 +1166,7 @@ type TypeLike interface {
 	GetClass() TypeClassLike
 	GetDeclaration() DeclarationLike
 	GetAbstraction() AbstractionLike
-	GetEnumeration() EnumerationLike
+	GetOptionalEnumeration() EnumerationLike
 }
 
 /*

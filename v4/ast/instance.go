@@ -42,13 +42,20 @@ func (c *instanceClass_) Make(
 	abstractions AbstractionsLike,
 	methods MethodsLike,
 ) InstanceLike {
-	return &instance_{
-		// Initialize instance attributes.
-		class_:        c,
-		declaration_:  declaration,
-		attributes_:   attributes,
-		abstractions_: abstractions,
-		methods_:      methods,
+	switch {
+	case declaration == nil:
+		panic("The declaration attribute is required for each instance.")
+	case attributes == nil:
+		panic("The attributes attribute is required for each instance.")
+	default:
+		return &instance_{
+			// Initialize instance attributes.
+			class_:        c,
+			declaration_:  declaration,
+			attributes_:   attributes,
+			abstractions_: abstractions,
+			methods_:      methods,
+		}
 	}
 }
 
@@ -79,11 +86,11 @@ func (v *instance_) GetAttributes() AttributesLike {
 	return v.attributes_
 }
 
-func (v *instance_) GetAbstractions() AbstractionsLike {
+func (v *instance_) GetOptionalAbstractions() AbstractionsLike {
 	return v.abstractions_
 }
 
-func (v *instance_) GetMethods() MethodsLike {
+func (v *instance_) GetOptionalMethods() MethodsLike {
 	return v.methods_
 }
 

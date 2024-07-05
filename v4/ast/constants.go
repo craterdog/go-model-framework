@@ -44,11 +44,18 @@ func (c *constantsClass_) Make(
 	note string,
 	constants col.Sequential[ConstantLike],
 ) ConstantsLike {
-	return &constants_{
-		// Initialize instance attributes.
-		class_:     c,
-		note_:      note,
-		constants_: constants,
+	switch {
+	case len(note) == 0:
+		panic("The note attribute is required for each sequence of constants.")
+	case constants == nil:
+		panic("At least one constant attribute is required for each sequence of constants.")
+	default:
+		return &constants_{
+			// Initialize instance attributes.
+			class_:     c,
+			note_:      note,
+			constants_: constants,
+		}
 	}
 }
 

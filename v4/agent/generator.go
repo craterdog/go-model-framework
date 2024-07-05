@@ -251,7 +251,7 @@ func (v *generator_) extractConstructorAttributes(
 		var constructor = iterator.GetNext()
 		var methodName = constructor.GetName()
 		if methodName == "Make" || sts.HasPrefix(methodName, "MakeWith") {
-			var parameters = constructor.GetParameters()
+			var parameters = constructor.GetOptionalParameters()
 			if parameters != nil {
 				v.extractParameterAttributes(parameters, catalog)
 			}
@@ -278,31 +278,31 @@ func (v *generator_) extractInstanceAttributes(
 		switch {
 		case sts.HasPrefix(name, "Is"):
 			attributeName = sts.TrimPrefix(name, "Is")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Was"):
 			attributeName = sts.TrimPrefix(name, "Was")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Are"):
 			attributeName = sts.TrimPrefix(name, "Are")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Were"):
 			attributeName = sts.TrimPrefix(name, "Were")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Has"):
 			attributeName = sts.TrimPrefix(name, "Has")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Had"):
 			attributeName = sts.TrimPrefix(name, "Had")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Have"):
 			attributeName = sts.TrimPrefix(name, "Have")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Get"):
 			attributeName = sts.TrimPrefix(name, "Get")
-			abstraction = attribute.GetAbstraction()
+			abstraction = attribute.GetOptionalAbstraction()
 		case sts.HasPrefix(name, "Set"):
 			attributeName = sts.TrimPrefix(name, "Set")
-			var parameter = attribute.GetParameter()
+			var parameter = attribute.GetOptionalParameter()
 			abstraction = parameter.GetAbstraction()
 		}
 		attributeName = v.makePrivate(attributeName)
@@ -350,7 +350,7 @@ func (v *generator_) extractTargetType(
 			var constructor = iterator.GetNext()
 			var name = constructor.GetName()
 			if name == "MakeFromValue" {
-				var parameter = constructor.GetParameters().GetParameter()
+				var parameter = constructor.GetOptionalParameters().GetParameter()
 				var abstraction = parameter.GetAbstraction()
 				var formatter = Formatter().Make()
 				targetType = formatter.FormatAbstraction(abstraction)
@@ -389,7 +389,7 @@ func (v *generator_) generateAbstractions(
 	implementation string,
 ) {
 	// Check for no aspect abstractions.
-	var abstractions = instance.GetAbstractions()
+	var abstractions = instance.GetOptionalAbstractions()
 	if abstractions == nil {
 		return implementation
 	}
@@ -404,14 +404,14 @@ func (v *generator_) generateAbstractions(
 		var instanceAspect = instanceAspectTemplate_
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<AspectName>", aspectName)
 		var methods string
-		if abstraction.GetAlias() == nil {
+		if abstraction.GetOptionalAlias() == nil {
 			// We only know the method signatures for the local aspects.
 			var mappings col.CatalogLike[string, ast.AbstractionLike]
 			var aspect = v.retrieveAspect(model, abstraction.GetName())
 			var declaration = aspect.GetDeclaration()
-			if declaration.GetGenericParameters() != nil {
-				var parameters = declaration.GetGenericParameters().GetParameters()
-				var arguments = abstraction.GetGenericArguments().GetArguments()
+			if declaration.GetOptionalGenericParameters() != nil {
+				var parameters = declaration.GetOptionalGenericParameters().GetParameters()
+				var arguments = abstraction.GetOptionalGenericArguments().GetArguments()
 				mappings = v.extractConcreteMappings(parameters, arguments)
 			}
 			methods = v.generateAbstractionMethods(targetType, aspect, mappings)
@@ -446,7 +446,7 @@ func (v *generator_) generateAttributeAssignments(
 	if sts.HasPrefix(name, "MakeFrom") {
 		return implementation
 	}
-	var parameters = constructor.GetParameters()
+	var parameters = constructor.GetOptionalParameters()
 	if parameters == nil {
 		return implementation
 	}
@@ -485,7 +485,7 @@ func (v *generator_) generateAttributeMethods(
 		var body string
 
 		var parameter string
-		var attributeParameter = attribute.GetParameter()
+		var attributeParameter = attribute.GetOptionalParameter()
 		var parameterName string
 		if attributeParameter != nil {
 			attributeName = sts.TrimPrefix(methodName, "Set")
@@ -495,7 +495,7 @@ func (v *generator_) generateAttributeMethods(
 		}
 
 		var resultType string
-		var abstraction = attribute.GetAbstraction()
+		var abstraction = attribute.GetOptionalAbstraction()
 		if abstraction != nil {
 			switch {
 			case sts.HasPrefix(methodName, "Get"):
@@ -570,7 +570,7 @@ func (v *generator_) generateClass(
 	// Insert any generic parameters and arguments into the template.
 	var parameters string
 	var arguments string
-	var genericParameters = classDeclaration.GetGenericParameters()
+	var genericParameters = classDeclaration.GetOptionalGenericParameters()
 	if genericParameters != nil {
 		var classParameters = genericParameters.GetParameters()
 		var classArguments = v.extractArguments(classParameters)
@@ -595,7 +595,7 @@ func (v *generator_) generateClassAccess(
 	implementation string,
 ) {
 	var declaration = class.GetDeclaration()
-	var genericParameters = declaration.GetGenericParameters()
+	var genericParameters = declaration.GetOptionalGenericParameters()
 	var reference = classReferenceTemplate_
 	var function = classFunctionTemplate_
 	if genericParameters != nil {
@@ -614,7 +614,7 @@ func (v *generator_) generateClassConstants(
 	implementation string,
 ) {
 	var formatter = Formatter().Make()
-	var classConstants = class.GetConstants()
+	var classConstants = class.GetOptionalConstants()
 	if classConstants == nil {
 		return implementation
 	}
@@ -668,7 +668,7 @@ func (v *generator_) generateConstantMethods(
 	implementation string,
 ) {
 	var formatter = Formatter().Make()
-	var classConstants = class.GetConstants()
+	var classConstants = class.GetOptionalConstants()
 	if classConstants == nil {
 		return implementation
 	}
@@ -708,7 +708,7 @@ func (v *generator_) generateConstructorMethods(
 	for iterator.HasNext() {
 		var constructor = iterator.GetNext()
 		var methodName = constructor.GetName()
-		var ConstructorParameters = constructor.GetParameters()
+		var ConstructorParameters = constructor.GetOptionalParameters()
 		var parameters string
 		if ConstructorParameters != nil {
 			parameters = formatter.FormatParameters(ConstructorParameters)
@@ -742,7 +742,7 @@ func (v *generator_) generateFunctionMethods(
 	implementation string,
 ) {
 	var formatter = Formatter().Make()
-	var classFunctions = class.GetFunctions()
+	var classFunctions = class.GetOptionalFunctions()
 	if classFunctions == nil {
 		return implementation
 	}
@@ -751,7 +751,7 @@ func (v *generator_) generateFunctionMethods(
 	for iterator.HasNext() {
 		var function = iterator.GetNext()
 		var name = function.GetName()
-		var functionParameters = function.GetParameters()
+		var functionParameters = function.GetOptionalParameters()
 		var parameters string
 		if functionParameters != nil {
 			parameters = formatter.FormatParameters(functionParameters)
@@ -786,7 +786,7 @@ func (v *generator_) generateImports(
 ) (
 	implementation string,
 ) {
-	var imports = model.GetImports()
+	var imports = model.GetOptionalImports()
 	if imports != nil || sts.Contains(class, "syn.") {
 		var modules = v.generateModules(imports, class)
 		implementation = importsTemplate_
@@ -871,7 +871,7 @@ func (v *generator_) generateMethodImplementation(
 
 	// Generate the right method body.
 	var body = methodBodyTemplate_
-	var methodResult = method.GetResult()
+	var methodResult = method.GetOptionalResult()
 	if methodResult != nil {
 		switch actual := methodResult.GetAny().(type) {
 		case ast.AbstractionLike:
@@ -891,7 +891,7 @@ func (v *generator_) generateMethodImplementation(
 	// Generate the method parameters.
 	var parameters string
 	var formatter = Formatter().Make()
-	var methodParameters = method.GetParameters()
+	var methodParameters = method.GetOptionalParameters()
 	if methodParameters != nil {
 		if mappings != nil && mappings.GetSize() > 0 {
 			methodParameters = v.replaceParameterTypes(methodParameters, mappings)
@@ -951,7 +951,7 @@ func (v *generator_) generatePublicMethods(
 ) string {
 	var formatter = Formatter().Make()
 	var publicMethods string
-	var instanceMethods = instance.GetMethods()
+	var instanceMethods = instance.GetOptionalMethods()
 	if instanceMethods == nil {
 		return publicMethods
 	}
@@ -960,13 +960,13 @@ func (v *generator_) generatePublicMethods(
 	for iterator.HasNext() {
 		var publicMethod = iterator.GetNext()
 		var methodName = publicMethod.GetName()
-		var methodParameters = publicMethod.GetParameters()
+		var methodParameters = publicMethod.GetOptionalParameters()
 		var parameters string
 		if methodParameters != nil {
 			parameters = formatter.FormatParameters(methodParameters)
 		}
 		var body = methodBodyTemplate_
-		var result = publicMethod.GetResult()
+		var result = publicMethod.GetOptionalResult()
 		var resultType string
 		if result != nil {
 			switch actual := result.GetAny().(type) {
@@ -1006,10 +1006,10 @@ func (v *generator_) replaceAbstractionType(
 	abstraction ast.AbstractionLike,
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.AbstractionLike {
-	var prefix = abstraction.GetPrefix()
-	var alias = abstraction.GetAlias()
+	var prefix = abstraction.GetOptionalPrefix()
+	var alias = abstraction.GetOptionalAlias()
 	var typeName = abstraction.GetName()
-	var genericArguments = abstraction.GetGenericArguments()
+	var genericArguments = abstraction.GetOptionalGenericArguments()
 
 	if prefix != nil {
 		prefix = v.replacePrefixType(prefix, mappings)
@@ -1024,9 +1024,9 @@ func (v *generator_) replaceAbstractionType(
 	if alias == nil {
 		var concreteType = mappings.GetValue(typeName)
 		if concreteType != nil {
-			alias = concreteType.GetAlias()
+			alias = concreteType.GetOptionalAlias()
 			typeName = concreteType.GetName()
-			genericArguments = concreteType.GetGenericArguments()
+			genericArguments = concreteType.GetOptionalGenericArguments()
 		}
 	}
 
@@ -1156,7 +1156,7 @@ func (v *generator_) retrieveAspect(
 	model ast.ModelLike,
 	name string,
 ) ast.AspectLike {
-	var aspects = model.GetAspects()
+	var aspects = model.GetOptionalAspects()
 	if aspects != nil {
 		var iterator = aspects.GetAspects().GetIterator()
 		for iterator.HasNext() {

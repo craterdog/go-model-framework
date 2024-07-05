@@ -41,12 +41,19 @@ func (c *functionalClass_) Make(
 	parameters ParametersLike,
 	result ResultLike,
 ) FunctionalLike {
-	return &functional_{
-		// Initialize instance attributes.
-		class_:       c,
-		declaration_: declaration,
-		parameters_:  parameters,
-		result_:      result,
+	switch {
+	case declaration == nil:
+		panic("The declaration attribute is required for each functional.")
+	case result == nil:
+		panic("The result attribute is required for each functional.")
+	default:
+		return &functional_{
+			// Initialize instance attributes.
+			class_:       c,
+			declaration_: declaration,
+			parameters_:  parameters,
+			result_:      result,
+		}
 	}
 }
 
@@ -72,7 +79,7 @@ func (v *functional_) GetDeclaration() DeclarationLike {
 	return v.declaration_
 }
 
-func (v *functional_) GetParameters() ParametersLike {
+func (v *functional_) GetOptionalParameters() ParametersLike {
 	return v.parameters_
 }
 

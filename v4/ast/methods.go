@@ -44,11 +44,18 @@ func (c *methodsClass_) Make(
 	note string,
 	methods col.Sequential[MethodLike],
 ) MethodsLike {
-	return &methods_{
-		// Initialize instance attributes.
-		class_:   c,
-		note_:    note,
-		methods_: methods,
+	switch {
+	case len(note) == 0:
+		panic("The note attribute is required for each sequence of methods.")
+	case methods == nil || methods.IsEmpty():
+		panic("At least one method is required for each sequence of methods.")
+	default:
+		return &methods_{
+			// Initialize instance attributes.
+			class_:   c,
+			note_:    note,
+			methods_: methods,
+		}
 	}
 }
 

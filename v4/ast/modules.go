@@ -41,10 +41,15 @@ type modulesClass_ struct {
 // Constructors
 
 func (c *modulesClass_) Make(modules col.Sequential[ModuleLike]) ModulesLike {
-	return &modules_{
-		// Initialize instance attributes.
-		class_:   c,
-		modules_: modules,
+	switch {
+	case modules == nil || modules.IsEmpty():
+		panic("At least one module is required for each sequence of modules.")
+	default:
+		return &modules_{
+			// Initialize instance attributes.
+			class_:   c,
+			modules_: modules,
+		}
 	}
 }
 

@@ -37,10 +37,15 @@ type additionalArgumentClass_ struct {
 // Constructors
 
 func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
-	return &additionalArgument_{
-		// Initialize instance attributes.
-		class_:    c,
-		argument_: argument,
+	switch {
+	case argument == nil:
+		panic("The argument attribute is required for each additional argument.")
+	default:
+		return &additionalArgument_{
+			// Initialize instance attributes.
+			class_:    c,
+			argument_: argument,
+		}
 	}
 }
 

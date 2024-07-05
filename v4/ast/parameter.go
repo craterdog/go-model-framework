@@ -40,11 +40,18 @@ func (c *parameterClass_) Make(
 	name string,
 	abstraction AbstractionLike,
 ) ParameterLike {
-	return &parameter_{
-		// Initialize instance attributes.
-		class_:       c,
-		name_:        name,
-		abstraction_: abstraction,
+	switch {
+	case len(name) == 0:
+		panic("The name attribute is required for each parameter.")
+	case abstraction == nil:
+		panic("The abstraction attribute is required for each parameter.")
+	default:
+		return &parameter_{
+			// Initialize instance attributes.
+			class_:       c,
+			name_:        name,
+			abstraction_: abstraction,
+		}
 	}
 }
 
