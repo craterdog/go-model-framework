@@ -899,7 +899,9 @@ func (v *generator_) generateMethodImplementation(
 	var formatter = Formatter().Make()
 	var methodParameters = method.GetParameters()
 	if methodParameters != nil {
-		methodParameters = v.replaceParameterTypes(methodParameters, mappings)
+		if mappings != nil && mappings.GetSize() > 0 {
+			methodParameters = v.replaceParameterTypes(methodParameters, mappings)
+		}
 		parameters = formatter.FormatParameters(methodParameters)
 	}
 	implementation = sts.ReplaceAll(implementation, "<Parameters>", parameters)
@@ -907,7 +909,9 @@ func (v *generator_) generateMethodImplementation(
 	// Generate the method result type.
 	var resultType string
 	if methodResult != nil {
-		methodResult = v.replaceResultType(methodResult, mappings)
+		if mappings != nil && mappings.GetSize() > 0 {
+			methodResult = v.replaceResultType(methodResult, mappings)
+		}
 		resultType = " " + formatter.FormatResult(methodResult)
 	}
 	implementation = sts.ReplaceAll(implementation, "<ResultType>", resultType)
@@ -1008,23 +1012,30 @@ func (v *generator_) replaceAbstractionType(
 	abstraction ast.AbstractionLike,
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.AbstractionLike {
-	// Skip any abstractions that are not generic arguments.
 	var prefix = abstraction.GetPrefix()
 	var alias = abstraction.GetAlias()
-	var genericArguments = abstraction.GetGenericArguments()
-	if alias != nil || genericArguments != nil {
-		return abstraction
-	}
 	var typeName = abstraction.GetName()
-	var concreteType = mappings.GetValue(typeName)
-	if concreteType == nil {
-		return abstraction
+	var genericArguments = abstraction.GetGenericArguments()
+
+	if prefix != nil {
+		prefix = v.replacePrefixType(prefix, mappings)
 	}
 
-	// Replace the generic argument with the concrete type.
-	alias = concreteType.GetAlias()
-	typeName = concreteType.GetName()
-	genericArguments = concreteType.GetGenericArguments()
+	if genericArguments != nil {
+		var arguments = genericArguments.GetArguments()
+		arguments = v.replaceArgumentTypes(arguments, mappings)
+		genericArguments = ast.GenericArguments().Make(arguments)
+	}
+
+	if alias == nil {
+		var concreteType = mappings.GetValue(typeName)
+		if concreteType != nil {
+			alias = concreteType.GetAlias()
+			typeName = concreteType.GetName()
+			genericArguments = concreteType.GetGenericArguments()
+		}
+	}
+
 	abstraction = ast.Abstraction().Make(
 		prefix,
 		alias,
@@ -1032,6 +1043,46 @@ func (v *generator_) replaceAbstractionType(
 		genericArguments,
 	)
 	return abstraction
+}
+
+func (v *generator_) replaceArgumentType(
+	argument ast.ArgumentLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) ast.ArgumentLike {
+	var abstraction = argument.GetAbstraction()
+	abstraction = v.replaceAbstractionType(abstraction, mappings)
+	argument = ast.Argument().Make(abstraction)
+	return argument
+}
+
+func (v *generator_) replaceArgumentTypes(
+	arguments ast.ArgumentsLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) ast.ArgumentsLike {
+	// Handle the non-generic case.
+	if mappings == nil {
+		return arguments
+	}
+
+	// Replace the first argument.
+	var argument = arguments.GetArgument()
+	argument = v.replaceArgumentType(argument, mappings)
+
+	// Replace any additional arguments.
+	var notation = cdc.Notation().Make()
+	var additionalArguments = col.List[ast.AdditionalArgumentLike](notation).Make()
+	var iterator = arguments.GetAdditionalArguments().GetIterator()
+	for iterator.HasNext() {
+		var additionalArgument = iterator.GetNext()
+		var argument = additionalArgument.GetArgument()
+		argument = v.replaceArgumentType(argument, mappings)
+		additionalArgument = ast.AdditionalArgument().Make(argument)
+		additionalArguments.AppendValue(additionalArgument)
+	}
+
+	// Construct a new sequence of arguments.
+	arguments = ast.Arguments().Make(argument, additionalArguments)
+	return arguments
 }
 
 func (v *generator_) replaceParameterType(
@@ -1049,11 +1100,6 @@ func (v *generator_) replaceParameterTypes(
 	parameters ast.ParametersLike,
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.ParametersLike {
-	// Handle the non-generic case.
-	if mappings == nil {
-		return parameters
-	}
-
 	// Replace the first parameter.
 	var parameter = parameters.GetParameter()
 	parameter = v.replaceParameterType(parameter, mappings)
@@ -1075,15 +1121,27 @@ func (v *generator_) replaceParameterTypes(
 	return parameters
 }
 
+func (v *generator_) replacePrefixType(
+	prefix ast.PrefixLike,
+	mappings col.CatalogLike[string, ast.AbstractionLike],
+) ast.PrefixLike {
+	switch actual := prefix.GetAny().(type) {
+	case ast.MapLike:
+		var typeName = actual.GetName()
+		var concreteType = mappings.GetValue(typeName)
+		typeName = concreteType.GetName()
+		var map_ = ast.Map().Make(typeName)
+		prefix = ast.Prefix().Make(map_)
+	default:
+		// Ignore the rest.
+	}
+	return prefix
+}
+
 func (v *generator_) replaceResultType(
 	result ast.ResultLike,
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.ResultLike {
-	// Handle the non-generic case.
-	if mappings == nil {
-		return result
-	}
-
 	// Handle the different kinds of results.
 	switch actual := result.GetAny().(type) {
 	case ast.AbstractionLike:
