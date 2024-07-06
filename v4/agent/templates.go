@@ -103,14 +103,26 @@ const typeBodyTemplate_ = `
 `
 
 const constructorBodyTemplate_ = `
-	return &<TargetName>_[<Arguments>]{
-		// Initialize instance attributes.
-		class_: c,<Assignments>
+	switch {
+	// Validate the arguments.<Checks>
+	default:
+		return &<TargetName>_[<Arguments>]{
+			// Initialize instance attributes.
+			class_: c,<Assignments>
+		}
 	}
 `
 
 const attributeAssignmentTemplate_ = `
-		<AttributeName>_: <ParameterName>,`
+			<AttributeName>_: <ParameterName>,`
+
+const stringCheckTemplate_ = `
+	case len(<ParameterName>) == 0:
+		panic("The <ParameterName> attribute is required for each <ClassName>.")`
+
+const attributeCheckTemplate_ = `
+	case <ParameterName> == nil:
+		panic("The <ParameterName> attribute is required for each <ClassName>.")`
 
 const functionBodyTemplate_ = `
 	var result_<ResultType>
@@ -174,7 +186,21 @@ const getterBodyTemplate_ = `
 	return v.<AttributeName>_
 `
 
-const setterBodyTemplate_ = `
+const setterStringTemplate_ = `
+	if len(<ParameterName>) == 0 {
+		panic("The <ParameterName> attribute cannot be an empty string.")
+	}
+	v.<AttributeName>_ = <ParameterName>
+`
+
+const setterReferenceTemplate_ = `
+	if <ParameterName> == nil {
+		panic("The <ParameterName> attribute cannot be nil.")
+	}
+	v.<AttributeName>_ = <ParameterName>
+`
+
+const setterValueTemplate_ = `
 	v.<AttributeName>_ = <ParameterName>
 `
 

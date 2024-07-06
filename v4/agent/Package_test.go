@@ -434,19 +434,29 @@ func (c *complexClass_) Make(
 	imaginaryPart float64,
 	form Form,
 ) ComplexLike {
-	return &complex_{
-		// Initialize instance attributes.
-		class_: c,
-		realPart_: realPart,
-		imaginaryPart_: imaginaryPart,
-		form_: form,
+	switch {
+	// Validate the arguments.
+	case form == nil:
+		panic("The form attribute is required for each Complex.")
+	default:
+		return &complex_{
+			// Initialize instance attributes.
+			class_: c,
+			realPart_: realPart,
+			imaginaryPart_: imaginaryPart,
+			form_: form,
+		}
 	}
 }
 
 func (c *complexClass_) MakeFromValue(value complex128) ComplexLike {
-	return &complex_{
-		// Initialize instance attributes.
-		class_: c,
+	switch {
+	// Validate the arguments.
+	default:
+		return &complex_{
+			// Initialize instance attributes.
+			class_: c,
+		}
 	}
 }
 
@@ -550,6 +560,9 @@ func (v *complex_) GetForm() Form {
 }
 
 func (v *complex_) SetForm(form Form) {
+	if form == nil {
+		panic("The form attribute cannot be nil.")
+	}
 	v.form_ = form
 }
 
@@ -663,11 +676,19 @@ func (c *associationClass_[K, V]) Make(
 	key K,
 	value V,
 ) AssociationLike[K, V] {
-	return &association_[K, V]{
-		// Initialize instance attributes.
-		class_: c,
-		key_: key,
-		value_: value,
+	switch {
+	// Validate the arguments.
+	case key == nil:
+		panic("The key attribute is required for each Association.")
+	case value == nil:
+		panic("The value attribute is required for each Association.")
+	default:
+		return &association_[K, V]{
+			// Initialize instance attributes.
+			class_: c,
+			key_: key,
+			value_: value,
+		}
 	}
 }
 
@@ -700,6 +721,9 @@ func (v *association_[K, V]) GetValue() V {
 }
 
 func (v *association_[K, V]) SetValue(value V) {
+	if value == nil {
+		panic("The value attribute cannot be nil.")
+	}
 	v.value_ = value
 }
 
@@ -777,30 +801,46 @@ type catalogClass_[
 // Constructors
 
 func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
-	return &catalog_[K, V]{
-		// Initialize instance attributes.
-		class_: c,
+	switch {
+	// Validate the arguments.
+	default:
+		return &catalog_[K, V]{
+			// Initialize instance attributes.
+			class_: c,
+		}
 	}
 }
 
 func (c *catalogClass_[K, V]) MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V] {
-	return &catalog_[K, V]{
-		// Initialize instance attributes.
-		class_: c,
+	switch {
+	// Validate the arguments.
+	default:
+		return &catalog_[K, V]{
+			// Initialize instance attributes.
+			class_: c,
+		}
 	}
 }
 
 func (c *catalogClass_[K, V]) MakeFromMap(associations map[K]V) CatalogLike[K, V] {
-	return &catalog_[K, V]{
-		// Initialize instance attributes.
-		class_: c,
+	switch {
+	// Validate the arguments.
+	default:
+		return &catalog_[K, V]{
+			// Initialize instance attributes.
+			class_: c,
+		}
 	}
 }
 
 func (c *catalogClass_[K, V]) MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V] {
-	return &catalog_[K, V]{
-		// Initialize instance attributes.
-		class_: c,
+	switch {
+	// Validate the arguments.
+	default:
+		return &catalog_[K, V]{
+			// Initialize instance attributes.
+			class_: c,
+		}
 	}
 }
 

@@ -207,6 +207,57 @@ func (v *generator_) extractArguments(
 	return arguments
 }
 
+func (v *generator_) extractAttributeNameAndType(
+	attribute ast.AttributeLike,
+) (
+	attributeName string,
+	attributeType string,
+) {
+	var name = attribute.GetName()
+	var abstraction ast.AbstractionLike
+	switch {
+	case sts.HasPrefix(name, "Is"):
+		attributeName = sts.TrimPrefix(name, "Is")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "Was"):
+		attributeName = sts.TrimPrefix(name, "Was")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "Are"):
+		attributeName = sts.TrimPrefix(name, "Are")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "Were"):
+		attributeName = sts.TrimPrefix(name, "Were")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "Has"):
+		attributeName = sts.TrimPrefix(name, "Has")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "Had"):
+		attributeName = sts.TrimPrefix(name, "Had")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "Have"):
+		attributeName = sts.TrimPrefix(name, "Have")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "GetOptional"):
+		attributeName = sts.TrimPrefix(name, "GetOptional")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "Get"):
+		attributeName = sts.TrimPrefix(name, "Get")
+		abstraction = attribute.GetOptionalAbstraction()
+	case sts.HasPrefix(name, "SetOptional"):
+		attributeName = sts.TrimPrefix(name, "SetOptional")
+		var parameter = attribute.GetOptionalParameter()
+		abstraction = parameter.GetAbstraction()
+	case sts.HasPrefix(name, "Set"):
+		attributeName = sts.TrimPrefix(name, "Set")
+		var parameter = attribute.GetOptionalParameter()
+		abstraction = parameter.GetAbstraction()
+	}
+	attributeName = v.makePrivate(attributeName)
+	var formatter = Formatter().Make()
+	attributeType = formatter.FormatAbstraction(abstraction)
+	return attributeName, attributeType
+}
+
 func (v *generator_) extractConcreteMappings(
 	parameters ast.ParametersLike,
 	arguments ast.ArgumentsLike,
@@ -263,9 +314,6 @@ func (v *generator_) extractInstanceAttributes(
 	instance ast.InstanceLike,
 	catalog col.CatalogLike[string, string],
 ) {
-	var attributeName string
-	var attributeType string
-	var formatter = Formatter().Make()
 	var attributes = instance.GetAttributes()
 	if attributes == nil {
 		return
@@ -273,40 +321,7 @@ func (v *generator_) extractInstanceAttributes(
 	var iterator = attributes.GetAttributes().GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
-		var name = attribute.GetName()
-		var abstraction ast.AbstractionLike
-		switch {
-		case sts.HasPrefix(name, "Is"):
-			attributeName = sts.TrimPrefix(name, "Is")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Was"):
-			attributeName = sts.TrimPrefix(name, "Was")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Are"):
-			attributeName = sts.TrimPrefix(name, "Are")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Were"):
-			attributeName = sts.TrimPrefix(name, "Were")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Has"):
-			attributeName = sts.TrimPrefix(name, "Has")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Had"):
-			attributeName = sts.TrimPrefix(name, "Had")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Have"):
-			attributeName = sts.TrimPrefix(name, "Have")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Get"):
-			attributeName = sts.TrimPrefix(name, "Get")
-			abstraction = attribute.GetOptionalAbstraction()
-		case sts.HasPrefix(name, "Set"):
-			attributeName = sts.TrimPrefix(name, "Set")
-			var parameter = attribute.GetOptionalParameter()
-			abstraction = parameter.GetAbstraction()
-		}
-		attributeName = v.makePrivate(attributeName)
-		attributeType = formatter.FormatAbstraction(abstraction)
+		var attributeName, attributeType = v.extractAttributeNameAndType(attribute)
 		catalog.SetValue(attributeName, attributeType)
 	}
 }
@@ -464,6 +479,55 @@ func (v *generator_) generateAttributeAssignments(
 	return implementation
 }
 
+func (v *generator_) generateAttributeCheck(
+	parameter ast.ParameterLike,
+) (
+	implementation string,
+) {
+	var parameterName = parameter.GetName()
+	var parameterType = parameter.GetAbstraction().GetName()
+	var attributeName = sts.TrimSuffix(parameterName, "_")
+	switch {
+	case parameterType == "string":
+		implementation = stringCheckTemplate_
+	case v.isPublic(parameterType):
+		implementation = attributeCheckTemplate_
+	default:
+		// Primitive types are not passed by reference.
+	}
+	implementation = sts.ReplaceAll(implementation, "<AttributeName>", attributeName)
+	implementation = sts.ReplaceAll(implementation, "<ParameterName>", parameterName)
+	return implementation
+}
+
+func (v *generator_) generateAttributeChecks(
+	class ast.ClassLike,
+	constructor ast.ConstructorLike,
+) (
+	implementation string,
+) {
+	var name = constructor.GetName()
+	if sts.HasPrefix(name, "MakeFrom") {
+		return implementation
+	}
+	var parameters = constructor.GetOptionalParameters()
+	if parameters == nil {
+		return implementation
+	}
+	var parameter = parameters.GetParameter()
+	var check = v.generateAttributeCheck(parameter)
+	implementation += check
+	var additionalParameters = parameters.GetAdditionalParameters()
+	var iterator = additionalParameters.GetIterator()
+	for iterator.HasNext() {
+		var additionalParameter = iterator.GetNext()
+		parameter = additionalParameter.GetParameter()
+		check = v.generateAttributeCheck(parameter)
+		implementation += check
+	}
+	return implementation
+}
+
 func (v *generator_) generateAttributeMethods(
 	targetType string,
 	class ast.ClassLike,
@@ -471,7 +535,6 @@ func (v *generator_) generateAttributeMethods(
 ) (
 	implementation string,
 ) {
-	var formatter = Formatter().Make()
 	var instanceAttributes = instance.GetAttributes()
 	if instanceAttributes == nil {
 		return implementation
@@ -480,41 +543,38 @@ func (v *generator_) generateAttributeMethods(
 	var iterator = instanceAttributes.GetAttributes().GetIterator()
 	for iterator.HasNext() {
 		var attribute = iterator.GetNext()
-		var methodName = attribute.GetName()
-		var attributeName string
+		var attributeName, attributeType = v.extractAttributeNameAndType(attribute)
 		var body string
-
 		var parameter string
-		var attributeParameter = attribute.GetOptionalParameter()
 		var parameterName string
-		if attributeParameter != nil {
-			attributeName = sts.TrimPrefix(methodName, "Set")
-			parameterName = attributeParameter.GetName()
-			parameter = formatter.FormatParameter(attributeParameter)
-			body = setterBodyTemplate_
-		}
-
 		var resultType string
-		var abstraction = attribute.GetOptionalAbstraction()
-		if abstraction != nil {
+
+		var methodName = attribute.GetName()
+		var attributeParameter = attribute.GetOptionalParameter()
+		if attributeParameter != nil {
+			// This is a setter method.
 			switch {
-			case sts.HasPrefix(methodName, "Get"):
-				attributeName = sts.TrimPrefix(methodName, "Get")
-			case sts.HasPrefix(methodName, "Is"):
-				attributeName = sts.TrimPrefix(methodName, "Is")
-			case sts.HasPrefix(methodName, "Was"):
-				attributeName = sts.TrimPrefix(methodName, "Was")
-			case sts.HasPrefix(methodName, "Has"):
-				attributeName = sts.TrimPrefix(methodName, "Has")
+			case sts.HasPrefix(methodName, "SetOptional"):
+				body = setterValueTemplate_
+			case attributeType == "string":
+				body = setterStringTemplate_
+			case v.isPublic(attributeType):
+				body = setterReferenceTemplate_
+			default:
+				body = setterValueTemplate_
 			}
-			resultType = " " + formatter.FormatAbstraction(abstraction)
+			var formatter = Formatter().Make()
+			parameter = formatter.FormatParameter(attributeParameter)
+			parameterName = attributeParameter.GetName()
+		} else {
+			// This is a getter method.
 			body = getterBodyTemplate_
 			if len(targetType) > 0 {
 				body = getterClassTemplate_
 			}
+			resultType = " " + attributeType
 		}
 
-		attributeName = v.makePrivate(attributeName)
 		body = sts.ReplaceAll(body, "<AttributeName>", attributeName)
 		body = sts.ReplaceAll(body, "<ParameterName>", parameterName)
 		var method = instanceMethodTemplate_
@@ -715,6 +775,7 @@ func (v *generator_) generateConstructorMethods(
 		}
 		var abstraction = constructor.GetAbstraction()
 		var resultType = " " + formatter.FormatAbstraction(abstraction)
+		var checks = v.generateAttributeChecks(class, constructor)
 		var assignments = v.generateAttributeAssignments(class, constructor)
 		var body = constructorBodyTemplate_
 		if len(targetType) > 0 {
@@ -725,6 +786,7 @@ func (v *generator_) generateConstructorMethods(
 				body = resultBodyTemplate_
 			}
 		}
+		body = sts.ReplaceAll(body, "<Checks>", checks)
 		body = sts.ReplaceAll(body, "<Assignments>", assignments)
 		var method = classMethodTemplate_
 		method = sts.ReplaceAll(method, "<Body>", body)
@@ -994,6 +1056,11 @@ func (v *generator_) generatePublicMethods(
 		publicMethods += method
 	}
 	return publicMethods
+}
+
+func (v *generator_) isPublic(name string) bool {
+	runes := []rune(name)
+	return uni.IsUpper(runes[0])
 }
 
 func (v *generator_) makePrivate(name string) string {
