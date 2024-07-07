@@ -78,7 +78,21 @@ const classMethodsTemplate_ = `
 // CLASS METHODS
 
 // Target
-<Target><Constructors><Constants><Functions>`
+<Target><Constructors><Constants><Functions><Private>`
+
+const privateMethodsTemplate_ = `
+// Private
+
+func (c *<TargetName>Class_[<Arguments>]) isNil(value any) bool {
+	var meta = ref.ValueOf(value)
+	return (meta.Kind() == ref.Ptr ||
+		meta.Kind() == ref.Interface ||
+		meta.Kind() == ref.Slice ||
+		meta.Kind() == ref.Map ||
+		meta.Kind() == ref.Chan ||
+		meta.Kind() == ref.Func) && meta.IsNil()
+}
+`
 
 const classTargetTemplate_ = `
 type <TargetName>Class_[<Parameters>] struct {
@@ -103,8 +117,8 @@ const typeBodyTemplate_ = `
 `
 
 const constructorBodyTemplate_ = `
-	switch {
-	// Validate the arguments.<Checks>
+	// Validate the arguments.
+	switch {<Checks>
 	default:
 		return &<TargetName>_[<Arguments>]{
 			// Initialize instance attributes.
@@ -121,7 +135,7 @@ const stringCheckTemplate_ = `
 		panic("The <ParameterName> attribute is required for each <ClassName>.")`
 
 const attributeCheckTemplate_ = `
-	case <ParameterName> == nil:
+	case c.isNil(<ParameterName>):
 		panic("The <ParameterName> attribute is required for each <ClassName>.")`
 
 const functionBodyTemplate_ = `
@@ -194,7 +208,7 @@ const setterStringTemplate_ = `
 `
 
 const setterReferenceTemplate_ = `
-	if <ParameterName> == nil {
+	if v.GetClass().(*<TargetName>Class_[<Arguments>]).isNil(<ParameterName>) {
 		panic("The <ParameterName> attribute cannot be nil.")
 	}
 	v.<AttributeName>_ = <ParameterName>

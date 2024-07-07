@@ -403,6 +403,10 @@ const complex_ = `/*
 
 package example
 
+import (
+	ref "reflect"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -434,9 +438,13 @@ func (c *complexClass_) Make(
 	imaginaryPart float64,
 	form Form,
 ) ComplexLike {
-	switch {
 	// Validate the arguments.
-	case form == nil:
+	switch {
+	case c.isNil(realPart):
+		panic("The realPart attribute is required for each Complex.")
+	case c.isNil(imaginaryPart):
+		panic("The imaginaryPart attribute is required for each Complex.")
+	case c.isNil(form):
 		panic("The form attribute is required for each Complex.")
 	default:
 		return &complex_{
@@ -450,8 +458,8 @@ func (c *complexClass_) Make(
 }
 
 func (c *complexClass_) MakeFromValue(value complex128) ComplexLike {
-	switch {
 	// Validate the arguments.
+	switch {
 	default:
 		return &complex_{
 			// Initialize instance attributes.
@@ -529,6 +537,18 @@ func (c *complexClass_) Norm(
 	return result_
 }
 
+// Private
+
+func (c *complexClass_) isNil(value any) bool {
+	var meta = ref.ValueOf(value)
+	return (meta.Kind() == ref.Ptr ||
+		meta.Kind() == ref.Interface ||
+		meta.Kind() == ref.Slice ||
+		meta.Kind() == ref.Map ||
+		meta.Kind() == ref.Chan ||
+		meta.Kind() == ref.Func) && meta.IsNil()
+}
+
 // INSTANCE METHODS
 
 // Target
@@ -560,7 +580,7 @@ func (v *complex_) GetForm() Form {
 }
 
 func (v *complex_) SetForm(form Form) {
-	if form == nil {
+	if v.GetClass().(*complexClass_).isNil(form) {
 		panic("The form attribute cannot be nil.")
 	}
 	v.form_ = form
@@ -619,6 +639,7 @@ package example
 
 import (
 	fmt "fmt"
+	ref "reflect"
 	syn "sync"
 )
 
@@ -676,11 +697,11 @@ func (c *associationClass_[K, V]) Make(
 	key K,
 	value V,
 ) AssociationLike[K, V] {
-	switch {
 	// Validate the arguments.
-	case key == nil:
+	switch {
+	case c.isNil(key):
 		panic("The key attribute is required for each Association.")
-	case value == nil:
+	case c.isNil(value):
 		panic("The value attribute is required for each Association.")
 	default:
 		return &association_[K, V]{
@@ -690,6 +711,18 @@ func (c *associationClass_[K, V]) Make(
 			value_: value,
 		}
 	}
+}
+
+// Private
+
+func (c *associationClass_[K, V]) isNil(value any) bool {
+	var meta = ref.ValueOf(value)
+	return (meta.Kind() == ref.Ptr ||
+		meta.Kind() == ref.Interface ||
+		meta.Kind() == ref.Slice ||
+		meta.Kind() == ref.Map ||
+		meta.Kind() == ref.Chan ||
+		meta.Kind() == ref.Func) && meta.IsNil()
 }
 
 // INSTANCE METHODS
@@ -721,7 +754,7 @@ func (v *association_[K, V]) GetValue() V {
 }
 
 func (v *association_[K, V]) SetValue(value V) {
-	if value == nil {
+	if v.GetClass().(*associationClass_[K, V]).isNil(value) {
 		panic("The value attribute cannot be nil.")
 	}
 	v.value_ = value
@@ -801,8 +834,8 @@ type catalogClass_[
 // Constructors
 
 func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
-	switch {
 	// Validate the arguments.
+	switch {
 	default:
 		return &catalog_[K, V]{
 			// Initialize instance attributes.
@@ -812,8 +845,8 @@ func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
 }
 
 func (c *catalogClass_[K, V]) MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V] {
-	switch {
 	// Validate the arguments.
+	switch {
 	default:
 		return &catalog_[K, V]{
 			// Initialize instance attributes.
@@ -823,8 +856,8 @@ func (c *catalogClass_[K, V]) MakeFromArray(associations []AssociationLike[K, V]
 }
 
 func (c *catalogClass_[K, V]) MakeFromMap(associations map[K]V) CatalogLike[K, V] {
-	switch {
 	// Validate the arguments.
+	switch {
 	default:
 		return &catalog_[K, V]{
 			// Initialize instance attributes.
@@ -834,8 +867,8 @@ func (c *catalogClass_[K, V]) MakeFromMap(associations map[K]V) CatalogLike[K, V
 }
 
 func (c *catalogClass_[K, V]) MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V] {
-	switch {
 	// Validate the arguments.
+	switch {
 	default:
 		return &catalog_[K, V]{
 			// Initialize instance attributes.

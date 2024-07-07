@@ -490,10 +490,8 @@ func (v *generator_) generateAttributeCheck(
 	switch {
 	case parameterType == "string":
 		implementation = stringCheckTemplate_
-	case v.isPublic(parameterType):
-		implementation = attributeCheckTemplate_
 	default:
-		// Primitive types are not passed by reference.
+		implementation = attributeCheckTemplate_
 	}
 	implementation = sts.ReplaceAll(implementation, "<AttributeName>", attributeName)
 	implementation = sts.ReplaceAll(implementation, "<ParameterName>", parameterName)
@@ -558,10 +556,8 @@ func (v *generator_) generateAttributeMethods(
 				body = setterValueTemplate_
 			case attributeType == "string":
 				body = setterStringTemplate_
-			case v.isPublic(attributeType):
-				body = setterReferenceTemplate_
 			default:
-				body = setterValueTemplate_
+				body = setterReferenceTemplate_
 			}
 			var formatter = Formatter().Make()
 			parameter = formatter.FormatParameter(attributeParameter)
@@ -702,12 +698,14 @@ func (v *generator_) generateClassMethods(
 	implementation = classMethodsTemplate_
 	var target = v.generateClassTarget(class)
 	implementation = sts.ReplaceAll(implementation, "<Target>", target)
-	var constantMethods = v.generateConstantMethods(class)
-	implementation = sts.ReplaceAll(implementation, "<Constants>", constantMethods)
 	var constructorMethods = v.generateConstructorMethods(targetType, class)
 	implementation = sts.ReplaceAll(implementation, "<Constructors>", constructorMethods)
+	var constantMethods = v.generateConstantMethods(class)
+	implementation = sts.ReplaceAll(implementation, "<Constants>", constantMethods)
 	var functionMethods = v.generateFunctionMethods(class)
 	implementation = sts.ReplaceAll(implementation, "<Functions>", functionMethods)
+	var privateMethods = v.generatePrivateMethods(targetType, class)
+	implementation = sts.ReplaceAll(implementation, "<Private>", privateMethods)
 	return implementation
 }
 
@@ -849,7 +847,9 @@ func (v *generator_) generateImports(
 	implementation string,
 ) {
 	var imports = model.GetOptionalImports()
-	if imports != nil || sts.Contains(class, "syn.") {
+	if imports != nil ||
+		sts.Contains(class, "syn.") ||
+		sts.Contains(class, "ref.") {
 		var modules = v.generateModules(imports, class)
 		implementation = importsTemplate_
 		implementation = sts.ReplaceAll(implementation, "<Modules>", modules)
@@ -994,6 +994,11 @@ func (v *generator_) generateModules(
 	}
 	if sts.Contains(class, "syn.") {
 		implementation += "\n\tfmt \"fmt\""
+	}
+	if sts.Contains(class, "ref.") {
+		implementation += "\n\tref \"reflect\""
+	}
+	if sts.Contains(class, "syn.") {
 		implementation += "\n\tsyn \"sync\""
 	}
 	if len(implementation) > 0 {
@@ -1005,6 +1010,27 @@ func (v *generator_) generateModules(
 func (v *generator_) generateNotice(model ast.ModelLike) string {
 	var notice = model.GetNotice().GetComment()
 	return notice
+}
+
+func (v *generator_) generatePrivateMethods(
+	targetType string,
+	class ast.ClassLike,
+) (
+	methods string,
+) {
+	if len(targetType) == 0 {
+		var constructors = class.GetConstructors()
+		var iterator = constructors.GetConstructors().GetIterator()
+		for iterator.HasNext() {
+			var constructor = iterator.GetNext()
+			if constructor.GetName() == "Make" &&
+				constructor.GetOptionalParameters() != nil {
+				methods = privateMethodsTemplate_
+				break
+			}
+		}
+	}
+	return methods
 }
 
 func (v *generator_) generatePublicMethods(
@@ -1056,11 +1082,6 @@ func (v *generator_) generatePublicMethods(
 		publicMethods += method
 	}
 	return publicMethods
-}
-
-func (v *generator_) isPublic(name string) bool {
-	runes := []rune(name)
-	return uni.IsUpper(runes[0])
 }
 
 func (v *generator_) makePrivate(name string) string {
