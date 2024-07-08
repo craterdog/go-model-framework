@@ -1017,8 +1017,10 @@ func (v *generator_) generatePrivateMethods(
 		var iterator = constructors.GetConstructors().GetIterator()
 		for iterator.HasNext() {
 			var constructor = iterator.GetNext()
-			if constructor.GetName() == "Make" &&
-				constructor.GetOptionalParameters() != nil {
+			var name = constructor.GetName()
+			var parameters = constructor.GetOptionalParameters()
+			if (name == "Make" || sts.HasPrefix(name, "MakeWith")) &&
+				parameters != nil {
 				methods = privateMethodsTemplate_
 				break
 			}
