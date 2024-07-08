@@ -83,14 +83,19 @@ const classMethodsTemplate_ = `
 const privateMethodsTemplate_ = `
 // Private
 
-func (c *<TargetName>Class_[<Arguments>]) isNil(value any) bool {
-	var meta = ref.ValueOf(value)
-	return (meta.Kind() == ref.Ptr ||
-		meta.Kind() == ref.Interface ||
-		meta.Kind() == ref.Slice ||
-		meta.Kind() == ref.Map ||
-		meta.Kind() == ref.Chan ||
-		meta.Kind() == ref.Func) && meta.IsNil()
+func (c *<TargetName>Class_[<Arguments>]) isUndefined(value any) bool {
+	switch actual := value.(type) {
+	case string:
+		return len(actual) > 0
+	default:
+		var meta = ref.ValueOf(actual)
+		return (meta.Kind() == ref.Ptr ||
+			meta.Kind() == ref.Interface ||
+			meta.Kind() == ref.Slice ||
+			meta.Kind() == ref.Map ||
+			meta.Kind() == ref.Chan ||
+			meta.Kind() == ref.Func) && meta.IsNil()
+	}
 }
 `
 
@@ -130,12 +135,8 @@ const constructorBodyTemplate_ = `
 const attributeAssignmentTemplate_ = `
 			<AttributeName>_: <ParameterName>,`
 
-const stringCheckTemplate_ = `
-	case len(<ParameterName>) == 0:
-		panic("The <ParameterName> attribute is required for each <ClassName>.")`
-
 const attributeCheckTemplate_ = `
-	case c.isNil(<ParameterName>):
+	case c.isUndefined(<ParameterName>):
 		panic("The <ParameterName> attribute is required for each <ClassName>.")`
 
 const functionBodyTemplate_ = `
@@ -208,7 +209,7 @@ const setterStringTemplate_ = `
 `
 
 const setterReferenceTemplate_ = `
-	if v.GetClass().(*<TargetName>Class_[<Arguments>]).isNil(<ParameterName>) {
+	if v.GetClass().(*<TargetName>Class_[<Arguments>]).isUndefined(<ParameterName>) {
 		panic("The <ParameterName> attribute cannot be nil.")
 	}
 	v.<AttributeName>_ = <ParameterName>

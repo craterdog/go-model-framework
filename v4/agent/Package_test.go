@@ -440,11 +440,11 @@ func (c *complexClass_) Make(
 ) ComplexLike {
 	// Validate the arguments.
 	switch {
-	case c.isNil(realPart):
+	case c.isUndefined(realPart):
 		panic("The realPart attribute is required for each Complex.")
-	case c.isNil(imaginaryPart):
+	case c.isUndefined(imaginaryPart):
 		panic("The imaginaryPart attribute is required for each Complex.")
-	case c.isNil(form):
+	case c.isUndefined(form):
 		panic("The form attribute is required for each Complex.")
 	default:
 		return &complex_{
@@ -539,14 +539,19 @@ func (c *complexClass_) Norm(
 
 // Private
 
-func (c *complexClass_) isNil(value any) bool {
-	var meta = ref.ValueOf(value)
-	return (meta.Kind() == ref.Ptr ||
-		meta.Kind() == ref.Interface ||
-		meta.Kind() == ref.Slice ||
-		meta.Kind() == ref.Map ||
-		meta.Kind() == ref.Chan ||
-		meta.Kind() == ref.Func) && meta.IsNil()
+func (c *complexClass_) isUndefined(value any) bool {
+	switch actual := value.(type) {
+	case string:
+		return len(actual) > 0
+	default:
+		var meta = ref.ValueOf(actual)
+		return (meta.Kind() == ref.Ptr ||
+			meta.Kind() == ref.Interface ||
+			meta.Kind() == ref.Slice ||
+			meta.Kind() == ref.Map ||
+			meta.Kind() == ref.Chan ||
+			meta.Kind() == ref.Func) && meta.IsNil()
+	}
 }
 
 // INSTANCE METHODS
@@ -580,7 +585,7 @@ func (v *complex_) GetForm() Form {
 }
 
 func (v *complex_) SetForm(form Form) {
-	if v.GetClass().(*complexClass_).isNil(form) {
+	if v.GetClass().(*complexClass_).isUndefined(form) {
 		panic("The form attribute cannot be nil.")
 	}
 	v.form_ = form
@@ -699,9 +704,9 @@ func (c *associationClass_[K, V]) Make(
 ) AssociationLike[K, V] {
 	// Validate the arguments.
 	switch {
-	case c.isNil(key):
+	case c.isUndefined(key):
 		panic("The key attribute is required for each Association.")
-	case c.isNil(value):
+	case c.isUndefined(value):
 		panic("The value attribute is required for each Association.")
 	default:
 		return &association_[K, V]{
@@ -715,14 +720,19 @@ func (c *associationClass_[K, V]) Make(
 
 // Private
 
-func (c *associationClass_[K, V]) isNil(value any) bool {
-	var meta = ref.ValueOf(value)
-	return (meta.Kind() == ref.Ptr ||
-		meta.Kind() == ref.Interface ||
-		meta.Kind() == ref.Slice ||
-		meta.Kind() == ref.Map ||
-		meta.Kind() == ref.Chan ||
-		meta.Kind() == ref.Func) && meta.IsNil()
+func (c *associationClass_[K, V]) isUndefined(value any) bool {
+	switch actual := value.(type) {
+	case string:
+		return len(actual) > 0
+	default:
+		var meta = ref.ValueOf(actual)
+		return (meta.Kind() == ref.Ptr ||
+			meta.Kind() == ref.Interface ||
+			meta.Kind() == ref.Slice ||
+			meta.Kind() == ref.Map ||
+			meta.Kind() == ref.Chan ||
+			meta.Kind() == ref.Func) && meta.IsNil()
+	}
 }
 
 // INSTANCE METHODS
@@ -754,7 +764,7 @@ func (v *association_[K, V]) GetValue() V {
 }
 
 func (v *association_[K, V]) SetValue(value V) {
-	if v.GetClass().(*associationClass_[K, V]).isNil(value) {
+	if v.GetClass().(*associationClass_[K, V]).isUndefined(value) {
 		panic("The value attribute cannot be nil.")
 	}
 	v.value_ = value

@@ -485,14 +485,8 @@ func (v *generator_) generateAttributeCheck(
 	implementation string,
 ) {
 	var parameterName = parameter.GetName()
-	var parameterType = parameter.GetAbstraction().GetName()
 	var attributeName = sts.TrimSuffix(parameterName, "_")
-	switch {
-	case parameterType == "string":
-		implementation = stringCheckTemplate_
-	default:
-		implementation = attributeCheckTemplate_
-	}
+	implementation = attributeCheckTemplate_
 	implementation = sts.ReplaceAll(implementation, "<AttributeName>", attributeName)
 	implementation = sts.ReplaceAll(implementation, "<ParameterName>", parameterName)
 	return implementation
