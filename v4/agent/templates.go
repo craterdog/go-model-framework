@@ -127,12 +127,12 @@ const constructorBodyTemplate_ = `
 	default:
 		return &<TargetName>_[<Arguments>]{
 			// Initialize instance attributes.
-			class_: c,<Assignments>
+			class_: c,<Initializations>
 		}
 	}
 `
 
-const attributeAssignmentTemplate_ = `
+const attributeInitializationTemplate_ = `
 			<AttributeName>_: <ParameterName>,`
 
 const attributeCheckTemplate_ = `
@@ -193,29 +193,22 @@ const returnBodyTemplate_ = `
 	return
 `
 
-const getterClassTemplate_ = `
+const getterTypeTemplate_ = `
 	return <ClassName>[<Arguments>]()
 `
 
-const getterBodyTemplate_ = `
+const getterClassTemplate_ = `
 	return v.<AttributeName>_
 `
 
-const setterStringTemplate_ = `
-	if len(<ParameterName>) == 0 {
-		panic("The <ParameterName> attribute cannot be an empty string.")
-	}
+const setterOptionalTemplate_ = `
 	v.<AttributeName>_ = <ParameterName>
 `
 
-const setterReferenceTemplate_ = `
+const setterClassTemplate_ = `
 	if v.GetClass().(*<TargetName>Class_[<Arguments>]).isUndefined(<ParameterName>) {
 		panic("The <ParameterName> attribute cannot be nil.")
 	}
-	v.<AttributeName>_ = <ParameterName>
-`
-
-const setterValueTemplate_ = `
 	v.<AttributeName>_ = <ParameterName>
 `
 
