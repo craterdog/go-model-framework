@@ -37,9 +37,10 @@ type genericArgumentsClass_ struct {
 // Constructors
 
 func (c *genericArgumentsClass_) Make(arguments ArgumentsLike) GenericArgumentsLike {
+	// Validate the arguments.
 	switch {
-	case arguments == nil:
-		panic("The arguments attribute is required for each generic arguments.")
+	case isUndefined(arguments):
+		panic("The arguments attribute is required for each GenericArguments.")
 	default:
 		return &genericArguments_{
 			// Initialize instance attributes.

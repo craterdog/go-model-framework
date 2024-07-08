@@ -37,9 +37,10 @@ type genericParametersClass_ struct {
 // Constructors
 
 func (c *genericParametersClass_) Make(parameters ParametersLike) GenericParametersLike {
+	// Validate the arguments.
 	switch {
-	case parameters == nil:
-		panic("The parameters attribute is required for each generic parameters.")
+	case isUndefined(parameters):
+		panic("The parameters attribute is required for each GenericParameters.")
 	default:
 		return &genericParameters_{
 			// Initialize instance attributes.

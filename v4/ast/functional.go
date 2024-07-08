@@ -38,21 +38,22 @@ type functionalClass_ struct {
 
 func (c *functionalClass_) Make(
 	declaration DeclarationLike,
-	parameters ParametersLike,
+	optionalParameters ParametersLike,
 	result ResultLike,
 ) FunctionalLike {
+	// Validate the arguments.
 	switch {
-	case declaration == nil:
-		panic("The declaration attribute is required for each functional.")
-	case result == nil:
-		panic("The result attribute is required for each functional.")
+	case isUndefined(declaration):
+		panic("The declaration attribute is required for each Functional.")
+	case isUndefined(result):
+		panic("The result attribute is required for each Functional.")
 	default:
 		return &functional_{
 			// Initialize instance attributes.
-			class_:       c,
-			declaration_: declaration,
-			parameters_:  parameters,
-			result_:      result,
+			class_:              c,
+			declaration_:        declaration,
+			optionalParameters_: optionalParameters,
+			result_:             result,
 		}
 	}
 }
@@ -63,10 +64,10 @@ func (c *functionalClass_) Make(
 
 type functional_ struct {
 	// Define instance attributes.
-	class_       FunctionalClassLike
-	declaration_ DeclarationLike
-	parameters_  ParametersLike
-	result_      ResultLike
+	class_              FunctionalClassLike
+	declaration_        DeclarationLike
+	optionalParameters_ ParametersLike
+	result_             ResultLike
 }
 
 // Attributes
@@ -80,7 +81,7 @@ func (v *functional_) GetDeclaration() DeclarationLike {
 }
 
 func (v *functional_) GetOptionalParameters() ParametersLike {
-	return v.parameters_
+	return v.optionalParameters_
 }
 
 func (v *functional_) GetResult() ResultLike {

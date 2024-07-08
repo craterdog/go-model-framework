@@ -39,22 +39,23 @@ type classClass_ struct {
 func (c *classClass_) Make(
 	declaration DeclarationLike,
 	constructors ConstructorsLike,
-	constants ConstantsLike,
-	functions FunctionsLike,
+	optionalConstants ConstantsLike,
+	optionalFunctions FunctionsLike,
 ) ClassLike {
+	// Validate the arguments.
 	switch {
-	case declaration == nil:
-		panic("The declaration attribute is required for each class.")
-	case constructors == nil:
-		panic("At least one constructor is required for each class.")
+	case isUndefined(declaration):
+		panic("The declaration attribute is required for each Class.")
+	case isUndefined(constructors):
+		panic("The constructors attribute is required for each Class.")
 	default:
 		return &class_{
 			// Initialize instance attributes.
-			class_:        c,
-			declaration_:  declaration,
-			constructors_: constructors,
-			constants_:    constants,
-			functions_:    functions,
+			class_:             c,
+			declaration_:       declaration,
+			constructors_:      constructors,
+			optionalConstants_: optionalConstants,
+			optionalFunctions_: optionalFunctions,
 		}
 	}
 }
@@ -65,11 +66,11 @@ func (c *classClass_) Make(
 
 type class_ struct {
 	// Define instance attributes.
-	class_        ClassClassLike
-	declaration_  DeclarationLike
-	constructors_ ConstructorsLike
-	constants_    ConstantsLike
-	functions_    FunctionsLike
+	class_             ClassClassLike
+	declaration_       DeclarationLike
+	constructors_      ConstructorsLike
+	optionalConstants_ ConstantsLike
+	optionalFunctions_ FunctionsLike
 }
 
 // Attributes
@@ -87,11 +88,11 @@ func (v *class_) GetConstructors() ConstructorsLike {
 }
 
 func (v *class_) GetOptionalConstants() ConstantsLike {
-	return v.constants_
+	return v.optionalConstants_
 }
 
 func (v *class_) GetOptionalFunctions() FunctionsLike {
-	return v.functions_
+	return v.optionalFunctions_
 }
 
 // Private

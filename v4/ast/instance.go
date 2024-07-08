@@ -39,22 +39,23 @@ type instanceClass_ struct {
 func (c *instanceClass_) Make(
 	declaration DeclarationLike,
 	attributes AttributesLike,
-	abstractions AbstractionsLike,
-	methods MethodsLike,
+	optionalAbstractions AbstractionsLike,
+	optionalMethods MethodsLike,
 ) InstanceLike {
+	// Validate the arguments.
 	switch {
-	case declaration == nil:
-		panic("The declaration attribute is required for each instance.")
-	case attributes == nil:
-		panic("The attributes attribute is required for each instance.")
+	case isUndefined(declaration):
+		panic("The declaration attribute is required for each Instance.")
+	case isUndefined(attributes):
+		panic("The attributes attribute is required for each Instance.")
 	default:
 		return &instance_{
 			// Initialize instance attributes.
-			class_:        c,
-			declaration_:  declaration,
-			attributes_:   attributes,
-			abstractions_: abstractions,
-			methods_:      methods,
+			class_:                c,
+			declaration_:          declaration,
+			attributes_:           attributes,
+			optionalAbstractions_: optionalAbstractions,
+			optionalMethods_:      optionalMethods,
 		}
 	}
 }
@@ -65,11 +66,11 @@ func (c *instanceClass_) Make(
 
 type instance_ struct {
 	// Define instance attributes.
-	class_        InstanceClassLike
-	declaration_  DeclarationLike
-	attributes_   AttributesLike
-	abstractions_ AbstractionsLike
-	methods_      MethodsLike
+	class_                InstanceClassLike
+	declaration_          DeclarationLike
+	attributes_           AttributesLike
+	optionalAbstractions_ AbstractionsLike
+	optionalMethods_      MethodsLike
 }
 
 // Attributes
@@ -87,11 +88,11 @@ func (v *instance_) GetAttributes() AttributesLike {
 }
 
 func (v *instance_) GetOptionalAbstractions() AbstractionsLike {
-	return v.abstractions_
+	return v.optionalAbstractions_
 }
 
 func (v *instance_) GetOptionalMethods() MethodsLike {
-	return v.methods_
+	return v.optionalMethods_
 }
 
 // Private

@@ -38,19 +38,20 @@ type methodClass_ struct {
 
 func (c *methodClass_) Make(
 	name string,
-	parameters ParametersLike,
-	result ResultLike,
+	optionalParameters ParametersLike,
+	optionalResult ResultLike,
 ) MethodLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each method.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Method.")
 	default:
 		return &method_{
 			// Initialize instance attributes.
-			class_:      c,
-			name_:       name,
-			parameters_: parameters,
-			result_:     result,
+			class_:              c,
+			name_:               name,
+			optionalParameters_: optionalParameters,
+			optionalResult_:     optionalResult,
 		}
 	}
 }
@@ -61,10 +62,10 @@ func (c *methodClass_) Make(
 
 type method_ struct {
 	// Define instance attributes.
-	class_      MethodClassLike
-	name_       string
-	parameters_ ParametersLike
-	result_     ResultLike
+	class_              MethodClassLike
+	name_               string
+	optionalParameters_ ParametersLike
+	optionalResult_     ResultLike
 }
 
 // Attributes
@@ -78,11 +79,11 @@ func (v *method_) GetName() string {
 }
 
 func (v *method_) GetOptionalParameters() ParametersLike {
-	return v.parameters_
+	return v.optionalParameters_
 }
 
 func (v *method_) GetOptionalResult() ResultLike {
-	return v.result_
+	return v.optionalResult_
 }
 
 // Private

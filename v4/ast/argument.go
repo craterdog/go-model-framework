@@ -37,9 +37,10 @@ type argumentClass_ struct {
 // Constructors
 
 func (c *argumentClass_) Make(abstraction AbstractionLike) ArgumentLike {
+	// Validate the arguments.
 	switch {
-	case abstraction == nil:
-		panic("The abstraction attribute is required for each argument.")
+	case isUndefined(abstraction):
+		panic("The abstraction attribute is required for each Argument.")
 	default:
 		return &argument_{
 			// Initialize instance attributes.

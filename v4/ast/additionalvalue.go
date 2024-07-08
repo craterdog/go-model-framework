@@ -37,9 +37,10 @@ type additionalValueClass_ struct {
 // Constructors
 
 func (c *additionalValueClass_) Make(name string) AdditionalValueLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each additional value.")
+	case isUndefined(name):
+		panic("The name attribute is required for each AdditionalValue.")
 	default:
 		return &additionalValue_{
 			// Initialize instance attributes.

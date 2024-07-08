@@ -37,9 +37,10 @@ type parameterizedClass_ struct {
 // Constructors
 
 func (c *parameterizedClass_) Make(parameters ParametersLike) ParameterizedLike {
+	// Validate the arguments.
 	switch {
-	case parameters == nil:
-		panic("The parameters attribute is required for each parameterized.")
+	case isUndefined(parameters):
+		panic("The parameters attribute is required for each Parameterized.")
 	default:
 		return &parameterized_{
 			// Initialize instance attributes.

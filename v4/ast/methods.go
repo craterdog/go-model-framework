@@ -44,11 +44,12 @@ func (c *methodsClass_) Make(
 	note string,
 	methods col.Sequential[MethodLike],
 ) MethodsLike {
+	// Validate the arguments.
 	switch {
-	case len(note) == 0:
-		panic("The note attribute is required for each sequence of methods.")
-	case methods == nil || methods.IsEmpty():
-		panic("At least one method is required for each sequence of methods.")
+	case isUndefined(note):
+		panic("The note attribute is required for each Methods.")
+	case isUndefined(methods):
+		panic("The methods attribute is required for each Methods.")
 	default:
 		return &methods_{
 			// Initialize instance attributes.

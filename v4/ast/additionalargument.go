@@ -37,9 +37,10 @@ type additionalArgumentClass_ struct {
 // Constructors
 
 func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
+	// Validate the arguments.
 	switch {
-	case argument == nil:
-		panic("The argument attribute is required for each additional argument.")
+	case isUndefined(argument):
+		panic("The argument attribute is required for each AdditionalArgument.")
 	default:
 		return &additionalArgument_{
 			// Initialize instance attributes.

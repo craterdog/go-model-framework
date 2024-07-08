@@ -37,22 +37,23 @@ type abstractionClass_ struct {
 // Constructors
 
 func (c *abstractionClass_) Make(
-	prefix PrefixLike,
-	alias AliasLike,
+	optionalPrefix PrefixLike,
+	optionalAlias AliasLike,
 	name string,
-	genericArguments GenericArgumentsLike,
+	optionalGenericArguments GenericArgumentsLike,
 ) AbstractionLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each abstraction.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Abstraction.")
 	default:
 		return &abstraction_{
 			// Initialize instance attributes.
-			class_:            c,
-			prefix_:           prefix,
-			alias_:            alias,
-			name_:             name,
-			genericArguments_: genericArguments,
+			class_:                    c,
+			optionalPrefix_:           optionalPrefix,
+			optionalAlias_:            optionalAlias,
+			name_:                     name,
+			optionalGenericArguments_: optionalGenericArguments,
 		}
 	}
 }
@@ -63,11 +64,11 @@ func (c *abstractionClass_) Make(
 
 type abstraction_ struct {
 	// Define instance attributes.
-	class_            AbstractionClassLike
-	prefix_           PrefixLike
-	alias_            AliasLike
-	name_             string
-	genericArguments_ GenericArgumentsLike
+	class_                    AbstractionClassLike
+	optionalPrefix_           PrefixLike
+	optionalAlias_            AliasLike
+	name_                     string
+	optionalGenericArguments_ GenericArgumentsLike
 }
 
 // Attributes
@@ -77,11 +78,11 @@ func (v *abstraction_) GetClass() AbstractionClassLike {
 }
 
 func (v *abstraction_) GetOptionalPrefix() PrefixLike {
-	return v.prefix_
+	return v.optionalPrefix_
 }
 
 func (v *abstraction_) GetOptionalAlias() AliasLike {
-	return v.alias_
+	return v.optionalAlias_
 }
 
 func (v *abstraction_) GetName() string {
@@ -89,7 +90,7 @@ func (v *abstraction_) GetName() string {
 }
 
 func (v *abstraction_) GetOptionalGenericArguments() GenericArgumentsLike {
-	return v.genericArguments_
+	return v.optionalGenericArguments_
 }
 
 // Private

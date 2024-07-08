@@ -44,11 +44,12 @@ func (c *instancesClass_) Make(
 	note string,
 	instances col.Sequential[InstanceLike],
 ) InstancesLike {
+	// Validate the arguments.
 	switch {
-	case len(note) == 0:
-		panic("The note attribute is required for each sequence of instances.")
-	case instances == nil || instances.IsEmpty():
-		panic("At least on instance is required for each sequence of instances.")
+	case isUndefined(note):
+		panic("The note attribute is required for each Instances.")
+	case isUndefined(instances):
+		panic("The instances attribute is required for each Instances.")
 	default:
 		return &instances_{
 			// Initialize instance attributes.

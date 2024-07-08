@@ -39,20 +39,21 @@ type declarationClass_ struct {
 func (c *declarationClass_) Make(
 	comment string,
 	name string,
-	genericParameters GenericParametersLike,
+	optionalGenericParameters GenericParametersLike,
 ) DeclarationLike {
+	// Validate the arguments.
 	switch {
-	case len(comment) == 0:
-		panic("The comment attribute is required for each declaration.")
-	case len(name) == 0:
-		panic("The name attribute is required for each declaration.")
+	case isUndefined(comment):
+		panic("The comment attribute is required for each Declaration.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Declaration.")
 	default:
 		return &declaration_{
 			// Initialize instance attributes.
-			class_:             c,
-			comment_:           comment,
-			name_:              name,
-			genericParameters_: genericParameters,
+			class_:                     c,
+			comment_:                   comment,
+			name_:                      name,
+			optionalGenericParameters_: optionalGenericParameters,
 		}
 	}
 }
@@ -63,10 +64,10 @@ func (c *declarationClass_) Make(
 
 type declaration_ struct {
 	// Define instance attributes.
-	class_             DeclarationClassLike
-	comment_           string
-	name_              string
-	genericParameters_ GenericParametersLike
+	class_                     DeclarationClassLike
+	comment_                   string
+	name_                      string
+	optionalGenericParameters_ GenericParametersLike
 }
 
 // Attributes
@@ -84,7 +85,7 @@ func (v *declaration_) GetName() string {
 }
 
 func (v *declaration_) GetOptionalGenericParameters() GenericParametersLike {
-	return v.genericParameters_
+	return v.optionalGenericParameters_
 }
 
 // Private

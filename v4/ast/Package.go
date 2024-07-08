@@ -43,10 +43,10 @@ concrete abstraction-like class.
 type AbstractionClassLike interface {
 	// Constructors
 	Make(
-		prefix PrefixLike,
-		alias AliasLike,
+		optionalPrefix PrefixLike,
+		optionalAlias AliasLike,
 		name string,
-		genericArguments GenericArgumentsLike,
+		optionalGenericArguments GenericArgumentsLike,
 	) AbstractionLike
 }
 
@@ -171,8 +171,8 @@ type AttributeClassLike interface {
 	// Constructors
 	Make(
 		name string,
-		parameter ParameterLike,
-		abstraction AbstractionLike,
+		optionalParameter ParameterLike,
+		optionalAbstraction AbstractionLike,
 	) AttributeLike
 }
 
@@ -209,8 +209,8 @@ type ClassClassLike interface {
 	Make(
 		declaration DeclarationLike,
 		constructors ConstructorsLike,
-		constants ConstantsLike,
-		functions FunctionsLike,
+		optionalConstants ConstantsLike,
+		optionalFunctions FunctionsLike,
 	) ClassLike
 }
 
@@ -262,7 +262,7 @@ type ConstructorClassLike interface {
 	// Constructors
 	Make(
 		name string,
-		parameters ParametersLike,
+		optionalParameters ParametersLike,
 		abstraction AbstractionLike,
 	) ConstructorLike
 }
@@ -290,7 +290,7 @@ type DeclarationClassLike interface {
 	Make(
 		comment string,
 		name string,
-		genericParameters GenericParametersLike,
+		optionalGenericParameters GenericParametersLike,
 	) DeclarationLike
 }
 
@@ -313,7 +313,7 @@ type FunctionClassLike interface {
 	// Constructors
 	Make(
 		name string,
-		parameters ParametersLike,
+		optionalParameters ParametersLike,
 		result ResultLike,
 	) FunctionLike
 }
@@ -327,7 +327,7 @@ type FunctionalClassLike interface {
 	// Constructors
 	Make(
 		declaration DeclarationLike,
-		parameters ParametersLike,
+		optionalParameters ParametersLike,
 		result ResultLike,
 	) FunctionalLike
 }
@@ -411,8 +411,8 @@ type InstanceClassLike interface {
 	Make(
 		declaration DeclarationLike,
 		attributes AttributesLike,
-		abstractions AbstractionsLike,
-		methods MethodsLike,
+		optionalAbstractions AbstractionsLike,
+		optionalMethods MethodsLike,
 	) InstanceLike
 }
 
@@ -448,8 +448,8 @@ type MethodClassLike interface {
 	// Constructors
 	Make(
 		name string,
-		parameters ParametersLike,
-		result ResultLike,
+		optionalParameters ParametersLike,
+		optionalResult ResultLike,
 	) MethodLike
 }
 
@@ -476,12 +476,12 @@ type ModelClassLike interface {
 	Make(
 		notice NoticeLike,
 		header HeaderLike,
-		imports ImportsLike,
-		types TypesLike,
-		functionals FunctionalsLike,
+		optionalImports ImportsLike,
+		optionalTypes TypesLike,
+		optionalFunctionals FunctionalsLike,
 		classes ClassesLike,
 		instances InstancesLike,
-		aspects AspectsLike,
+		optionalAspects AspectsLike,
 	) ModelLike
 }
 
@@ -584,7 +584,7 @@ type TypeClassLike interface {
 	Make(
 		declaration DeclarationLike,
 		abstraction AbstractionLike,
-		enumeration EnumerationLike,
+		optionalEnumeration EnumerationLike,
 	) TypeLike
 }
 

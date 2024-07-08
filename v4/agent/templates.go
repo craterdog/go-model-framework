@@ -12,6 +12,8 @@
 
 package agent
 
+// Templates
+
 const classTemplate_ = `<Notice><Header><Imports><Access><Class><Instance>`
 
 const headerTemplate_ = `
@@ -78,26 +80,7 @@ const classMethodsTemplate_ = `
 // CLASS METHODS
 
 // Target
-<Target><Constructors><Constants><Functions><Private>`
-
-const privateMethodsTemplate_ = `
-// Private
-
-func (c *<TargetName>Class_[<Arguments>]) isUndefined(value any) bool {
-	switch actual := value.(type) {
-	case string:
-		return len(actual) > 0
-	default:
-		var meta = ref.ValueOf(actual)
-		return (meta.Kind() == ref.Ptr ||
-			meta.Kind() == ref.Interface ||
-			meta.Kind() == ref.Slice ||
-			meta.Kind() == ref.Map ||
-			meta.Kind() == ref.Chan ||
-			meta.Kind() == ref.Func) && meta.IsNil()
-	}
-}
-`
+<Target><Constructors><Constants><Functions>`
 
 const classTargetTemplate_ = `
 type <TargetName>Class_[<Parameters>] struct {
@@ -136,7 +119,7 @@ const attributeInitializationTemplate_ = `
 			<AttributeName>_: <ParameterName>,`
 
 const attributeCheckTemplate_ = `
-	case c.isUndefined(<ParameterName>):
+	case isUndefined(<ParameterName>):
 		panic("The <ParameterName> attribute is required for each <ClassName>.")`
 
 const functionBodyTemplate_ = `
@@ -206,7 +189,7 @@ const setterOptionalTemplate_ = `
 `
 
 const setterClassTemplate_ = `
-	if v.GetClass().(*<TargetName>Class_[<Arguments>]).isUndefined(<ParameterName>) {
+	if isUndefined(<ParameterName>) {
 		panic("The <ParameterName> attribute cannot be nil.")
 	}
 	v.<AttributeName>_ = <ParameterName>

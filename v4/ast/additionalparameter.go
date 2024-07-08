@@ -37,9 +37,10 @@ type additionalParameterClass_ struct {
 // Constructors
 
 func (c *additionalParameterClass_) Make(parameter ParameterLike) AdditionalParameterLike {
+	// Validate the arguments.
 	switch {
-	case parameter == nil:
-		panic("The parameter attribute is required for each additional parameter.")
+	case isUndefined(parameter):
+		panic("The parameter attribute is required for each AdditionalParameter.")
 	default:
 		return &additionalParameter_{
 			// Initialize instance attributes.

@@ -44,11 +44,12 @@ func (c *functionsClass_) Make(
 	note string,
 	functions col.Sequential[FunctionLike],
 ) FunctionsLike {
+	// Validate the arguments.
 	switch {
-	case len(note) == 0:
-		panic("The note attribute is required for each sequence of functions.")
-	case functions == nil || functions.IsEmpty():
-		panic("At least one function is required for each sequence of functions.")
+	case isUndefined(note):
+		panic("The note attribute is required for each Functions.")
+	case isUndefined(functions):
+		panic("The functions attribute is required for each Functions.")
 	default:
 		return &functions_{
 			// Initialize instance attributes.

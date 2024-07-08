@@ -41,9 +41,10 @@ type modulesClass_ struct {
 // Constructors
 
 func (c *modulesClass_) Make(modules col.Sequential[ModuleLike]) ModulesLike {
+	// Validate the arguments.
 	switch {
-	case modules == nil || modules.IsEmpty():
-		panic("At least one module is required for each sequence of modules.")
+	case isUndefined(modules):
+		panic("The modules attribute is required for each Modules.")
 	default:
 		return &modules_{
 			// Initialize instance attributes.

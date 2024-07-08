@@ -12,54 +12,23 @@
 
 package ast
 
-// CLASS ACCESS
-
-// Reference
-
-var arrayClass = &arrayClass_{
-	// Initialize class constants.
-}
-
-// Function
-
-func Array() ArrayClassLike {
-	return arrayClass
-}
-
-// CLASS METHODS
-
-// Target
-
-type arrayClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *arrayClass_) Make() ArrayLike {
-	// Validate the arguments.
-	switch {
-	default:
-		return &array_{
-			// Initialize instance attributes.
-			class_: c,
-		}
-	}
-}
-
-// INSTANCE METHODS
-
-// Target
-
-type array_ struct {
-	// Define instance attributes.
-	class_ ArrayClassLike
-}
-
-// Attributes
-
-func (v *array_) GetClass() ArrayClassLike {
-	return v.class_
-}
+import (
+	ref "reflect"
+)
 
 // Private
+
+func isUndefined(value any) bool {
+	switch actual := value.(type) {
+	case string:
+		return len(actual) == 0
+	default:
+		var meta = ref.ValueOf(actual)
+		return (meta.Kind() == ref.Ptr ||
+			meta.Kind() == ref.Interface ||
+			meta.Kind() == ref.Slice ||
+			meta.Kind() == ref.Map ||
+			meta.Kind() == ref.Chan ||
+			meta.Kind() == ref.Func) && meta.IsNil()
+	}
+}

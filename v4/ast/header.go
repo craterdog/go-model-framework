@@ -40,11 +40,12 @@ func (c *headerClass_) Make(
 	comment string,
 	name string,
 ) HeaderLike {
+	// Validate the arguments.
 	switch {
-	case len(comment) == 0:
-		panic("The comment attribute is required for each header.")
-	case len(name) == 0:
-		panic("The name attribute is required for each header.")
+	case isUndefined(comment):
+		panic("The comment attribute is required for each Header.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Header.")
 	default:
 		return &header_{
 			// Initialize instance attributes.

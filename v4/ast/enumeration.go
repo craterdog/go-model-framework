@@ -37,9 +37,10 @@ type enumerationClass_ struct {
 // Constructors
 
 func (c *enumerationClass_) Make(values ValuesLike) EnumerationLike {
+	// Validate the arguments.
 	switch {
-	case values == nil:
-		panic("The values attribute is required for each enumeration.")
+	case isUndefined(values):
+		panic("The values attribute is required for each Enumeration.")
 	default:
 		return &enumeration_{
 			// Initialize instance attributes.

@@ -37,9 +37,10 @@ type noticeClass_ struct {
 // Constructors
 
 func (c *noticeClass_) Make(comment string) NoticeLike {
+	// Validate the arguments.
 	switch {
-	case len(comment) == 0:
-		panic("The comment attribute is required for each notice.")
+	case isUndefined(comment):
+		panic("The comment attribute is required for each Notice.")
 	default:
 		return &notice_{
 			// Initialize instance attributes.

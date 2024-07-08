@@ -40,11 +40,12 @@ func (c *constantClass_) Make(
 	name string,
 	abstraction AbstractionLike,
 ) ConstantLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each constant.")
-	case abstraction == nil:
-		panic("The abstraction attribute is required for each constant.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Constant.")
+	case isUndefined(abstraction):
+		panic("The abstraction attribute is required for each Constant.")
 	default:
 		return &constant_{
 			// Initialize instance attributes.

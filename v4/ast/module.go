@@ -40,11 +40,12 @@ func (c *moduleClass_) Make(
 	name string,
 	path string,
 ) ModuleLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each module.")
-	case len(path) == 0:
-		panic("The path attribute is required for each module.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Module.")
+	case isUndefined(path):
+		panic("The path attribute is required for each Module.")
 	default:
 		return &module_{
 			// Initialize instance attributes.

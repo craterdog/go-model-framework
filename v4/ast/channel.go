@@ -37,9 +37,13 @@ type channelClass_ struct {
 // Constructors
 
 func (c *channelClass_) Make() ChannelLike {
-	return &channel_{
-		// Initialize instance attributes.
-		class_: c,
+	// Validate the arguments.
+	switch {
+	default:
+		return &channel_{
+			// Initialize instance attributes.
+			class_: c,
+		}
 	}
 }
 

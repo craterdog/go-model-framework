@@ -39,34 +39,35 @@ type modelClass_ struct {
 func (c *modelClass_) Make(
 	notice NoticeLike,
 	header HeaderLike,
-	imports ImportsLike,
-	types TypesLike,
-	functionals FunctionalsLike,
+	optionalImports ImportsLike,
+	optionalTypes TypesLike,
+	optionalFunctionals FunctionalsLike,
 	classes ClassesLike,
 	instances InstancesLike,
-	aspects AspectsLike,
+	optionalAspects AspectsLike,
 ) ModelLike {
+	// Validate the arguments.
 	switch {
-	case notice == nil:
-		panic("The notice attribute is required for each model.")
-	case header == nil:
-		panic("The header attribute is required for each model.")
-	case classes == nil:
-		panic("The classes attribute is required for each model.")
-	case instances == nil:
-		panic("The instances attribute is required for each model.")
+	case isUndefined(notice):
+		panic("The notice attribute is required for each Model.")
+	case isUndefined(header):
+		panic("The header attribute is required for each Model.")
+	case isUndefined(classes):
+		panic("The classes attribute is required for each Model.")
+	case isUndefined(instances):
+		panic("The instances attribute is required for each Model.")
 	default:
 		return &model_{
 			// Initialize instance attributes.
-			class_:       c,
-			notice_:      notice,
-			header_:      header,
-			imports_:     imports,
-			types_:       types,
-			functionals_: functionals,
-			classes_:     classes,
-			instances_:   instances,
-			aspects_:     aspects,
+			class_:               c,
+			notice_:              notice,
+			header_:              header,
+			optionalImports_:     optionalImports,
+			optionalTypes_:       optionalTypes,
+			optionalFunctionals_: optionalFunctionals,
+			classes_:             classes,
+			instances_:           instances,
+			optionalAspects_:     optionalAspects,
 		}
 	}
 }
@@ -77,15 +78,15 @@ func (c *modelClass_) Make(
 
 type model_ struct {
 	// Define instance attributes.
-	class_       ModelClassLike
-	notice_      NoticeLike
-	header_      HeaderLike
-	imports_     ImportsLike
-	types_       TypesLike
-	functionals_ FunctionalsLike
-	classes_     ClassesLike
-	instances_   InstancesLike
-	aspects_     AspectsLike
+	class_               ModelClassLike
+	notice_              NoticeLike
+	header_              HeaderLike
+	optionalImports_     ImportsLike
+	optionalTypes_       TypesLike
+	optionalFunctionals_ FunctionalsLike
+	classes_             ClassesLike
+	instances_           InstancesLike
+	optionalAspects_     AspectsLike
 }
 
 // Attributes
@@ -103,15 +104,15 @@ func (v *model_) GetHeader() HeaderLike {
 }
 
 func (v *model_) GetOptionalImports() ImportsLike {
-	return v.imports_
+	return v.optionalImports_
 }
 
 func (v *model_) GetOptionalTypes() TypesLike {
-	return v.types_
+	return v.optionalTypes_
 }
 
 func (v *model_) GetOptionalFunctionals() FunctionalsLike {
-	return v.functionals_
+	return v.optionalFunctionals_
 }
 
 func (v *model_) GetClasses() ClassesLike {
@@ -123,7 +124,7 @@ func (v *model_) GetInstances() InstancesLike {
 }
 
 func (v *model_) GetOptionalAspects() AspectsLike {
-	return v.aspects_
+	return v.optionalAspects_
 }
 
 // Private

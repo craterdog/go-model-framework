@@ -36,15 +36,16 @@ type prefixClass_ struct {
 
 // Constructors
 
-func (c *prefixClass_) Make(any_ any) PrefixLike {
+func (c *prefixClass_) Make(any any) PrefixLike {
+	// Validate the arguments.
 	switch {
-	case any_ == nil:
-		panic("The any_ attribute is required for each prefix.")
+	case isUndefined(any):
+		panic("The any attribute is required for each Prefix.")
 	default:
 		return &prefix_{
 			// Initialize instance attributes.
 			class_: c,
-			any_:   any_,
+			any_:   any,
 		}
 	}
 }

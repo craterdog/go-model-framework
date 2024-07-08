@@ -725,10 +725,6 @@ func (v *generator_) generateClassMethods(
 	var functionMethods = v.generateFunctionMethods(class)
 	implementation = sts.ReplaceAll(implementation, "<Functions>", functionMethods)
 
-	// Generate any private class methods.
-	var privateMethods = v.generatePrivateMethods(targetType, class)
-	implementation = sts.ReplaceAll(implementation, "<Private>", privateMethods)
-
 	return implementation
 }
 
@@ -909,11 +905,6 @@ func (v *generator_) generateImports(
 	// Generate imports for specific modules that are referenced in the code.
 	if sts.Contains(class, "syn.") {
 		implementation += "\n\tfmt \"fmt\""
-	}
-	if sts.Contains(class, "ref.") {
-		implementation += "\n\tref \"reflect\""
-	}
-	if sts.Contains(class, "syn.") {
 		implementation += "\n\tsyn \"sync\""
 	}
 
@@ -1091,55 +1082,6 @@ func (v *generator_) generateModules(
 func (v *generator_) generateNotice(model ast.ModelLike) string {
 	var notice = model.GetNotice().GetComment()
 	return notice
-}
-
-func (v *generator_) generatePrivateMethods(
-	targetType string,
-	class ast.ClassLike,
-) (
-	implementation string,
-) {
-	// Extended primitive type classes don't define private class methods.
-	if len(targetType) > 0 {
-		return implementation
-	}
-
-	// Check each class constructor method for attribute parameters.
-	var constructors = class.GetConstructors()
-	var constructorIterator = constructors.GetConstructors().GetIterator()
-	for constructorIterator.HasNext() {
-		var constructor = constructorIterator.GetNext()
-
-		// Ignore class constructor methods that don't have attribute parameters.
-		var name = constructor.GetName()
-		var parameters = constructor.GetOptionalParameters()
-		if parameters == nil || sts.HasPrefix(name, "MakeFrom") {
-			continue
-		}
-
-		// Check the first parameter in the class constructor.
-		var parameter = parameters.GetParameter()
-		if !sts.HasPrefix(parameter.GetName(), "optional") {
-			// Found a mandatory attribute parameter.
-			implementation = privateMethodsTemplate_
-			return implementation
-		}
-
-		// Check any additional parameters in the class constructor.
-		var parameterIterator = parameters.GetAdditionalParameters().GetIterator()
-		for parameterIterator.HasNext() {
-			var additionalParameter = parameterIterator.GetNext()
-			var parameter = additionalParameter.GetParameter()
-			if !sts.HasPrefix(parameter.GetName(), "optional") {
-				// Found a mandatory attribute parameter.
-				implementation = privateMethodsTemplate_
-				return implementation
-			}
-		}
-	}
-
-	// No mandatory attribute parameters were found.
-	return implementation
 }
 
 func (v *generator_) generatePublicMethods(

@@ -40,11 +40,12 @@ func (c *parameterClass_) Make(
 	name string,
 	abstraction AbstractionLike,
 ) ParameterLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each parameter.")
-	case abstraction == nil:
-		panic("The abstraction attribute is required for each parameter.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Parameter.")
+	case isUndefined(abstraction):
+		panic("The abstraction attribute is required for each Parameter.")
 	default:
 		return &parameter_{
 			// Initialize instance attributes.

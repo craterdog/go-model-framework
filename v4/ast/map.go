@@ -37,9 +37,10 @@ type mapClass_ struct {
 // Constructors
 
 func (c *mapClass_) Make(name string) MapLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each map.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Map.")
 	default:
 		return &map_{
 			// Initialize instance attributes.

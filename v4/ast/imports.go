@@ -37,9 +37,10 @@ type importsClass_ struct {
 // Constructors
 
 func (c *importsClass_) Make(modules ModulesLike) ImportsLike {
+	// Validate the arguments.
 	switch {
-	case modules == nil:
-		panic("The modules attribute is required for each sequence of imports.")
+	case isUndefined(modules):
+		panic("The modules attribute is required for each Imports.")
 	default:
 		return &imports_{
 			// Initialize instance attributes.

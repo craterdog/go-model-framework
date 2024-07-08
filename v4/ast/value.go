@@ -40,11 +40,12 @@ func (c *valueClass_) Make(
 	name string,
 	abstraction AbstractionLike,
 ) ValueLike {
+	// Validate the arguments.
 	switch {
-	case len(name) == 0:
-		panic("The name attribute is required for each value.")
-	case abstraction == nil:
-		panic("The abstraction attribute is required for each value.")
+	case isUndefined(name):
+		panic("The name attribute is required for each Value.")
+	case isUndefined(abstraction):
+		panic("The abstraction attribute is required for each Value.")
 	default:
 		return &value_{
 			// Initialize instance attributes.
