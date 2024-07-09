@@ -149,6 +149,19 @@ func (v *generator_) GenerateClass(
 	panic(message)
 }
 
+func (v *generator_) GeneratePrivate(
+	model ast.ModelLike,
+) (
+	implementation string,
+) {
+	implementation = privateTemplate_
+	var notice = model.GetNotice().GetComment()
+	implementation = sts.ReplaceAll(implementation, "<Notice>", notice)
+	var name = model.GetHeader().GetName()
+	implementation = sts.ReplaceAll(implementation, "<name>", name)
+	return implementation
+}
+
 // Private
 
 func (v *generator_) expandCopyright(copyright string) string {
@@ -885,7 +898,7 @@ func (v *generator_) generateHeader(
 ) {
 	var header = headerTemplate_
 	var name = model.GetHeader().GetName()
-	header = sts.ReplaceAll(header, "<Name>", name)
+	header = sts.ReplaceAll(header, "<name>", name)
 	return header
 }
 

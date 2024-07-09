@@ -17,7 +17,7 @@ package agent
 const classTemplate_ = `<Notice><Header><Imports><Access><Class><Instance>`
 
 const headerTemplate_ = `
-package <Name>
+package <name>
 `
 
 const importsTemplate_ = `
@@ -737,4 +737,28 @@ type Sequential[V any] interface {
 	AsArray() []V
 	GetSize() int
 	IsEmpty() bool
+}`
+
+const privateTemplate_ = `<Notice>
+package <name>
+
+import (
+	ref "reflect"
+)
+
+// Private
+
+func isUndefined(value any) bool {
+	switch actual := value.(type) {
+	case string:
+		return len(actual) == 0
+	default:
+		var meta = ref.ValueOf(actual)
+		return (meta.Kind() == ref.Ptr ||
+			meta.Kind() == ref.Interface ||
+			meta.Kind() == ref.Slice ||
+			meta.Kind() == ref.Map ||
+			meta.Kind() == ref.Chan ||
+			meta.Kind() == ref.Func) && meta.IsNil()
+	}
 }`

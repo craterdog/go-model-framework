@@ -84,12 +84,51 @@ func TestCreateGenericStructure(t *tes.T) {
 	var copyright string
 	var model = generator.CreateGenericStructure(name, copyright)
 
+	// Generate the package private definitions.
+	var source = generator.GeneratePrivate(model)
+	ass.Equal(t, private, source)
+
 	// Generate the classes from the generic structure model.
-	var source = generator.GenerateClass(model, "association")
+	source = generator.GenerateClass(model, "association")
 	ass.Equal(t, association, source)
 	source = generator.GenerateClass(model, "catalog")
 	ass.Equal(t, catalog, source)
 }
+
+const private = `/*
+................................................................................
+.                   Copyright (c) 2024.  All Rights Reserved.                  .
+................................................................................
+.  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
+.                                                                              .
+.  This code is free software; you can redistribute it and/or modify it under  .
+.  the terms of The MIT License (MIT), as published by the Open Source         .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
+................................................................................
+*/
+
+package example
+
+import (
+	ref "reflect"
+)
+
+// Private
+
+func isUndefined(value any) bool {
+	switch actual := value.(type) {
+	case string:
+		return len(actual) == 0
+	default:
+		var meta = ref.ValueOf(actual)
+		return (meta.Kind() == ref.Ptr ||
+			meta.Kind() == ref.Interface ||
+			meta.Kind() == ref.Slice ||
+			meta.Kind() == ref.Map ||
+			meta.Kind() == ref.Chan ||
+			meta.Kind() == ref.Func) && meta.IsNil()
+	}
+}`
 
 const angle = `/*
 ................................................................................
