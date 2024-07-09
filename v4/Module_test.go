@@ -15,8 +15,67 @@ package module_test
 import (
 	fmt "fmt"
 	mod "github.com/craterdog/go-model-framework/v4"
+	ass "github.com/stretchr/testify/assert"
+	osx "os"
+	sts "strings"
 	tes "testing"
 )
+
+var testModels = []string{
+	"ast/Package.go",
+	"agent/Package.go",
+}
+
+func TestRoundTrips(t *tes.T) {
+	for _, modelfile := range testModels {
+		var bytes, err = osx.ReadFile(modelfile)
+		if err != nil {
+			panic(err)
+		}
+		var source = string(bytes)
+		var parser = mod.Parser()
+		var model = parser.ParseSource(source)
+		var formatter = mod.Formatter()
+		var actual = formatter.FormatModel(model)
+		ass.Equal(t, actual, source)
+		var validator = mod.Validator()
+		validator.ValidateModel(model)
+	}
+}
+
+func TestAstGeneration(t *tes.T) {
+	var filename = "ast/Package.go"
+	var bytes, err = osx.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	var source = string(bytes)
+	var parser = mod.Parser()
+	var model = parser.ParseSource(source)
+	var generator = mod.Generator()
+	source = generator.GeneratePrivate(model)
+	bytes = []byte(source)
+	filename = "ast/Private.go"
+	err = osx.WriteFile(filename, bytes, 0644)
+	if err != nil {
+		panic(err)
+	}
+	var iterator = model.GetClasses().GetClasses().GetIterator()
+	for iterator.HasNext() {
+		var class = iterator.GetNext()
+		var name = sts.ToLower(sts.TrimSuffix(
+			class.GetDeclaration().GetName(),
+			"ClassLike",
+		))
+		source = generator.GenerateClass(model, name)
+		bytes = []byte(source)
+		var filename = "ast/" + name + ".go"
+		var err = osx.WriteFile(filename, bytes, 0644)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
 
 func TestClassType(t *tes.T) {
 	var generator = mod.Generator()
