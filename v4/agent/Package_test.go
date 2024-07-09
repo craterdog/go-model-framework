@@ -105,7 +105,8 @@ func isUndefined(value any) bool {
 			meta.Kind() == ref.Chan ||
 			meta.Kind() == ref.Func) && meta.IsNil()
 	}
-}`
+}
+`
 
 const angle = `/*
 ................................................................................
