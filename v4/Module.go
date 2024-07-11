@@ -30,6 +30,7 @@ package module
 
 import (
 	fmt "fmt"
+	mod "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	age "github.com/craterdog/go-model-framework/v4/agent"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
@@ -123,11 +124,13 @@ func Abstraction(args ...any) AbstractionLike {
 		case GenericArgumentsLike:
 			genericArguments = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the abstraction constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the abstraction constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -159,11 +162,13 @@ func Abstractions(args ...any) AbstractionsLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[AbstractionLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the abstractions constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the abstractions constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -186,11 +191,13 @@ func AdditionalArgument(args ...any) AdditionalArgumentLike {
 		case ArgumentLike:
 			argument = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the additional argument constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the additional argument constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -209,11 +216,13 @@ func AdditionalParameter(args ...any) AdditionalParameterLike {
 		case ParameterLike:
 			parameter = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the additional parameter constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the additional parameter constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -232,11 +241,13 @@ func AdditionalValue(args ...any) AdditionalValueLike {
 		case string:
 			name = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the additional value constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the additional value constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -255,11 +266,13 @@ func Alias(args ...any) AliasLike {
 		case string:
 			name = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the alias constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the alias constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -278,11 +291,13 @@ func Argument(args ...any) ArgumentLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the argument constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the argument constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -309,11 +324,13 @@ func Arguments(args ...any) ArgumentsLike {
 			case reflectedType.Implements(sequenceType):
 				additionalArguments = arg.(col.Sequential[AdditionalArgumentLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the additional arguments constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the additional arguments constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -333,11 +350,13 @@ func Array(args ...any) ArrayLike {
 	for _, arg := range args {
 		switch actual := arg.(type) {
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the array constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the array constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -364,11 +383,13 @@ func Aspect(args ...any) AspectLike {
 			case reflectedType.Implements(sequenceType):
 				methods = arg.(col.Sequential[MethodLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the aspect constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the aspect constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -399,11 +420,13 @@ func Aspects(args ...any) AspectsLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[AspectLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the aspects constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the aspects constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -432,11 +455,13 @@ func Attribute(args ...any) AttributeLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the attribute constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the attribute constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -467,11 +492,13 @@ func Attributes(args ...any) AttributesLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[AttributeLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the attributes constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the attributes constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -491,11 +518,13 @@ func Channel(args ...any) ChannelLike {
 	for _, arg := range args {
 		switch actual := arg.(type) {
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the channel constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the channel constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -523,11 +552,13 @@ func Class(args ...any) ClassLike {
 		case FunctionsLike:
 			functions = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the class constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the class constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -559,11 +590,13 @@ func Classes(args ...any) ClassesLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[ClassLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the classes constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the classes constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -589,11 +622,13 @@ func Constant(args ...any) ConstantLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the constant constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the constant constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -623,11 +658,13 @@ func Constants(args ...any) ConstantsLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[ConstantLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the constants constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the constants constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -656,11 +693,13 @@ func Constructor(args ...any) ConstructorLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the constructor constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the constructor constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -691,11 +730,13 @@ func Constructors(args ...any) ConstructorsLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[ConstructorLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the constructors constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the constructors constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -726,11 +767,13 @@ func Declaration(args ...any) DeclarationLike {
 		case GenericParametersLike:
 			genericParameters = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the declaration constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the declaration constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -753,11 +796,13 @@ func Enumeration(args ...any) EnumerationLike {
 		case ValuesLike:
 			values = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the enumeration constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the enumeration constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -784,11 +829,13 @@ func Function(args ...any) FunctionLike {
 		case ResultLike:
 			result = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the function constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the function constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -817,11 +864,13 @@ func Functional(args ...any) FunctionalLike {
 		case ResultLike:
 			result = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the functional constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the functional constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -852,11 +901,13 @@ func Functionals(args ...any) FunctionalsLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[FunctionalLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the functionals constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the functionals constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -887,11 +938,13 @@ func Functions(args ...any) FunctionsLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[FunctionLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the functions constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the functions constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -914,11 +967,13 @@ func GenericArguments(args ...any) GenericArgumentsLike {
 		case ArgumentsLike:
 			arguments = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the generic arguments constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the generic arguments constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -937,11 +992,13 @@ func GenericParameters(args ...any) GenericParametersLike {
 		case ParametersLike:
 			parameters = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the generic parameters constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the generic parameters constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -965,11 +1022,13 @@ func Header(args ...any) HeaderLike {
 				name = actual
 			}
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the header constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the header constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -991,11 +1050,13 @@ func Imports(args ...any) ImportsLike {
 		case ModulesLike:
 			modules = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the imports constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the imports constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1023,11 +1084,13 @@ func Instance(args ...any) InstanceLike {
 		case MethodsLike:
 			methods = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the instance constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the instance constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1059,11 +1122,13 @@ func Instances(args ...any) InstancesLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[InstanceLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the instances constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the instances constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -1086,11 +1151,13 @@ func Map(args ...any) MapLike {
 		case string:
 			name = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the map constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the map constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1115,11 +1182,13 @@ func Method(args ...any) MethodLike {
 		case ResultLike:
 			result = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the method constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the method constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1150,11 +1219,13 @@ func Methods(args ...any) MethodsLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[MethodLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the methods constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the methods constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -1198,11 +1269,13 @@ func Model(args ...any) ModelLike {
 		case AspectsLike:
 			aspects = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the model constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the model constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1235,11 +1308,13 @@ func Module(args ...any) ModuleLike {
 				text = actual
 			}
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the module constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the module constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1266,11 +1341,13 @@ func Modules(args ...any) ModulesLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[ModuleLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the modules constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the modules constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -1290,11 +1367,13 @@ func Notice(args ...any) NoticeLike {
 		case string:
 			comment = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the notice constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the notice constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1318,11 +1397,13 @@ func Parameter(args ...any) ParameterLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the parameter constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the parameter constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1344,11 +1425,13 @@ func Parameterized(args ...any) ParameterizedLike {
 		case ParametersLike:
 			parameters = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the imports constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the imports constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1375,11 +1458,13 @@ func Parameters(args ...any) ParametersLike {
 			case reflectedType.Implements(sequenceType):
 				additionalParameters = arg.(col.Sequential[AdditionalParameterLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the parameters constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the parameters constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -1408,11 +1493,13 @@ func Prefix(args ...any) PrefixLike {
 		case ast.ChannelLike:
 			channel = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the prefix constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the prefix constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1444,11 +1531,13 @@ func Result(args ...any) ResultLike {
 		case ParameterizedLike:
 			parameterized = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the result constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the result constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1481,11 +1570,13 @@ func Type(args ...any) TypeLike {
 		case EnumerationLike:
 			enumeration = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the type constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the type constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1516,11 +1607,13 @@ func Types(args ...any) TypesLike {
 			case reflectedType.Implements(sequenceType):
 				sequence = arg.(col.Sequential[TypeLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the types constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the types constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
@@ -1546,11 +1639,13 @@ func Value(args ...any) ValueLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			var message = fmt.Sprintf(
-				"An unknown argument type was passed into the value constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			if !mod.IsUndefined(arg) {
+				var message = fmt.Sprintf(
+					"An unknown argument type was passed into the value constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -1580,11 +1675,13 @@ func Values(args ...any) ValuesLike {
 			case reflectedType.Implements(sequenceType):
 				additionalValues = arg.(col.Sequential[AdditionalValueLike])
 			default:
-				var message = fmt.Sprintf(
-					"An unknown argument type was passed into the additional values constructor: %T\n",
-					actual,
-				)
-				panic(message)
+				if !mod.IsUndefined(arg) {
+					var message = fmt.Sprintf(
+						"An unknown argument type was passed into the additional values constructor: %T\n",
+						actual,
+					)
+					panic(message)
+				}
 			}
 		}
 	}
