@@ -70,30 +70,6 @@ func (v *generator_) GetClass() GeneratorClassLike {
 
 // Public
 
-func (v *generator_) CreateClassType(
-	name string,
-	copyright string,
-) ast.ModelLike {
-	copyright = v.expandCopyright(copyright)
-	var source = sts.ReplaceAll(angleTemplate_, "<Copyright>", copyright)
-	source = sts.ReplaceAll(source, "<name>", name)
-	var parser = Parser().Make()
-	var model = parser.ParseSource(source)
-	return model
-}
-
-func (v *generator_) CreateGenericType(
-	name string,
-	copyright string,
-) ast.ModelLike {
-	copyright = v.expandCopyright(copyright)
-	var source = sts.ReplaceAll(arrayTemplate_, "<Copyright>", copyright)
-	source = sts.ReplaceAll(source, "<name>", name)
-	var parser = Parser().Make()
-	var model = parser.ParseSource(source)
-	return model
-}
-
 func (v *generator_) CreateClassStructure(
 	name string,
 	copyright string,
@@ -106,12 +82,36 @@ func (v *generator_) CreateClassStructure(
 	return model
 }
 
+func (v *generator_) CreateClassType(
+	name string,
+	copyright string,
+) ast.ModelLike {
+	copyright = v.expandCopyright(copyright)
+	var source = sts.ReplaceAll(angleTemplate_, "<Copyright>", copyright)
+	source = sts.ReplaceAll(source, "<name>", name)
+	var parser = Parser().Make()
+	var model = parser.ParseSource(source)
+	return model
+}
+
 func (v *generator_) CreateGenericStructure(
 	name string,
 	copyright string,
 ) ast.ModelLike {
 	copyright = v.expandCopyright(copyright)
 	var source = sts.ReplaceAll(catalogTemplate_, "<Copyright>", copyright)
+	source = sts.ReplaceAll(source, "<name>", name)
+	var parser = Parser().Make()
+	var model = parser.ParseSource(source)
+	return model
+}
+
+func (v *generator_) CreateGenericType(
+	name string,
+	copyright string,
+) ast.ModelLike {
+	copyright = v.expandCopyright(copyright)
+	var source = sts.ReplaceAll(arrayTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
 	var parser = Parser().Make()
 	var model = parser.ParseSource(source)
@@ -147,19 +147,6 @@ func (v *generator_) GenerateClass(
 		name,
 	)
 	panic(message)
-}
-
-func (v *generator_) GeneratePrivate(
-	model ast.ModelLike,
-) (
-	implementation string,
-) {
-	implementation = privateTemplate_
-	var notice = model.GetNotice().GetComment()
-	implementation = sts.ReplaceAll(implementation, "<Notice>", notice)
-	var name = model.GetHeader().GetName()
-	implementation = sts.ReplaceAll(implementation, "<name>", name)
-	return implementation
 }
 
 // Private
@@ -439,55 +426,6 @@ func (v *generator_) generateAbstractions(
 	return implementation
 }
 
-func (v *generator_) generateAttributeInitialization(
-	parameter ast.ParameterLike,
-) (
-	implementation string,
-) {
-	var parameterName = parameter.GetName()
-	var attributeName = sts.TrimSuffix(parameterName, "_")
-	implementation = attributeInitializationTemplate_
-	implementation = sts.ReplaceAll(implementation, "<AttributeName>", attributeName)
-	implementation = sts.ReplaceAll(implementation, "<ParameterName>", parameterName)
-	return implementation
-}
-
-func (v *generator_) generateAttributeInitializations(
-	class ast.ClassLike,
-	constructor ast.ConstructorLike,
-) (
-	implementation string,
-) {
-	// Ignore a constructor that doesn't take attributes as parameters.
-	var name = constructor.GetName()
-	if sts.HasPrefix(name, "MakeFrom") {
-		return implementation
-	}
-
-	// Ignore a constructor that doesn't take any parameters.
-	var parameters = constructor.GetOptionalParameters()
-	if parameters == nil {
-		return implementation
-	}
-
-	// Generate the first attribute initialization.
-	var parameter = parameters.GetParameter()
-	var initialization = v.generateAttributeInitialization(parameter)
-	implementation += initialization
-
-	// Generate any additional attribute initializations.
-	var additionalParameters = parameters.GetAdditionalParameters()
-	var iterator = additionalParameters.GetIterator()
-	for iterator.HasNext() {
-		var additionalParameter = iterator.GetNext()
-		parameter = additionalParameter.GetParameter()
-		initialization = v.generateAttributeInitialization(parameter)
-		implementation += initialization
-	}
-
-	return implementation
-}
-
 func (v *generator_) generateAttributeCheck(
 	parameter ast.ParameterLike,
 ) (
@@ -539,6 +477,55 @@ func (v *generator_) generateAttributeChecks(
 		parameter = additionalParameter.GetParameter()
 		check = v.generateAttributeCheck(parameter)
 		implementation += check
+	}
+
+	return implementation
+}
+
+func (v *generator_) generateAttributeInitialization(
+	parameter ast.ParameterLike,
+) (
+	implementation string,
+) {
+	var parameterName = parameter.GetName()
+	var attributeName = sts.TrimSuffix(parameterName, "_")
+	implementation = attributeInitializationTemplate_
+	implementation = sts.ReplaceAll(implementation, "<AttributeName>", attributeName)
+	implementation = sts.ReplaceAll(implementation, "<ParameterName>", parameterName)
+	return implementation
+}
+
+func (v *generator_) generateAttributeInitializations(
+	class ast.ClassLike,
+	constructor ast.ConstructorLike,
+) (
+	implementation string,
+) {
+	// Ignore a constructor that doesn't take attributes as parameters.
+	var name = constructor.GetName()
+	if sts.HasPrefix(name, "MakeFrom") {
+		return implementation
+	}
+
+	// Ignore a constructor that doesn't take any parameters.
+	var parameters = constructor.GetOptionalParameters()
+	if parameters == nil {
+		return implementation
+	}
+
+	// Generate the first attribute initialization.
+	var parameter = parameters.GetParameter()
+	var initialization = v.generateAttributeInitialization(parameter)
+	implementation += initialization
+
+	// Generate any additional attribute initializations.
+	var additionalParameters = parameters.GetAdditionalParameters()
+	var iterator = additionalParameters.GetIterator()
+	for iterator.HasNext() {
+		var additionalParameter = iterator.GetNext()
+		parameter = additionalParameter.GetParameter()
+		initialization = v.generateAttributeInitialization(parameter)
+		implementation += initialization
 	}
 
 	return implementation
@@ -918,6 +905,13 @@ func (v *generator_) generateImports(
 	// Generate imports for specific modules that are referenced in the code.
 	if sts.Contains(class, "syn.") {
 		implementation += "\n\tfmt \"fmt\""
+	}
+
+	if sts.Contains(class, "mod.") {
+		implementation += "\n\tmod \"github.com/craterdog/go-collection-framework/v4\""
+	}
+
+	if sts.Contains(class, "syn.") {
 		implementation += "\n\tsyn \"sync\""
 	}
 

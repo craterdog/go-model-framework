@@ -186,7 +186,6 @@ type GeneratorLike interface {
 		model ast.ModelLike,
 		name string,
 	) string
-	GeneratePrivate(model ast.ModelLike) string
 }
 
 /*

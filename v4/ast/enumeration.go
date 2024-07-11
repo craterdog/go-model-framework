@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type enumerationClass_ struct {
 func (c *enumerationClass_) Make(values ValuesLike) EnumerationLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(values):
+	case mod.IsUndefined(values):
 		panic("The values attribute is required for each Enumeration.")
 	default:
 		return &enumeration_{

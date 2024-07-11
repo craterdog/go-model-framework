@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -43,9 +47,9 @@ func (c *functionClass_) Make(
 ) FunctionLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(name):
+	case mod.IsUndefined(name):
 		panic("The name attribute is required for each Function.")
-	case isUndefined(result):
+	case mod.IsUndefined(result):
 		panic("The result attribute is required for each Function.")
 	default:
 		return &function_{

@@ -13,6 +13,7 @@
 package ast
 
 import (
+	mod "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
@@ -46,9 +47,9 @@ func (c *attributesClass_) Make(
 ) AttributesLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(note):
+	case mod.IsUndefined(note):
 		panic("The note attribute is required for each Attributes.")
-	case isUndefined(attributes):
+	case mod.IsUndefined(attributes):
 		panic("The attributes attribute is required for each Attributes.")
 	default:
 		return &attributes_{

@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -44,9 +48,9 @@ func (c *instanceClass_) Make(
 ) InstanceLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(declaration):
+	case mod.IsUndefined(declaration):
 		panic("The declaration attribute is required for each Instance.")
-	case isUndefined(attributes):
+	case mod.IsUndefined(attributes):
 		panic("The attributes attribute is required for each Instance.")
 	default:
 		return &instance_{

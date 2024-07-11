@@ -61,52 +61,12 @@ func TestCreateGenericStructure(t *tes.T) {
 	var copyright string
 	var model = generator.CreateGenericStructure(name, copyright)
 
-	// Generate the package private definitions.
-	var source = generator.GeneratePrivate(model)
-	ass.Equal(t, private, source)
-
 	// Generate the classes from the generic structure model.
-	source = generator.GenerateClass(model, "association")
+	var source = generator.GenerateClass(model, "association")
 	ass.Equal(t, association, source)
 	source = generator.GenerateClass(model, "catalog")
 	ass.Equal(t, catalog, source)
 }
-
-const private = `/*
-................................................................................
-.                   Copyright (c) 2024.  All Rights Reserved.                  .
-................................................................................
-.  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
-.                                                                              .
-.  This code is free software; you can redistribute it and/or modify it under  .
-.  the terms of The MIT License (MIT), as published by the Open Source         .
-.  Initiative. (See https://opensource.org/license/MIT)                        .
-................................................................................
-*/
-
-package example
-
-import (
-	ref "reflect"
-)
-
-// Private
-
-func isUndefined(value any) bool {
-	switch actual := value.(type) {
-	case string:
-		return len(actual) == 0
-	default:
-		var meta = ref.ValueOf(actual)
-		return (meta.Kind() == ref.Ptr ||
-			meta.Kind() == ref.Interface ||
-			meta.Kind() == ref.Slice ||
-			meta.Kind() == ref.Map ||
-			meta.Kind() == ref.Chan ||
-			meta.Kind() == ref.Func) && meta.IsNil()
-	}
-}
-`
 
 const angle = `/*
 ................................................................................
@@ -420,6 +380,10 @@ const complex_ = `/*
 
 package example
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -453,11 +417,11 @@ func (c *complexClass_) Make(
 ) ComplexLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(realPart):
+	case mod.IsUndefined(realPart):
 		panic("The realPart attribute is required for each Complex.")
-	case isUndefined(imaginaryPart):
+	case mod.IsUndefined(imaginaryPart):
 		panic("The imaginaryPart attribute is required for each Complex.")
-	case isUndefined(form):
+	case mod.IsUndefined(form):
 		panic("The form attribute is required for each Complex.")
 	default:
 		return &complex_{
@@ -581,7 +545,7 @@ func (v *complex_) GetForm() Form {
 }
 
 func (v *complex_) SetForm(form Form) {
-	if isUndefined(form) {
+	if mod.IsUndefined(form) {
 		panic("The form attribute cannot be nil.")
 	}
 	v.form_ = form
@@ -640,6 +604,7 @@ package example
 
 import (
 	fmt "fmt"
+	mod "github.com/craterdog/go-collection-framework/v4"
 	syn "sync"
 )
 
@@ -699,9 +664,9 @@ func (c *associationClass_[K, V]) Make(
 ) AssociationLike[K, V] {
 	// Validate the arguments.
 	switch {
-	case isUndefined(key):
+	case mod.IsUndefined(key):
 		panic("The key attribute is required for each Association.")
-	case isUndefined(value):
+	case mod.IsUndefined(value):
 		panic("The value attribute is required for each Association.")
 	default:
 		return &association_[K, V]{
@@ -742,7 +707,7 @@ func (v *association_[K, V]) GetValue() V {
 }
 
 func (v *association_[K, V]) SetValue(value V) {
-	if isUndefined(value) {
+	if mod.IsUndefined(value) {
 		panic("The value attribute cannot be nil.")
 	}
 	v.value_ = value

@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type additionalParameterClass_ struct {
 func (c *additionalParameterClass_) Make(parameter ParameterLike) AdditionalParameterLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(parameter):
+	case mod.IsUndefined(parameter):
 		panic("The parameter attribute is required for each AdditionalParameter.")
 	default:
 		return &additionalParameter_{

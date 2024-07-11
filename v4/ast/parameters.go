@@ -13,6 +13,7 @@
 package ast
 
 import (
+	mod "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
@@ -46,9 +47,9 @@ func (c *parametersClass_) Make(
 ) ParametersLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(parameter):
+	case mod.IsUndefined(parameter):
 		panic("The parameter attribute is required for each Parameters.")
-	case isUndefined(additionalParameters):
+	case mod.IsUndefined(additionalParameters):
 		panic("The additionalParameters attribute is required for each Parameters.")
 	default:
 		return &parameters_{

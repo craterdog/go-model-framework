@@ -13,6 +13,7 @@
 package ast
 
 import (
+	mod "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
@@ -46,9 +47,9 @@ func (c *constructorsClass_) Make(
 ) ConstructorsLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(note):
+	case mod.IsUndefined(note):
 		panic("The note attribute is required for each Constructors.")
-	case isUndefined(constructors):
+	case mod.IsUndefined(constructors):
 		panic("The constructors attribute is required for each Constructors.")
 	default:
 		return &constructors_{

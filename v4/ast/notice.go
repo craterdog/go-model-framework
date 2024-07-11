@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type noticeClass_ struct {
 func (c *noticeClass_) Make(comment string) NoticeLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(comment):
+	case mod.IsUndefined(comment):
 		panic("The comment attribute is required for each Notice.")
 	default:
 		return &notice_{

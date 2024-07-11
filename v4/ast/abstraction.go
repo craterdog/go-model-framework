@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -44,7 +48,7 @@ func (c *abstractionClass_) Make(
 ) AbstractionLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(name):
+	case mod.IsUndefined(name):
 		panic("The name attribute is required for each Abstraction.")
 	default:
 		return &abstraction_{

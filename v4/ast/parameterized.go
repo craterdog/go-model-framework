@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type parameterizedClass_ struct {
 func (c *parameterizedClass_) Make(parameters ParametersLike) ParameterizedLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(parameters):
+	case mod.IsUndefined(parameters):
 		panic("The parameters attribute is required for each Parameterized.")
 	default:
 		return &parameterized_{

@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type genericParametersClass_ struct {
 func (c *genericParametersClass_) Make(parameters ParametersLike) GenericParametersLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(parameters):
+	case mod.IsUndefined(parameters):
 		panic("The parameters attribute is required for each GenericParameters.")
 	default:
 		return &genericParameters_{

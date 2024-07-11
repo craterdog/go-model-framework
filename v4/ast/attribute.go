@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -43,7 +47,7 @@ func (c *attributeClass_) Make(
 ) AttributeLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(name):
+	case mod.IsUndefined(name):
 		panic("The name attribute is required for each Attribute.")
 	default:
 		return &attribute_{

@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type resultClass_ struct {
 func (c *resultClass_) Make(any any) ResultLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(any):
+	case mod.IsUndefined(any):
 		panic("The any attribute is required for each Result.")
 	default:
 		return &result_{

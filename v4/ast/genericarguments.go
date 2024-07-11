@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type genericArgumentsClass_ struct {
 func (c *genericArgumentsClass_) Make(arguments ArgumentsLike) GenericArgumentsLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(arguments):
+	case mod.IsUndefined(arguments):
 		panic("The arguments attribute is required for each GenericArguments.")
 	default:
 		return &genericArguments_{

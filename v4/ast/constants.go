@@ -13,6 +13,7 @@
 package ast
 
 import (
+	mod "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
@@ -46,9 +47,9 @@ func (c *constantsClass_) Make(
 ) ConstantsLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(note):
+	case mod.IsUndefined(note):
 		panic("The note attribute is required for each Constants.")
-	case isUndefined(constants):
+	case mod.IsUndefined(constants):
 		panic("The constants attribute is required for each Constants.")
 	default:
 		return &constants_{

@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -43,9 +47,9 @@ func (c *constructorClass_) Make(
 ) ConstructorLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(name):
+	case mod.IsUndefined(name):
 		panic("The name attribute is required for each Constructor.")
-	case isUndefined(abstraction):
+	case mod.IsUndefined(abstraction):
 		panic("The abstraction attribute is required for each Constructor.")
 	default:
 		return &constructor_{

@@ -13,6 +13,7 @@
 package ast
 
 import (
+	mod "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
@@ -43,7 +44,7 @@ type modulesClass_ struct {
 func (c *modulesClass_) Make(modules col.Sequential[ModuleLike]) ModulesLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(modules):
+	case mod.IsUndefined(modules):
 		panic("The modules attribute is required for each Modules.")
 	default:
 		return &modules_{

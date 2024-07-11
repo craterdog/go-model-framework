@@ -12,6 +12,10 @@
 
 package ast
 
+import (
+	mod "github.com/craterdog/go-collection-framework/v4"
+)
+
 // CLASS ACCESS
 
 // Reference
@@ -39,7 +43,7 @@ type prefixClass_ struct {
 func (c *prefixClass_) Make(any any) PrefixLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(any):
+	case mod.IsUndefined(any):
 		panic("The any attribute is required for each Prefix.")
 	default:
 		return &prefix_{

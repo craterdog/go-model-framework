@@ -53,13 +53,6 @@ func TestAstGeneration(t *tes.T) {
 	var parser = mod.Parser()
 	var model = parser.ParseSource(source)
 	var generator = mod.Generator()
-	source = generator.GeneratePrivate(model)
-	bytes = []byte(source)
-	filename = "ast/Private.go"
-	err = osx.WriteFile(filename, bytes, 0644)
-	if err != nil {
-		panic(err)
-	}
 	var iterator = model.GetClasses().GetClasses().GetIterator()
 	for iterator.HasNext() {
 		var class = iterator.GetNext()

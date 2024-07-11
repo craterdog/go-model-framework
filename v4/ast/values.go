@@ -13,6 +13,7 @@
 package ast
 
 import (
+	mod "github.com/craterdog/go-collection-framework/v4"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
@@ -46,9 +47,9 @@ func (c *valuesClass_) Make(
 ) ValuesLike {
 	// Validate the arguments.
 	switch {
-	case isUndefined(value):
+	case mod.IsUndefined(value):
 		panic("The value attribute is required for each Values.")
-	case isUndefined(additionalValues):
+	case mod.IsUndefined(additionalValues):
 		panic("The additionalValues attribute is required for each Values.")
 	default:
 		return &values_{
