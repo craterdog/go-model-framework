@@ -143,7 +143,7 @@ func Abstraction(args ...any) AbstractionLike {
 
 func Abstractions(args ...any) AbstractionsLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Abstractions"
 	var sequence col.Sequential[AbstractionLike]
 
 	// Process the actual arguments.
@@ -383,7 +383,7 @@ func Aspect(args ...any) AspectLike {
 
 func Aspects(args ...any) AspectsLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Aspects"
 	var sequence col.Sequential[AspectLike]
 
 	// Process the actual arguments.
@@ -451,7 +451,7 @@ func Attribute(args ...any) AttributeLike {
 
 func Attributes(args ...any) AttributesLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Attributes"
 	var sequence col.Sequential[AttributeLike]
 
 	// Process the actual arguments.
@@ -543,7 +543,7 @@ func Class(args ...any) ClassLike {
 
 func Classes(args ...any) ClassesLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Classes"
 	var sequence col.Sequential[ClassLike]
 
 	// Process the actual arguments.
@@ -607,7 +607,7 @@ func Constant(args ...any) ConstantLike {
 
 func Constants(args ...any) ConstantsLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Constants"
 	var sequence col.Sequential[ConstantLike]
 
 	// Process the actual arguments.
@@ -675,7 +675,7 @@ func Constructor(args ...any) ConstructorLike {
 
 func Constructors(args ...any) ConstructorsLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Constructors"
 	var sequence col.Sequential[ConstructorLike]
 
 	// Process the actual arguments.
@@ -836,7 +836,7 @@ func Functional(args ...any) FunctionalLike {
 
 func Functionals(args ...any) FunctionalsLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Functionals"
 	var sequence col.Sequential[FunctionalLike]
 
 	// Process the actual arguments.
@@ -871,7 +871,7 @@ func Functionals(args ...any) FunctionalsLike {
 
 func Functions(args ...any) FunctionsLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Functions"
 	var sequence col.Sequential[FunctionLike]
 
 	// Process the actual arguments.
@@ -1043,7 +1043,7 @@ func Instance(args ...any) InstanceLike {
 
 func Instances(args ...any) InstancesLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Instances"
 	var sequence col.Sequential[InstanceLike]
 
 	// Process the actual arguments.
@@ -1134,7 +1134,7 @@ func Method(args ...any) MethodLike {
 
 func Methods(args ...any) MethodsLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Methods"
 	var sequence col.Sequential[MethodLike]
 
 	// Process the actual arguments.
@@ -1500,7 +1500,7 @@ func Type(args ...any) TypeLike {
 
 func Types(args ...any) TypesLike {
 	// Initialize the possible arguments.
-	var note string
+	var note = "// Types"
 	var sequence col.Sequential[TypeLike]
 
 	// Process the actual arguments.
