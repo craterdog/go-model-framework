@@ -14,7 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v4/agent"
+	mod "github.com/craterdog/go-collection-framework/v4"
 	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
@@ -210,7 +210,7 @@ func (v *parser_) parseAbstraction() (
 	var name string
 	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
-		if prefix != nil || alias != nil {
+		if mod.IsDefined(prefix) || mod.IsDefined(alias) {
 			var message = v.formatError(token)
 			message += v.generateSyntax("name",
 				"Abstraction",
@@ -555,16 +555,16 @@ func (v *parser_) parseAspects() (
 	}
 
 	// Found a sequence of aspects.
-	list.SortValuesWithRanker(func(first, second ast.AspectLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.AspectLike) mod.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return age.LesserRank
+			return mod.LesserRank
 		case firstName > secondName:
-			return age.GreaterRank
+			return mod.GreaterRank
 		default:
-			return age.EqualRank
+			return mod.EqualRank
 		}
 	})
 	aspects = ast.Aspects().Make(note, list)
@@ -785,16 +785,16 @@ func (v *parser_) parseClasses() (
 	}
 
 	// Found a sequence of classes.
-	list.SortValuesWithRanker(func(first, second ast.ClassLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.ClassLike) mod.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return age.LesserRank
+			return mod.LesserRank
 		case firstName > secondName:
-			return age.GreaterRank
+			return mod.GreaterRank
 		default:
-			return age.EqualRank
+			return mod.EqualRank
 		}
 	})
 	classes = ast.Classes().Make(note, list)
@@ -1223,16 +1223,16 @@ func (v *parser_) parseFunctionals() (
 	}
 
 	// Found a sequence of functionals.
-	list.SortValuesWithRanker(func(first, second ast.FunctionalLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.FunctionalLike) mod.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return age.LesserRank
+			return mod.LesserRank
 		case firstName > secondName:
-			return age.GreaterRank
+			return mod.GreaterRank
 		default:
-			return age.EqualRank
+			return mod.EqualRank
 		}
 	})
 	functionals = ast.Functionals().Make(note, list)
@@ -1558,16 +1558,16 @@ func (v *parser_) parseInstances() (
 	}
 
 	// Found a sequence of instances.
-	list.SortValuesWithRanker(func(first, second ast.InstanceLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.InstanceLike) mod.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return age.LesserRank
+			return mod.LesserRank
 		case firstName > secondName:
-			return age.GreaterRank
+			return mod.GreaterRank
 		default:
-			return age.EqualRank
+			return mod.EqualRank
 		}
 	})
 	instances = ast.Instances().Make(note, list)
@@ -1816,16 +1816,16 @@ func (v *parser_) parseModules() (
 	}
 
 	// Found a sequence of modules.
-	list.SortValuesWithRanker(func(first, second ast.ModuleLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.ModuleLike) mod.Rank {
 		var firstPath = first.GetPath()
 		var secondPath = second.GetPath()
 		switch {
 		case firstPath < secondPath:
-			return age.LesserRank
+			return mod.LesserRank
 		case firstPath > secondPath:
-			return age.GreaterRank
+			return mod.GreaterRank
 		default:
-			return age.EqualRank
+			return mod.EqualRank
 		}
 	})
 	modules = ast.Modules().Make(list)
@@ -2019,8 +2019,7 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 	if token.GetType() == expectedType {
 		// Found the right token type.
 		value = token.GetValue()
-		var notConstrained = len(expectedValue) == 0
-		if notConstrained || value == expectedValue {
+		if mod.IsUndefined(expectedValue) || value == expectedValue {
 			// Found the right token value.
 			return value, token, true
 		}
@@ -2099,16 +2098,16 @@ func (v *parser_) parseTypes() (
 	}
 
 	// Found a sequence of types.
-	list.SortValuesWithRanker(func(first, second ast.TypeLike) age.Rank {
+	list.SortValuesWithRanker(func(first, second ast.TypeLike) mod.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return age.LesserRank
+			return mod.LesserRank
 		case firstName > secondName:
-			return age.GreaterRank
+			return mod.GreaterRank
 		default:
-			return age.EqualRank
+			return mod.EqualRank
 		}
 	})
 	types = ast.Types().Make(note, list)

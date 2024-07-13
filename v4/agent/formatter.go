@@ -14,6 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
+	col "github.com/craterdog/go-collection-framework/v4"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 	reg "regexp"
 	sts "strings"
@@ -131,17 +132,17 @@ func (v *formatter_) fixComment(comment string) string {
 
 func (v *formatter_) formatAbstraction(abstraction ast.AbstractionLike) {
 	var prefix = abstraction.GetOptionalPrefix()
-	if prefix != nil {
+	if col.IsDefined(prefix) {
 		v.formatPrefix(prefix)
 	}
 	var alias = abstraction.GetOptionalAlias()
-	if alias != nil {
+	if col.IsDefined(alias) {
 		v.formatAlias(alias)
 	}
 	var name = abstraction.GetName()
 	v.appendString(name)
 	var genericArguments = abstraction.GetOptionalGenericArguments()
-	if genericArguments != nil {
+	if col.IsDefined(genericArguments) {
 		v.formatGenericArguments(genericArguments)
 	}
 }
@@ -243,12 +244,12 @@ func (v *formatter_) formatAttribute(attribute ast.AttributeLike) {
 	v.appendString(name)
 	v.appendString("(")
 	var parameter = attribute.GetOptionalParameter()
-	if parameter != nil {
+	if col.IsDefined(parameter) {
 		v.formatParameter(parameter)
 	}
 	v.appendString(")")
 	var abstraction = attribute.GetOptionalAbstraction()
-	if abstraction != nil {
+	if col.IsDefined(abstraction) {
 		v.appendString(" ")
 		v.formatAbstraction(abstraction)
 	}
@@ -282,7 +283,7 @@ func (v *formatter_) formatClass(class ast.ClassLike) {
 	v.appendNewline()
 
 	var constants = class.GetOptionalConstants()
-	if constants != nil {
+	if col.IsDefined(constants) {
 		v.depth_++
 		v.formatConstants(constants)
 		v.depth_--
@@ -290,7 +291,7 @@ func (v *formatter_) formatClass(class ast.ClassLike) {
 	}
 
 	var functions = class.GetOptionalFunctions()
-	if functions != nil {
+	if col.IsDefined(functions) {
 		v.depth_++
 		v.formatFunctions(functions)
 		v.depth_--
@@ -337,7 +338,7 @@ func (v *formatter_) formatConstructor(constructor ast.ConstructorLike) {
 	v.appendString(name)
 	v.appendString("(")
 	var parameters = constructor.GetOptionalParameters()
-	if parameters != nil {
+	if col.IsDefined(parameters) {
 		v.formatParameters(parameters)
 	}
 	v.appendString(") ")
@@ -363,7 +364,7 @@ func (v *formatter_) formatDeclaration(declaration ast.DeclarationLike) {
 	var name = declaration.GetName()
 	v.appendString(name)
 	var genericParameters = declaration.GetOptionalGenericParameters()
-	if genericParameters != nil {
+	if col.IsDefined(genericParameters) {
 		v.formatGenericParameters(genericParameters)
 	}
 }
@@ -382,7 +383,7 @@ func (v *formatter_) formatFunction(function ast.FunctionLike) {
 	v.appendString(name)
 	v.appendString("(")
 	var parameters = function.GetOptionalParameters()
-	if parameters != nil {
+	if col.IsDefined(parameters) {
 		v.formatParameters(parameters)
 	}
 	v.appendString(") ")
@@ -396,7 +397,7 @@ func (v *formatter_) formatFunctional(functional ast.FunctionalLike) {
 	v.formatDeclaration(declaration)
 	v.appendString(" func(")
 	var parameters = functional.GetOptionalParameters()
-	if parameters != nil {
+	if col.IsDefined(parameters) {
 		v.formatParameters(parameters)
 	}
 	v.appendString(") ")
@@ -478,7 +479,7 @@ func (v *formatter_) formatInstance(instance ast.InstanceLike) {
 	v.appendNewline()
 
 	var abstractions = instance.GetOptionalAbstractions()
-	if abstractions != nil {
+	if col.IsDefined(abstractions) {
 		v.depth_++
 		v.formatAbstractions(abstractions)
 		v.depth_--
@@ -486,7 +487,7 @@ func (v *formatter_) formatInstance(instance ast.InstanceLike) {
 	}
 
 	var methods = instance.GetOptionalMethods()
-	if methods != nil {
+	if col.IsDefined(methods) {
 		v.depth_++
 		v.formatMethods(methods)
 		v.depth_--
@@ -520,12 +521,12 @@ func (v *formatter_) formatMethod(method ast.MethodLike) {
 	v.appendString(name)
 	v.appendString("(")
 	var parameters = method.GetOptionalParameters()
-	if parameters != nil {
+	if col.IsDefined(parameters) {
 		v.formatParameters(parameters)
 	}
 	v.appendString(")")
 	var result = method.GetOptionalResult()
-	if result != nil {
+	if col.IsDefined(result) {
 		v.appendString(" ")
 		v.formatResult(result)
 	}
@@ -547,15 +548,15 @@ func (v *formatter_) formatModel(model ast.ModelLike) {
 	var header = model.GetHeader()
 	v.formatHeader(header)
 	var imports = model.GetOptionalImports()
-	if imports != nil {
+	if col.IsDefined(imports) {
 		v.formatImports(imports)
 	}
 	var types = model.GetOptionalTypes()
-	if types != nil {
+	if col.IsDefined(types) {
 		v.formatTypes(types)
 	}
 	var functionals = model.GetOptionalFunctionals()
-	if functionals != nil {
+	if col.IsDefined(functionals) {
 		v.formatFunctionals(functionals)
 	}
 	var classes = model.GetClasses()
@@ -563,7 +564,7 @@ func (v *formatter_) formatModel(model ast.ModelLike) {
 	var instances = model.GetInstances()
 	v.formatInstances(instances)
 	var aspects = model.GetOptionalAspects()
-	if aspects != nil {
+	if col.IsDefined(aspects) {
 		v.formatAspects(aspects)
 	}
 }
@@ -669,7 +670,7 @@ func (v *formatter_) formatType(type_ ast.TypeLike) {
 	var abstraction = type_.GetAbstraction()
 	v.formatAbstraction(abstraction)
 	var enumeration = type_.GetOptionalEnumeration()
-	if enumeration != nil {
+	if col.IsDefined(enumeration) {
 		v.appendNewline()
 		v.formatEnumeration(enumeration)
 	}

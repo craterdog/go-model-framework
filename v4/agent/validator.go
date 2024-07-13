@@ -14,6 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
+	mod "github.com/craterdog/go-collection-framework/v4"
 	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
@@ -107,7 +108,7 @@ func (v *validator_) ValidateModel(model ast.ModelLike) {
 
 func (v *validator_) extractAspects(model ast.ModelLike) {
 	var aspects = model.GetOptionalAspects()
-	if aspects != nil {
+	if mod.IsDefined(aspects) {
 		var iterator = aspects.GetAspects().GetIterator()
 		for iterator.HasNext() {
 			var aspect = iterator.GetNext()
@@ -119,7 +120,7 @@ func (v *validator_) extractAspects(model ast.ModelLike) {
 
 func (v *validator_) extractClasses(model ast.ModelLike) {
 	var classes = model.GetClasses()
-	if classes != nil {
+	if mod.IsDefined(classes) {
 		var iterator = classes.GetClasses().GetIterator()
 		for iterator.HasNext() {
 			var class = iterator.GetNext()
@@ -132,7 +133,7 @@ func (v *validator_) extractClasses(model ast.ModelLike) {
 
 func (v *validator_) extractFunctionals(model ast.ModelLike) {
 	var functionals = model.GetOptionalFunctionals()
-	if functionals != nil {
+	if mod.IsDefined(functionals) {
 		var iterator = functionals.GetFunctionals().GetIterator()
 		for iterator.HasNext() {
 			var functional = iterator.GetNext()
@@ -144,7 +145,7 @@ func (v *validator_) extractFunctionals(model ast.ModelLike) {
 
 func (v *validator_) extractInstances(model ast.ModelLike) {
 	var instances = model.GetInstances()
-	if instances != nil {
+	if mod.IsDefined(instances) {
 		var iterator = instances.GetInstances().GetIterator()
 		for iterator.HasNext() {
 			var instance = iterator.GetNext()
@@ -157,7 +158,7 @@ func (v *validator_) extractInstances(model ast.ModelLike) {
 
 func (v *validator_) extractModules(model ast.ModelLike) {
 	var imports = model.GetOptionalImports()
-	if imports != nil {
+	if mod.IsDefined(imports) {
 		var iterator = imports.GetModules().GetModules().GetIterator()
 		for iterator.HasNext() {
 			var module = iterator.GetNext()
@@ -170,7 +171,7 @@ func (v *validator_) extractModules(model ast.ModelLike) {
 
 func (v *validator_) extractTypes(model ast.ModelLike) {
 	var types = model.GetOptionalTypes()
-	if types != nil {
+	if mod.IsDefined(types) {
 		var iterator = types.GetTypes().GetIterator()
 		for iterator.HasNext() {
 			var type_ = iterator.GetNext()
@@ -183,13 +184,13 @@ func (v *validator_) extractTypes(model ast.ModelLike) {
 func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 	// Validate the optional prefix.
 	var prefix = abstraction.GetOptionalPrefix()
-	if prefix != nil {
+	if mod.IsDefined(prefix) {
 		v.validatePrefix(prefix)
 	}
 
 	// Validate the optional alias.
 	var alias = abstraction.GetOptionalAlias()
-	if alias != nil {
+	if mod.IsDefined(alias) {
 		v.validateAlias(alias)
 	}
 
@@ -199,7 +200,7 @@ func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 
 	// Validate any generic arguments.
 	var genericArguments = abstraction.GetOptionalGenericArguments()
-	if genericArguments != nil {
+	if mod.IsDefined(genericArguments) {
 		var arguments = genericArguments.GetArguments()
 		v.validateArguments(arguments)
 	}
@@ -263,7 +264,7 @@ func (v *validator_) validateAspect(aspect ast.AspectLike) {
 	// Verify that this aspect is actually used in this model.
 	var name = declaration.GetName()
 	var abstraction = v.abstractions_.GetValue(name)
-	if abstraction == nil {
+	if mod.IsUndefined(abstraction) {
 		var message = fmt.Sprintf(
 			"The following aspect is never used in this model: %v",
 			name,
@@ -332,11 +333,11 @@ func (v *validator_) validateAttributes(
 
 func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 	var prefix = abstraction.GetOptionalPrefix()
-	if prefix != nil {
+	if mod.IsDefined(prefix) {
 		panic("A boolean type does not have a prefix.")
 	}
 	var alias = abstraction.GetOptionalAlias()
-	if alias != nil {
+	if mod.IsDefined(alias) {
 		panic("A boolean type does not have an alias.")
 	}
 	var name = abstraction.GetName()
@@ -344,7 +345,7 @@ func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 		panic("A question attribute must have a boolean type.")
 	}
 	var arguments = abstraction.GetOptionalGenericArguments()
-	if arguments != nil {
+	if mod.IsDefined(arguments) {
 		panic("A boolean type is not a generic type.")
 	}
 }
@@ -356,19 +357,19 @@ func (v *validator_) validateClass(class ast.ClassLike) {
 
 	// Validate the constructors.
 	var constructors = class.GetConstructors()
-	if constructors != nil {
+	if mod.IsDefined(constructors) {
 		v.validateConstructors(constructors)
 	}
 
 	// Validate the constants.
 	var constants = class.GetOptionalConstants()
-	if constants != nil {
+	if mod.IsDefined(constants) {
 		v.validateConstants(constants)
 	}
 
 	// Validate the functions.
 	var functions = class.GetOptionalFunctions()
-	if functions != nil {
+	if mod.IsDefined(functions) {
 		v.validateFunctions(functions)
 	}
 }
@@ -378,7 +379,8 @@ func (v *validator_) validateClasses(model ast.ModelLike) {
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var name = association.GetKey()
-		if v.instances_.GetValue(name) == nil {
+		var instance = v.instances_.GetValue(name)
+		if mod.IsUndefined(instance) {
 			var message = fmt.Sprintf(
 				"The following instance interface is missing: %v",
 				name,
@@ -406,7 +408,7 @@ func (v *validator_) validateConstants(constants ast.ConstantsLike) {
 func (v *validator_) validateConstructor(constructor ast.ConstructorLike) {
 	// Validate any parameters.
 	var parameters = constructor.GetOptionalParameters()
-	if parameters != nil {
+	if mod.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
@@ -426,7 +428,7 @@ func (v *validator_) validateConstructors(constructors ast.ConstructorsLike) {
 func (v *validator_) validateDeclaration(declaration ast.DeclarationLike) {
 	// Validate any generic parameters.
 	var genericParameters = declaration.GetOptionalGenericParameters()
-	if genericParameters != nil {
+	if mod.IsDefined(genericParameters) {
 		var parameters = genericParameters.GetParameters()
 		v.validateParameters(parameters)
 	}
@@ -443,7 +445,7 @@ func (v *validator_) validateEnumeration(enumeration ast.EnumerationLike) {
 func (v *validator_) validateFunction(function ast.FunctionLike) {
 	// Validate any parameters.
 	var parameters = function.GetOptionalParameters()
-	if parameters != nil {
+	if mod.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
@@ -459,7 +461,7 @@ func (v *validator_) validateFunctional(functional ast.FunctionalLike) {
 
 	// Validate any parameters.
 	var parameters = functional.GetOptionalParameters()
-	if parameters != nil {
+	if mod.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
@@ -470,7 +472,7 @@ func (v *validator_) validateFunctional(functional ast.FunctionalLike) {
 	// Verify that this functional is actually used in this model.
 	var name = declaration.GetName()
 	var abstraction = v.abstractions_.GetValue(name)
-	if abstraction == nil {
+	if mod.IsUndefined(abstraction) {
 		var message = fmt.Sprintf(
 			"The following functional is never used in this model: %v",
 			name,
@@ -508,13 +510,13 @@ func (v *validator_) validateInstance(instance ast.InstanceLike) {
 
 	// Validate the instance abstraction methods.
 	var abstractions = instance.GetOptionalAbstractions()
-	if abstractions != nil {
+	if mod.IsDefined(abstractions) {
 		v.validateAbstractions(abstractions)
 	}
 
 	// Validate the instance public methods.
 	var methods = instance.GetOptionalMethods()
-	if methods != nil {
+	if mod.IsDefined(methods) {
 		v.validateMethods(methods.GetMethods())
 	}
 }
@@ -524,7 +526,8 @@ func (v *validator_) validateInstances(model ast.ModelLike) {
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var name = association.GetKey()
-		if v.classes_.GetValue(name) == nil {
+		var class = v.classes_.GetValue(name)
+		if mod.IsUndefined(class) {
 			var message = fmt.Sprintf(
 				"The following class interface is missing: %v",
 				name,
@@ -539,13 +542,13 @@ func (v *validator_) validateInstances(model ast.ModelLike) {
 func (v *validator_) validateMethod(method ast.MethodLike) {
 	// Validate any method parameters.
 	var parameters = method.GetOptionalParameters()
-	if parameters != nil {
+	if mod.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
 	// Validate any method results.
 	var result = method.GetOptionalResult()
-	if result != nil {
+	if mod.IsDefined(result) {
 		v.validateResult(result)
 	}
 }
@@ -590,7 +593,7 @@ func (v *validator_) validateParameters(parameters ast.ParametersLike) {
 
 	// Validate any additional parameters.
 	var additionalParameters = parameters.GetAdditionalParameters()
-	if additionalParameters != nil {
+	if mod.IsDefined(additionalParameters) {
 		var iterator = additionalParameters.GetIterator()
 		for iterator.HasNext() {
 			var parameter = iterator.GetNext()
@@ -630,14 +633,14 @@ func (v *validator_) validateType(type_ ast.TypeLike) {
 
 	// Validate any enumeration values.
 	var enumeration = type_.GetOptionalEnumeration()
-	if enumeration != nil {
+	if mod.IsDefined(enumeration) {
 		v.validateEnumeration(enumeration)
 	}
 
 	// Verify that this type is actually used in this model.
 	var name = declaration.GetName()
 	abstraction = v.abstractions_.GetValue(name)
-	if abstraction == nil {
+	if mod.IsUndefined(abstraction) {
 		var message = fmt.Sprintf(
 			"The following type is never used in this model: %v",
 			name,

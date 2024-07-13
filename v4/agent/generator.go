@@ -14,6 +14,7 @@ package agent
 
 import (
 	fmt "fmt"
+	mod "github.com/craterdog/go-collection-framework/v4"
 	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
@@ -292,7 +293,7 @@ func (v *generator_) extractConstructorAttributes(
 		var methodName = constructor.GetName()
 		var parameters = constructor.GetOptionalParameters()
 		// Focus on constructors that are passed attributes as arguments.
-		if parameters != nil &&
+		if mod.IsDefined(parameters) &&
 			(methodName == "Make" || sts.HasPrefix(methodName, "MakeWith")) {
 			v.extractParameterAttributes(parameters, attributes)
 		}
@@ -391,7 +392,7 @@ func (v *generator_) generateAbstractions(
 ) {
 	// Check to see if this instance interface includes aspect abstractions.
 	var abstractions = instance.GetOptionalAbstractions()
-	if abstractions == nil {
+	if mod.IsUndefined(abstractions) {
 		return implementation
 	}
 
@@ -405,14 +406,15 @@ func (v *generator_) generateAbstractions(
 		var instanceAspect = instanceAspectTemplate_
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<AspectName>", aspectName)
 		var methods string
-		if abstraction.GetOptionalAlias() == nil {
+		var alias = abstraction.GetOptionalAlias()
+		if mod.IsUndefined(alias) {
 			// We will only know the method signatures for the local aspects.
 			var mappings col.CatalogLike[string, ast.AbstractionLike]
 			var aspect = v.retrieveAspect(model, abstraction.GetName())
 			var declaration = aspect.GetDeclaration()
 			var genericParameters = declaration.GetOptionalGenericParameters()
 			var genericArguments = abstraction.GetOptionalGenericArguments()
-			if genericParameters != nil && genericArguments != nil {
+			if mod.IsDefined(genericParameters) && mod.IsDefined(genericArguments) {
 				var parameters = genericParameters.GetParameters()
 				var arguments = genericArguments.GetArguments()
 				mappings = v.extractConcreteMappings(parameters, arguments)
@@ -460,7 +462,7 @@ func (v *generator_) generateAttributeChecks(
 
 	// Ignore a constructor that doesn't take any parameters.
 	var parameters = constructor.GetOptionalParameters()
-	if parameters == nil {
+	if mod.IsUndefined(parameters) {
 		return implementation
 	}
 
@@ -509,7 +511,7 @@ func (v *generator_) generateAttributeInitializations(
 
 	// Ignore a constructor that doesn't take any parameters.
 	var parameters = constructor.GetOptionalParameters()
-	if parameters == nil {
+	if mod.IsUndefined(parameters) {
 		return implementation
 	}
 
@@ -568,7 +570,7 @@ func (v *generator_) generateAttributeMethods(
 		} else {
 			// This is a getter method.
 			body = getterClassTemplate_
-			if len(targetType) > 0 {
+			if mod.IsDefined(targetType) {
 				body = getterTypeTemplate_
 			}
 			resultType = " " + attributeType
@@ -578,7 +580,7 @@ func (v *generator_) generateAttributeMethods(
 
 		// Generate the attribute method implementation.
 		var method = instanceMethodTemplate_
-		if len(targetType) > 0 {
+		if mod.IsDefined(targetType) {
 			method = typeMethodTemplate_
 		}
 		method = sts.ReplaceAll(method, "<Body>", body)
@@ -632,7 +634,7 @@ func (v *generator_) generateClass(
 	var parameters string
 	var arguments string
 	var genericParameters = classDeclaration.GetOptionalGenericParameters()
-	if genericParameters != nil {
+	if mod.IsDefined(genericParameters) {
 		var classParameters = genericParameters.GetParameters()
 		var classArguments = v.extractArguments(classParameters)
 		var formatter = Formatter().Make()
@@ -661,7 +663,7 @@ func (v *generator_) generateClassAccess(
 
 	// Switch to a generic class model if necessary.
 	var genericParameters = declaration.GetOptionalGenericParameters()
-	if genericParameters != nil {
+	if mod.IsDefined(genericParameters) {
 		reference = genericReferenceTemplate_
 		function = genericFunctionTemplate_
 	}
@@ -680,7 +682,7 @@ func (v *generator_) generateClassConstants(
 ) {
 	// Check to see if this class model includes class constants.
 	var classConstants = class.GetOptionalConstants()
-	if classConstants == nil {
+	if mod.IsUndefined(classConstants) {
 		return implementation
 	}
 
@@ -749,7 +751,7 @@ func (v *generator_) generateConstantMethods(
 ) {
 	// Check to see if this class model includes class constants.
 	var classConstants = class.GetOptionalConstants()
-	if classConstants == nil {
+	if mod.IsUndefined(classConstants) {
 		return implementation
 	}
 
@@ -796,7 +798,7 @@ func (v *generator_) generateConstructorMethods(
 
 		// Choose the appropriate class constructor method body.
 		var body = constructorBodyTemplate_
-		if len(targetType) > 0 {
+		if mod.IsDefined(targetType) {
 			if methodName == "MakeFromValue" {
 				body = typeBodyTemplate_
 				body = sts.ReplaceAll(body, "<TargetType>", targetType)
@@ -818,7 +820,7 @@ func (v *generator_) generateConstructorMethods(
 		// Generate any parameters for the class constructor.
 		var constructorParameters = constructor.GetOptionalParameters()
 		var parameters string
-		if constructorParameters != nil {
+		if mod.IsDefined(constructorParameters) {
 			parameters = formatter.FormatParameters(constructorParameters)
 		}
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
@@ -840,7 +842,7 @@ func (v *generator_) generateFunctionMethods(
 ) {
 	// Check to see if this class model includes class functions.
 	var classFunctions = class.GetOptionalFunctions()
-	if classFunctions == nil {
+	if mod.IsUndefined(classFunctions) {
 		return implementation
 	}
 
@@ -859,7 +861,7 @@ func (v *generator_) generateFunctionMethods(
 		// Generate any parameters for the class function.
 		var functionParameters = function.GetOptionalParameters()
 		var parameters string
-		if functionParameters != nil {
+		if mod.IsDefined(functionParameters) {
 			parameters = formatter.FormatParameters(functionParameters)
 		}
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
@@ -897,7 +899,7 @@ func (v *generator_) generateImports(
 ) {
 	// Check to see if this class model includes module imports.
 	var imports = model.GetOptionalImports()
-	if imports != nil {
+	if mod.IsDefined(imports) {
 		var modules = imports.GetModules()
 		implementation = v.generateModules(modules, class)
 	}
@@ -916,7 +918,7 @@ func (v *generator_) generateImports(
 	}
 
 	// Generate an import statement with any imported modules.
-	if len(implementation) > 0 {
+	if mod.IsDefined(implementation) {
 		implementation += "\n"
 		implementation = sts.ReplaceAll(
 			importsTemplate_,
@@ -997,7 +999,7 @@ func (v *generator_) generateInstanceTarget(
 	implementation string,
 ) {
 	// Generate the right instance target definition.
-	if len(targetType) > 0 {
+	if mod.IsDefined(targetType) {
 		implementation = typeTargetTemplate_
 		implementation = sts.ReplaceAll(implementation, "<TargetType>", targetType)
 	} else {
@@ -1016,7 +1018,7 @@ func (v *generator_) generateMethodImplementation(
 	implementation string,
 ) {
 	// Choose the right method template.
-	if len(targetType) > 0 {
+	if mod.IsDefined(targetType) {
 		implementation = typeMethodTemplate_
 	} else {
 		implementation = instanceMethodTemplate_
@@ -1027,7 +1029,7 @@ func (v *generator_) generateMethodImplementation(
 	// Generate the right method body.
 	var body = methodBodyTemplate_
 	var methodResult = method.GetOptionalResult()
-	if methodResult != nil {
+	if mod.IsDefined(methodResult) {
 		switch actual := methodResult.GetAny().(type) {
 		case ast.AbstractionLike:
 			body = resultBodyTemplate_
@@ -1047,8 +1049,8 @@ func (v *generator_) generateMethodImplementation(
 	var parameters string
 	var formatter = Formatter().Make()
 	var methodParameters = method.GetOptionalParameters()
-	if methodParameters != nil {
-		if mappings != nil && mappings.GetSize() > 0 {
+	if mod.IsDefined(methodParameters) {
+		if mod.IsDefined(mappings) && mappings.GetSize() > 0 {
 			methodParameters = v.replaceParameterTypes(methodParameters, mappings)
 		}
 		parameters = formatter.FormatParameters(methodParameters)
@@ -1057,8 +1059,8 @@ func (v *generator_) generateMethodImplementation(
 
 	// Generate the method result type.
 	var resultType string
-	if methodResult != nil {
-		if mappings != nil && mappings.GetSize() > 0 {
+	if mod.IsDefined(methodResult) {
+		if mod.IsDefined(mappings) && mappings.GetSize() > 0 {
 			methodResult = v.replaceResultType(methodResult, mappings)
 		}
 		resultType = " " + formatter.FormatResult(methodResult)
@@ -1099,7 +1101,7 @@ func (v *generator_) generatePublicMethods(
 ) {
 	// Check to see if this instance interface includes public methods.
 	var instanceMethods = instance.GetOptionalMethods()
-	if instanceMethods == nil {
+	if mod.IsUndefined(instanceMethods) {
 		return implementation
 	}
 
@@ -1112,7 +1114,7 @@ func (v *generator_) generatePublicMethods(
 
 		// Choose the appropriate method template.
 		var method = instanceMethodTemplate_
-		if len(targetType) > 0 {
+		if mod.IsDefined(targetType) {
 			method = typeMethodTemplate_
 		}
 
@@ -1123,7 +1125,7 @@ func (v *generator_) generatePublicMethods(
 		// Generate any parameters for the public method.
 		var methodParameters = publicMethod.GetOptionalParameters()
 		var parameters string
-		if methodParameters != nil {
+		if mod.IsDefined(methodParameters) {
 			parameters = formatter.FormatParameters(methodParameters)
 		}
 		method = sts.ReplaceAll(method, "<Parameters>", parameters)
@@ -1131,7 +1133,7 @@ func (v *generator_) generatePublicMethods(
 		// Generate the body of the public method.
 		var body = methodBodyTemplate_
 		var result = publicMethod.GetOptionalResult()
-		if result != nil {
+		if mod.IsDefined(result) {
 			switch actual := result.GetAny().(type) {
 			case ast.AbstractionLike:
 				body = resultBodyTemplate_
@@ -1149,7 +1151,7 @@ func (v *generator_) generatePublicMethods(
 
 		// Generate the result type for the public method.
 		var resultType string
-		if result != nil {
+		if mod.IsDefined(result) {
 			resultType = " " + formatter.FormatResult(result)
 		}
 		method = sts.ReplaceAll(method, "<ResultType>", resultType)
@@ -1172,13 +1174,13 @@ func (v *generator_) replaceAbstractionType(
 ) ast.AbstractionLike {
 	// Replace the generic type in a prefix with the concrete type.
 	var prefix = abstraction.GetOptionalPrefix()
-	if prefix != nil {
+	if mod.IsDefined(prefix) {
 		prefix = v.replacePrefixType(prefix, mappings)
 	}
 
 	// Replace the generic types in a sequence of arguments with concrete types.
 	var genericArguments = abstraction.GetOptionalGenericArguments()
-	if genericArguments != nil {
+	if mod.IsDefined(genericArguments) {
 		var arguments = genericArguments.GetArguments()
 		arguments = v.replaceArgumentTypes(arguments, mappings)
 		genericArguments = ast.GenericArguments().Make(arguments)
@@ -1187,9 +1189,9 @@ func (v *generator_) replaceAbstractionType(
 	// Replace a non-aliased generic type with its concrete type.
 	var typeName = abstraction.GetName()
 	var alias = abstraction.GetOptionalAlias()
-	if alias == nil {
+	if mod.IsUndefined(alias) {
 		var concreteType = mappings.GetValue(typeName)
-		if concreteType != nil {
+		if mod.IsDefined(concreteType) {
 			alias = concreteType.GetOptionalAlias()
 			typeName = concreteType.GetName()
 			genericArguments = concreteType.GetOptionalGenericArguments()
@@ -1222,7 +1224,7 @@ func (v *generator_) replaceArgumentTypes(
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.ArgumentsLike {
 	// Ignore the non-generic case.
-	if mappings == nil {
+	if mod.IsUndefined(mappings) {
 		return arguments
 	}
 
@@ -1263,7 +1265,7 @@ func (v *generator_) replaceParameterTypes(
 	mappings col.CatalogLike[string, ast.AbstractionLike],
 ) ast.ParametersLike {
 	// Ignore the non-generic case.
-	if mappings == nil {
+	if mod.IsUndefined(mappings) {
 		return parameters
 	}
 
@@ -1337,7 +1339,7 @@ func (v *generator_) retrieveAspect(
 	name string,
 ) ast.AspectLike {
 	var aspects = model.GetOptionalAspects()
-	if aspects != nil {
+	if mod.IsDefined(aspects) {
 		var iterator = aspects.GetAspects().GetIterator()
 		for iterator.HasNext() {
 			var aspect = iterator.GetNext()
