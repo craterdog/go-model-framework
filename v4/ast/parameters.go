@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type parametersClass_ struct {
 
 func (c *parametersClass_) Make(
 	parameter ParameterLike,
-	additionalParameters col.Sequential[AdditionalParameterLike],
+	additionalParameters abs.Sequential[AdditionalParameterLike],
 ) ParametersLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(parameter):
+	case col.IsUndefined(parameter):
 		panic("The parameter attribute is required for each Parameters.")
-	case mod.IsUndefined(additionalParameters):
+	case col.IsUndefined(additionalParameters):
 		panic("The additionalParameters attribute is required for each Parameters.")
 	default:
 		return &parameters_{
@@ -69,7 +69,7 @@ type parameters_ struct {
 	// Define instance attributes.
 	class_                ParametersClassLike
 	parameter_            ParameterLike
-	additionalParameters_ col.Sequential[AdditionalParameterLike]
+	additionalParameters_ abs.Sequential[AdditionalParameterLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *parameters_) GetParameter() ParameterLike {
 	return v.parameter_
 }
 
-func (v *parameters_) GetAdditionalParameters() col.Sequential[AdditionalParameterLike] {
+func (v *parameters_) GetAdditionalParameters() abs.Sequential[AdditionalParameterLike] {
 	return v.additionalParameters_
 }
 

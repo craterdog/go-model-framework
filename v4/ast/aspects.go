@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type aspectsClass_ struct {
 
 func (c *aspectsClass_) Make(
 	note string,
-	aspects col.Sequential[AspectLike],
+	aspects abs.Sequential[AspectLike],
 ) AspectsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(note):
+	case col.IsUndefined(note):
 		panic("The note attribute is required for each Aspects.")
-	case mod.IsUndefined(aspects):
+	case col.IsUndefined(aspects):
 		panic("The aspects attribute is required for each Aspects.")
 	default:
 		return &aspects_{
@@ -69,7 +69,7 @@ type aspects_ struct {
 	// Define instance attributes.
 	class_   AspectsClassLike
 	note_    string
-	aspects_ col.Sequential[AspectLike]
+	aspects_ abs.Sequential[AspectLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *aspects_) GetNote() string {
 	return v.note_
 }
 
-func (v *aspects_) GetAspects() col.Sequential[AspectLike] {
+func (v *aspects_) GetAspects() abs.Sequential[AspectLike] {
 	return v.aspects_
 }
 

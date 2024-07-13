@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type aspectClass_ struct {
 
 func (c *aspectClass_) Make(
 	declaration DeclarationLike,
-	methods col.Sequential[MethodLike],
+	methods abs.Sequential[MethodLike],
 ) AspectLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(declaration):
+	case col.IsUndefined(declaration):
 		panic("The declaration attribute is required for each Aspect.")
-	case mod.IsUndefined(methods):
+	case col.IsUndefined(methods):
 		panic("The methods attribute is required for each Aspect.")
 	default:
 		return &aspect_{
@@ -69,7 +69,7 @@ type aspect_ struct {
 	// Define instance attributes.
 	class_       AspectClassLike
 	declaration_ DeclarationLike
-	methods_     col.Sequential[MethodLike]
+	methods_     abs.Sequential[MethodLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *aspect_) GetDeclaration() DeclarationLike {
 	return v.declaration_
 }
 
-func (v *aspect_) GetMethods() col.Sequential[MethodLike] {
+func (v *aspect_) GetMethods() abs.Sequential[MethodLike] {
 	return v.methods_
 }
 

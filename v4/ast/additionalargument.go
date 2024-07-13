@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -43,7 +43,7 @@ type additionalArgumentClass_ struct {
 func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(argument):
+	case col.IsUndefined(argument):
 		panic("The argument attribute is required for each AdditionalArgument.")
 	default:
 		return &additionalArgument_{

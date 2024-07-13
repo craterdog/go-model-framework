@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -46,9 +46,9 @@ func (c *constantClass_) Make(
 ) ConstantLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(name):
+	case col.IsUndefined(name):
 		panic("The name attribute is required for each Constant.")
-	case mod.IsUndefined(abstraction):
+	case col.IsUndefined(abstraction):
 		panic("The abstraction attribute is required for each Constant.")
 	default:
 		return &constant_{

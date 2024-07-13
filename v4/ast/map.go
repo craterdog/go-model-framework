@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -43,7 +43,7 @@ type mapClass_ struct {
 func (c *mapClass_) Make(name string) MapLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(name):
+	case col.IsUndefined(name):
 		panic("The name attribute is required for each Map.")
 	default:
 		return &map_{

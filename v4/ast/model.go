@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -52,13 +52,13 @@ func (c *modelClass_) Make(
 ) ModelLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(notice):
+	case col.IsUndefined(notice):
 		panic("The notice attribute is required for each Model.")
-	case mod.IsUndefined(header):
+	case col.IsUndefined(header):
 		panic("The header attribute is required for each Model.")
-	case mod.IsUndefined(classes):
+	case col.IsUndefined(classes):
 		panic("The classes attribute is required for each Model.")
-	case mod.IsUndefined(instances):
+	case col.IsUndefined(instances):
 		panic("The instances attribute is required for each Model.")
 	default:
 		return &model_{

@@ -119,7 +119,7 @@ const attributeInitializationTemplate_ = `
 			<AttributeName>_: <ParameterName>,`
 
 const attributeCheckTemplate_ = `
-	case mod.IsUndefined(<ParameterName>):
+	case col.IsUndefined(<ParameterName>):
 		panic("The <ParameterName> attribute is required for each <ClassName>.")`
 
 const functionBodyTemplate_ = `
@@ -189,7 +189,7 @@ const setterOptionalTemplate_ = `
 `
 
 const setterClassTemplate_ = `
-	if mod.IsUndefined(<ParameterName>) {
+	if col.IsUndefined(<ParameterName>) {
 		panic("The <ParameterName> attribute cannot be nil.")
 	}
 	v.<AttributeName>_ = <ParameterName>

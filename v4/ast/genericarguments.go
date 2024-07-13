@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -43,7 +43,7 @@ type genericArgumentsClass_ struct {
 func (c *genericArgumentsClass_) Make(arguments ArgumentsLike) GenericArgumentsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(arguments):
+	case col.IsUndefined(arguments):
 		panic("The arguments attribute is required for each GenericArguments.")
 	default:
 		return &genericArguments_{

@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type valuesClass_ struct {
 
 func (c *valuesClass_) Make(
 	value ValueLike,
-	additionalValues col.Sequential[AdditionalValueLike],
+	additionalValues abs.Sequential[AdditionalValueLike],
 ) ValuesLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(value):
+	case col.IsUndefined(value):
 		panic("The value attribute is required for each Values.")
-	case mod.IsUndefined(additionalValues):
+	case col.IsUndefined(additionalValues):
 		panic("The additionalValues attribute is required for each Values.")
 	default:
 		return &values_{
@@ -69,7 +69,7 @@ type values_ struct {
 	// Define instance attributes.
 	class_            ValuesClassLike
 	value_            ValueLike
-	additionalValues_ col.Sequential[AdditionalValueLike]
+	additionalValues_ abs.Sequential[AdditionalValueLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *values_) GetValue() ValueLike {
 	return v.value_
 }
 
-func (v *values_) GetAdditionalValues() col.Sequential[AdditionalValueLike] {
+func (v *values_) GetAdditionalValues() abs.Sequential[AdditionalValueLike] {
 	return v.additionalValues_
 }
 

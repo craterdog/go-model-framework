@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -48,9 +48,9 @@ func (c *classClass_) Make(
 ) ClassLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(declaration):
+	case col.IsUndefined(declaration):
 		panic("The declaration attribute is required for each Class.")
-	case mod.IsUndefined(constructors):
+	case col.IsUndefined(constructors):
 		panic("The constructors attribute is required for each Class.")
 	default:
 		return &class_{

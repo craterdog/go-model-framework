@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type methodsClass_ struct {
 
 func (c *methodsClass_) Make(
 	note string,
-	methods col.Sequential[MethodLike],
+	methods abs.Sequential[MethodLike],
 ) MethodsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(note):
+	case col.IsUndefined(note):
 		panic("The note attribute is required for each Methods.")
-	case mod.IsUndefined(methods):
+	case col.IsUndefined(methods):
 		panic("The methods attribute is required for each Methods.")
 	default:
 		return &methods_{
@@ -69,7 +69,7 @@ type methods_ struct {
 	// Define instance attributes.
 	class_   MethodsClassLike
 	note_    string
-	methods_ col.Sequential[MethodLike]
+	methods_ abs.Sequential[MethodLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *methods_) GetNote() string {
 	return v.note_
 }
 
-func (v *methods_) GetMethods() col.Sequential[MethodLike] {
+func (v *methods_) GetMethods() abs.Sequential[MethodLike] {
 	return v.methods_
 }
 

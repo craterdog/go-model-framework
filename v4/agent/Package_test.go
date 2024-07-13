@@ -381,7 +381,7 @@ const complex_ = `/*
 package example
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -417,11 +417,11 @@ func (c *complexClass_) Make(
 ) ComplexLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(realPart):
+	case col.IsUndefined(realPart):
 		panic("The realPart attribute is required for each Complex.")
-	case mod.IsUndefined(imaginaryPart):
+	case col.IsUndefined(imaginaryPart):
 		panic("The imaginaryPart attribute is required for each Complex.")
-	case mod.IsUndefined(form):
+	case col.IsUndefined(form):
 		panic("The form attribute is required for each Complex.")
 	default:
 		return &complex_{
@@ -545,7 +545,7 @@ func (v *complex_) GetForm() Form {
 }
 
 func (v *complex_) SetForm(form Form) {
-	if mod.IsUndefined(form) {
+	if col.IsUndefined(form) {
 		panic("The form attribute cannot be nil.")
 	}
 	v.form_ = form
@@ -604,7 +604,7 @@ package example
 
 import (
 	fmt "fmt"
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 	syn "sync"
 )
 
@@ -664,9 +664,9 @@ func (c *associationClass_[K, V]) Make(
 ) AssociationLike[K, V] {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(key):
+	case col.IsUndefined(key):
 		panic("The key attribute is required for each Association.")
-	case mod.IsUndefined(value):
+	case col.IsUndefined(value):
 		panic("The value attribute is required for each Association.")
 	default:
 		return &association_[K, V]{
@@ -707,7 +707,7 @@ func (v *association_[K, V]) GetValue() V {
 }
 
 func (v *association_[K, V]) SetValue(value V) {
-	if mod.IsUndefined(value) {
+	if col.IsUndefined(value) {
 		panic("The value attribute cannot be nil.")
 	}
 	v.value_ = value

@@ -14,8 +14,8 @@ package agent
 
 import (
 	fmt "fmt"
-	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 	reg "regexp"
 	sts "strings"
 )
@@ -66,7 +66,7 @@ type scannerClass_ struct {
 
 func (c *scannerClass_) Make(
 	source string,
-	tokens col.QueueLike[TokenLike],
+	tokens abs.QueueLike[TokenLike],
 ) ScannerLike {
 	var scanner = &scanner_{
 		// Initialize instance attributes.
@@ -100,11 +100,10 @@ func (c *scannerClass_) FormatToken(token TokenLike) string {
 func (c *scannerClass_) MatchToken(
 	type_ TokenType,
 	text string,
-) col.ListLike[string] {
+) abs.ListLike[string] {
 	var matcher = c.matchers_[type_]
 	var matches = matcher.FindStringSubmatch(text)
-	var notation = cdc.Notation().Make()
-	return col.List[string](notation).MakeFromArray(matches)
+	return col.List[string](matches)
 }
 
 // INSTANCE METHODS
@@ -119,7 +118,7 @@ type scanner_ struct {
 	line_     int // The line number in the source string of the next rune.
 	position_ int // The position in the current line of the next rune.
 	runes_    []rune
-	tokens_   col.QueueLike[TokenLike]
+	tokens_   abs.QueueLike[TokenLike]
 }
 
 // Attributes

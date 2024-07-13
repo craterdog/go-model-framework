@@ -30,7 +30,7 @@ on interfaces, not on each other.
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // Classes
@@ -59,7 +59,7 @@ type AbstractionsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		abstractions col.Sequential[AbstractionLike],
+		abstractions abs.Sequential[AbstractionLike],
 	) AbstractionsLike
 }
 
@@ -122,7 +122,7 @@ type ArgumentsClassLike interface {
 	// Constructors
 	Make(
 		argument ArgumentLike,
-		additionalArguments col.Sequential[AdditionalArgumentLike],
+		additionalArguments abs.Sequential[AdditionalArgumentLike],
 	) ArgumentsLike
 }
 
@@ -145,7 +145,7 @@ type AspectClassLike interface {
 	// Constructors
 	Make(
 		declaration DeclarationLike,
-		methods col.Sequential[MethodLike],
+		methods abs.Sequential[MethodLike],
 	) AspectLike
 }
 
@@ -158,7 +158,7 @@ type AspectsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		aspects col.Sequential[AspectLike],
+		aspects abs.Sequential[AspectLike],
 	) AspectsLike
 }
 
@@ -185,7 +185,7 @@ type AttributesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		attributes col.Sequential[AttributeLike],
+		attributes abs.Sequential[AttributeLike],
 	) AttributesLike
 }
 
@@ -223,7 +223,7 @@ type ClassesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		classes col.Sequential[ClassLike],
+		classes abs.Sequential[ClassLike],
 	) ClassesLike
 }
 
@@ -249,7 +249,7 @@ type ConstantsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		constants col.Sequential[ConstantLike],
+		constants abs.Sequential[ConstantLike],
 	) ConstantsLike
 }
 
@@ -276,7 +276,7 @@ type ConstructorsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		constructors col.Sequential[ConstructorLike],
+		constructors abs.Sequential[ConstructorLike],
 	) ConstructorsLike
 }
 
@@ -341,7 +341,7 @@ type FunctionalsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		functionals col.Sequential[FunctionalLike],
+		functionals abs.Sequential[FunctionalLike],
 	) FunctionalsLike
 }
 
@@ -354,7 +354,7 @@ type FunctionsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		functions col.Sequential[FunctionLike],
+		functions abs.Sequential[FunctionLike],
 	) FunctionsLike
 }
 
@@ -425,7 +425,7 @@ type InstancesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		instances col.Sequential[InstanceLike],
+		instances abs.Sequential[InstanceLike],
 	) InstancesLike
 }
 
@@ -462,7 +462,7 @@ type MethodsClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		methods col.Sequential[MethodLike],
+		methods abs.Sequential[MethodLike],
 	) MethodsLike
 }
 
@@ -505,7 +505,7 @@ modules-like class.
 */
 type ModulesClassLike interface {
 	// Constructors
-	Make(modules col.Sequential[ModuleLike]) ModulesLike
+	Make(modules abs.Sequential[ModuleLike]) ModulesLike
 }
 
 /*
@@ -550,7 +550,7 @@ type ParametersClassLike interface {
 	// Constructors
 	Make(
 		parameter ParameterLike,
-		additionalParameters col.Sequential[AdditionalParameterLike],
+		additionalParameters abs.Sequential[AdditionalParameterLike],
 	) ParametersLike
 }
 
@@ -597,7 +597,7 @@ type TypesClassLike interface {
 	// Constructors
 	Make(
 		note string,
-		types col.Sequential[TypeLike],
+		types abs.Sequential[TypeLike],
 	) TypesLike
 }
 
@@ -623,7 +623,7 @@ type ValuesClassLike interface {
 	// Constructors
 	Make(
 		value ValueLike,
-		additionalValues col.Sequential[AdditionalValueLike],
+		additionalValues abs.Sequential[AdditionalValueLike],
 	) ValuesLike
 }
 
@@ -652,7 +652,7 @@ type AbstractionsLike interface {
 	// Attributes
 	GetClass() AbstractionsClassLike
 	GetNote() string
-	GetAbstractions() col.Sequential[AbstractionLike]
+	GetAbstractions() abs.Sequential[AbstractionLike]
 }
 
 /*
@@ -719,7 +719,7 @@ type ArgumentsLike interface {
 	// Attributes
 	GetClass() ArgumentsClassLike
 	GetArgument() ArgumentLike
-	GetAdditionalArguments() col.Sequential[AdditionalArgumentLike]
+	GetAdditionalArguments() abs.Sequential[AdditionalArgumentLike]
 }
 
 /*
@@ -741,7 +741,7 @@ type AspectLike interface {
 	// Attributes
 	GetClass() AspectClassLike
 	GetDeclaration() DeclarationLike
-	GetMethods() col.Sequential[MethodLike]
+	GetMethods() abs.Sequential[MethodLike]
 }
 
 /*
@@ -753,7 +753,7 @@ type AspectsLike interface {
 	// Attributes
 	GetClass() AspectsClassLike
 	GetNote() string
-	GetAspects() col.Sequential[AspectLike]
+	GetAspects() abs.Sequential[AspectLike]
 }
 
 /*
@@ -778,7 +778,7 @@ type AttributesLike interface {
 	// Attributes
 	GetClass() AttributesClassLike
 	GetNote() string
-	GetAttributes() col.Sequential[AttributeLike]
+	GetAttributes() abs.Sequential[AttributeLike]
 }
 
 /*
@@ -814,7 +814,7 @@ type ClassesLike interface {
 	// Attributes
 	GetClass() ClassesClassLike
 	GetNote() string
-	GetClasses() col.Sequential[ClassLike]
+	GetClasses() abs.Sequential[ClassLike]
 }
 
 /*
@@ -838,7 +838,7 @@ type ConstantsLike interface {
 	// Attributes
 	GetClass() ConstantsClassLike
 	GetNote() string
-	GetConstants() col.Sequential[ConstantLike]
+	GetConstants() abs.Sequential[ConstantLike]
 }
 
 /*
@@ -863,7 +863,7 @@ type ConstructorsLike interface {
 	// Attributes
 	GetClass() ConstructorsClassLike
 	GetNote() string
-	GetConstructors() col.Sequential[ConstructorLike]
+	GetConstructors() abs.Sequential[ConstructorLike]
 }
 
 /*
@@ -925,7 +925,7 @@ type FunctionalsLike interface {
 	// Attributes
 	GetClass() FunctionalsClassLike
 	GetNote() string
-	GetFunctionals() col.Sequential[FunctionalLike]
+	GetFunctionals() abs.Sequential[FunctionalLike]
 }
 
 /*
@@ -937,7 +937,7 @@ type FunctionsLike interface {
 	// Attributes
 	GetClass() FunctionsClassLike
 	GetNote() string
-	GetFunctions() col.Sequential[FunctionLike]
+	GetFunctions() abs.Sequential[FunctionLike]
 }
 
 /*
@@ -1008,7 +1008,7 @@ type InstancesLike interface {
 	// Attributes
 	GetClass() InstancesClassLike
 	GetNote() string
-	GetInstances() col.Sequential[InstanceLike]
+	GetInstances() abs.Sequential[InstanceLike]
 }
 
 /*
@@ -1044,7 +1044,7 @@ type MethodsLike interface {
 	// Attributes
 	GetClass() MethodsClassLike
 	GetNote() string
-	GetMethods() col.Sequential[MethodLike]
+	GetMethods() abs.Sequential[MethodLike]
 }
 
 /*
@@ -1085,7 +1085,7 @@ of a concrete modules-like class.
 type ModulesLike interface {
 	// Attributes
 	GetClass() ModulesClassLike
-	GetModules() col.Sequential[ModuleLike]
+	GetModules() abs.Sequential[ModuleLike]
 }
 
 /*
@@ -1131,7 +1131,7 @@ type ParametersLike interface {
 	// Attributes
 	GetClass() ParametersClassLike
 	GetParameter() ParameterLike
-	GetAdditionalParameters() col.Sequential[AdditionalParameterLike]
+	GetAdditionalParameters() abs.Sequential[AdditionalParameterLike]
 }
 
 /*
@@ -1178,7 +1178,7 @@ type TypesLike interface {
 	// Attributes
 	GetClass() TypesClassLike
 	GetNote() string
-	GetTypes() col.Sequential[TypeLike]
+	GetTypes() abs.Sequential[TypeLike]
 }
 
 /*
@@ -1202,5 +1202,5 @@ type ValuesLike interface {
 	// Attributes
 	GetClass() ValuesClassLike
 	GetValue() ValueLike
-	GetAdditionalValues() col.Sequential[AdditionalValueLike]
+	GetAdditionalValues() abs.Sequential[AdditionalValueLike]
 }

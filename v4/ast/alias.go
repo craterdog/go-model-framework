@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -43,7 +43,7 @@ type aliasClass_ struct {
 func (c *aliasClass_) Make(name string) AliasLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(name):
+	case col.IsUndefined(name):
 		panic("The name attribute is required for each Alias.")
 	default:
 		return &alias_{

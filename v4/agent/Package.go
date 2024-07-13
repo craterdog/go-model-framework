@@ -27,7 +27,7 @@ on interfaces, not on each other.
 package agent
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
 
@@ -98,7 +98,7 @@ type ScannerClassLike interface {
 	// Constructors
 	Make(
 		source string,
-		tokens col.QueueLike[TokenLike],
+		tokens abs.QueueLike[TokenLike],
 	) ScannerLike
 
 	// Functions
@@ -106,7 +106,7 @@ type ScannerClassLike interface {
 	MatchToken(
 		type_ TokenType,
 		text string,
-	) col.ListLike[string]
+	) abs.ListLike[string]
 }
 
 /*

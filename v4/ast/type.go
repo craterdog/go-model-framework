@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -47,9 +47,9 @@ func (c *typeClass_) Make(
 ) TypeLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(declaration):
+	case col.IsUndefined(declaration):
 		panic("The declaration attribute is required for each Type.")
-	case mod.IsUndefined(abstraction):
+	case col.IsUndefined(abstraction):
 		panic("The abstraction attribute is required for each Type.")
 	default:
 		return &type_{

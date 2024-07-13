@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -43,7 +43,7 @@ type importsClass_ struct {
 func (c *importsClass_) Make(modules ModulesLike) ImportsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(modules):
+	case col.IsUndefined(modules):
 		panic("The modules attribute is required for each Imports.")
 	default:
 		return &imports_{

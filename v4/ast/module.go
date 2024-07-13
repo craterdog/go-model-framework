@@ -13,7 +13,7 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
+	col "github.com/craterdog/go-collection-framework/v4"
 )
 
 // CLASS ACCESS
@@ -46,9 +46,9 @@ func (c *moduleClass_) Make(
 ) ModuleLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(name):
+	case col.IsUndefined(name):
 		panic("The name attribute is required for each Module.")
-	case mod.IsUndefined(path):
+	case col.IsUndefined(path):
 		panic("The path attribute is required for each Module.")
 	default:
 		return &module_{

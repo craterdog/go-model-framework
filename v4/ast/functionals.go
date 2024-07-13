@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type functionalsClass_ struct {
 
 func (c *functionalsClass_) Make(
 	note string,
-	functionals col.Sequential[FunctionalLike],
+	functionals abs.Sequential[FunctionalLike],
 ) FunctionalsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(note):
+	case col.IsUndefined(note):
 		panic("The note attribute is required for each Functionals.")
-	case mod.IsUndefined(functionals):
+	case col.IsUndefined(functionals):
 		panic("The functionals attribute is required for each Functionals.")
 	default:
 		return &functionals_{
@@ -69,7 +69,7 @@ type functionals_ struct {
 	// Define instance attributes.
 	class_       FunctionalsClassLike
 	note_        string
-	functionals_ col.Sequential[FunctionalLike]
+	functionals_ abs.Sequential[FunctionalLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *functionals_) GetNote() string {
 	return v.note_
 }
 
-func (v *functionals_) GetFunctionals() col.Sequential[FunctionalLike] {
+func (v *functionals_) GetFunctionals() abs.Sequential[FunctionalLike] {
 	return v.functionals_
 }
 

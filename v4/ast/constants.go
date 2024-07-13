@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type constantsClass_ struct {
 
 func (c *constantsClass_) Make(
 	note string,
-	constants col.Sequential[ConstantLike],
+	constants abs.Sequential[ConstantLike],
 ) ConstantsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(note):
+	case col.IsUndefined(note):
 		panic("The note attribute is required for each Constants.")
-	case mod.IsUndefined(constants):
+	case col.IsUndefined(constants):
 		panic("The constants attribute is required for each Constants.")
 	default:
 		return &constants_{
@@ -69,7 +69,7 @@ type constants_ struct {
 	// Define instance attributes.
 	class_     ConstantsClassLike
 	note_      string
-	constants_ col.Sequential[ConstantLike]
+	constants_ abs.Sequential[ConstantLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *constants_) GetNote() string {
 	return v.note_
 }
 
-func (v *constants_) GetConstants() col.Sequential[ConstantLike] {
+func (v *constants_) GetConstants() abs.Sequential[ConstantLike] {
 	return v.constants_
 }
 

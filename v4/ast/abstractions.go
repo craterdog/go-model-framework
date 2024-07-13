@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type abstractionsClass_ struct {
 
 func (c *abstractionsClass_) Make(
 	note string,
-	abstractions col.Sequential[AbstractionLike],
+	abstractions abs.Sequential[AbstractionLike],
 ) AbstractionsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(note):
+	case col.IsUndefined(note):
 		panic("The note attribute is required for each Abstractions.")
-	case mod.IsUndefined(abstractions):
+	case col.IsUndefined(abstractions):
 		panic("The abstractions attribute is required for each Abstractions.")
 	default:
 		return &abstractions_{
@@ -69,7 +69,7 @@ type abstractions_ struct {
 	// Define instance attributes.
 	class_        AbstractionsClassLike
 	note_         string
-	abstractions_ col.Sequential[AbstractionLike]
+	abstractions_ abs.Sequential[AbstractionLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *abstractions_) GetNote() string {
 	return v.note_
 }
 
-func (v *abstractions_) GetAbstractions() col.Sequential[AbstractionLike] {
+func (v *abstractions_) GetAbstractions() abs.Sequential[AbstractionLike] {
 	return v.abstractions_
 }
 

@@ -14,9 +14,8 @@ package agent
 
 import (
 	fmt "fmt"
-	mod "github.com/craterdog/go-collection-framework/v4"
-	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 	sts "strings"
 )
@@ -59,13 +58,13 @@ func (c *validatorClass_) Make() ValidatorLike {
 type validator_ struct {
 	// Define instance attributes.
 	class_        ValidatorClassLike
-	imports_      col.CatalogLike[string, ast.ModuleLike]
-	types_        col.CatalogLike[string, ast.TypeLike]
-	functionals_  col.CatalogLike[string, ast.FunctionalLike]
-	aspects_      col.CatalogLike[string, ast.AspectLike]
-	classes_      col.CatalogLike[string, ast.ClassLike]
-	instances_    col.CatalogLike[string, ast.InstanceLike]
-	abstractions_ col.CatalogLike[string, ast.AbstractionLike]
+	imports_      abs.CatalogLike[string, ast.ModuleLike]
+	types_        abs.CatalogLike[string, ast.TypeLike]
+	functionals_  abs.CatalogLike[string, ast.FunctionalLike]
+	aspects_      abs.CatalogLike[string, ast.AspectLike]
+	classes_      abs.CatalogLike[string, ast.ClassLike]
+	instances_    abs.CatalogLike[string, ast.InstanceLike]
+	abstractions_ abs.CatalogLike[string, ast.AbstractionLike]
 }
 
 // Attributes
@@ -78,14 +77,13 @@ func (v *validator_) GetClass() ValidatorClassLike {
 
 func (v *validator_) ValidateModel(model ast.ModelLike) {
 	// Initialize the catalogs.
-	var notation = cdc.Notation().Make()
-	v.imports_ = col.Catalog[string, ast.ModuleLike](notation).Make()
-	v.types_ = col.Catalog[string, ast.TypeLike](notation).Make()
-	v.functionals_ = col.Catalog[string, ast.FunctionalLike](notation).Make()
-	v.classes_ = col.Catalog[string, ast.ClassLike](notation).Make()
-	v.instances_ = col.Catalog[string, ast.InstanceLike](notation).Make()
-	v.aspects_ = col.Catalog[string, ast.AspectLike](notation).Make()
-	v.abstractions_ = col.Catalog[string, ast.AbstractionLike](notation).Make()
+	v.imports_ = col.Catalog[string, ast.ModuleLike]()
+	v.types_ = col.Catalog[string, ast.TypeLike]()
+	v.functionals_ = col.Catalog[string, ast.FunctionalLike]()
+	v.classes_ = col.Catalog[string, ast.ClassLike]()
+	v.instances_ = col.Catalog[string, ast.InstanceLike]()
+	v.aspects_ = col.Catalog[string, ast.AspectLike]()
+	v.abstractions_ = col.Catalog[string, ast.AbstractionLike]()
 
 	// Extract the catalogs.
 	v.extractModules(model)
@@ -108,7 +106,7 @@ func (v *validator_) ValidateModel(model ast.ModelLike) {
 
 func (v *validator_) extractAspects(model ast.ModelLike) {
 	var aspects = model.GetOptionalAspects()
-	if mod.IsDefined(aspects) {
+	if col.IsDefined(aspects) {
 		var iterator = aspects.GetAspects().GetIterator()
 		for iterator.HasNext() {
 			var aspect = iterator.GetNext()
@@ -120,7 +118,7 @@ func (v *validator_) extractAspects(model ast.ModelLike) {
 
 func (v *validator_) extractClasses(model ast.ModelLike) {
 	var classes = model.GetClasses()
-	if mod.IsDefined(classes) {
+	if col.IsDefined(classes) {
 		var iterator = classes.GetClasses().GetIterator()
 		for iterator.HasNext() {
 			var class = iterator.GetNext()
@@ -133,7 +131,7 @@ func (v *validator_) extractClasses(model ast.ModelLike) {
 
 func (v *validator_) extractFunctionals(model ast.ModelLike) {
 	var functionals = model.GetOptionalFunctionals()
-	if mod.IsDefined(functionals) {
+	if col.IsDefined(functionals) {
 		var iterator = functionals.GetFunctionals().GetIterator()
 		for iterator.HasNext() {
 			var functional = iterator.GetNext()
@@ -145,7 +143,7 @@ func (v *validator_) extractFunctionals(model ast.ModelLike) {
 
 func (v *validator_) extractInstances(model ast.ModelLike) {
 	var instances = model.GetInstances()
-	if mod.IsDefined(instances) {
+	if col.IsDefined(instances) {
 		var iterator = instances.GetInstances().GetIterator()
 		for iterator.HasNext() {
 			var instance = iterator.GetNext()
@@ -158,7 +156,7 @@ func (v *validator_) extractInstances(model ast.ModelLike) {
 
 func (v *validator_) extractModules(model ast.ModelLike) {
 	var imports = model.GetOptionalImports()
-	if mod.IsDefined(imports) {
+	if col.IsDefined(imports) {
 		var iterator = imports.GetModules().GetModules().GetIterator()
 		for iterator.HasNext() {
 			var module = iterator.GetNext()
@@ -171,7 +169,7 @@ func (v *validator_) extractModules(model ast.ModelLike) {
 
 func (v *validator_) extractTypes(model ast.ModelLike) {
 	var types = model.GetOptionalTypes()
-	if mod.IsDefined(types) {
+	if col.IsDefined(types) {
 		var iterator = types.GetTypes().GetIterator()
 		for iterator.HasNext() {
 			var type_ = iterator.GetNext()
@@ -184,13 +182,13 @@ func (v *validator_) extractTypes(model ast.ModelLike) {
 func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 	// Validate the optional prefix.
 	var prefix = abstraction.GetOptionalPrefix()
-	if mod.IsDefined(prefix) {
+	if col.IsDefined(prefix) {
 		v.validatePrefix(prefix)
 	}
 
 	// Validate the optional alias.
 	var alias = abstraction.GetOptionalAlias()
-	if mod.IsDefined(alias) {
+	if col.IsDefined(alias) {
 		v.validateAlias(alias)
 	}
 
@@ -200,7 +198,7 @@ func (v *validator_) validateAbstraction(abstraction ast.AbstractionLike) {
 
 	// Validate any generic arguments.
 	var genericArguments = abstraction.GetOptionalGenericArguments()
-	if mod.IsDefined(genericArguments) {
+	if col.IsDefined(genericArguments) {
 		var arguments = genericArguments.GetArguments()
 		v.validateArguments(arguments)
 	}
@@ -264,7 +262,7 @@ func (v *validator_) validateAspect(aspect ast.AspectLike) {
 	// Verify that this aspect is actually used in this model.
 	var name = declaration.GetName()
 	var abstraction = v.abstractions_.GetValue(name)
-	if mod.IsUndefined(abstraction) {
+	if col.IsUndefined(abstraction) {
 		var message = fmt.Sprintf(
 			"The following aspect is never used in this model: %v",
 			name,
@@ -333,11 +331,11 @@ func (v *validator_) validateAttributes(
 
 func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 	var prefix = abstraction.GetOptionalPrefix()
-	if mod.IsDefined(prefix) {
+	if col.IsDefined(prefix) {
 		panic("A boolean type does not have a prefix.")
 	}
 	var alias = abstraction.GetOptionalAlias()
-	if mod.IsDefined(alias) {
+	if col.IsDefined(alias) {
 		panic("A boolean type does not have an alias.")
 	}
 	var name = abstraction.GetName()
@@ -345,7 +343,7 @@ func (v *validator_) validateBoolean(abstraction ast.AbstractionLike) {
 		panic("A question attribute must have a boolean type.")
 	}
 	var arguments = abstraction.GetOptionalGenericArguments()
-	if mod.IsDefined(arguments) {
+	if col.IsDefined(arguments) {
 		panic("A boolean type is not a generic type.")
 	}
 }
@@ -357,19 +355,19 @@ func (v *validator_) validateClass(class ast.ClassLike) {
 
 	// Validate the constructors.
 	var constructors = class.GetConstructors()
-	if mod.IsDefined(constructors) {
+	if col.IsDefined(constructors) {
 		v.validateConstructors(constructors)
 	}
 
 	// Validate the constants.
 	var constants = class.GetOptionalConstants()
-	if mod.IsDefined(constants) {
+	if col.IsDefined(constants) {
 		v.validateConstants(constants)
 	}
 
 	// Validate the functions.
 	var functions = class.GetOptionalFunctions()
-	if mod.IsDefined(functions) {
+	if col.IsDefined(functions) {
 		v.validateFunctions(functions)
 	}
 }
@@ -380,7 +378,7 @@ func (v *validator_) validateClasses(model ast.ModelLike) {
 		var association = iterator.GetNext()
 		var name = association.GetKey()
 		var instance = v.instances_.GetValue(name)
-		if mod.IsUndefined(instance) {
+		if col.IsUndefined(instance) {
 			var message = fmt.Sprintf(
 				"The following instance interface is missing: %v",
 				name,
@@ -408,7 +406,7 @@ func (v *validator_) validateConstants(constants ast.ConstantsLike) {
 func (v *validator_) validateConstructor(constructor ast.ConstructorLike) {
 	// Validate any parameters.
 	var parameters = constructor.GetOptionalParameters()
-	if mod.IsDefined(parameters) {
+	if col.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
@@ -428,7 +426,7 @@ func (v *validator_) validateConstructors(constructors ast.ConstructorsLike) {
 func (v *validator_) validateDeclaration(declaration ast.DeclarationLike) {
 	// Validate any generic parameters.
 	var genericParameters = declaration.GetOptionalGenericParameters()
-	if mod.IsDefined(genericParameters) {
+	if col.IsDefined(genericParameters) {
 		var parameters = genericParameters.GetParameters()
 		v.validateParameters(parameters)
 	}
@@ -445,7 +443,7 @@ func (v *validator_) validateEnumeration(enumeration ast.EnumerationLike) {
 func (v *validator_) validateFunction(function ast.FunctionLike) {
 	// Validate any parameters.
 	var parameters = function.GetOptionalParameters()
-	if mod.IsDefined(parameters) {
+	if col.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
@@ -461,7 +459,7 @@ func (v *validator_) validateFunctional(functional ast.FunctionalLike) {
 
 	// Validate any parameters.
 	var parameters = functional.GetOptionalParameters()
-	if mod.IsDefined(parameters) {
+	if col.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
@@ -472,7 +470,7 @@ func (v *validator_) validateFunctional(functional ast.FunctionalLike) {
 	// Verify that this functional is actually used in this model.
 	var name = declaration.GetName()
 	var abstraction = v.abstractions_.GetValue(name)
-	if mod.IsUndefined(abstraction) {
+	if col.IsUndefined(abstraction) {
 		var message = fmt.Sprintf(
 			"The following functional is never used in this model: %v",
 			name,
@@ -510,13 +508,13 @@ func (v *validator_) validateInstance(instance ast.InstanceLike) {
 
 	// Validate the instance abstraction methods.
 	var abstractions = instance.GetOptionalAbstractions()
-	if mod.IsDefined(abstractions) {
+	if col.IsDefined(abstractions) {
 		v.validateAbstractions(abstractions)
 	}
 
 	// Validate the instance public methods.
 	var methods = instance.GetOptionalMethods()
-	if mod.IsDefined(methods) {
+	if col.IsDefined(methods) {
 		v.validateMethods(methods.GetMethods())
 	}
 }
@@ -527,7 +525,7 @@ func (v *validator_) validateInstances(model ast.ModelLike) {
 		var association = iterator.GetNext()
 		var name = association.GetKey()
 		var class = v.classes_.GetValue(name)
-		if mod.IsUndefined(class) {
+		if col.IsUndefined(class) {
 			var message = fmt.Sprintf(
 				"The following class interface is missing: %v",
 				name,
@@ -542,18 +540,18 @@ func (v *validator_) validateInstances(model ast.ModelLike) {
 func (v *validator_) validateMethod(method ast.MethodLike) {
 	// Validate any method parameters.
 	var parameters = method.GetOptionalParameters()
-	if mod.IsDefined(parameters) {
+	if col.IsDefined(parameters) {
 		v.validateParameters(parameters)
 	}
 
 	// Validate any method results.
 	var result = method.GetOptionalResult()
-	if mod.IsDefined(result) {
+	if col.IsDefined(result) {
 		v.validateResult(result)
 	}
 }
 
-func (v *validator_) validateMethods(methods col.Sequential[ast.MethodLike]) {
+func (v *validator_) validateMethods(methods abs.Sequential[ast.MethodLike]) {
 	var iterator = methods.GetIterator()
 	for iterator.HasNext() {
 		var method = iterator.GetNext()
@@ -593,7 +591,7 @@ func (v *validator_) validateParameters(parameters ast.ParametersLike) {
 
 	// Validate any additional parameters.
 	var additionalParameters = parameters.GetAdditionalParameters()
-	if mod.IsDefined(additionalParameters) {
+	if col.IsDefined(additionalParameters) {
 		var iterator = additionalParameters.GetIterator()
 		for iterator.HasNext() {
 			var parameter = iterator.GetNext()
@@ -633,14 +631,14 @@ func (v *validator_) validateType(type_ ast.TypeLike) {
 
 	// Validate any enumeration values.
 	var enumeration = type_.GetOptionalEnumeration()
-	if mod.IsDefined(enumeration) {
+	if col.IsDefined(enumeration) {
 		v.validateEnumeration(enumeration)
 	}
 
 	// Verify that this type is actually used in this model.
 	var name = declaration.GetName()
 	abstraction = v.abstractions_.GetValue(name)
-	if mod.IsUndefined(abstraction) {
+	if col.IsUndefined(abstraction) {
 		var message = fmt.Sprintf(
 			"The following type is never used in this model: %v",
 			name,

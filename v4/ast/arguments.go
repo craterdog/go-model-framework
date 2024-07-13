@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type argumentsClass_ struct {
 
 func (c *argumentsClass_) Make(
 	argument ArgumentLike,
-	additionalArguments col.Sequential[AdditionalArgumentLike],
+	additionalArguments abs.Sequential[AdditionalArgumentLike],
 ) ArgumentsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(argument):
+	case col.IsUndefined(argument):
 		panic("The argument attribute is required for each Arguments.")
-	case mod.IsUndefined(additionalArguments):
+	case col.IsUndefined(additionalArguments):
 		panic("The additionalArguments attribute is required for each Arguments.")
 	default:
 		return &arguments_{
@@ -69,7 +69,7 @@ type arguments_ struct {
 	// Define instance attributes.
 	class_               ArgumentsClassLike
 	argument_            ArgumentLike
-	additionalArguments_ col.Sequential[AdditionalArgumentLike]
+	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *arguments_) GetArgument() ArgumentLike {
 	return v.argument_
 }
 
-func (v *arguments_) GetAdditionalArguments() col.Sequential[AdditionalArgumentLike] {
+func (v *arguments_) GetAdditionalArguments() abs.Sequential[AdditionalArgumentLike] {
 	return v.additionalArguments_
 }
 

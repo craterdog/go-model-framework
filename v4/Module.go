@@ -30,8 +30,8 @@ package module
 
 import (
 	fmt "fmt"
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 	age "github.com/craterdog/go-model-framework/v4/agent"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 	ref "reflect"
@@ -124,7 +124,7 @@ func Abstraction(args ...any) AbstractionLike {
 		case GenericArgumentsLike:
 			genericArguments = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the abstraction constructor: %T\n",
 					actual,
@@ -147,7 +147,7 @@ func Abstraction(args ...any) AbstractionLike {
 func Abstractions(args ...any) AbstractionsLike {
 	// Initialize the possible arguments.
 	var note = "// Abstractions"
-	var sequence col.Sequential[AbstractionLike]
+	var sequence abs.Sequential[AbstractionLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -156,13 +156,13 @@ func Abstractions(args ...any) AbstractionsLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[AbstractionLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[AbstractionLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[AbstractionLike])
+				sequence = arg.(abs.Sequential[AbstractionLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the abstractions constructor: %T\n",
 						actual,
@@ -191,7 +191,7 @@ func AdditionalArgument(args ...any) AdditionalArgumentLike {
 		case ArgumentLike:
 			argument = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the additional argument constructor: %T\n",
 					actual,
@@ -216,7 +216,7 @@ func AdditionalParameter(args ...any) AdditionalParameterLike {
 		case ParameterLike:
 			parameter = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the additional parameter constructor: %T\n",
 					actual,
@@ -241,7 +241,7 @@ func AdditionalValue(args ...any) AdditionalValueLike {
 		case string:
 			name = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the additional value constructor: %T\n",
 					actual,
@@ -266,7 +266,7 @@ func Alias(args ...any) AliasLike {
 		case string:
 			name = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the alias constructor: %T\n",
 					actual,
@@ -291,7 +291,7 @@ func Argument(args ...any) ArgumentLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the argument constructor: %T\n",
 					actual,
@@ -309,7 +309,7 @@ func Argument(args ...any) ArgumentLike {
 func Arguments(args ...any) ArgumentsLike {
 	// Initialize the possible arguments.
 	var argument ArgumentLike
-	var additionalArguments col.Sequential[AdditionalArgumentLike]
+	var additionalArguments abs.Sequential[AdditionalArgumentLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -318,13 +318,13 @@ func Arguments(args ...any) ArgumentsLike {
 			argument = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[AdditionalArgumentLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[AdditionalArgumentLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				additionalArguments = arg.(col.Sequential[AdditionalArgumentLike])
+				additionalArguments = arg.(abs.Sequential[AdditionalArgumentLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the additional arguments constructor: %T\n",
 						actual,
@@ -350,7 +350,7 @@ func Array(args ...any) ArrayLike {
 	for _, arg := range args {
 		switch actual := arg.(type) {
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the array constructor: %T\n",
 					actual,
@@ -368,7 +368,7 @@ func Array(args ...any) ArrayLike {
 func Aspect(args ...any) AspectLike {
 	// Initialize the possible arguments.
 	var declaration DeclarationLike
-	var methods col.Sequential[MethodLike]
+	var methods abs.Sequential[MethodLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -377,13 +377,13 @@ func Aspect(args ...any) AspectLike {
 			declaration = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[MethodLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[MethodLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				methods = arg.(col.Sequential[MethodLike])
+				methods = arg.(abs.Sequential[MethodLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the aspect constructor: %T\n",
 						actual,
@@ -405,7 +405,7 @@ func Aspect(args ...any) AspectLike {
 func Aspects(args ...any) AspectsLike {
 	// Initialize the possible arguments.
 	var note = "// Aspects"
-	var sequence col.Sequential[AspectLike]
+	var sequence abs.Sequential[AspectLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -414,13 +414,13 @@ func Aspects(args ...any) AspectsLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[AspectLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[AspectLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[AspectLike])
+				sequence = arg.(abs.Sequential[AspectLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the aspects constructor: %T\n",
 						actual,
@@ -455,7 +455,7 @@ func Attribute(args ...any) AttributeLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the attribute constructor: %T\n",
 					actual,
@@ -477,7 +477,7 @@ func Attribute(args ...any) AttributeLike {
 func Attributes(args ...any) AttributesLike {
 	// Initialize the possible arguments.
 	var note = "// Attributes"
-	var sequence col.Sequential[AttributeLike]
+	var sequence abs.Sequential[AttributeLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -486,13 +486,13 @@ func Attributes(args ...any) AttributesLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[AttributeLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[AttributeLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[AttributeLike])
+				sequence = arg.(abs.Sequential[AttributeLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the attributes constructor: %T\n",
 						actual,
@@ -518,7 +518,7 @@ func Channel(args ...any) ChannelLike {
 	for _, arg := range args {
 		switch actual := arg.(type) {
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the channel constructor: %T\n",
 					actual,
@@ -552,7 +552,7 @@ func Class(args ...any) ClassLike {
 		case FunctionsLike:
 			functions = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the class constructor: %T\n",
 					actual,
@@ -575,7 +575,7 @@ func Class(args ...any) ClassLike {
 func Classes(args ...any) ClassesLike {
 	// Initialize the possible arguments.
 	var note = "// Classes"
-	var sequence col.Sequential[ClassLike]
+	var sequence abs.Sequential[ClassLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -584,13 +584,13 @@ func Classes(args ...any) ClassesLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[ClassLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[ClassLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[ClassLike])
+				sequence = arg.(abs.Sequential[ClassLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the classes constructor: %T\n",
 						actual,
@@ -622,7 +622,7 @@ func Constant(args ...any) ConstantLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the constant constructor: %T\n",
 					actual,
@@ -643,7 +643,7 @@ func Constant(args ...any) ConstantLike {
 func Constants(args ...any) ConstantsLike {
 	// Initialize the possible arguments.
 	var note = "// Constants"
-	var sequence col.Sequential[ConstantLike]
+	var sequence abs.Sequential[ConstantLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -652,13 +652,13 @@ func Constants(args ...any) ConstantsLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[ConstantLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[ConstantLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[ConstantLike])
+				sequence = arg.(abs.Sequential[ConstantLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the constants constructor: %T\n",
 						actual,
@@ -693,7 +693,7 @@ func Constructor(args ...any) ConstructorLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the constructor constructor: %T\n",
 					actual,
@@ -715,7 +715,7 @@ func Constructor(args ...any) ConstructorLike {
 func Constructors(args ...any) ConstructorsLike {
 	// Initialize the possible arguments.
 	var note = "// Constructors"
-	var sequence col.Sequential[ConstructorLike]
+	var sequence abs.Sequential[ConstructorLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -724,13 +724,13 @@ func Constructors(args ...any) ConstructorsLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[ConstructorLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[ConstructorLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[ConstructorLike])
+				sequence = arg.(abs.Sequential[ConstructorLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the constructors constructor: %T\n",
 						actual,
@@ -767,7 +767,7 @@ func Declaration(args ...any) DeclarationLike {
 		case GenericParametersLike:
 			genericParameters = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the declaration constructor: %T\n",
 					actual,
@@ -796,7 +796,7 @@ func Enumeration(args ...any) EnumerationLike {
 		case ValuesLike:
 			values = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the enumeration constructor: %T\n",
 					actual,
@@ -829,7 +829,7 @@ func Function(args ...any) FunctionLike {
 		case ResultLike:
 			result = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the function constructor: %T\n",
 					actual,
@@ -864,7 +864,7 @@ func Functional(args ...any) FunctionalLike {
 		case ResultLike:
 			result = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the functional constructor: %T\n",
 					actual,
@@ -886,7 +886,7 @@ func Functional(args ...any) FunctionalLike {
 func Functionals(args ...any) FunctionalsLike {
 	// Initialize the possible arguments.
 	var note = "// Functionals"
-	var sequence col.Sequential[FunctionalLike]
+	var sequence abs.Sequential[FunctionalLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -895,13 +895,13 @@ func Functionals(args ...any) FunctionalsLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[FunctionalLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[FunctionalLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[FunctionalLike])
+				sequence = arg.(abs.Sequential[FunctionalLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the functionals constructor: %T\n",
 						actual,
@@ -923,7 +923,7 @@ func Functionals(args ...any) FunctionalsLike {
 func Functions(args ...any) FunctionsLike {
 	// Initialize the possible arguments.
 	var note = "// Functions"
-	var sequence col.Sequential[FunctionLike]
+	var sequence abs.Sequential[FunctionLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -932,13 +932,13 @@ func Functions(args ...any) FunctionsLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[FunctionLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[FunctionLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[FunctionLike])
+				sequence = arg.(abs.Sequential[FunctionLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the functions constructor: %T\n",
 						actual,
@@ -967,7 +967,7 @@ func GenericArguments(args ...any) GenericArgumentsLike {
 		case ArgumentsLike:
 			arguments = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the generic arguments constructor: %T\n",
 					actual,
@@ -992,7 +992,7 @@ func GenericParameters(args ...any) GenericParametersLike {
 		case ParametersLike:
 			parameters = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the generic parameters constructor: %T\n",
 					actual,
@@ -1022,7 +1022,7 @@ func Header(args ...any) HeaderLike {
 				name = actual
 			}
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the header constructor: %T\n",
 					actual,
@@ -1050,7 +1050,7 @@ func Imports(args ...any) ImportsLike {
 		case ModulesLike:
 			modules = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the imports constructor: %T\n",
 					actual,
@@ -1084,7 +1084,7 @@ func Instance(args ...any) InstanceLike {
 		case MethodsLike:
 			methods = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the instance constructor: %T\n",
 					actual,
@@ -1107,7 +1107,7 @@ func Instance(args ...any) InstanceLike {
 func Instances(args ...any) InstancesLike {
 	// Initialize the possible arguments.
 	var note = "// Instances"
-	var sequence col.Sequential[InstanceLike]
+	var sequence abs.Sequential[InstanceLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -1116,13 +1116,13 @@ func Instances(args ...any) InstancesLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[InstanceLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[InstanceLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[InstanceLike])
+				sequence = arg.(abs.Sequential[InstanceLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the instances constructor: %T\n",
 						actual,
@@ -1151,7 +1151,7 @@ func Map(args ...any) MapLike {
 		case string:
 			name = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the map constructor: %T\n",
 					actual,
@@ -1182,7 +1182,7 @@ func Method(args ...any) MethodLike {
 		case ResultLike:
 			result = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the method constructor: %T\n",
 					actual,
@@ -1204,7 +1204,7 @@ func Method(args ...any) MethodLike {
 func Methods(args ...any) MethodsLike {
 	// Initialize the possible arguments.
 	var note = "// Methods"
-	var sequence col.Sequential[MethodLike]
+	var sequence abs.Sequential[MethodLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -1213,13 +1213,13 @@ func Methods(args ...any) MethodsLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[MethodLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[MethodLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[MethodLike])
+				sequence = arg.(abs.Sequential[MethodLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the methods constructor: %T\n",
 						actual,
@@ -1269,7 +1269,7 @@ func Model(args ...any) ModelLike {
 		case AspectsLike:
 			aspects = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the model constructor: %T\n",
 					actual,
@@ -1308,7 +1308,7 @@ func Module(args ...any) ModuleLike {
 				text = actual
 			}
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the module constructor: %T\n",
 					actual,
@@ -1328,20 +1328,20 @@ func Module(args ...any) ModuleLike {
 
 func Modules(args ...any) ModulesLike {
 	// Initialize the possible arguments.
-	var sequence col.Sequential[ModuleLike]
+	var sequence abs.Sequential[ModuleLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
 		switch actual := arg.(type) {
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[ModuleLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[ModuleLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[ModuleLike])
+				sequence = arg.(abs.Sequential[ModuleLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the modules constructor: %T\n",
 						actual,
@@ -1367,7 +1367,7 @@ func Notice(args ...any) NoticeLike {
 		case string:
 			comment = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the notice constructor: %T\n",
 					actual,
@@ -1397,7 +1397,7 @@ func Parameter(args ...any) ParameterLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the parameter constructor: %T\n",
 					actual,
@@ -1425,7 +1425,7 @@ func Parameterized(args ...any) ParameterizedLike {
 		case ParametersLike:
 			parameters = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the imports constructor: %T\n",
 					actual,
@@ -1443,7 +1443,7 @@ func Parameterized(args ...any) ParameterizedLike {
 func Parameters(args ...any) ParametersLike {
 	// Initialize the possible arguments.
 	var parameter ParameterLike
-	var additionalParameters col.Sequential[AdditionalParameterLike]
+	var additionalParameters abs.Sequential[AdditionalParameterLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -1452,13 +1452,13 @@ func Parameters(args ...any) ParametersLike {
 			parameter = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[AdditionalParameterLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[AdditionalParameterLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				additionalParameters = arg.(col.Sequential[AdditionalParameterLike])
+				additionalParameters = arg.(abs.Sequential[AdditionalParameterLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the parameters constructor: %T\n",
 						actual,
@@ -1493,7 +1493,7 @@ func Prefix(args ...any) PrefixLike {
 		case ast.ChannelLike:
 			channel = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the prefix constructor: %T\n",
 					actual,
@@ -1531,7 +1531,7 @@ func Result(args ...any) ResultLike {
 		case ParameterizedLike:
 			parameterized = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the result constructor: %T\n",
 					actual,
@@ -1570,7 +1570,7 @@ func Type(args ...any) TypeLike {
 		case EnumerationLike:
 			enumeration = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the type constructor: %T\n",
 					actual,
@@ -1592,7 +1592,7 @@ func Type(args ...any) TypeLike {
 func Types(args ...any) TypesLike {
 	// Initialize the possible arguments.
 	var note = "// Types"
-	var sequence col.Sequential[TypeLike]
+	var sequence abs.Sequential[TypeLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -1601,13 +1601,13 @@ func Types(args ...any) TypesLike {
 			note = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[TypeLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[TypeLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				sequence = arg.(col.Sequential[TypeLike])
+				sequence = arg.(abs.Sequential[TypeLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the types constructor: %T\n",
 						actual,
@@ -1639,7 +1639,7 @@ func Value(args ...any) ValueLike {
 		case AbstractionLike:
 			abstraction = actual
 		default:
-			if mod.IsDefined(arg) {
+			if col.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the value constructor: %T\n",
 					actual,
@@ -1660,7 +1660,7 @@ func Value(args ...any) ValueLike {
 func Values(args ...any) ValuesLike {
 	// Initialize the possible arguments.
 	var value ValueLike
-	var additionalValues col.Sequential[AdditionalValueLike]
+	var additionalValues abs.Sequential[AdditionalValueLike]
 
 	// Process the actual arguments.
 	for _, arg := range args {
@@ -1669,13 +1669,13 @@ func Values(args ...any) ValuesLike {
 			value = actual
 		default:
 			// Unfortunately generic types must be handled reflectively.
-			var sequenceType = ref.TypeOf((*col.Sequential[AdditionalValueLike])(nil)).Elem()
+			var sequenceType = ref.TypeOf((*abs.Sequential[AdditionalValueLike])(nil)).Elem()
 			var reflectedType = ref.TypeOf(arg)
 			switch {
 			case reflectedType.Implements(sequenceType):
-				additionalValues = arg.(col.Sequential[AdditionalValueLike])
+				additionalValues = arg.(abs.Sequential[AdditionalValueLike])
 			default:
-				if mod.IsDefined(arg) {
+				if col.IsDefined(arg) {
 					var message = fmt.Sprintf(
 						"An unknown argument type was passed into the additional values constructor: %T\n",
 						actual,

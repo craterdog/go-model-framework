@@ -14,9 +14,8 @@ package agent
 
 import (
 	fmt "fmt"
-	mod "github.com/craterdog/go-collection-framework/v4"
-	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 	sts "strings"
 )
@@ -64,8 +63,8 @@ type parser_ struct {
 	// Define instance attributes.
 	class_  ParserClassLike
 	source_ string                   // The original source code.
-	tokens_ col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
-	next_   col.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
+	tokens_ abs.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
+	next_   abs.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
 }
 
 // Attributes
@@ -79,9 +78,8 @@ func (v *parser_) GetClass() ParserClassLike {
 func (v *parser_) ParseSource(source string) ast.ModelLike {
 	source = sts.ReplaceAll(source, "\t", "    ")
 	v.source_ = source
-	var notation = cdc.Notation().Make()
-	v.tokens_ = col.Queue[TokenLike](notation).MakeWithCapacity(parserClass.queueSize_)
-	v.next_ = col.Stack[TokenLike](notation).MakeWithCapacity(parserClass.stackSize_)
+	v.tokens_ = col.Queue[TokenLike](parserClass.queueSize_)
+	v.next_ = col.Stack[TokenLike](parserClass.stackSize_)
 
 	// The scanner runs in a separate Go routine.
 	Scanner().Make(v.source_, v.tokens_)
@@ -210,7 +208,7 @@ func (v *parser_) parseAbstraction() (
 	var name string
 	name, token, ok = v.parseToken(NameToken, "")
 	if !ok {
-		if mod.IsDefined(prefix) || mod.IsDefined(alias) {
+		if col.IsDefined(prefix) || col.IsDefined(alias) {
 			var message = v.formatError(token)
 			message += v.generateSyntax("name",
 				"Abstraction",
@@ -265,8 +263,7 @@ func (v *parser_) parseAbstractions() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AbstractionLike](notation).Make()
+	var list = col.List[ast.AbstractionLike]()
 	for ok {
 		list.AppendValue(abstraction)
 		abstraction, token, ok = v.parseAbstraction()
@@ -409,8 +406,7 @@ func (v *parser_) parseArguments() (
 	}
 
 	// Attempt to parse zero or more additional arguments.
-	var notation = cdc.Notation().Make()
-	var additionalArguments = col.List[ast.AdditionalArgumentLike](notation).Make()
+	var additionalArguments = col.List[ast.AdditionalArgumentLike]()
 	var additionalArgument ast.AdditionalArgumentLike
 	additionalArgument, token, ok = v.parseAdditionalArgument()
 	for ok {
@@ -499,8 +495,7 @@ func (v *parser_) parseAspect() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var methods = col.List[ast.MethodLike](notation).Make()
+	var methods = col.List[ast.MethodLike]()
 	for ok {
 		methods.AppendValue(method)
 		method, _, ok = v.parseMethod()
@@ -547,24 +542,23 @@ func (v *parser_) parseAspects() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AspectLike](notation).Make()
+	var list = col.List[ast.AspectLike]()
 	for ok {
 		list.AppendValue(aspect)
 		aspect, token, ok = v.parseAspect()
 	}
 
 	// Found a sequence of aspects.
-	list.SortValuesWithRanker(func(first, second ast.AspectLike) mod.Rank {
+	list.SortValuesWithRanker(func(first, second ast.AspectLike) col.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return mod.LesserRank
+			return col.LesserRank
 		case firstName > secondName:
-			return mod.GreaterRank
+			return col.GreaterRank
 		default:
-			return mod.EqualRank
+			return col.EqualRank
 		}
 	})
 	aspects = ast.Aspects().Make(note, list)
@@ -643,8 +637,7 @@ func (v *parser_) parseAttributes() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.AttributeLike](notation).Make()
+	var list = col.List[ast.AttributeLike]()
 	for ok {
 		list.AppendValue(attribute)
 		attribute, token, ok = v.parseAttribute()
@@ -777,24 +770,23 @@ func (v *parser_) parseClasses() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.ClassLike](notation).Make()
+	var list = col.List[ast.ClassLike]()
 	for ok {
 		list.AppendValue(class)
 		class, token, ok = v.parseClass()
 	}
 
 	// Found a sequence of classes.
-	list.SortValuesWithRanker(func(first, second ast.ClassLike) mod.Rank {
+	list.SortValuesWithRanker(func(first, second ast.ClassLike) col.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return mod.LesserRank
+			return col.LesserRank
 		case firstName > secondName:
-			return mod.GreaterRank
+			return col.GreaterRank
 		default:
-			return mod.EqualRank
+			return col.EqualRank
 		}
 	})
 	classes = ast.Classes().Make(note, list)
@@ -868,8 +860,7 @@ func (v *parser_) parseConstants() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.ConstantLike](notation).Make()
+	var list = col.List[ast.ConstantLike]()
 	for ok {
 		list.AppendValue(constant)
 		constant, token, ok = v.parseConstant()
@@ -952,8 +943,7 @@ func (v *parser_) parseConstructors() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.ConstructorLike](notation).Make()
+	var list = col.List[ast.ConstructorLike]()
 	for ok {
 		list.AppendValue(constructor)
 		constructor, token, ok = v.parseConstructor()
@@ -1215,24 +1205,23 @@ func (v *parser_) parseFunctionals() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.FunctionalLike](notation).Make()
+	var list = col.List[ast.FunctionalLike]()
 	for ok {
 		list.AppendValue(functional)
 		functional, token, ok = v.parseFunctional()
 	}
 
 	// Found a sequence of functionals.
-	list.SortValuesWithRanker(func(first, second ast.FunctionalLike) mod.Rank {
+	list.SortValuesWithRanker(func(first, second ast.FunctionalLike) col.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return mod.LesserRank
+			return col.LesserRank
 		case firstName > secondName:
-			return mod.GreaterRank
+			return col.GreaterRank
 		default:
-			return mod.EqualRank
+			return col.EqualRank
 		}
 	})
 	functionals = ast.Functionals().Make(note, list)
@@ -1263,8 +1252,7 @@ func (v *parser_) parseFunctions() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.FunctionLike](notation).Make()
+	var list = col.List[ast.FunctionLike]()
 	for ok {
 		list.AppendValue(function)
 		function, token, ok = v.parseFunction()
@@ -1550,24 +1538,23 @@ func (v *parser_) parseInstances() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.InstanceLike](notation).Make()
+	var list = col.List[ast.InstanceLike]()
 	for ok {
 		list.AppendValue(instance)
 		instance, token, ok = v.parseInstance()
 	}
 
 	// Found a sequence of instances.
-	list.SortValuesWithRanker(func(first, second ast.InstanceLike) mod.Rank {
+	list.SortValuesWithRanker(func(first, second ast.InstanceLike) col.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return mod.LesserRank
+			return col.LesserRank
 		case firstName > secondName:
-			return mod.GreaterRank
+			return col.GreaterRank
 		default:
-			return mod.EqualRank
+			return col.EqualRank
 		}
 	})
 	instances = ast.Instances().Make(note, list)
@@ -1695,8 +1682,7 @@ func (v *parser_) parseMethods() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.MethodLike](notation).Make()
+	var list = col.List[ast.MethodLike]()
 	for ok {
 		list.AppendValue(method)
 		method, token, ok = v.parseMethod()
@@ -1806,8 +1792,7 @@ func (v *parser_) parseModules() (
 	ok bool,
 ) {
 	// Attempt to parse a sequence of modules.
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.ModuleLike](notation).Make()
+	var list = col.List[ast.ModuleLike]()
 	var module ast.ModuleLike
 	module, token, ok = v.parseModule()
 	for ok {
@@ -1816,16 +1801,16 @@ func (v *parser_) parseModules() (
 	}
 
 	// Found a sequence of modules.
-	list.SortValuesWithRanker(func(first, second ast.ModuleLike) mod.Rank {
+	list.SortValuesWithRanker(func(first, second ast.ModuleLike) col.Rank {
 		var firstPath = first.GetPath()
 		var secondPath = second.GetPath()
 		switch {
 		case firstPath < secondPath:
-			return mod.LesserRank
+			return col.LesserRank
 		case firstPath > secondPath:
-			return mod.GreaterRank
+			return col.GreaterRank
 		default:
-			return mod.EqualRank
+			return col.EqualRank
 		}
 	})
 	modules = ast.Modules().Make(list)
@@ -1934,8 +1919,7 @@ func (v *parser_) parseParameters() (
 	}
 
 	// Attempt to parse zero or more additional parameters.
-	var notation = cdc.Notation().Make()
-	var additionalParameters = col.List[ast.AdditionalParameterLike](notation).Make()
+	var additionalParameters = col.List[ast.AdditionalParameterLike]()
 	var additionalParameter ast.AdditionalParameterLike
 	additionalParameter, token, ok = v.parseAdditionalParameter()
 	for ok {
@@ -2019,7 +2003,7 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 	if token.GetType() == expectedType {
 		// Found the right token type.
 		value = token.GetValue()
-		if mod.IsUndefined(expectedValue) || value == expectedValue {
+		if col.IsUndefined(expectedValue) || value == expectedValue {
 			// Found the right token value.
 			return value, token, true
 		}
@@ -2090,24 +2074,23 @@ func (v *parser_) parseTypes() (
 		)
 		panic(message)
 	}
-	var notation = cdc.Notation().Make()
-	var list = col.List[ast.TypeLike](notation).Make()
+	var list = col.List[ast.TypeLike]()
 	for ok {
 		list.AppendValue(type_)
 		type_, token, ok = v.parseType()
 	}
 
 	// Found a sequence of types.
-	list.SortValuesWithRanker(func(first, second ast.TypeLike) mod.Rank {
+	list.SortValuesWithRanker(func(first, second ast.TypeLike) col.Rank {
 		var firstName = first.GetDeclaration().GetName()
 		var secondName = second.GetDeclaration().GetName()
 		switch {
 		case firstName < secondName:
-			return mod.LesserRank
+			return col.LesserRank
 		case firstName > secondName:
-			return mod.GreaterRank
+			return col.GreaterRank
 		default:
-			return mod.EqualRank
+			return col.EqualRank
 		}
 	})
 	types = ast.Types().Make(note, list)
@@ -2180,8 +2163,7 @@ func (v *parser_) parseValues() (
 	}
 
 	// Attempt to parse zero or more additional values.
-	var notation = cdc.Notation().Make()
-	var additionalValues = col.List[ast.AdditionalValueLike](notation).Make()
+	var additionalValues = col.List[ast.AdditionalValueLike]()
 	var additionalValue ast.AdditionalValueLike
 	additionalValue, token, ok = v.parseAdditionalValue()
 	for ok {

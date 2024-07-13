@@ -13,8 +13,8 @@
 package ast
 
 import (
-	mod "github.com/craterdog/go-collection-framework/v4"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -43,13 +43,13 @@ type constructorsClass_ struct {
 
 func (c *constructorsClass_) Make(
 	note string,
-	constructors col.Sequential[ConstructorLike],
+	constructors abs.Sequential[ConstructorLike],
 ) ConstructorsLike {
 	// Validate the arguments.
 	switch {
-	case mod.IsUndefined(note):
+	case col.IsUndefined(note):
 		panic("The note attribute is required for each Constructors.")
-	case mod.IsUndefined(constructors):
+	case col.IsUndefined(constructors):
 		panic("The constructors attribute is required for each Constructors.")
 	default:
 		return &constructors_{
@@ -69,7 +69,7 @@ type constructors_ struct {
 	// Define instance attributes.
 	class_        ConstructorsClassLike
 	note_         string
-	constructors_ col.Sequential[ConstructorLike]
+	constructors_ abs.Sequential[ConstructorLike]
 }
 
 // Attributes
@@ -82,7 +82,7 @@ func (v *constructors_) GetNote() string {
 	return v.note_
 }
 
-func (v *constructors_) GetConstructors() col.Sequential[ConstructorLike] {
+func (v *constructors_) GetConstructors() abs.Sequential[ConstructorLike] {
 	return v.constructors_
 }
 
