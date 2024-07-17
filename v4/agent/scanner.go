@@ -37,12 +37,12 @@ var scannerClass = &scannerClass_{
 		SpaceToken:     "space",
 	},
 	matchers_: map[TokenType]*reg.Regexp{
-		CommentToken:   reg.MustCompile(`^(?:` + comment_ + `)`),
-		DelimiterToken: reg.MustCompile(`^(?:` + delimiter_ + `)`),
-		NameToken:      reg.MustCompile(`^(?:` + name_ + `)`),
-		NoteToken:      reg.MustCompile(`^(?:` + note_ + `)`),
-		PathToken:      reg.MustCompile(`^(?:` + path_ + `)`),
-		SpaceToken:     reg.MustCompile(`^(?:` + space_ + `)`),
+		CommentToken:   reg.MustCompile("^(?:" + comment_ + ")"),
+		DelimiterToken: reg.MustCompile("^(?:" + delimiter_ + ")"),
+		NameToken:      reg.MustCompile("^(?:" + name_ + ")"),
+		NoteToken:      reg.MustCompile("^(?:" + note_ + ")"),
+		PathToken:      reg.MustCompile("^(?:" + path_ + ")"),
+		SpaceToken:     reg.MustCompile("^(?:" + space_ + ")"),
 	},
 }
 
@@ -224,17 +224,17 @@ way.  We append an underscore to each name to lessen the chance of a name
 collision with other private Go class constants in this package.
 */
 const (
-	any_       = `.|\n`
-	comment_   = `/\*` + `((?:` + any_ + `)*?)` + `\*/\n`
-	control_   = `\p{Cc}`
-	delimiter_ = `[[\](){}\.,=]`
-	digit_     = `\p{Nd}`
-	eof_       = `\z`
-	letter_    = lower_ + `|` + upper_ + `|_`
-	lower_     = `\p{Ll}`
-	name_      = `(?:` + letter_ + `)(?:` + letter_ + `|` + digit_ + `)*_?`
-	note_      = `\/\/ [^` + control_ + `]*`
-	path_      = `"(?:` + any_ + `)*?"` // This returns the shortest match.
-	space_     = `[ \t\r\n]+`
-	upper_     = `\p{Lu}`
+	any_       = ".|\\n"
+	comment_   = "/\\*" + "((?:" + any_ + ")*?)" + "\\*/\\n"
+	control_   = "\\p{Cc}"
+	delimiter_ = "[[\\](){}\\.,=]"
+	digit_     = "\\p{Nd}"
+	eof_       = "\\z"
+	letter_    = lower_ + "|" + upper_ + "|_"
+	lower_     = "\\p{Ll}"
+	name_      = "(?:" + letter_ + ")(?:" + letter_ + "|" + digit_ + ")*_?"
+	note_      = "\\/\\/ [^" + control_ + "]*"
+	path_      = "\"(?:" + any_ + ")*?\"" // This returns the shortest match.
+	space_     = "[ \\t\\r\\n]+"
+	upper_     = "\\p{Lu}"
 )
