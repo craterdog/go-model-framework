@@ -348,7 +348,7 @@ func (v *generator_) extractTargetType(
 			var constructor = iterator.GetNext()
 			var name = constructor.GetName()
 			if name == "MakeFromValue" {
-				// We found a primitive value target type.
+				// We found an intrinsic value target type.
 				var parameter = constructor.GetOptionalParameters().GetParameter()
 				var abstraction = parameter.GetAbstraction()
 				var formatter = Formatter().Make()
