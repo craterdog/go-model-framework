@@ -48,9 +48,9 @@ func (c *functionalClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(declaration):
-		panic("The declaration attribute is required for each Functional.")
+		panic("The declaration attribute is required by this class.")
 	case col.IsUndefined(result):
-		panic("The result attribute is required for each Functional.")
+		panic("The result attribute is required by this class.")
 	default:
 		return &functional_{
 			// Initialize instance attributes.

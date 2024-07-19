@@ -48,9 +48,9 @@ func (c *constructorsClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(note):
-		panic("The note attribute is required for each Constructors.")
+		panic("The note attribute is required by this class.")
 	case col.IsUndefined(constructors):
-		panic("The constructors attribute is required for each Constructors.")
+		panic("The constructors attribute is required by this class.")
 	default:
 		return &constructors_{
 			// Initialize instance attributes.

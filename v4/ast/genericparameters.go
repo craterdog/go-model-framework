@@ -44,7 +44,7 @@ func (c *genericParametersClass_) Make(parameters ParametersLike) GenericParamet
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(parameters):
-		panic("The parameters attribute is required for each GenericParameters.")
+		panic("The parameters attribute is required by this class.")
 	default:
 		return &genericParameters_{
 			// Initialize instance attributes.

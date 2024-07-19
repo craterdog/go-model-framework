@@ -48,7 +48,7 @@ func (c *methodClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Method.")
+		panic("The name attribute is required by this class.")
 	default:
 		return &method_{
 			// Initialize instance attributes.

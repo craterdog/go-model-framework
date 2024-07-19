@@ -48,9 +48,9 @@ func (c *functionalsClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(note):
-		panic("The note attribute is required for each Functionals.")
+		panic("The note attribute is required by this class.")
 	case col.IsUndefined(functionals):
-		panic("The functionals attribute is required for each Functionals.")
+		panic("The functionals attribute is required by this class.")
 	default:
 		return &functionals_{
 			// Initialize instance attributes.

@@ -44,7 +44,7 @@ func (c *parameterizedClass_) Make(parameters ParametersLike) ParameterizedLike 
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(parameters):
-		panic("The parameters attribute is required for each Parameterized.")
+		panic("The parameters attribute is required by this class.")
 	default:
 		return &parameterized_{
 			// Initialize instance attributes.

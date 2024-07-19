@@ -53,13 +53,13 @@ func (c *modelClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(notice):
-		panic("The notice attribute is required for each Model.")
+		panic("The notice attribute is required by this class.")
 	case col.IsUndefined(header):
-		panic("The header attribute is required for each Model.")
+		panic("The header attribute is required by this class.")
 	case col.IsUndefined(classes):
-		panic("The classes attribute is required for each Model.")
+		panic("The classes attribute is required by this class.")
 	case col.IsUndefined(instances):
-		panic("The instances attribute is required for each Model.")
+		panic("The instances attribute is required by this class.")
 	default:
 		return &model_{
 			// Initialize instance attributes.

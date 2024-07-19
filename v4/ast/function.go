@@ -48,9 +48,9 @@ func (c *functionClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Function.")
+		panic("The name attribute is required by this class.")
 	case col.IsUndefined(result):
-		panic("The result attribute is required for each Function.")
+		panic("The result attribute is required by this class.")
 	default:
 		return &function_{
 			// Initialize instance attributes.

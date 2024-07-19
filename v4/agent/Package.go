@@ -43,7 +43,7 @@ const (
 	ErrorToken TokenType = iota
 	CommentToken
 	DelimiterToken
-	EOFToken
+	EofToken
 	NameToken
 	NoteToken
 	PathToken

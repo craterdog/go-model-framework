@@ -48,9 +48,9 @@ func (c *valuesClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(value):
-		panic("The value attribute is required for each Values.")
+		panic("The value attribute is required by this class.")
 	case col.IsUndefined(additionalValues):
-		panic("The additionalValues attribute is required for each Values.")
+		panic("The additionalValues attribute is required by this class.")
 	default:
 		return &values_{
 			// Initialize instance attributes.

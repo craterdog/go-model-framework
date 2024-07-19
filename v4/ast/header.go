@@ -47,9 +47,9 @@ func (c *headerClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(comment):
-		panic("The comment attribute is required for each Header.")
+		panic("The comment attribute is required by this class.")
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Header.")
+		panic("The name attribute is required by this class.")
 	default:
 		return &header_{
 			// Initialize instance attributes.

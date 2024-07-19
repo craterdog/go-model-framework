@@ -48,9 +48,9 @@ func (c *constantsClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(note):
-		panic("The note attribute is required for each Constants.")
+		panic("The note attribute is required by this class.")
 	case col.IsUndefined(constants):
-		panic("The constants attribute is required for each Constants.")
+		panic("The constants attribute is required by this class.")
 	default:
 		return &constants_{
 			// Initialize instance attributes.

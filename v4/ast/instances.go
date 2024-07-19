@@ -48,9 +48,9 @@ func (c *instancesClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(note):
-		panic("The note attribute is required for each Instances.")
+		panic("The note attribute is required by this class.")
 	case col.IsUndefined(instances):
-		panic("The instances attribute is required for each Instances.")
+		panic("The instances attribute is required by this class.")
 	default:
 		return &instances_{
 			// Initialize instance attributes.

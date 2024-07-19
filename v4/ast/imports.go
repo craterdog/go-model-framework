@@ -44,7 +44,7 @@ func (c *importsClass_) Make(modules ModulesLike) ImportsLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(modules):
-		panic("The modules attribute is required for each Imports.")
+		panic("The modules attribute is required by this class.")
 	default:
 		return &imports_{
 			// Initialize instance attributes.

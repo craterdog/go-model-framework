@@ -30,7 +30,7 @@ var scannerClass = &scannerClass_{
 		ErrorToken:     "error",
 		CommentToken:   "comment",
 		DelimiterToken: "delimiter",
-		EOFToken:       "EOF",
+		EofToken:       "eof",
 		NameToken:      "name",
 		NoteToken:      "note",
 		PathToken:      "path",
@@ -154,8 +154,8 @@ func (v *scanner_) emitToken(type_ TokenType) {
 	v.tokens_.AddValue(token) // This will block if the queue is full.
 }
 
-func (v *scanner_) foundEOF() {
-	v.emitToken(EOFToken)
+func (v *scanner_) foundEof() {
+	v.emitToken(EofToken)
 }
 
 func (v *scanner_) foundError() {
@@ -177,7 +177,7 @@ func (v *scanner_) foundToken(type_ TokenType) bool {
 		var count = sts.Count(match, "\n")
 		if count > 0 {
 			v.line_ += count
-			v.position_ = v.indexOfLastEOL(token)
+			v.position_ = v.indexOfLastEol(token)
 		} else {
 			v.position_ += v.next_ - v.first_
 		}
@@ -187,7 +187,7 @@ func (v *scanner_) foundToken(type_ TokenType) bool {
 	return false
 }
 
-func (v *scanner_) indexOfLastEOL(runes []rune) int {
+func (v *scanner_) indexOfLastEol(runes []rune) int {
 	var length = len(runes)
 	for index := length; index > 0; index-- {
 		if runes[index-1] == '\n' {
@@ -212,7 +212,7 @@ loop:
 			break loop
 		}
 	}
-	v.foundEOF()
+	v.foundEof()
 }
 
 /*

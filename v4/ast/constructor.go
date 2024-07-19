@@ -48,9 +48,9 @@ func (c *constructorClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Constructor.")
+		panic("The name attribute is required by this class.")
 	case col.IsUndefined(abstraction):
-		panic("The abstraction attribute is required for each Constructor.")
+		panic("The abstraction attribute is required by this class.")
 	default:
 		return &constructor_{
 			// Initialize instance attributes.

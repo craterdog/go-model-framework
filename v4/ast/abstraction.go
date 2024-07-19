@@ -49,7 +49,7 @@ func (c *abstractionClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Abstraction.")
+		panic("The name attribute is required by this class.")
 	default:
 		return &abstraction_{
 			// Initialize instance attributes.

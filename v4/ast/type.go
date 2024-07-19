@@ -48,9 +48,9 @@ func (c *typeClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(declaration):
-		panic("The declaration attribute is required for each Type.")
+		panic("The declaration attribute is required by this class.")
 	case col.IsUndefined(abstraction):
-		panic("The abstraction attribute is required for each Type.")
+		panic("The abstraction attribute is required by this class.")
 	default:
 		return &type_{
 			// Initialize instance attributes.

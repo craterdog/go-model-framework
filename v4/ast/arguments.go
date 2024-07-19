@@ -48,9 +48,9 @@ func (c *argumentsClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(argument):
-		panic("The argument attribute is required for each Arguments.")
+		panic("The argument attribute is required by this class.")
 	case col.IsUndefined(additionalArguments):
-		panic("The additionalArguments attribute is required for each Arguments.")
+		panic("The additionalArguments attribute is required by this class.")
 	default:
 		return &arguments_{
 			// Initialize instance attributes.

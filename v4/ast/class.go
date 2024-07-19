@@ -49,9 +49,9 @@ func (c *classClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(declaration):
-		panic("The declaration attribute is required for each Class.")
+		panic("The declaration attribute is required by this class.")
 	case col.IsUndefined(constructors):
-		panic("The constructors attribute is required for each Class.")
+		panic("The constructors attribute is required by this class.")
 	default:
 		return &class_{
 			// Initialize instance attributes.

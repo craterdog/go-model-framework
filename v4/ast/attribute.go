@@ -48,7 +48,7 @@ func (c *attributeClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Attribute.")
+		panic("The name attribute is required by this class.")
 	default:
 		return &attribute_{
 			// Initialize instance attributes.

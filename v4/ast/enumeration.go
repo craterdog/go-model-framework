@@ -44,7 +44,7 @@ func (c *enumerationClass_) Make(values ValuesLike) EnumerationLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(values):
-		panic("The values attribute is required for each Enumeration.")
+		panic("The values attribute is required by this class.")
 	default:
 		return &enumeration_{
 			// Initialize instance attributes.

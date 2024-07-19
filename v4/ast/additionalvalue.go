@@ -44,7 +44,7 @@ func (c *additionalValueClass_) Make(name string) AdditionalValueLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each AdditionalValue.")
+		panic("The name attribute is required by this class.")
 	default:
 		return &additionalValue_{
 			// Initialize instance attributes.

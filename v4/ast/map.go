@@ -44,7 +44,7 @@ func (c *mapClass_) Make(name string) MapLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Map.")
+		panic("The name attribute is required by this class.")
 	default:
 		return &map_{
 			// Initialize instance attributes.

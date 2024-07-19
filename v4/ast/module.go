@@ -47,9 +47,9 @@ func (c *moduleClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Module.")
+		panic("The name attribute is required by this class.")
 	case col.IsUndefined(path):
-		panic("The path attribute is required for each Module.")
+		panic("The path attribute is required by this class.")
 	default:
 		return &module_{
 			// Initialize instance attributes.

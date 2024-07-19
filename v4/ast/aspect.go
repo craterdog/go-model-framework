@@ -48,9 +48,9 @@ func (c *aspectClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(declaration):
-		panic("The declaration attribute is required for each Aspect.")
+		panic("The declaration attribute is required by this class.")
 	case col.IsUndefined(methods):
-		panic("The methods attribute is required for each Aspect.")
+		panic("The methods attribute is required by this class.")
 	default:
 		return &aspect_{
 			// Initialize instance attributes.

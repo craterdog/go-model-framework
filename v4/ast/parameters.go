@@ -48,9 +48,9 @@ func (c *parametersClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(parameter):
-		panic("The parameter attribute is required for each Parameters.")
+		panic("The parameter attribute is required by this class.")
 	case col.IsUndefined(additionalParameters):
-		panic("The additionalParameters attribute is required for each Parameters.")
+		panic("The additionalParameters attribute is required by this class.")
 	default:
 		return &parameters_{
 			// Initialize instance attributes.

@@ -48,9 +48,9 @@ func (c *methodsClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(note):
-		panic("The note attribute is required for each Methods.")
+		panic("The note attribute is required by this class.")
 	case col.IsUndefined(methods):
-		panic("The methods attribute is required for each Methods.")
+		panic("The methods attribute is required by this class.")
 	default:
 		return &methods_{
 			// Initialize instance attributes.

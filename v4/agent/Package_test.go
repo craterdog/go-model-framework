@@ -418,11 +418,11 @@ func (c *complexClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(realPart):
-		panic("The realPart attribute is required for each Complex.")
+		panic("The realPart attribute is required by this class.")
 	case col.IsUndefined(imaginaryPart):
-		panic("The imaginaryPart attribute is required for each Complex.")
+		panic("The imaginaryPart attribute is required by this class.")
 	case col.IsUndefined(form):
-		panic("The form attribute is required for each Complex.")
+		panic("The form attribute is required by this class.")
 	default:
 		return &complex_{
 			// Initialize instance attributes.
@@ -665,9 +665,9 @@ func (c *associationClass_[K, V]) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(key):
-		panic("The key attribute is required for each Association.")
+		panic("The key attribute is required by this class.")
 	case col.IsUndefined(value):
-		panic("The value attribute is required for each Association.")
+		panic("The value attribute is required by this class.")
 	default:
 		return &association_[K, V]{
 			// Initialize instance attributes.

@@ -44,7 +44,7 @@ func (c *argumentClass_) Make(abstraction AbstractionLike) ArgumentLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(abstraction):
-		panic("The abstraction attribute is required for each Argument.")
+		panic("The abstraction attribute is required by this class.")
 	default:
 		return &argument_{
 			// Initialize instance attributes.

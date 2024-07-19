@@ -44,7 +44,7 @@ func (c *genericArgumentsClass_) Make(arguments ArgumentsLike) GenericArgumentsL
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(arguments):
-		panic("The arguments attribute is required for each GenericArguments.")
+		panic("The arguments attribute is required by this class.")
 	default:
 		return &genericArguments_{
 			// Initialize instance attributes.

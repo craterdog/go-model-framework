@@ -44,7 +44,7 @@ func (c *noticeClass_) Make(comment string) NoticeLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(comment):
-		panic("The comment attribute is required for each Notice.")
+		panic("The comment attribute is required by this class.")
 	default:
 		return &notice_{
 			// Initialize instance attributes.

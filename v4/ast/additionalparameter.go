@@ -44,7 +44,7 @@ func (c *additionalParameterClass_) Make(parameter ParameterLike) AdditionalPara
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(parameter):
-		panic("The parameter attribute is required for each AdditionalParameter.")
+		panic("The parameter attribute is required by this class.")
 	default:
 		return &additionalParameter_{
 			// Initialize instance attributes.

@@ -44,7 +44,7 @@ func (c *prefixClass_) Make(any any) PrefixLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(any):
-		panic("The any attribute is required for each Prefix.")
+		panic("The any attribute is required by this class.")
 	default:
 		return &prefix_{
 			// Initialize instance attributes.

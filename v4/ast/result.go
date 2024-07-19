@@ -44,7 +44,7 @@ func (c *resultClass_) Make(any any) ResultLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(any):
-		panic("The any attribute is required for each Result.")
+		panic("The any attribute is required by this class.")
 	default:
 		return &result_{
 			// Initialize instance attributes.

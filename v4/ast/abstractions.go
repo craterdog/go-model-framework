@@ -48,9 +48,9 @@ func (c *abstractionsClass_) Make(
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(note):
-		panic("The note attribute is required for each Abstractions.")
+		panic("The note attribute is required by this class.")
 	case col.IsUndefined(abstractions):
-		panic("The abstractions attribute is required for each Abstractions.")
+		panic("The abstractions attribute is required by this class.")
 	default:
 		return &abstractions_{
 			// Initialize instance attributes.

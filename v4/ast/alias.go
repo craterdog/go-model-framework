@@ -44,7 +44,7 @@ func (c *aliasClass_) Make(name string) AliasLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
-		panic("The name attribute is required for each Alias.")
+		panic("The name attribute is required by this class.")
 	default:
 		return &alias_{
 			// Initialize instance attributes.

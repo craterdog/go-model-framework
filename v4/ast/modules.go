@@ -45,7 +45,7 @@ func (c *modulesClass_) Make(modules abs.Sequential[ModuleLike]) ModulesLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(modules):
-		panic("The modules attribute is required for each Modules.")
+		panic("The modules attribute is required by this class.")
 	default:
 		return &modules_{
 			// Initialize instance attributes.

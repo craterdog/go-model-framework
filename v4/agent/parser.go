@@ -103,7 +103,7 @@ func (v *parser_) ParseSource(source string) ast.ModelLike {
 	}
 
 	// Attempt to parse the end-of-file marker.
-	_, token, ok = v.parseToken(EOFToken, "")
+	_, token, ok = v.parseToken(EofToken, "")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("EOF",
