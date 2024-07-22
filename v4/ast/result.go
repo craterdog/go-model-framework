@@ -40,16 +40,16 @@ type resultClass_ struct {
 
 // Constructors
 
-func (c *resultClass_) Make(any any) ResultLike {
+func (c *resultClass_) Make(any_ any) ResultLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(any):
+	case col.IsUndefined(any_):
 		panic("The any attribute is required by this class.")
 	default:
 		return &result_{
 			// Initialize instance attributes.
 			class_: c,
-			any_:   any,
+			any_:   any_,
 		}
 	}
 }

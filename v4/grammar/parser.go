@@ -10,7 +10,7 @@
 ................................................................................
 */
 
-package agent
+package grammar
 
 import (
 	fmt "fmt"
@@ -25,7 +25,7 @@ import (
 // Reference
 
 var parserClass = &parserClass_{
-	// Initialize class constants.
+	// Initialize the class constants.
 	queueSize_: 16,
 	stackSize_: 4,
 }
@@ -41,7 +41,7 @@ func Parser() ParserClassLike {
 // Target
 
 type parserClass_ struct {
-	// Define class constants.
+	// Define the class constants.
 	queueSize_ uint
 	stackSize_ uint
 }
@@ -50,7 +50,7 @@ type parserClass_ struct {
 
 func (c *parserClass_) Make() ParserLike {
 	return &parser_{
-		// Initialize instance attributes.
+		// Initialize the instance attributes.
 		class_: c,
 	}
 }
@@ -60,7 +60,7 @@ func (c *parserClass_) Make() ParserLike {
 // Target
 
 type parser_ struct {
-	// Define instance attributes.
+	// Define the instance attributes.
 	class_  ParserClassLike
 	source_ string                   // The original source code.
 	tokens_ abs.QueueLike[TokenLike] // A queue of unread tokens from the scanner.

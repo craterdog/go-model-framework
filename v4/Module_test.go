@@ -23,7 +23,7 @@ import (
 
 var testModels = []string{
 	"ast/Package.go",
-	"agent/Package.go",
+	"grammar/Package.go",
 }
 
 func TestRoundTrips(t *tes.T) {

@@ -10,13 +10,14 @@
 ................................................................................
 */
 
-package agent
+package generator
 
 import (
 	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
+	gra "github.com/craterdog/go-model-framework/v4/grammar"
 	sts "strings"
 	tim "time"
 	uni "unicode"
@@ -77,7 +78,7 @@ func (v *generator_) CreateClassStructure(
 	copyright = v.expandCopyright(copyright)
 	var source = sts.ReplaceAll(complexTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
-	var parser = Parser().Make()
+	var parser = gra.Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
 }
@@ -89,7 +90,7 @@ func (v *generator_) CreateClassType(
 	copyright = v.expandCopyright(copyright)
 	var source = sts.ReplaceAll(angleTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
-	var parser = Parser().Make()
+	var parser = gra.Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
 }
@@ -101,7 +102,7 @@ func (v *generator_) CreateGenericStructure(
 	copyright = v.expandCopyright(copyright)
 	var source = sts.ReplaceAll(catalogTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
-	var parser = Parser().Make()
+	var parser = gra.Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
 }
@@ -113,7 +114,7 @@ func (v *generator_) CreateGenericType(
 	copyright = v.expandCopyright(copyright)
 	var source = sts.ReplaceAll(arrayTemplate_, "<Copyright>", copyright)
 	source = sts.ReplaceAll(source, "<name>", name)
-	var parser = Parser().Make()
+	var parser = gra.Parser().Make()
 	var model = parser.ParseSource(source)
 	return model
 }
@@ -244,7 +245,7 @@ func (v *generator_) extractAttributeNameAndType(
 		abstraction = parameter.GetAbstraction()
 	}
 	attributeName = v.makePrivate(attributeName)
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	attributeType = formatter.FormatAbstraction(abstraction)
 	return attributeName, attributeType
 }
@@ -316,7 +317,7 @@ func (v *generator_) extractParameterAttribute(
 	var parameterName = parameter.GetName()
 	parameterName = sts.TrimSuffix(parameterName, "_")
 	var abstraction = parameter.GetAbstraction()
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	var parameterType = formatter.FormatAbstraction(abstraction)
 	attributes.SetValue(parameterName, parameterType)
 }
@@ -351,7 +352,7 @@ func (v *generator_) extractTargetType(
 				// We found an intrinsic value target type.
 				var parameter = constructor.GetOptionalParameters().GetParameter()
 				var abstraction = parameter.GetAbstraction()
-				var formatter = Formatter().Make()
+				var formatter = gra.Formatter().Make()
 				targetType = formatter.FormatAbstraction(abstraction)
 				break
 			}
@@ -398,7 +399,7 @@ func (v *generator_) generateAbstractions(
 	for iterator.HasNext() {
 		// Each aspect abstraction binds to its own concrete arguments.
 		var abstraction = iterator.GetNext()
-		var formatter = Formatter().Make()
+		var formatter = gra.Formatter().Make()
 		var aspectName = formatter.FormatAbstraction(abstraction)
 		var instanceAspect = instanceAspectTemplate_
 		instanceAspect = sts.ReplaceAll(instanceAspect, "<AspectName>", aspectName)
@@ -561,7 +562,7 @@ func (v *generator_) generateAttributeMethods(
 			default:
 				body = setterClassTemplate_
 			}
-			var formatter = Formatter().Make()
+			var formatter = gra.Formatter().Make()
 			parameter = formatter.FormatParameter(attributeParameter)
 			parameterName = attributeParameter.GetName()
 		} else {
@@ -634,7 +635,7 @@ func (v *generator_) generateClass(
 	if col.IsDefined(genericParameters) {
 		var classParameters = genericParameters.GetParameters()
 		var classArguments = v.extractArguments(classParameters)
-		var formatter = Formatter().Make()
+		var formatter = gra.Formatter().Make()
 		parameters = "[" + formatter.FormatParameters(classParameters) + "]"
 		arguments = "[" + formatter.FormatArguments(classArguments) + "]"
 	}
@@ -684,7 +685,7 @@ func (v *generator_) generateClassConstants(
 	}
 
 	// Generate the code for each private class constant declaration.
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	var iterator = classConstants.GetConstants().GetIterator()
 	for iterator.HasNext() {
 		var classConstant = iterator.GetNext()
@@ -754,7 +755,7 @@ func (v *generator_) generateConstantMethods(
 
 	// Generate the code for each class constant access method.
 	implementation = "\n// Constants\n"
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	var iterator = classConstants.GetConstants().GetIterator()
 	for iterator.HasNext() {
 		var constant = iterator.GetNext()
@@ -782,7 +783,7 @@ func (v *generator_) generateConstructorMethods(
 ) {
 	// Generate the code for each class constructor method.
 	implementation = "\n// Constructors\n"
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	var classConstructors = class.GetConstructors()
 	var iterator = classConstructors.GetConstructors().GetIterator()
 	for iterator.HasNext() {
@@ -845,7 +846,7 @@ func (v *generator_) generateFunctionMethods(
 
 	// Generate the code for each class function method.
 	implementation = "\n// Functions\n"
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	var iterator = classFunctions.GetFunctions().GetIterator()
 	for iterator.HasNext() {
 		var function = iterator.GetNext()
@@ -1043,7 +1044,7 @@ func (v *generator_) generateMethodImplementation(
 
 	// Generate the method parameters.
 	var parameters string
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	var methodParameters = method.GetOptionalParameters()
 	if col.IsDefined(methodParameters) {
 		if col.IsDefined(mappings) && mappings.GetSize() > 0 {
@@ -1103,7 +1104,7 @@ func (v *generator_) generatePublicMethods(
 
 	// Generate the code for each instance public method.
 	implementation = "\n// Public\n"
-	var formatter = Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	var iterator = instanceMethods.GetMethods().GetIterator()
 	for iterator.HasNext() {
 		var publicMethod = iterator.GetNext()

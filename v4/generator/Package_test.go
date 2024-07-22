@@ -10,17 +10,17 @@
 ................................................................................
 */
 
-package agent_test
+package generator_test
 
 import (
-	age "github.com/craterdog/go-model-framework/v4/agent"
+	gen "github.com/craterdog/go-model-framework/v4/generator"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestCreateClassType(t *tes.T) {
 	// Create a new class type model.
-	var generator = age.Generator().Make()
+	var generator = gen.Generator().Make()
 	var name = "example"
 	var copyright = "Copyright (c) ACME Inc.  All Rights Reserved."
 	var model = generator.CreateClassType(name, copyright)
@@ -32,7 +32,7 @@ func TestCreateClassType(t *tes.T) {
 
 func TestCreateGenericType(t *tes.T) {
 	// Create a new generic type model.
-	var generator = age.Generator().Make()
+	var generator = gen.Generator().Make()
 	var name = "example"
 	var copyright string
 	var model = generator.CreateGenericType(name, copyright)
@@ -44,7 +44,7 @@ func TestCreateGenericType(t *tes.T) {
 
 func TestCreateClassStructure(t *tes.T) {
 	// Create a new class structure model.
-	var generator = age.Generator().Make()
+	var generator = gen.Generator().Make()
 	var name = "example"
 	var copyright string
 	var model = generator.CreateClassStructure(name, copyright)
@@ -56,7 +56,7 @@ func TestCreateClassStructure(t *tes.T) {
 
 func TestCreateGenericStructure(t *tes.T) {
 	// Create a new generic structure model.
-	var generator = age.Generator().Make()
+	var generator = gen.Generator().Make()
 	var name = "example"
 	var copyright string
 	var model = generator.CreateGenericStructure(name, copyright)

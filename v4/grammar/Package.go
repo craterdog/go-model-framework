@@ -11,9 +11,16 @@
 */
 
 /*
-Package "agent" provides the ability to generate Go class files based on a
-Go Package.go file that follows the format shown in the following code template:
-  - https://github.com/craterdog/go-model-framework/blob/main/models/Package.go
+Package "grammar" provides the following grammar classes that operate on the
+abstract syntax tree (AST) for this module:
+  - Token captures the attributes associated with a parsed token.
+  - Scanner is used to scan the source byte stream and recognize matching tokens.
+  - Parser is used to process the token stream and generate the AST.
+  - Validator is used to validate the semantics associated with an AST.
+  - Formatter is used to format an AST back into a canonical version of its source.
+
+For detailed documentation on this package refer to the wiki:
+  - https://github.com/craterdog/go-model-framework/wiki
 
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:
@@ -24,7 +31,7 @@ be developed and used seamlessly since the interface definitions only depend on
 other interfaces and intrinsic types—and the class implementations only depend
 on interfaces, not on each other.
 */
-package agent
+package grammar
 
 import (
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
@@ -44,6 +51,7 @@ const (
 	CommentToken
 	DelimiterToken
 	EofToken
+	EolToken
 	NameToken
 	NoteToken
 	PathToken
@@ -63,16 +71,6 @@ type FormatterClassLike interface {
 }
 
 /*
-GeneratorClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete generator-like class.
-*/
-type GeneratorClassLike interface {
-	// Constructors
-	Make() GeneratorLike
-}
-
-/*
 ParserClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete parser-like class.
@@ -86,6 +84,8 @@ type ParserClassLike interface {
 ScannerClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete scanner-like class.  The following functions are supported:
+
+AsString() returns the string version of the token type.
 
 FormatToken() returns a formatted string containing the attributes of the token.
 
@@ -102,6 +102,7 @@ type ScannerClassLike interface {
 	) ScannerLike
 
 	// Functions
+	AsString(type_ TokenType) string
 	FormatToken(token TokenLike) string
 	MatchToken(
 		type_ TokenType,
@@ -144,7 +145,7 @@ instance of a concrete formatter-like class.
 type FormatterLike interface {
 	// Attributes
 	GetClass() FormatterClassLike
-	GetDepth() int
+	GetDepth() uint
 
 	// Methods
 	FormatAbstraction(abstraction ast.AbstractionLike) string
@@ -154,38 +155,6 @@ type FormatterLike interface {
 	FormatParameter(parameter ast.ParameterLike) string
 	FormatParameters(parameters ast.ParametersLike) string
 	FormatResult(result ast.ResultLike) string
-}
-
-/*
-GeneratorLike is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete generator-like class.
-*/
-type GeneratorLike interface {
-	// Attributes
-	GetClass() GeneratorClassLike
-
-	// Methods
-	CreateClassType(
-		name string,
-		copyright string,
-	) ast.ModelLike
-	CreateGenericType(
-		name string,
-		copyright string,
-	) ast.ModelLike
-	CreateClassStructure(
-		name string,
-		copyright string,
-	) ast.ModelLike
-	CreateGenericStructure(
-		name string,
-		copyright string,
-	) ast.ModelLike
-	GenerateClass(
-		model ast.ModelLike,
-		name string,
-	) string
 }
 
 /*

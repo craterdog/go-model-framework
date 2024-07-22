@@ -10,7 +10,7 @@
 ................................................................................
 */
 
-package agent
+package grammar
 
 import (
 	fmt "fmt"
@@ -25,24 +25,28 @@ import (
 // Reference
 
 var scannerClass = &scannerClass_{
-	// Initialize class constants.
+	// Initialize the class constants.
 	tokens_: map[TokenType]string{
 		ErrorToken:     "error",
 		CommentToken:   "comment",
 		DelimiterToken: "delimiter",
 		EofToken:       "eof",
+		EolToken:       "eol",
 		NameToken:      "name",
 		NoteToken:      "note",
 		PathToken:      "path",
 		SpaceToken:     "space",
 	},
 	matchers_: map[TokenType]*reg.Regexp{
-		CommentToken:   reg.MustCompile("^(?:" + comment_ + ")"),
-		DelimiterToken: reg.MustCompile("^(?:" + delimiter_ + ")"),
-		NameToken:      reg.MustCompile("^(?:" + name_ + ")"),
-		NoteToken:      reg.MustCompile("^(?:" + note_ + ")"),
-		PathToken:      reg.MustCompile("^(?:" + path_ + ")"),
-		SpaceToken:     reg.MustCompile("^(?:" + space_ + ")"),
+		ErrorToken:     reg.MustCompile("x^"),
+		CommentToken:   reg.MustCompile("^" + comment_),
+		DelimiterToken: reg.MustCompile("^" + delimiter_),
+		EofToken:       reg.MustCompile("^" + eof_),
+		EolToken:       reg.MustCompile("^" + eol_),
+		NameToken:      reg.MustCompile("^" + name_),
+		NoteToken:      reg.MustCompile("^" + note_),
+		PathToken:      reg.MustCompile("^" + path_),
+		SpaceToken:     reg.MustCompile("^" + space_),
 	},
 }
 
@@ -57,7 +61,7 @@ func Scanner() ScannerClassLike {
 // Target
 
 type scannerClass_ struct {
-	// Define class constants.
+	// Define the class constants.
 	tokens_   map[TokenType]string
 	matchers_ map[TokenType]*reg.Regexp
 }
@@ -69,7 +73,7 @@ func (c *scannerClass_) Make(
 	tokens abs.QueueLike[TokenLike],
 ) ScannerLike {
 	var scanner = &scanner_{
-		// Initialize instance attributes.
+		// Initialize the instance attributes.
 		class_:    c,
 		line_:     1,
 		position_: 1,
@@ -81,6 +85,10 @@ func (c *scannerClass_) Make(
 }
 
 // Functions
+
+func (c *scannerClass_) AsString(type_ TokenType) string {
+	return c.tokens_[type_]
+}
 
 func (c *scannerClass_) FormatToken(token TokenLike) string {
 	var value = token.GetValue()
@@ -111,7 +119,7 @@ func (c *scannerClass_) MatchToken(
 // Target
 
 type scanner_ struct {
-	// Define instance attributes.
+	// Define the instance attributes.
 	class_    ScannerClassLike
 	first_    int // A zero based index of the first possible rune in the next token.
 	next_     int // A zero based index of the next possible rune in the next token.
@@ -148,6 +156,8 @@ func (v *scanner_) emitToken(type_ TokenType) {
 		value = "<CRTN>"
 	case "\v":
 		value = "<VTAB>"
+	case "":
+		value = "<EOFL>"
 	}
 	var token = Token().Make(v.line_, v.position_, type_, value)
 	//fmt.Println(Scanner().FormatToken(token)) // Uncomment when debugging.
@@ -170,8 +180,10 @@ func (v *scanner_) foundToken(type_ TokenType) bool {
 		var match = matches.GetValue(1)
 		var token = []rune(match)
 		var length = len(token)
+
+		// Found the requested token type.
 		v.next_ += length
-		if type_ != SpaceToken {
+		if type_ != SpaceToken && type_ != EolToken {
 			v.emitToken(type_)
 		}
 		var count = sts.Count(match, "\n")
@@ -184,6 +196,8 @@ func (v *scanner_) foundToken(type_ TokenType) bool {
 		v.first_ = v.next_
 		return true
 	}
+
+	// The next token is not the requested token type.
 	return false
 }
 
@@ -201,8 +215,11 @@ func (v *scanner_) scanTokens() {
 loop:
 	for v.next_ < len(v.runes_) {
 		switch {
+		case v.foundToken(ErrorToken):
 		case v.foundToken(CommentToken):
 		case v.foundToken(DelimiterToken):
+		case v.foundToken(EofToken):
+		case v.foundToken(EolToken):
 		case v.foundToken(NameToken):
 		case v.foundToken(NoteToken):
 		case v.foundToken(PathToken):
@@ -224,17 +241,18 @@ way.  We append an underscore to each name to lessen the chance of a name
 collision with other private Go class constants in this package.
 */
 const (
-	any_       = ".|\\n"
-	comment_   = "/\\*" + "((?:" + any_ + ")*?)" + "\\*/\\n"
+	error_     = "x^"
+	any_       = "."
+	comment_   = "(?:/\\*" + eol_ + "(" + any_ + "|" + eol_ + ")*?" + eol_ + "\\*/" + eol_ + ")"
 	control_   = "\\p{Cc}"
-	delimiter_ = "[[\\](){}\\.,=]"
+	delimiter_ = "(?:\\[|\\]|\\(|\\)|\\{|\\}|\\.|,|=)"
 	digit_     = "\\p{Nd}"
 	eof_       = "\\z"
-	letter_    = lower_ + "|" + upper_ + "|_"
+	eol_       = "\\r?\\n"
 	lower_     = "\\p{Ll}"
-	name_      = "(?:" + letter_ + ")(?:" + letter_ + "|" + digit_ + ")*_?"
-	note_      = "\\/\\/ [^" + control_ + "]*"
-	path_      = "\"(?:" + any_ + ")*?\"" // This returns the shortest match.
-	space_     = "[ \\t\\r\\n]+"
+	name_      = "(?:(" + lower_ + "|" + upper_ + ")(" + lower_ + "|" + upper_ + "|" + digit_ + ")*_?)"
+	note_      = "(?://[^" + control_ + "]*)"
+	path_      = "(?:\"" + any_ + "*?\")"
+	space_     = "[ \\t]+"
 	upper_     = "\\p{Lu}"
 )

@@ -10,14 +10,14 @@
 ................................................................................
 */
 
-package agent
+package grammar
 
 // CLASS ACCESS
 
 // Reference
 
 var tokenClass = &tokenClass_{
-	// Initialize class constants.
+	// Initialize the class constants.
 }
 
 // Function
@@ -31,7 +31,7 @@ func Token() TokenClassLike {
 // Target
 
 type tokenClass_ struct {
-	// Define class constants.
+	// Define the class constants.
 }
 
 // Constructors
@@ -43,7 +43,7 @@ func (c *tokenClass_) Make(
 	value string,
 ) TokenLike {
 	return &token_{
-		// Initialize instance attributes.
+		// Initialize the instance attributes.
 		class_:    c,
 		line_:     line,
 		position_: position,
@@ -57,7 +57,7 @@ func (c *tokenClass_) Make(
 // Target
 
 type token_ struct {
-	// Define instance attributes.
+	// Define the instance attributes.
 	class_    TokenClassLike
 	line_     int
 	position_ int

@@ -10,7 +10,7 @@
 ................................................................................
 */
 
-package agent
+package grammar
 
 import (
 	fmt "fmt"
@@ -25,7 +25,7 @@ import (
 // Reference
 
 var validatorClass = &validatorClass_{
-	// Initialize class constants.
+	// Initialize the class constants.
 }
 
 // Function
@@ -39,14 +39,14 @@ func Validator() ValidatorClassLike {
 // Target
 
 type validatorClass_ struct {
-	// Define class constants.
+	// Define the class constants.
 }
 
 // Constructors
 
 func (c *validatorClass_) Make() ValidatorLike {
 	return &validator_{
-		// Initialize instance attributes.
+		// Initialize the instance attributes.
 		class_: c,
 	}
 }
@@ -56,7 +56,7 @@ func (c *validatorClass_) Make() ValidatorLike {
 // Target
 
 type validator_ struct {
-	// Define instance attributes.
+	// Define the instance attributes.
 	class_        ValidatorClassLike
 	imports_      abs.CatalogLike[string, ast.ModuleLike]
 	types_        abs.CatalogLike[string, ast.TypeLike]

@@ -32,8 +32,9 @@ import (
 	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
-	age "github.com/craterdog/go-model-framework/v4/agent"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
+	gen "github.com/craterdog/go-model-framework/v4/generator"
+	gra "github.com/craterdog/go-model-framework/v4/grammar"
 	ref "reflect"
 )
 
@@ -92,13 +93,18 @@ type (
 	ValuesLike              = ast.ValuesLike
 )
 
-// Agents
+// Grammar
 
 type (
-	FormatterLike = age.FormatterLike
-	GeneratorLike = age.GeneratorLike
-	ParserLike    = age.ParserLike
-	ValidatorLike = age.ValidatorLike
+	FormatterLike = gra.FormatterLike
+	ParserLike    = gra.ParserLike
+	ValidatorLike = gra.ValidatorLike
+)
+
+// Generator
+
+type (
+	GeneratorLike = gen.GeneratorLike
 )
 
 // UNIVERSAL CONSTRUCTORS
@@ -1700,7 +1706,7 @@ func Formatter(args ...any) FormatterLike {
 	if len(args) > 0 {
 		panic("The formatter constructor does not take any arguments.")
 	}
-	var formatter = age.Formatter().Make()
+	var formatter = gra.Formatter().Make()
 	return formatter
 }
 
@@ -1708,7 +1714,7 @@ func Generator(args ...any) GeneratorLike {
 	if len(args) > 0 {
 		panic("The generator constructor does not take any arguments.")
 	}
-	var generator = age.Generator().Make()
+	var generator = gen.Generator().Make()
 	return generator
 }
 
@@ -1716,7 +1722,7 @@ func Parser(args ...any) ParserLike {
 	if len(args) > 0 {
 		panic("The parser constructor does not take any arguments.")
 	}
-	var parser = age.Parser().Make()
+	var parser = gra.Parser().Make()
 	return parser
 }
 
@@ -1724,6 +1730,6 @@ func Validator(args ...any) ValidatorLike {
 	if len(args) > 0 {
 		panic("The validator constructor does not take any arguments.")
 	}
-	var validator = age.Validator().Make()
+	var validator = gra.Validator().Make()
 	return validator
 }
