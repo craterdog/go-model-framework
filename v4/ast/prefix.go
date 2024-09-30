@@ -64,11 +64,13 @@ type prefix_ struct {
 	any_   any
 }
 
-// Attributes
+// Public
 
 func (v *prefix_) GetClass() PrefixClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *prefix_) GetAny() any {
 	return v.any_

@@ -14,49 +14,42 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
-	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var abstractionsClass = &abstractionsClass_{
+var noneClass = &noneClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Abstractions() AbstractionsClassLike {
-	return abstractionsClass
+func None() NoneClassLike {
+	return noneClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type abstractionsClass_ struct {
+type noneClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *abstractionsClass_) Make(
-	note string,
-	abstractions abs.Sequential[AbstractionLike],
-) AbstractionsLike {
+func (c *noneClass_) Make(newline string) NoneLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(abstractions):
-		panic("The abstractions attribute is required by this class.")
+	case col.IsUndefined(newline):
+		panic("The newline attribute is required by this class.")
 	default:
-		return &abstractions_{
+		return &none_{
 			// Initialize instance attributes.
-			class_:        c,
-			note_:         note,
-			abstractions_: abstractions,
+			class_:   c,
+			newline_: newline,
 		}
 	}
 }
@@ -65,25 +58,22 @@ func (c *abstractionsClass_) Make(
 
 // Target
 
-type abstractions_ struct {
+type none_ struct {
 	// Define instance attributes.
-	class_        AbstractionsClassLike
-	note_         string
-	abstractions_ abs.Sequential[AbstractionLike]
+	class_   NoneClassLike
+	newline_ string
 }
 
-// Attributes
+// Public
 
-func (v *abstractions_) GetClass() AbstractionsClassLike {
+func (v *none_) GetClass() NoneClassLike {
 	return v.class_
 }
 
-func (v *abstractions_) GetNote() string {
-	return v.note_
-}
+// Attribute
 
-func (v *abstractions_) GetAbstractions() abs.Sequential[AbstractionLike] {
-	return v.abstractions_
+func (v *none_) GetNewline() string {
+	return v.newline_
 }
 
 // Private

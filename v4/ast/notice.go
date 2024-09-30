@@ -64,11 +64,13 @@ type notice_ struct {
 	comment_ string
 }
 
-// Attributes
+// Public
 
 func (v *notice_) GetClass() NoticeClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *notice_) GetComment() string {
 	return v.comment_

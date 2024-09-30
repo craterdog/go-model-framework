@@ -14,42 +14,43 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var additionalValueClass = &additionalValueClass_{
+var functionalDefinitionsClass = &functionalDefinitionsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func AdditionalValue() AdditionalValueClassLike {
-	return additionalValueClass
+func FunctionalDefinitions() FunctionalDefinitionsClassLike {
+	return functionalDefinitionsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type additionalValueClass_ struct {
+type functionalDefinitionsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *additionalValueClass_) Make(name string) AdditionalValueLike {
+func (c *functionalDefinitionsClass_) Make(functionals abs.Sequential[FunctionalLike]) FunctionalDefinitionsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
+	case col.IsUndefined(functionals):
+		panic("The functionals attribute is required by this class.")
 	default:
-		return &additionalValue_{
+		return &functionalDefinitions_{
 			// Initialize instance attributes.
-			class_: c,
-			name_:  name,
+			class_:       c,
+			functionals_: functionals,
 		}
 	}
 }
@@ -58,20 +59,22 @@ func (c *additionalValueClass_) Make(name string) AdditionalValueLike {
 
 // Target
 
-type additionalValue_ struct {
+type functionalDefinitions_ struct {
 	// Define instance attributes.
-	class_ AdditionalValueClassLike
-	name_  string
+	class_       FunctionalDefinitionsClassLike
+	functionals_ abs.Sequential[FunctionalLike]
 }
 
-// Attributes
+// Public
 
-func (v *additionalValue_) GetClass() AdditionalValueClassLike {
+func (v *functionalDefinitions_) GetClass() FunctionalDefinitionsClassLike {
 	return v.class_
 }
 
-func (v *additionalValue_) GetName() string {
-	return v.name_
+// Attribute
+
+func (v *functionalDefinitions_) GetFunctionals() abs.Sequential[FunctionalLike] {
+	return v.functionals_
 }
 
 // Private

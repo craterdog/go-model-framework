@@ -71,11 +71,13 @@ type value_ struct {
 	abstraction_ AbstractionLike
 }
 
-// Attributes
+// Public
 
 func (v *value_) GetClass() ValueClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *value_) GetName() string {
 	return v.name_

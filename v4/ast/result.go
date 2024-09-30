@@ -64,11 +64,13 @@ type result_ struct {
 	any_   any
 }
 
-// Attributes
+// Public
 
 func (v *result_) GetClass() ResultClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *result_) GetAny() any {
 	return v.any_

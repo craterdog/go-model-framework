@@ -72,11 +72,13 @@ type attribute_ struct {
 	optionalAbstraction_ AbstractionLike
 }
 
-// Attributes
+// Public
 
 func (v *attribute_) GetClass() AttributeClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *attribute_) GetName() string {
 	return v.name_

@@ -14,49 +14,50 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
-	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var aspectsClass = &aspectsClass_{
+var moduleDefinitionClass = &moduleDefinitionClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Aspects() AspectsClassLike {
-	return aspectsClass
+func ModuleDefinition() ModuleDefinitionClassLike {
+	return moduleDefinitionClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type aspectsClass_ struct {
+type moduleDefinitionClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *aspectsClass_) Make(
-	note string,
-	aspects abs.Sequential[AspectLike],
-) AspectsLike {
+func (c *moduleDefinitionClass_) Make(
+	notice NoticeLike,
+	header HeaderLike,
+	optionalImports ImportsLike,
+) ModuleDefinitionLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(aspects):
-		panic("The aspects attribute is required by this class.")
+	case col.IsUndefined(notice):
+		panic("The notice attribute is required by this class.")
+	case col.IsUndefined(header):
+		panic("The header attribute is required by this class.")
 	default:
-		return &aspects_{
+		return &moduleDefinition_{
 			// Initialize instance attributes.
-			class_:   c,
-			note_:    note,
-			aspects_: aspects,
+			class_:           c,
+			notice_:          notice,
+			header_:          header,
+			optionalImports_: optionalImports,
 		}
 	}
 }
@@ -65,25 +66,32 @@ func (c *aspectsClass_) Make(
 
 // Target
 
-type aspects_ struct {
+type moduleDefinition_ struct {
 	// Define instance attributes.
-	class_   AspectsClassLike
-	note_    string
-	aspects_ abs.Sequential[AspectLike]
+	class_           ModuleDefinitionClassLike
+	notice_          NoticeLike
+	header_          HeaderLike
+	optionalImports_ ImportsLike
 }
 
-// Attributes
+// Public
 
-func (v *aspects_) GetClass() AspectsClassLike {
+func (v *moduleDefinition_) GetClass() ModuleDefinitionClassLike {
 	return v.class_
 }
 
-func (v *aspects_) GetNote() string {
-	return v.note_
+// Attribute
+
+func (v *moduleDefinition_) GetNotice() NoticeLike {
+	return v.notice_
 }
 
-func (v *aspects_) GetAspects() abs.Sequential[AspectLike] {
-	return v.aspects_
+func (v *moduleDefinition_) GetHeader() HeaderLike {
+	return v.header_
+}
+
+func (v *moduleDefinition_) GetOptionalImports() ImportsLike {
+	return v.optionalImports_
 }
 
 // Private

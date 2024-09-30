@@ -21,42 +21,36 @@ import (
 
 // Reference
 
-var classesClass = &classesClass_{
+var aspectDefinitionsClass = &aspectDefinitionsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Classes() ClassesClassLike {
-	return classesClass
+func AspectDefinitions() AspectDefinitionsClassLike {
+	return aspectDefinitionsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type classesClass_ struct {
+type aspectDefinitionsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *classesClass_) Make(
-	note string,
-	classes abs.Sequential[ClassLike],
-) ClassesLike {
+func (c *aspectDefinitionsClass_) Make(aspects abs.Sequential[AspectLike]) AspectDefinitionsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(classes):
-		panic("The classes attribute is required by this class.")
+	case col.IsUndefined(aspects):
+		panic("The aspects attribute is required by this class.")
 	default:
-		return &classes_{
+		return &aspectDefinitions_{
 			// Initialize instance attributes.
 			class_:   c,
-			note_:    note,
-			classes_: classes,
+			aspects_: aspects,
 		}
 	}
 }
@@ -65,25 +59,22 @@ func (c *classesClass_) Make(
 
 // Target
 
-type classes_ struct {
+type aspectDefinitions_ struct {
 	// Define instance attributes.
-	class_   ClassesClassLike
-	note_    string
-	classes_ abs.Sequential[ClassLike]
+	class_   AspectDefinitionsClassLike
+	aspects_ abs.Sequential[AspectLike]
 }
 
-// Attributes
+// Public
 
-func (v *classes_) GetClass() ClassesClassLike {
+func (v *aspectDefinitions_) GetClass() AspectDefinitionsClassLike {
 	return v.class_
 }
 
-func (v *classes_) GetNote() string {
-	return v.note_
-}
+// Attribute
 
-func (v *classes_) GetClasses() abs.Sequential[ClassLike] {
-	return v.classes_
+func (v *aspectDefinitions_) GetAspects() abs.Sequential[AspectLike] {
+	return v.aspects_
 }
 
 // Private

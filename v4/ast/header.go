@@ -71,11 +71,13 @@ type header_ struct {
 	name_    string
 }
 
-// Attributes
+// Public
 
 func (v *header_) GetClass() HeaderClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *header_) GetComment() string {
 	return v.comment_

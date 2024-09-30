@@ -10,6 +10,7 @@
 ................................................................................
 */
 
+// nolint
 package grammar
 
 import (
@@ -61,22 +62,19 @@ func (c *parserClass_) Make() ParserLike {
 
 type parser_ struct {
 	// Define the instance attributes.
-	class_  ParserClassLike
+	class_  *parserClass_
 	source_ string                   // The original source code.
 	tokens_ abs.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
 	next_   abs.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
 }
 
-// Attributes
+// Public
 
 func (v *parser_) GetClass() ParserClassLike {
 	return v.class_
 }
 
-// Public
-
 func (v *parser_) ParseSource(source string) ast.ModelLike {
-	source = sts.ReplaceAll(source, "\t", "    ")
 	v.source_ = source
 	v.tokens_ = col.Queue[TokenLike](parserClass.queueSize_)
 	v.next_ = col.Stack[TokenLike](parserClass.stackSize_)
@@ -84,49 +82,3002 @@ func (v *parser_) ParseSource(source string) ast.ModelLike {
 	// The scanner runs in a separate Go routine.
 	Scanner().Make(v.source_, v.tokens_)
 
-	// Attempt to parse a model.
+	// Attempt to parse the model.
 	var model, token, ok = v.parseModel()
 	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Model",
-			"Model",
-			"Notice",
-			"Header",
-			"Imports",
-			"Types",
-			"Functionals",
-			"Classes",
-			"Instances",
-			"Aspects",
-		)
+		var message = v.formatError(token, "Model")
 		panic(message)
 	}
 
-	// Attempt to parse the end-of-file marker.
-	_, token, ok = v.parseToken(EofToken, "")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("EOF",
-			"Model",
-			"Notice",
-			"Header",
-			"Imports",
-			"Types",
-			"Functionals",
-			"Classes",
-			"Instances",
-			"Aspects",
-		)
-		panic(message)
-	}
-
-	// Found a model.
+	// Found the model.
 	return model
 }
 
 // Private
 
-func (v *parser_) formatError(token TokenLike) string {
+func (v *parser_) parseAbstraction() (
+	abstraction ast.AbstractionLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse an optional prefix rule.
+	var optionalPrefix ast.PrefixLike
+	optionalPrefix, _, ok = v.parsePrefix()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Abstraction")
+			panic(message)
+		} else {
+			// This is not a single abstraction rule.
+			return abstraction, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional suffix rule.
+	var optionalSuffix ast.SuffixLike
+	optionalSuffix, _, ok = v.parseSuffix()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse an optional genericArguments rule.
+	var optionalGenericArguments ast.GenericArgumentsLike
+	optionalGenericArguments, _, ok = v.parseGenericArguments()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single abstraction rule.
+	ruleFound_ = true
+	abstraction = ast.Abstraction().Make(
+		optionalPrefix,
+		name,
+		optionalSuffix,
+		optionalGenericArguments,
+	)
+	return abstraction, token, ruleFound_
+}
+
+func (v *parser_) parseAdditionalArgument() (
+	additionalArgument ast.AdditionalArgumentLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "," delimiter.
+	_, token, ok = v.parseDelimiter(",")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AdditionalArgument")
+			panic(message)
+		} else {
+			// This is not a single additionalArgument rule.
+			return additionalArgument, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single argument rule.
+	var argument ast.ArgumentLike
+	argument, token, ok = v.parseArgument()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AdditionalArgument")
+			panic(message)
+		} else {
+			// This is not a single additionalArgument rule.
+			return additionalArgument, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single additionalArgument rule.
+	ruleFound_ = true
+	additionalArgument = ast.AdditionalArgument().Make(argument)
+	return additionalArgument, token, ruleFound_
+}
+
+func (v *parser_) parseAdditionalValue() (
+	additionalValue ast.AdditionalValueLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AdditionalValue")
+			panic(message)
+		} else {
+			// This is not a single additionalValue rule.
+			return additionalValue, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single additionalValue rule.
+	ruleFound_ = true
+	additionalValue = ast.AdditionalValue().Make(name)
+	return additionalValue, token, ruleFound_
+}
+
+func (v *parser_) parseArgument() (
+	argument ast.ArgumentLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Argument")
+			panic(message)
+		} else {
+			// This is not a single argument rule.
+			return argument, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single argument rule.
+	ruleFound_ = true
+	argument = ast.Argument().Make(abstraction)
+	return argument, token, ruleFound_
+}
+
+func (v *parser_) parseArray() (
+	array ast.ArrayLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "[" delimiter.
+	_, token, ok = v.parseDelimiter("[")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Array")
+			panic(message)
+		} else {
+			// This is not a single array rule.
+			return array, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "]" delimiter.
+	_, token, ok = v.parseDelimiter("]")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Array")
+			panic(message)
+		} else {
+			// This is not a single array rule.
+			return array, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single array rule.
+	ruleFound_ = true
+	array = ast.Array().Make()
+	return array, token, ruleFound_
+}
+
+func (v *parser_) parseAspect() (
+	aspect ast.AspectLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single declaration rule.
+	var declaration ast.DeclarationLike
+	declaration, token, ok = v.parseDeclaration()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Aspect")
+			panic(message)
+		} else {
+			// This is not a single aspect rule.
+			return aspect, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "interface" delimiter.
+	_, token, ok = v.parseDelimiter("interface")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Aspect")
+			panic(message)
+		} else {
+			// This is not a single aspect rule.
+			return aspect, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "{" delimiter.
+	_, token, ok = v.parseDelimiter("{")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Aspect")
+			panic(message)
+		} else {
+			// This is not a single aspect rule.
+			return aspect, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited method rules.
+	var methods = col.List[ast.MethodLike]()
+methodsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var method ast.MethodLike
+		method, token, ok = v.parseMethod()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single aspect rule.
+					return aspect, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Aspect")
+				message += "The number of method rules must be at least 1."
+				panic(message)
+			default:
+				break methodsLoop
+			}
+		}
+		methods.AppendValue(method)
+	}
+
+	// Attempt to parse a single "}" delimiter.
+	_, token, ok = v.parseDelimiter("}")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Aspect")
+			panic(message)
+		} else {
+			// This is not a single aspect rule.
+			return aspect, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single aspect rule.
+	ruleFound_ = true
+	aspect = ast.Aspect().Make(
+		declaration,
+		methods,
+	)
+	return aspect, token, ruleFound_
+}
+
+func (v *parser_) parseAspectDefinitions() (
+	aspectDefinitions ast.AspectDefinitionsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Aspects" delimiter.
+	_, token, ok = v.parseDelimiter("// Aspects")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AspectDefinitions")
+			panic(message)
+		} else {
+			// This is not a single aspectDefinitions rule.
+			return aspectDefinitions, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited aspect rules.
+	var aspects = col.List[ast.AspectLike]()
+aspectsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var aspect ast.AspectLike
+		aspect, token, ok = v.parseAspect()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single aspectDefinitions rule.
+					return aspectDefinitions, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "AspectDefinitions")
+				message += "The number of aspect rules must be at least 1."
+				panic(message)
+			default:
+				break aspectsLoop
+			}
+		}
+		aspects.AppendValue(aspect)
+	}
+
+	// Found a single aspectDefinitions rule.
+	ruleFound_ = true
+	aspectDefinitions = ast.AspectDefinitions().Make(aspects)
+	return aspectDefinitions, token, ruleFound_
+}
+
+func (v *parser_) parseAspectInterfaces() (
+	aspectInterfaces ast.AspectInterfacesLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Aspect" delimiter.
+	_, token, ok = v.parseDelimiter("// Aspect")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AspectInterfaces")
+			panic(message)
+		} else {
+			// This is not a single aspectInterfaces rule.
+			return aspectInterfaces, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited interface rules.
+	var interfaces = col.List[ast.InterfaceLike]()
+interfacesLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var interface_ ast.InterfaceLike
+		interface_, token, ok = v.parseInterface()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single aspectInterfaces rule.
+					return aspectInterfaces, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "AspectInterfaces")
+				message += "The number of interface rules must be at least 1."
+				panic(message)
+			default:
+				break interfacesLoop
+			}
+		}
+		interfaces.AppendValue(interface_)
+	}
+
+	// Found a single aspectInterfaces rule.
+	ruleFound_ = true
+	aspectInterfaces = ast.AspectInterfaces().Make(interfaces)
+	return aspectInterfaces, token, ruleFound_
+}
+
+func (v *parser_) parseAttribute() (
+	attribute ast.AttributeLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Attribute")
+			panic(message)
+		} else {
+			// This is not a single attribute rule.
+			return attribute, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Attribute")
+			panic(message)
+		} else {
+			// This is not a single attribute rule.
+			return attribute, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional parameter rule.
+	var optionalParameter ast.ParameterLike
+	optionalParameter, _, ok = v.parseParameter()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Attribute")
+			panic(message)
+		} else {
+			// This is not a single attribute rule.
+			return attribute, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional abstraction rule.
+	var optionalAbstraction ast.AbstractionLike
+	optionalAbstraction, _, ok = v.parseAbstraction()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single attribute rule.
+	ruleFound_ = true
+	attribute = ast.Attribute().Make(
+		name,
+		optionalParameter,
+		optionalAbstraction,
+	)
+	return attribute, token, ruleFound_
+}
+
+func (v *parser_) parseAttributeMethods() (
+	attributeMethods ast.AttributeMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Attribute" delimiter.
+	_, token, ok = v.parseDelimiter("// Attribute")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AttributeMethods")
+			panic(message)
+		} else {
+			// This is not a single attributeMethods rule.
+			return attributeMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited attribute rules.
+	var attributes = col.List[ast.AttributeLike]()
+attributesLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var attribute ast.AttributeLike
+		attribute, token, ok = v.parseAttribute()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single attributeMethods rule.
+					return attributeMethods, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "AttributeMethods")
+				message += "The number of attribute rules must be at least 1."
+				panic(message)
+			default:
+				break attributesLoop
+			}
+		}
+		attributes.AppendValue(attribute)
+	}
+
+	// Found a single attributeMethods rule.
+	ruleFound_ = true
+	attributeMethods = ast.AttributeMethods().Make(attributes)
+	return attributeMethods, token, ruleFound_
+}
+
+func (v *parser_) parseChannel() (
+	channel ast.ChannelLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "chan" delimiter.
+	_, token, ok = v.parseDelimiter("chan")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Channel")
+			panic(message)
+		} else {
+			// This is not a single channel rule.
+			return channel, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single channel rule.
+	ruleFound_ = true
+	channel = ast.Channel().Make()
+	return channel, token, ruleFound_
+}
+
+func (v *parser_) parseClass() (
+	class ast.ClassLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single declaration rule.
+	var declaration ast.DeclarationLike
+	declaration, token, ok = v.parseDeclaration()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Class")
+			panic(message)
+		} else {
+			// This is not a single class rule.
+			return class, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "interface" delimiter.
+	_, token, ok = v.parseDelimiter("interface")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Class")
+			panic(message)
+		} else {
+			// This is not a single class rule.
+			return class, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "{" delimiter.
+	_, token, ok = v.parseDelimiter("{")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Class")
+			panic(message)
+		} else {
+			// This is not a single class rule.
+			return class, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single classMethods rule.
+	var classMethods ast.ClassMethodsLike
+	classMethods, token, ok = v.parseClassMethods()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Class")
+			panic(message)
+		} else {
+			// This is not a single class rule.
+			return class, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "}" delimiter.
+	_, token, ok = v.parseDelimiter("}")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Class")
+			panic(message)
+		} else {
+			// This is not a single class rule.
+			return class, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single class rule.
+	ruleFound_ = true
+	class = ast.Class().Make(
+		declaration,
+		classMethods,
+	)
+	return class, token, ruleFound_
+}
+
+func (v *parser_) parseClassDefinitions() (
+	classDefinitions ast.ClassDefinitionsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Classes" delimiter.
+	_, token, ok = v.parseDelimiter("// Classes")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "ClassDefinitions")
+			panic(message)
+		} else {
+			// This is not a single classDefinitions rule.
+			return classDefinitions, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited class rules.
+	var classes = col.List[ast.ClassLike]()
+classesLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var class ast.ClassLike
+		class, token, ok = v.parseClass()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single classDefinitions rule.
+					return classDefinitions, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "ClassDefinitions")
+				message += "The number of class rules must be at least 1."
+				panic(message)
+			default:
+				break classesLoop
+			}
+		}
+		classes.AppendValue(class)
+	}
+
+	// Found a single classDefinitions rule.
+	ruleFound_ = true
+	classDefinitions = ast.ClassDefinitions().Make(classes)
+	return classDefinitions, token, ruleFound_
+}
+
+func (v *parser_) parseClassMethods() (
+	classMethods ast.ClassMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single constructorMethods rule.
+	var constructorMethods ast.ConstructorMethodsLike
+	constructorMethods, token, ok = v.parseConstructorMethods()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "ClassMethods")
+			panic(message)
+		} else {
+			// This is not a single classMethods rule.
+			return classMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional constantMethods rule.
+	var optionalConstantMethods ast.ConstantMethodsLike
+	optionalConstantMethods, _, ok = v.parseConstantMethods()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse an optional functionMethods rule.
+	var optionalFunctionMethods ast.FunctionMethodsLike
+	optionalFunctionMethods, _, ok = v.parseFunctionMethods()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single classMethods rule.
+	ruleFound_ = true
+	classMethods = ast.ClassMethods().Make(
+		constructorMethods,
+		optionalConstantMethods,
+		optionalFunctionMethods,
+	)
+	return classMethods, token, ruleFound_
+}
+
+func (v *parser_) parseConstant() (
+	constant ast.ConstantLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constant")
+			panic(message)
+		} else {
+			// This is not a single constant rule.
+			return constant, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constant")
+			panic(message)
+		} else {
+			// This is not a single constant rule.
+			return constant, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constant")
+			panic(message)
+		} else {
+			// This is not a single constant rule.
+			return constant, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constant")
+			panic(message)
+		} else {
+			// This is not a single constant rule.
+			return constant, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single constant rule.
+	ruleFound_ = true
+	constant = ast.Constant().Make(
+		name,
+		abstraction,
+	)
+	return constant, token, ruleFound_
+}
+
+func (v *parser_) parseConstantMethods() (
+	constantMethods ast.ConstantMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Constant" delimiter.
+	_, token, ok = v.parseDelimiter("// Constant")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "ConstantMethods")
+			panic(message)
+		} else {
+			// This is not a single constantMethods rule.
+			return constantMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited constant rules.
+	var constants = col.List[ast.ConstantLike]()
+constantsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var constant ast.ConstantLike
+		constant, token, ok = v.parseConstant()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single constantMethods rule.
+					return constantMethods, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "ConstantMethods")
+				message += "The number of constant rules must be at least 1."
+				panic(message)
+			default:
+				break constantsLoop
+			}
+		}
+		constants.AppendValue(constant)
+	}
+
+	// Found a single constantMethods rule.
+	ruleFound_ = true
+	constantMethods = ast.ConstantMethods().Make(constants)
+	return constantMethods, token, ruleFound_
+}
+
+func (v *parser_) parseConstructor() (
+	constructor ast.ConstructorLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constructor")
+			panic(message)
+		} else {
+			// This is not a single constructor rule.
+			return constructor, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constructor")
+			panic(message)
+		} else {
+			// This is not a single constructor rule.
+			return constructor, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited parameter rules.
+	var parameters = col.List[ast.ParameterLike]()
+parametersLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var parameter ast.ParameterLike
+		parameter, token, ok = v.parseParameter()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single constructor rule.
+					return constructor, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Constructor")
+				message += "The number of parameter rules must be at least 0."
+				panic(message)
+			default:
+				break parametersLoop
+			}
+		}
+		parameters.AppendValue(parameter)
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constructor")
+			panic(message)
+		} else {
+			// This is not a single constructor rule.
+			return constructor, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constructor")
+			panic(message)
+		} else {
+			// This is not a single constructor rule.
+			return constructor, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single constructor rule.
+	ruleFound_ = true
+	constructor = ast.Constructor().Make(
+		name,
+		parameters,
+		abstraction,
+	)
+	return constructor, token, ruleFound_
+}
+
+func (v *parser_) parseConstructorMethods() (
+	constructorMethods ast.ConstructorMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Constructor" delimiter.
+	_, token, ok = v.parseDelimiter("// Constructor")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "ConstructorMethods")
+			panic(message)
+		} else {
+			// This is not a single constructorMethods rule.
+			return constructorMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited constructor rules.
+	var constructors = col.List[ast.ConstructorLike]()
+constructorsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var constructor ast.ConstructorLike
+		constructor, token, ok = v.parseConstructor()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single constructorMethods rule.
+					return constructorMethods, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "ConstructorMethods")
+				message += "The number of constructor rules must be at least 1."
+				panic(message)
+			default:
+				break constructorsLoop
+			}
+		}
+		constructors.AppendValue(constructor)
+	}
+
+	// Found a single constructorMethods rule.
+	ruleFound_ = true
+	constructorMethods = ast.ConstructorMethods().Make(constructors)
+	return constructorMethods, token, ruleFound_
+}
+
+func (v *parser_) parseDeclaration() (
+	declaration ast.DeclarationLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single comment token.
+	var comment string
+	comment, token, ok = v.parseToken(CommentToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Declaration")
+			panic(message)
+		} else {
+			// This is not a single declaration rule.
+			return declaration, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "type" delimiter.
+	_, token, ok = v.parseDelimiter("type")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Declaration")
+			panic(message)
+		} else {
+			// This is not a single declaration rule.
+			return declaration, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Declaration")
+			panic(message)
+		} else {
+			// This is not a single declaration rule.
+			return declaration, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional genericParameters rule.
+	var optionalGenericParameters ast.GenericParametersLike
+	optionalGenericParameters, _, ok = v.parseGenericParameters()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single declaration rule.
+	ruleFound_ = true
+	declaration = ast.Declaration().Make(
+		comment,
+		name,
+		optionalGenericParameters,
+	)
+	return declaration, token, ruleFound_
+}
+
+func (v *parser_) parseEnumeration() (
+	enumeration ast.EnumerationLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "const" delimiter.
+	_, token, ok = v.parseDelimiter("const")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Enumeration")
+			panic(message)
+		} else {
+			// This is not a single enumeration rule.
+			return enumeration, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Enumeration")
+			panic(message)
+		} else {
+			// This is not a single enumeration rule.
+			return enumeration, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single value rule.
+	var value ast.ValueLike
+	value, token, ok = v.parseValue()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Enumeration")
+			panic(message)
+		} else {
+			// This is not a single enumeration rule.
+			return enumeration, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited additionalValue rules.
+	var additionalValues = col.List[ast.AdditionalValueLike]()
+additionalValuesLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var additionalValue ast.AdditionalValueLike
+		additionalValue, token, ok = v.parseAdditionalValue()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single enumeration rule.
+					return enumeration, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Enumeration")
+				message += "The number of additionalValue rules must be at least 0."
+				panic(message)
+			default:
+				break additionalValuesLoop
+			}
+		}
+		additionalValues.AppendValue(additionalValue)
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Enumeration")
+			panic(message)
+		} else {
+			// This is not a single enumeration rule.
+			return enumeration, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single enumeration rule.
+	ruleFound_ = true
+	enumeration = ast.Enumeration().Make(
+		value,
+		additionalValues,
+	)
+	return enumeration, token, ruleFound_
+}
+
+func (v *parser_) parseFunction() (
+	function ast.FunctionLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Function")
+			panic(message)
+		} else {
+			// This is not a single function rule.
+			return function, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Function")
+			panic(message)
+		} else {
+			// This is not a single function rule.
+			return function, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited parameter rules.
+	var parameters = col.List[ast.ParameterLike]()
+parametersLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var parameter ast.ParameterLike
+		parameter, token, ok = v.parseParameter()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single function rule.
+					return function, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Function")
+				message += "The number of parameter rules must be at least 0."
+				panic(message)
+			default:
+				break parametersLoop
+			}
+		}
+		parameters.AppendValue(parameter)
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Function")
+			panic(message)
+		} else {
+			// This is not a single function rule.
+			return function, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single result rule.
+	var result ast.ResultLike
+	result, token, ok = v.parseResult()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Function")
+			panic(message)
+		} else {
+			// This is not a single function rule.
+			return function, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single function rule.
+	ruleFound_ = true
+	function = ast.Function().Make(
+		name,
+		parameters,
+		result,
+	)
+	return function, token, ruleFound_
+}
+
+func (v *parser_) parseFunctionMethods() (
+	functionMethods ast.FunctionMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Function" delimiter.
+	_, token, ok = v.parseDelimiter("// Function")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "FunctionMethods")
+			panic(message)
+		} else {
+			// This is not a single functionMethods rule.
+			return functionMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited function rules.
+	var functions = col.List[ast.FunctionLike]()
+functionsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var function ast.FunctionLike
+		function, token, ok = v.parseFunction()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single functionMethods rule.
+					return functionMethods, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "FunctionMethods")
+				message += "The number of function rules must be at least 1."
+				panic(message)
+			default:
+				break functionsLoop
+			}
+		}
+		functions.AppendValue(function)
+	}
+
+	// Found a single functionMethods rule.
+	ruleFound_ = true
+	functionMethods = ast.FunctionMethods().Make(functions)
+	return functionMethods, token, ruleFound_
+}
+
+func (v *parser_) parseFunctional() (
+	functional ast.FunctionalLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single declaration rule.
+	var declaration ast.DeclarationLike
+	declaration, token, ok = v.parseDeclaration()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Functional")
+			panic(message)
+		} else {
+			// This is not a single functional rule.
+			return functional, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "func" delimiter.
+	_, token, ok = v.parseDelimiter("func")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Functional")
+			panic(message)
+		} else {
+			// This is not a single functional rule.
+			return functional, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Functional")
+			panic(message)
+		} else {
+			// This is not a single functional rule.
+			return functional, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited parameter rules.
+	var parameters = col.List[ast.ParameterLike]()
+parametersLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var parameter ast.ParameterLike
+		parameter, token, ok = v.parseParameter()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single functional rule.
+					return functional, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Functional")
+				message += "The number of parameter rules must be at least 0."
+				panic(message)
+			default:
+				break parametersLoop
+			}
+		}
+		parameters.AppendValue(parameter)
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Functional")
+			panic(message)
+		} else {
+			// This is not a single functional rule.
+			return functional, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single result rule.
+	var result ast.ResultLike
+	result, token, ok = v.parseResult()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Functional")
+			panic(message)
+		} else {
+			// This is not a single functional rule.
+			return functional, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single functional rule.
+	ruleFound_ = true
+	functional = ast.Functional().Make(
+		declaration,
+		parameters,
+		result,
+	)
+	return functional, token, ruleFound_
+}
+
+func (v *parser_) parseFunctionalDefinitions() (
+	functionalDefinitions ast.FunctionalDefinitionsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Functionals" delimiter.
+	_, token, ok = v.parseDelimiter("// Functionals")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "FunctionalDefinitions")
+			panic(message)
+		} else {
+			// This is not a single functionalDefinitions rule.
+			return functionalDefinitions, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited functional rules.
+	var functionals = col.List[ast.FunctionalLike]()
+functionalsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var functional ast.FunctionalLike
+		functional, token, ok = v.parseFunctional()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single functionalDefinitions rule.
+					return functionalDefinitions, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "FunctionalDefinitions")
+				message += "The number of functional rules must be at least 1."
+				panic(message)
+			default:
+				break functionalsLoop
+			}
+		}
+		functionals.AppendValue(functional)
+	}
+
+	// Found a single functionalDefinitions rule.
+	ruleFound_ = true
+	functionalDefinitions = ast.FunctionalDefinitions().Make(functionals)
+	return functionalDefinitions, token, ruleFound_
+}
+
+func (v *parser_) parseGenericArguments() (
+	genericArguments ast.GenericArgumentsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "[" delimiter.
+	_, token, ok = v.parseDelimiter("[")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GenericArguments")
+			panic(message)
+		} else {
+			// This is not a single genericArguments rule.
+			return genericArguments, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single argument rule.
+	var argument ast.ArgumentLike
+	argument, token, ok = v.parseArgument()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GenericArguments")
+			panic(message)
+		} else {
+			// This is not a single genericArguments rule.
+			return genericArguments, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited additionalArgument rules.
+	var additionalArguments = col.List[ast.AdditionalArgumentLike]()
+additionalArgumentsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var additionalArgument ast.AdditionalArgumentLike
+		additionalArgument, token, ok = v.parseAdditionalArgument()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single genericArguments rule.
+					return genericArguments, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "GenericArguments")
+				message += "The number of additionalArgument rules must be at least 0."
+				panic(message)
+			default:
+				break additionalArgumentsLoop
+			}
+		}
+		additionalArguments.AppendValue(additionalArgument)
+	}
+
+	// Attempt to parse a single "]" delimiter.
+	_, token, ok = v.parseDelimiter("]")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GenericArguments")
+			panic(message)
+		} else {
+			// This is not a single genericArguments rule.
+			return genericArguments, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single genericArguments rule.
+	ruleFound_ = true
+	genericArguments = ast.GenericArguments().Make(
+		argument,
+		additionalArguments,
+	)
+	return genericArguments, token, ruleFound_
+}
+
+func (v *parser_) parseGenericParameters() (
+	genericParameters ast.GenericParametersLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "[" delimiter.
+	_, token, ok = v.parseDelimiter("[")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GenericParameters")
+			panic(message)
+		} else {
+			// This is not a single genericParameters rule.
+			return genericParameters, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited parameter rules.
+	var parameters = col.List[ast.ParameterLike]()
+parametersLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var parameter ast.ParameterLike
+		parameter, token, ok = v.parseParameter()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single genericParameters rule.
+					return genericParameters, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "GenericParameters")
+				message += "The number of parameter rules must be at least 1."
+				panic(message)
+			default:
+				break parametersLoop
+			}
+		}
+		parameters.AppendValue(parameter)
+	}
+
+	// Attempt to parse a single "]" delimiter.
+	_, token, ok = v.parseDelimiter("]")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GenericParameters")
+			panic(message)
+		} else {
+			// This is not a single genericParameters rule.
+			return genericParameters, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single genericParameters rule.
+	ruleFound_ = true
+	genericParameters = ast.GenericParameters().Make(parameters)
+	return genericParameters, token, ruleFound_
+}
+
+func (v *parser_) parseHeader() (
+	header ast.HeaderLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single comment token.
+	var comment string
+	comment, token, ok = v.parseToken(CommentToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Header")
+			panic(message)
+		} else {
+			// This is not a single header rule.
+			return header, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "package" delimiter.
+	_, token, ok = v.parseDelimiter("package")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Header")
+			panic(message)
+		} else {
+			// This is not a single header rule.
+			return header, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Header")
+			panic(message)
+		} else {
+			// This is not a single header rule.
+			return header, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single header rule.
+	ruleFound_ = true
+	header = ast.Header().Make(
+		comment,
+		name,
+	)
+	return header, token, ruleFound_
+}
+
+func (v *parser_) parseImports() (
+	imports ast.ImportsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "import" delimiter.
+	_, token, ok = v.parseDelimiter("import")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Imports")
+			panic(message)
+		} else {
+			// This is not a single imports rule.
+			return imports, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Imports")
+			panic(message)
+		} else {
+			// This is not a single imports rule.
+			return imports, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited module rules.
+	var modules = col.List[ast.ModuleLike]()
+modulesLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var module ast.ModuleLike
+		module, token, ok = v.parseModule()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single imports rule.
+					return imports, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Imports")
+				message += "The number of module rules must be at least 1."
+				panic(message)
+			default:
+				break modulesLoop
+			}
+		}
+		modules.AppendValue(module)
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Imports")
+			panic(message)
+		} else {
+			// This is not a single imports rule.
+			return imports, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single imports rule.
+	ruleFound_ = true
+	imports = ast.Imports().Make(modules)
+	return imports, token, ruleFound_
+}
+
+func (v *parser_) parseInstance() (
+	instance ast.InstanceLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single declaration rule.
+	var declaration ast.DeclarationLike
+	declaration, token, ok = v.parseDeclaration()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Instance")
+			panic(message)
+		} else {
+			// This is not a single instance rule.
+			return instance, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "interface" delimiter.
+	_, token, ok = v.parseDelimiter("interface")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Instance")
+			panic(message)
+		} else {
+			// This is not a single instance rule.
+			return instance, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "{" delimiter.
+	_, token, ok = v.parseDelimiter("{")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Instance")
+			panic(message)
+		} else {
+			// This is not a single instance rule.
+			return instance, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single instanceMethods rule.
+	var instanceMethods ast.InstanceMethodsLike
+	instanceMethods, token, ok = v.parseInstanceMethods()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Instance")
+			panic(message)
+		} else {
+			// This is not a single instance rule.
+			return instance, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "}" delimiter.
+	_, token, ok = v.parseDelimiter("}")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Instance")
+			panic(message)
+		} else {
+			// This is not a single instance rule.
+			return instance, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single instance rule.
+	ruleFound_ = true
+	instance = ast.Instance().Make(
+		declaration,
+		instanceMethods,
+	)
+	return instance, token, ruleFound_
+}
+
+func (v *parser_) parseInstanceDefinitions() (
+	instanceDefinitions ast.InstanceDefinitionsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Instances" delimiter.
+	_, token, ok = v.parseDelimiter("// Instances")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "InstanceDefinitions")
+			panic(message)
+		} else {
+			// This is not a single instanceDefinitions rule.
+			return instanceDefinitions, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited instance rules.
+	var instances = col.List[ast.InstanceLike]()
+instancesLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var instance ast.InstanceLike
+		instance, token, ok = v.parseInstance()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single instanceDefinitions rule.
+					return instanceDefinitions, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "InstanceDefinitions")
+				message += "The number of instance rules must be at least 1."
+				panic(message)
+			default:
+				break instancesLoop
+			}
+		}
+		instances.AppendValue(instance)
+	}
+
+	// Found a single instanceDefinitions rule.
+	ruleFound_ = true
+	instanceDefinitions = ast.InstanceDefinitions().Make(instances)
+	return instanceDefinitions, token, ruleFound_
+}
+
+func (v *parser_) parseInstanceMethods() (
+	instanceMethods ast.InstanceMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single publicMethods rule.
+	var publicMethods ast.PublicMethodsLike
+	publicMethods, token, ok = v.parsePublicMethods()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "InstanceMethods")
+			panic(message)
+		} else {
+			// This is not a single instanceMethods rule.
+			return instanceMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional attributeMethods rule.
+	var optionalAttributeMethods ast.AttributeMethodsLike
+	optionalAttributeMethods, _, ok = v.parseAttributeMethods()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse an optional aspectInterfaces rule.
+	var optionalAspectInterfaces ast.AspectInterfacesLike
+	optionalAspectInterfaces, _, ok = v.parseAspectInterfaces()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single instanceMethods rule.
+	ruleFound_ = true
+	instanceMethods = ast.InstanceMethods().Make(
+		publicMethods,
+		optionalAttributeMethods,
+		optionalAspectInterfaces,
+	)
+	return instanceMethods, token, ruleFound_
+}
+
+func (v *parser_) parseInterface() (
+	interface_ ast.InterfaceLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Interface")
+			panic(message)
+		} else {
+			// This is not a single interface rule.
+			return interface_, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional suffix rule.
+	var optionalSuffix ast.SuffixLike
+	optionalSuffix, _, ok = v.parseSuffix()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse an optional genericArguments rule.
+	var optionalGenericArguments ast.GenericArgumentsLike
+	optionalGenericArguments, _, ok = v.parseGenericArguments()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single interface rule.
+	ruleFound_ = true
+	interface_ = ast.Interface().Make(
+		name,
+		optionalSuffix,
+		optionalGenericArguments,
+	)
+	return interface_, token, ruleFound_
+}
+
+func (v *parser_) parseInterfaceDefinitions() (
+	interfaceDefinitions ast.InterfaceDefinitionsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single classDefinitions rule.
+	var classDefinitions ast.ClassDefinitionsLike
+	classDefinitions, token, ok = v.parseClassDefinitions()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "InterfaceDefinitions")
+			panic(message)
+		} else {
+			// This is not a single interfaceDefinitions rule.
+			return interfaceDefinitions, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single instanceDefinitions rule.
+	var instanceDefinitions ast.InstanceDefinitionsLike
+	instanceDefinitions, token, ok = v.parseInstanceDefinitions()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "InterfaceDefinitions")
+			panic(message)
+		} else {
+			// This is not a single interfaceDefinitions rule.
+			return interfaceDefinitions, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional aspectDefinitions rule.
+	var optionalAspectDefinitions ast.AspectDefinitionsLike
+	optionalAspectDefinitions, _, ok = v.parseAspectDefinitions()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single interfaceDefinitions rule.
+	ruleFound_ = true
+	interfaceDefinitions = ast.InterfaceDefinitions().Make(
+		classDefinitions,
+		instanceDefinitions,
+		optionalAspectDefinitions,
+	)
+	return interfaceDefinitions, token, ruleFound_
+}
+
+func (v *parser_) parseMap() (
+	map_ ast.MapLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "map" delimiter.
+	_, token, ok = v.parseDelimiter("map")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Map")
+			panic(message)
+		} else {
+			// This is not a single map rule.
+			return map_, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "[" delimiter.
+	_, token, ok = v.parseDelimiter("[")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Map")
+			panic(message)
+		} else {
+			// This is not a single map rule.
+			return map_, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Map")
+			panic(message)
+		} else {
+			// This is not a single map rule.
+			return map_, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "]" delimiter.
+	_, token, ok = v.parseDelimiter("]")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Map")
+			panic(message)
+		} else {
+			// This is not a single map rule.
+			return map_, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single map rule.
+	ruleFound_ = true
+	map_ = ast.Map().Make(name)
+	return map_, token, ruleFound_
+}
+
+func (v *parser_) parseMethod() (
+	method ast.MethodLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Method")
+			panic(message)
+		} else {
+			// This is not a single method rule.
+			return method, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Method")
+			panic(message)
+		} else {
+			// This is not a single method rule.
+			return method, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited parameter rules.
+	var parameters = col.List[ast.ParameterLike]()
+parametersLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var parameter ast.ParameterLike
+		parameter, token, ok = v.parseParameter()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single method rule.
+					return method, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Method")
+				message += "The number of parameter rules must be at least 0."
+				panic(message)
+			default:
+				break parametersLoop
+			}
+		}
+		parameters.AppendValue(parameter)
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Method")
+			panic(message)
+		} else {
+			// This is not a single method rule.
+			return method, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional result rule.
+	var optionalResult ast.ResultLike
+	optionalResult, _, ok = v.parseResult()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single method rule.
+	ruleFound_ = true
+	method = ast.Method().Make(
+		name,
+		parameters,
+		optionalResult,
+	)
+	return method, token, ruleFound_
+}
+
+func (v *parser_) parseModel() (
+	model ast.ModelLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single moduleDefinition rule.
+	var moduleDefinition ast.ModuleDefinitionLike
+	moduleDefinition, token, ok = v.parseModuleDefinition()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Model")
+			panic(message)
+		} else {
+			// This is not a single model rule.
+			return model, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single primitiveDefinitions rule.
+	var primitiveDefinitions ast.PrimitiveDefinitionsLike
+	primitiveDefinitions, token, ok = v.parsePrimitiveDefinitions()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Model")
+			panic(message)
+		} else {
+			// This is not a single model rule.
+			return model, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single interfaceDefinitions rule.
+	var interfaceDefinitions ast.InterfaceDefinitionsLike
+	interfaceDefinitions, token, ok = v.parseInterfaceDefinitions()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Model")
+			panic(message)
+		} else {
+			// This is not a single model rule.
+			return model, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single model rule.
+	ruleFound_ = true
+	model = ast.Model().Make(
+		moduleDefinition,
+		primitiveDefinitions,
+		interfaceDefinitions,
+	)
+	return model, token, ruleFound_
+}
+
+func (v *parser_) parseModule() (
+	module ast.ModuleLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Module")
+			panic(message)
+		} else {
+			// This is not a single module rule.
+			return module, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single path token.
+	var path string
+	path, token, ok = v.parseToken(PathToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Module")
+			panic(message)
+		} else {
+			// This is not a single module rule.
+			return module, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single module rule.
+	ruleFound_ = true
+	module = ast.Module().Make(
+		name,
+		path,
+	)
+	return module, token, ruleFound_
+}
+
+func (v *parser_) parseModuleDefinition() (
+	moduleDefinition ast.ModuleDefinitionLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single notice rule.
+	var notice ast.NoticeLike
+	notice, token, ok = v.parseNotice()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "ModuleDefinition")
+			panic(message)
+		} else {
+			// This is not a single moduleDefinition rule.
+			return moduleDefinition, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single header rule.
+	var header ast.HeaderLike
+	header, token, ok = v.parseHeader()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "ModuleDefinition")
+			panic(message)
+		} else {
+			// This is not a single moduleDefinition rule.
+			return moduleDefinition, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional imports rule.
+	var optionalImports ast.ImportsLike
+	optionalImports, _, ok = v.parseImports()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single moduleDefinition rule.
+	ruleFound_ = true
+	moduleDefinition = ast.ModuleDefinition().Make(
+		notice,
+		header,
+		optionalImports,
+	)
+	return moduleDefinition, token, ruleFound_
+}
+
+func (v *parser_) parseNone() (
+	none ast.NoneLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single newline token.
+	var newline string
+	newline, token, ok = v.parseToken(NewlineToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "None")
+			panic(message)
+		} else {
+			// This is not a single none rule.
+			return none, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single none rule.
+	ruleFound_ = true
+	none = ast.None().Make(newline)
+	return none, token, ruleFound_
+}
+
+func (v *parser_) parseNotice() (
+	notice ast.NoticeLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single comment token.
+	var comment string
+	comment, token, ok = v.parseToken(CommentToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Notice")
+			panic(message)
+		} else {
+			// This is not a single notice rule.
+			return notice, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single notice rule.
+	ruleFound_ = true
+	notice = ast.Notice().Make(comment)
+	return notice, token, ruleFound_
+}
+
+func (v *parser_) parseParameter() (
+	parameter ast.ParameterLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Parameter")
+			panic(message)
+		} else {
+			// This is not a single parameter rule.
+			return parameter, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Parameter")
+			panic(message)
+		} else {
+			// This is not a single parameter rule.
+			return parameter, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "," delimiter.
+	_, token, ok = v.parseDelimiter(",")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Parameter")
+			panic(message)
+		} else {
+			// This is not a single parameter rule.
+			return parameter, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single parameter rule.
+	ruleFound_ = true
+	parameter = ast.Parameter().Make(
+		name,
+		abstraction,
+	)
+	return parameter, token, ruleFound_
+}
+
+func (v *parser_) parseParameterized() (
+	parameterized ast.ParameterizedLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Parameterized")
+			panic(message)
+		} else {
+			// This is not a single parameterized rule.
+			return parameterized, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited parameter rules.
+	var parameters = col.List[ast.ParameterLike]()
+parametersLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var parameter ast.ParameterLike
+		parameter, token, ok = v.parseParameter()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single parameterized rule.
+					return parameterized, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Parameterized")
+				message += "The number of parameter rules must be at least 1."
+				panic(message)
+			default:
+				break parametersLoop
+			}
+		}
+		parameters.AppendValue(parameter)
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Parameterized")
+			panic(message)
+		} else {
+			// This is not a single parameterized rule.
+			return parameterized, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single parameterized rule.
+	ruleFound_ = true
+	parameterized = ast.Parameterized().Make(parameters)
+	return parameterized, token, ruleFound_
+}
+
+func (v *parser_) parsePrefix() (
+	prefix ast.PrefixLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a single array rule.
+	var array ast.ArrayLike
+	array, token, ok = v.parseArray()
+	if ok {
+		// Found a single array prefix.
+		prefix = ast.Prefix().Make(array)
+		return prefix, token, true
+	}
+
+	// Attempt to parse a single map rule.
+	var map_ ast.MapLike
+	map_, token, ok = v.parseMap()
+	if ok {
+		// Found a single map prefix.
+		prefix = ast.Prefix().Make(map_)
+		return prefix, token, true
+	}
+
+	// Attempt to parse a single channel rule.
+	var channel ast.ChannelLike
+	channel, token, ok = v.parseChannel()
+	if ok {
+		// Found a single channel prefix.
+		prefix = ast.Prefix().Make(channel)
+		return prefix, token, true
+	}
+
+	// This is not a single prefix rule.
+	return prefix, token, false
+
+}
+
+func (v *parser_) parsePrimitiveDefinitions() (
+	primitiveDefinitions ast.PrimitiveDefinitionsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse an optional typeDefinitions rule.
+	var optionalTypeDefinitions ast.TypeDefinitionsLike
+	optionalTypeDefinitions, _, ok = v.parseTypeDefinitions()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse an optional functionalDefinitions rule.
+	var optionalFunctionalDefinitions ast.FunctionalDefinitionsLike
+	optionalFunctionalDefinitions, _, ok = v.parseFunctionalDefinitions()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single primitiveDefinitions rule.
+	ruleFound_ = true
+	primitiveDefinitions = ast.PrimitiveDefinitions().Make(
+		optionalTypeDefinitions,
+		optionalFunctionalDefinitions,
+	)
+	return primitiveDefinitions, token, ruleFound_
+}
+
+func (v *parser_) parsePublicMethods() (
+	publicMethods ast.PublicMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Public" delimiter.
+	_, token, ok = v.parseDelimiter("// Public")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "PublicMethods")
+			panic(message)
+		} else {
+			// This is not a single publicMethods rule.
+			return publicMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited method rules.
+	var methods = col.List[ast.MethodLike]()
+methodsLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var method ast.MethodLike
+		method, token, ok = v.parseMethod()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single publicMethods rule.
+					return publicMethods, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "PublicMethods")
+				message += "The number of method rules must be at least 1."
+				panic(message)
+			default:
+				break methodsLoop
+			}
+		}
+		methods.AppendValue(method)
+	}
+
+	// Found a single publicMethods rule.
+	ruleFound_ = true
+	publicMethods = ast.PublicMethods().Make(methods)
+	return publicMethods, token, ruleFound_
+}
+
+func (v *parser_) parseResult() (
+	result ast.ResultLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a single none rule.
+	var none ast.NoneLike
+	none, token, ok = v.parseNone()
+	if ok {
+		// Found a single none result.
+		result = ast.Result().Make(none)
+		return result, token, true
+	}
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if ok {
+		// Found a single abstraction result.
+		result = ast.Result().Make(abstraction)
+		return result, token, true
+	}
+
+	// Attempt to parse a single parameterized rule.
+	var parameterized ast.ParameterizedLike
+	parameterized, token, ok = v.parseParameterized()
+	if ok {
+		// Found a single parameterized result.
+		result = ast.Result().Make(parameterized)
+		return result, token, true
+	}
+
+	// This is not a single result rule.
+	return result, token, false
+
+}
+
+func (v *parser_) parseSuffix() (
+	suffix ast.SuffixLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "." delimiter.
+	_, token, ok = v.parseDelimiter(".")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Suffix")
+			panic(message)
+		} else {
+			// This is not a single suffix rule.
+			return suffix, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Suffix")
+			panic(message)
+		} else {
+			// This is not a single suffix rule.
+			return suffix, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single suffix rule.
+	ruleFound_ = true
+	suffix = ast.Suffix().Make(name)
+	return suffix, token, ruleFound_
+}
+
+func (v *parser_) parseType() (
+	type_ ast.TypeLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single declaration rule.
+	var declaration ast.DeclarationLike
+	declaration, token, ok = v.parseDeclaration()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Type")
+			panic(message)
+		} else {
+			// This is not a single type rule.
+			return type_, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Type")
+			panic(message)
+		} else {
+			// This is not a single type rule.
+			return type_, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional enumeration rule.
+	var optionalEnumeration ast.EnumerationLike
+	optionalEnumeration, _, ok = v.parseEnumeration()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single type rule.
+	ruleFound_ = true
+	type_ = ast.Type().Make(
+		declaration,
+		abstraction,
+		optionalEnumeration,
+	)
+	return type_, token, ruleFound_
+}
+
+func (v *parser_) parseTypeDefinitions() (
+	typeDefinitions ast.TypeDefinitionsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "// Types" delimiter.
+	_, token, ok = v.parseDelimiter("// Types")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "TypeDefinitions")
+			panic(message)
+		} else {
+			// This is not a single typeDefinitions rule.
+			return typeDefinitions, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 1 to unlimited type rules.
+	var types = col.List[ast.TypeLike]()
+typesLoop:
+	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+		var type_ ast.TypeLike
+		type_, token, ok = v.parseType()
+		if !ok {
+			switch {
+			case numberFound_ < 1:
+				if !ruleFound_ {
+					// This is not a single typeDefinitions rule.
+					return typeDefinitions, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "TypeDefinitions")
+				message += "The number of type rules must be at least 1."
+				panic(message)
+			default:
+				break typesLoop
+			}
+		}
+		types.AppendValue(type_)
+	}
+
+	// Found a single typeDefinitions rule.
+	ruleFound_ = true
+	typeDefinitions = ast.TypeDefinitions().Make(types)
+	return typeDefinitions, token, ruleFound_
+}
+
+func (v *parser_) parseValue() (
+	value ast.ValueLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Value")
+			panic(message)
+		} else {
+			// This is not a single value rule.
+			return value, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Value")
+			panic(message)
+		} else {
+			// This is not a single value rule.
+			return value, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "=" delimiter.
+	_, token, ok = v.parseDelimiter("=")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Value")
+			panic(message)
+		} else {
+			// This is not a single value rule.
+			return value, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "iota" delimiter.
+	_, token, ok = v.parseDelimiter("iota")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Value")
+			panic(message)
+		} else {
+			// This is not a single value rule.
+			return value, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single value rule.
+	ruleFound_ = true
+	value = ast.Value().Make(
+		name,
+		abstraction,
+	)
+	return value, token, ruleFound_
+}
+
+func (v *parser_) parseDelimiter(expectedValue string) (
+	value string,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a single delimiter.
+	value, token, ok = v.parseToken(DelimiterToken)
+	if ok {
+		if value == expectedValue {
+			// Found the right delimiter.
+			return value, token, true
+		}
+		v.putBack(token)
+	}
+
+	// This is not the right delimiter.
+	return value, token, false
+}
+
+func (v *parser_) parseToken(tokenType TokenType) (
+	value string,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a specific token type.
+	token = v.getNextToken()
+	for token != nil {
+		// Check the token type.
+		switch token.GetType() {
+		case tokenType:
+			// Found the right token type.
+			value = token.GetValue()
+			return value, token, true
+		case SpaceToken, NewlineToken:
+			// Ignore any unspecified whitespace.
+			token = v.getNextToken()
+		default:
+			// This is not the right token type.
+			v.putBack(token)
+			return value, token, false
+		}
+	}
+
+	// We are at the end-of-file marker.
+	return value, token, false
+}
+
+func (v *parser_) formatError(token TokenLike, ruleName string) string {
 	// Format the error message.
 	var message = fmt.Sprintf(
 		"An unexpected token was received by the parser: %v\n",
@@ -144,7 +3095,7 @@ func (v *parser_) formatError(token TokenLike) string {
 
 	// Append an arrow pointing to the error.
 	message += " \033[32m>>>─"
-	var count = 0
+	var count uint
 	for count < token.GetPosition() {
 		message += "─"
 		count++
@@ -152,24 +3103,23 @@ func (v *parser_) formatError(token TokenLike) string {
 	message += "⌃\033[36m\n"
 
 	// Append the following source line for context.
-	if line < len(lines) {
+	if line < uint(len(lines)) {
 		message += fmt.Sprintf("%04d: ", line+1) + string(lines[line]) + "\n"
 	}
 	message += "\033[0m\n"
-
-	return message
-}
-
-func (v *parser_) generateSyntax(expected string, names ...string) string {
-	var message = "Was expecting '" + expected + "' from:\n"
-	for _, name := range names {
+	if col.IsDefined(ruleName) {
+		message += "Was expecting:\n"
 		message += fmt.Sprintf(
 			"  \033[32m%v: \033[33m%v\033[0m\n\n",
-			name,
-			syntax[name],
+			ruleName,
+			v.getDefinition(ruleName),
 		)
 	}
 	return message
+}
+
+func (v *parser_) getDefinition(ruleName string) string {
+	return syntax_.GetValue(ruleName)
 }
 
 func (v *parser_) getNextToken() TokenLike {
@@ -181,2058 +3131,86 @@ func (v *parser_) getNextToken() TokenLike {
 	// Read a new token from the token stream.
 	var token, ok = v.tokens_.RemoveHead() // This will wait for a token.
 	if !ok {
-		panic("The token channel terminated without an EOF token.")
+		// The token channel has been closed.
+		return nil
 	}
 
 	// Check for an error token.
 	if token.GetType() == ErrorToken {
-		var message = v.formatError(token)
+		var message = v.formatError(token, "")
 		panic(message)
 	}
 
 	return token
 }
 
-func (v *parser_) parseAbstraction() (
-	abstraction ast.AbstractionLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse an optional prefix.
-	var prefix, _, _ = v.parsePrefix()
-
-	// Attempt to parse an optional alias.
-	var alias, _, _ = v.parseAlias()
-
-	// Attempt to parse the name of the abstraction.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		if col.IsDefined(prefix) || col.IsDefined(alias) {
-			var message = v.formatError(token)
-			message += v.generateSyntax("name",
-				"Abstraction",
-				"Prefix",
-				"GenericArguments",
-			)
-			panic(message)
-		}
-		// This is not an abstraction.
-		return abstraction, token, false
-	}
-
-	// Check if the name is actually a method name for the next declaration.
-	var delimiterToken TokenLike
-	_, delimiterToken, ok = v.parseToken(DelimiterToken, "(")
-	if ok {
-		// This is not an abstraction, put back the delimiter and name tokens.
-		v.putBack(delimiterToken)
-		v.putBack(token)
-		return abstraction, token, false
-	}
-
-	// Attempt to parse optional generic arguments.
-	var genericArguments, _, _ = v.parseGenericArguments()
-
-	// Found an abstraction.
-	abstraction = ast.Abstraction().Make(prefix, alias, name, genericArguments)
-	return abstraction, token, true
-}
-
-func (v *parser_) parseAbstractions() (
-	abstractions ast.AbstractionsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Abstractions")
-	if !ok {
-		// This is not a sequence of abstractions.
-		return abstractions, token, false
-	}
-
-	// Attempt to parse one or more abstractions.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Abstraction",
-			"Abstractions",
-			"Abstraction",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.AbstractionLike]()
-	for ok {
-		list.AppendValue(abstraction)
-		abstraction, token, ok = v.parseAbstraction()
-	}
-
-	// Found a sequence of abstractions.
-	abstractions = ast.Abstractions().Make(note, list)
-	return abstractions, token, true
-}
-
-func (v *parser_) parseAdditionalArgument() (
-	additionalArgument ast.AdditionalArgumentLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the trailing "," for the previous argument.
-	_, token, ok = v.parseToken(DelimiterToken, ",")
-	if !ok {
-		// This is not an additional argument.
-		return additionalArgument, token, false
-	}
-
-	// Attempt to parse an additional argument.
-	var argument ast.ArgumentLike
-	argument, _, ok = v.parseArgument()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Argument",
-			"AdditionalArgument",
-			"Argument",
-		)
-		panic(message)
-	}
-
-	// Found an additional argument.
-	additionalArgument = ast.AdditionalArgument().Make(argument)
-	return additionalArgument, token, true
-}
-
-func (v *parser_) parseAdditionalParameter() (
-	additionalParameter ast.AdditionalParameterLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the trailing "," for the previous parameter.
-	_, token, ok = v.parseToken(DelimiterToken, ",")
-	if !ok {
-		// This is not an additional parameter.
-		return additionalParameter, token, false
-	}
-
-	// Attempt to parse an additional parameter.
-	var parameter ast.ParameterLike
-	parameter, _, ok = v.parseParameter()
-	if !ok {
-		// This is not an additional parameter, put back the comma token.
-		v.putBack(token)
-		return additionalParameter, token, false
-	}
-
-	// Found an additional parameter.
-	additionalParameter = ast.AdditionalParameter().Make(parameter)
-	return additionalParameter, token, true
-}
-
-func (v *parser_) parseAdditionalValue() (
-	additionalValue ast.AdditionalValueLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the value.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not an additional value.
-		return additionalValue, token, false
-	}
-
-	// Found an additional value.
-	additionalValue = ast.AdditionalValue().Make(name)
-	return additionalValue, token, true
-}
-
-func (v *parser_) parseAlias() (
-	alias ast.AliasLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a module name abbreviation.
-	var name string
-	var nameToken TokenLike
-	name, nameToken, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not an alias.
-		return alias, nameToken, false
-	}
-
-	// Attempt to parse the trailing ".".
-	_, token, ok = v.parseToken(DelimiterToken, ".")
-	if !ok {
-		// This is not an alias, put back the name token.
-		v.putBack(nameToken)
-		return alias, token, false
-	}
-
-	// Found an alias.
-	alias = ast.Alias().Make(name)
-	return alias, token, true
-}
-
-func (v *parser_) parseArgument() (
-	argument ast.ArgumentLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse an abstraction.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		// This is not an argument.
-		return argument, token, false
-	}
-
-	// Found an argument.
-	argument = ast.Argument().Make(abstraction)
-	return argument, token, true
-}
-
-func (v *parser_) parseArguments() (
-	arguments ast.ArgumentsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse an argument.
-	var argument ast.ArgumentLike
-	argument, token, ok = v.parseArgument()
-	if !ok {
-		// This is not a sequence of arguments.
-		return arguments, token, false
-	}
-
-	// Attempt to parse zero or more additional arguments.
-	var additionalArguments = col.List[ast.AdditionalArgumentLike]()
-	var additionalArgument ast.AdditionalArgumentLike
-	additionalArgument, token, ok = v.parseAdditionalArgument()
-	for ok {
-		additionalArguments.AppendValue(additionalArgument)
-		additionalArgument, token, ok = v.parseAdditionalArgument()
-	}
-
-	// Found a sequence of arguments.
-	arguments = ast.Arguments().Make(argument, additionalArguments)
-	return arguments, token, true
-}
-
-func (v *parser_) parseArray() (
-	array ast.ArrayLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the opening "[" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "[")
-	if !ok {
-		// This is not an array.
-		return array, token, false
-	}
-
-	// Attempt to parse the closing "]" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "]")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("]",
-			"Array",
-		)
-		panic(message)
-	}
-
-	// Found an array.
-	array = ast.Array().Make()
-	return array, token, true
-}
-
-func (v *parser_) parseAspect() (
-	aspect ast.AspectLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a declaration.
-	var declaration ast.DeclarationLike
-	declaration, token, ok = v.parseDeclaration()
-	if !ok {
-		// This is not an aspect.
-		return aspect, token, false
-	}
-
-	// Attempt to parse a literal.
-	_, token, ok = v.parseToken(NameToken, "interface")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"interface"`,
-			"Aspect",
-			"Declaration",
-			"Method",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the opening "{" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "{")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("{",
-			"Aspect",
-			"Declaration",
-			"Method",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse one or more methods.
-	var method ast.MethodLike
-	method, token, ok = v.parseMethod()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Methods",
-			"Aspect",
-			"Declaration",
-			"Method",
-		)
-		panic(message)
-	}
-	var methods = col.List[ast.MethodLike]()
-	for ok {
-		methods.AppendValue(method)
-		method, _, ok = v.parseMethod()
-	}
-
-	// Attempt to parse the closing "}" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "}")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("}",
-			"Aspect",
-			"Declaration",
-			"Method",
-		)
-		panic(message)
-	}
-
-	// Found an aspect.
-	aspect = ast.Aspect().Make(declaration, methods)
-	return aspect, token, true
-}
-
-func (v *parser_) parseAspects() (
-	aspects ast.AspectsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Aspects")
-	if !ok {
-		// This is not a sequence of aspects.
-		return aspects, token, false
-	}
-
-	// Attempt to parse one or more aspects.
-	var aspect ast.AspectLike
-	aspect, token, ok = v.parseAspect()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Aspect",
-			"Aspects",
-			"Aspect",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.AspectLike]()
-	for ok {
-		list.AppendValue(aspect)
-		aspect, token, ok = v.parseAspect()
-	}
-
-	// Found a sequence of aspects.
-	list.SortValuesWithRanker(func(first, second ast.AspectLike) col.Rank {
-		var firstName = first.GetDeclaration().GetName()
-		var secondName = second.GetDeclaration().GetName()
-		switch {
-		case firstName < secondName:
-			return col.LesserRank
-		case firstName > secondName:
-			return col.GreaterRank
-		default:
-			return col.EqualRank
-		}
-	})
-	aspects = ast.Aspects().Make(note, list)
-	return aspects, token, true
-}
-
-func (v *parser_) parseAttribute() (
-	attribute ast.AttributeLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the attribute.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not an attribute.
-		return attribute, token, false
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Attribute",
-			"Parameter",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional parameter.
-	var parameter, _, _ = v.parseParameter()
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Attribute",
-			"Parameter",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional abstraction.
-	var abstraction, _, _ = v.parseAbstraction()
-
-	// Found an attribute.
-	attribute = ast.Attribute().Make(name, parameter, abstraction)
-	return attribute, token, true
-}
-
-func (v *parser_) parseAttributes() (
-	attributes ast.AttributesLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Attributes")
-	if !ok {
-		// This is not a sequence of attributes.
-		return attributes, token, false
-	}
-
-	// Attempt to parse one or more attributes.
-	var attribute ast.AttributeLike
-	attribute, token, ok = v.parseAttribute()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Attribute",
-			"Attributes",
-			"Attribute",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.AttributeLike]()
-	for ok {
-		list.AppendValue(attribute)
-		attribute, token, ok = v.parseAttribute()
-	}
-
-	// Found a sequence of attributes.
-	attributes = ast.Attributes().Make(note, list)
-	return attributes, token, true
-}
-
-func (v *parser_) parseChannel() (
-	channel ast.ChannelLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the "chan" keyword.
-	_, token, ok = v.parseToken(NameToken, "chan")
-	if !ok {
-		// This is not a channel.
-		return channel, token, false
-	}
-
-	// Found a channel.
-	channel = ast.Channel().Make()
-	return channel, token, true
-}
-
-func (v *parser_) parseClass() (
-	class ast.ClassLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a declaration.
-	var declaration ast.DeclarationLike
-	declaration, token, ok = v.parseDeclaration()
-	if !ok {
-		// This is not a class.
-		return class, token, false
-	}
-
-	// Attempt to parse the "interface" keyword.
-	_, token, ok = v.parseToken(NameToken, "interface")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"interface"`,
-			"Class",
-			"Declaration",
-			"Constructors",
-			"Constants",
-			"Functions",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the opening "{" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "{")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("{",
-			"Class",
-			"Declaration",
-			"Constructors",
-			"Constants",
-			"Functions",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse a sequence of constructors.
-	var constructors ast.ConstructorsLike
-	constructors, token, ok = v.parseConstructors()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("// Constructors",
-			"Class",
-			"Declaration",
-			"Constructors",
-			"Constants",
-			"Functions",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of constants.
-	var constants, _, _ = v.parseConstants()
-
-	// Attempt to parse an optional sequence of functions.
-	var functions, _, _ = v.parseFunctions()
-
-	// Attempt to parse the closing "}" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "}")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("}",
-			"Class",
-			"Declaration",
-			"Constructors",
-			"Constants",
-			"Functions",
-		)
-		panic(message)
-	}
-
-	// Found a class.
-	class = ast.Class().Make(declaration, constructors, constants, functions)
-	return class, token, true
-}
-
-func (v *parser_) parseClasses() (
-	classes ast.ClassesLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Classes")
-	if !ok {
-		// This is not a sequence of classes.
-		return classes, token, false
-	}
-
-	// Attempt to parse one or more classes.
-	var class ast.ClassLike
-	class, token, ok = v.parseClass()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Class",
-			"Classes",
-			"Class",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.ClassLike]()
-	for ok {
-		list.AppendValue(class)
-		class, token, ok = v.parseClass()
-	}
-
-	// Found a sequence of classes.
-	list.SortValuesWithRanker(func(first, second ast.ClassLike) col.Rank {
-		var firstName = first.GetDeclaration().GetName()
-		var secondName = second.GetDeclaration().GetName()
-		switch {
-		case firstName < secondName:
-			return col.LesserRank
-		case firstName > secondName:
-			return col.GreaterRank
-		default:
-			return col.EqualRank
-		}
-	})
-	classes = ast.Classes().Make(note, list)
-	return classes, token, true
-}
-
-func (v *parser_) parseConstant() (
-	constant ast.ConstantLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the constant.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not a constant.
-		return constant, token, false
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Constant",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Constant",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional abstraction.
-	var abstraction, _, _ = v.parseAbstraction()
-
-	// Found a constant.
-	constant = ast.Constant().Make(name, abstraction)
-	return constant, token, true
-}
-
-func (v *parser_) parseConstants() (
-	constants ast.ConstantsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Constants")
-	if !ok {
-		// This is not a sequence of constants.
-		return constants, token, false
-	}
-
-	// Attempt to parse one or more constants.
-	var constant ast.ConstantLike
-	constant, token, ok = v.parseConstant()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Constant",
-			"Constants",
-			"Constant",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.ConstantLike]()
-	for ok {
-		list.AppendValue(constant)
-		constant, token, ok = v.parseConstant()
-	}
-
-	// Found a sequence of constants.
-	constants = ast.Constants().Make(note, list)
-	return constants, token, true
-}
-
-func (v *parser_) parseConstructor() (
-	constructor ast.ConstructorLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the constructor.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not a constructor.
-		return constructor, token, false
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Constructor",
-			"Parameters",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of parameters.
-	var parameters, _, _ = v.parseParameters()
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Constructor",
-			"Parameters",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional abstraction.
-	var abstraction, _, _ = v.parseAbstraction()
-
-	// Found a constructor.
-	constructor = ast.Constructor().Make(name, parameters, abstraction)
-	return constructor, token, true
-}
-
-func (v *parser_) parseConstructors() (
-	constructors ast.ConstructorsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Constructors")
-	if !ok {
-		// This is not a sequence of constructors.
-		return constructors, token, false
-	}
-
-	// Attempt to parse one or more constructors.
-	var constructor ast.ConstructorLike
-	constructor, token, ok = v.parseConstructor()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Constructor",
-			"Constructors",
-			"Constructor",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.ConstructorLike]()
-	for ok {
-		list.AppendValue(constructor)
-		constructor, token, ok = v.parseConstructor()
-	}
-
-	// Found a sequence of constructors.
-	constructors = ast.Constructors().Make(note, list)
-	return constructors, token, true
-}
-
-func (v *parser_) parseDeclaration() (
-	declaration ast.DeclarationLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a comment.
-	var comment string
-	comment, token, ok = v.parseToken(CommentToken, "")
-	if !ok {
-		// This is not a declaration.
-		return declaration, token, false
-	}
-
-	// Attempt to parse the "type" keyword.
-	_, token, ok = v.parseToken(NameToken, "type")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"type"`,
-			"Declaration",
-			"GenericParameters",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the name of the type declaration.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("name",
-			"Declaration",
-			"GenericParameters",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of generic parameters.
-	var genericParameters, _, _ = v.parseGenericParameters()
-
-	// Found a declaration.
-	declaration = ast.Declaration().Make(comment, name, genericParameters)
-	return declaration, token, true
-}
-
-func (v *parser_) parseEnumeration() (
-	enumeration ast.EnumerationLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the "const" keyword.
-	_, token, ok = v.parseToken(NameToken, "const")
-	if !ok {
-		// This is not an enumeration.
-		return enumeration, token, false
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Enumeration",
-			"Values",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the enumerated values.
-	var values ast.ValuesLike
-	values, token, ok = v.parseValues()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Values",
-			"Enumeration",
-			"Values",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Enumeration",
-			"Values",
-		)
-		panic(message)
-	}
-
-	// Found an enumeration.
-	enumeration = ast.Enumeration().Make(values)
-	return enumeration, token, true
-}
-
-func (v *parser_) parseFunction() (
-	function ast.FunctionLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the function.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not a function.
-		return function, token, false
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Function",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of parameters.
-	var parameters, _, _ = v.parseParameters()
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Function",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse a result.
-	var result ast.ResultLike
-	result, token, ok = v.parseResult()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Result",
-			"Function",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Found a function.
-	function = ast.Function().Make(name, parameters, result)
-	return function, token, true
-}
-
-func (v *parser_) parseFunctional() (
-	functional ast.FunctionalLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a declaration.
-	var declaration ast.DeclarationLike
-	declaration, token, ok = v.parseDeclaration()
-	if !ok {
-		// This is not a functional.
-		return functional, token, false
-	}
-
-	// Attempt to parse the "func" keyword.
-	_, token, ok = v.parseToken(NameToken, "func")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"func"`,
-			"Functional",
-			"Declaration",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Functional",
-			"Declaration",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of parameters.
-	var parameters, _, _ = v.parseParameters()
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Functional",
-			"Declaration",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse a result.
-	var result ast.ResultLike
-	result, token, ok = v.parseResult()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Result",
-			"Functional",
-			"Declaration",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Found a functional.
-	functional = ast.Functional().Make(declaration, parameters, result)
-	return functional, token, true
-}
-
-func (v *parser_) parseFunctionals() (
-	functionals ast.FunctionalsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Functionals")
-	if !ok {
-		// This is not a sequence of functionals.
-		return functionals, token, false
-	}
-
-	// Attempt to parse one or more functionals.
-	var functional ast.FunctionalLike
-	functional, token, ok = v.parseFunctional()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Functional",
-			"Functionals",
-			"Functional",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.FunctionalLike]()
-	for ok {
-		list.AppendValue(functional)
-		functional, token, ok = v.parseFunctional()
-	}
-
-	// Found a sequence of functionals.
-	list.SortValuesWithRanker(func(first, second ast.FunctionalLike) col.Rank {
-		var firstName = first.GetDeclaration().GetName()
-		var secondName = second.GetDeclaration().GetName()
-		switch {
-		case firstName < secondName:
-			return col.LesserRank
-		case firstName > secondName:
-			return col.GreaterRank
-		default:
-			return col.EqualRank
-		}
-	})
-	functionals = ast.Functionals().Make(note, list)
-	return functionals, token, true
-}
-
-func (v *parser_) parseFunctions() (
-	functions ast.FunctionsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Functions")
-	if !ok {
-		// This is not a sequence of functions.
-		return functions, token, false
-	}
-
-	// Attempt to parse one or more functions.
-	var function ast.FunctionLike
-	function, token, ok = v.parseFunction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Function",
-			"Functions",
-			"Function",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.FunctionLike]()
-	for ok {
-		list.AppendValue(function)
-		function, token, ok = v.parseFunction()
-	}
-
-	// Found a sequence of functions.
-	functions = ast.Functions().Make(note, list)
-	return functions, token, true
-}
-
-func (v *parser_) parseGenericArguments() (
-	genericArguments ast.GenericArgumentsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the opening "[" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "[")
-	if !ok {
-		// This is not a sequence of generic arguments.
-		return genericArguments, token, false
-	}
-
-	// Attempt to parse the arguments.
-	var arguments ast.ArgumentsLike
-	arguments, token, ok = v.parseArguments()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Arguments",
-			"GenericArguments",
-			"Arguments",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the closing "]" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "]")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("]",
-			"GenericArguments",
-			"Arguments",
-		)
-		panic(message)
-	}
-
-	// Found a sequence of generic arguments.
-	genericArguments = ast.GenericArguments().Make(arguments)
-	return genericArguments, token, true
-}
-
-func (v *parser_) parseGenericParameters() (
-	genericParameters ast.GenericParametersLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the opening "[" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "[")
-	if !ok {
-		// This is not a sequence of generic parameters.
-		return genericParameters, token, false
-	}
-
-	// Attempt to parse the parameters.
-	var parameters ast.ParametersLike
-	parameters, token, ok = v.parseParameters()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Parameters",
-			"GenericParameters",
-			"Parameters",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the closing "]" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "]")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("]",
-			"GenericParameters",
-			"Parameters",
-		)
-		panic(message)
-	}
-
-	// Found a sequence of generic parameters.
-	genericParameters = ast.GenericParameters().Make(parameters)
-	return genericParameters, token, true
-}
-
-func (v *parser_) parseHeader() (
-	header ast.HeaderLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a comment.
-	var comment string
-	comment, token, ok = v.parseToken(CommentToken, "")
-	if !ok {
-		// This is not a header.
-		return header, token, false
-	}
-
-	// Attempt to parse the "package" keyword.
-	_, token, ok = v.parseToken(NameToken, "package")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"package"`,
-			"Header",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the name of the package.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("name",
-			"Header",
-		)
-		panic(message)
-	}
-
-	// Found a header.
-	header = ast.Header().Make(comment, name)
-	return header, token, true
-}
-
-func (v *parser_) parseImports() (
-	imports ast.ImportsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the "import" keyword.
-	_, token, ok = v.parseToken(NameToken, "import")
-	if !ok {
-		// This is not a sequence of imported modules.
-		return imports, token, false
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Imports",
-			"Modules",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse a sequence of imported modules.
-	var modules ast.ModulesLike
-	modules, token, ok = v.parseModules()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Modules",
-			"Imports",
-			"Modules",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Imports",
-			"Modules",
-		)
-		panic(message)
-	}
-
-	// Found a sequence of imported modules.
-	imports = ast.Imports().Make(modules)
-	return imports, token, true
-}
-
-func (v *parser_) parseInstance() (
-	instance ast.InstanceLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a declaration.
-	var declaration ast.DeclarationLike
-	declaration, token, ok = v.parseDeclaration()
-	if !ok {
-		// This is not an instance.
-		return instance, token, false
-	}
-
-	// Attempt to parse the "interface" keyword.
-	_, token, ok = v.parseToken(NameToken, "interface")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"interface"`,
-			"Instance",
-			"Declaration",
-			"Attributes",
-			"Abstractions",
-			"Methods",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the opening "{" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "{")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("{",
-			"Instance",
-			"Declaration",
-			"Attributes",
-			"Abstractions",
-			"Methods",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse a sequence of attributes.
-	var attributes ast.AttributesLike
-	attributes, token, ok = v.parseAttributes()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("{",
-			"Instance",
-			"Declaration",
-			"Attributes",
-			"Abstractions",
-			"Methods",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of abstractions.
-	var abstractions, _, _ = v.parseAbstractions()
-
-	// Attempt to parse an optional sequence of methods.
-	var methods, _, _ = v.parseMethods()
-
-	// Attempt to parse the closing "}" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "}")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("}",
-			"Instance",
-			"Declaration",
-			"Attributes",
-			"Abstractions",
-			"Methods",
-		)
-		panic(message)
-	}
-
-	// Found an instance.
-	instance = ast.Instance().Make(declaration, attributes, abstractions, methods)
-	return instance, token, true
-}
-
-func (v *parser_) parseInstances() (
-	instances ast.InstancesLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Instances")
-	if !ok {
-		// This is not a sequence of instances.
-		return instances, token, false
-	}
-
-	// Attempt to parse one or more instances.
-	var instance ast.InstanceLike
-	instance, token, ok = v.parseInstance()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Instance",
-			"Instances",
-			"Instance",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.InstanceLike]()
-	for ok {
-		list.AppendValue(instance)
-		instance, token, ok = v.parseInstance()
-	}
-
-	// Found a sequence of instances.
-	list.SortValuesWithRanker(func(first, second ast.InstanceLike) col.Rank {
-		var firstName = first.GetDeclaration().GetName()
-		var secondName = second.GetDeclaration().GetName()
-		switch {
-		case firstName < secondName:
-			return col.LesserRank
-		case firstName > secondName:
-			return col.GreaterRank
-		default:
-			return col.EqualRank
-		}
-	})
-	instances = ast.Instances().Make(note, list)
-	return instances, token, true
-}
-
-func (v *parser_) parseMap() (
-	map_ ast.MapLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the "map" keyword.
-	_, token, ok = v.parseToken(NameToken, "map")
-	if !ok {
-		// This is not a map.
-		return map_, token, false
-	}
-
-	// Attempt to parse the opening "[" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "[")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("[",
-			"Map",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the name of the map key type.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("name",
-			"Map",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the closing "]" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "]")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("]",
-			"Map",
-		)
-		panic(message)
-	}
-
-	// Found a map.
-	map_ = ast.Map().Make(name)
-	return map_, token, true
-}
-
-func (v *parser_) parseMethod() (
-	method ast.MethodLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the method.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not a method.
-		return method, token, false
-	}
-
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Method",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of parameters.
-	var parameters, _, _ = v.parseParameters()
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Method",
-			"Parameters",
-			"Result",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional result.
-	var result ast.ResultLike
-	result, _, _ = v.parseResult()
-
-	// Found a method.
-	method = ast.Method().Make(name, parameters, result)
-	return method, token, true
-}
-
-func (v *parser_) parseMethods() (
-	methods ast.MethodsLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Methods")
-	if !ok {
-		// This is not a sequence of methods.
-		return methods, token, false
-	}
-
-	// Attempt to parse one or more methods.
-	var method ast.MethodLike
-	method, token, ok = v.parseMethod()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Method",
-			"Methods",
-			"Method",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.MethodLike]()
-	for ok {
-		list.AppendValue(method)
-		method, token, ok = v.parseMethod()
-	}
-
-	// Found a sequence of methods.
-	methods = ast.Methods().Make(note, list)
-	return methods, token, true
-}
-
-func (v *parser_) parseModel() (
-	model ast.ModelLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a notice.
-	var notice ast.NoticeLike
-	notice, token, ok = v.parseNotice()
-	if !ok {
-		// This is not a model.
-		return model, token, false
-	}
-
-	// Attempt to parse a header.
-	var header ast.HeaderLike
-	header, token, ok = v.parseHeader()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Header",
-			"Model",
-			"Notice",
-			"Header",
-			"Imports",
-			"Types",
-			"Functionals",
-			"Classes",
-			"Instances",
-			"Aspects",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional sequence of imports.
-	var imports, _, _ = v.parseImports()
-
-	// Attempt to parse an optional sequence of types.
-	var types, _, _ = v.parseTypes()
-
-	// Attempt to parse an optional sequence of functionals.
-	var functionals, _, _ = v.parseFunctionals()
-
-	// Attempt to parse an optional sequence of classes.
-	var classes, _, _ = v.parseClasses()
-
-	// Attempt to parse an optional sequence of instances.
-	var instances, _, _ = v.parseInstances()
-
-	// Attempt to parse an optional sequence of aspects.
-	var aspects, _, _ = v.parseAspects()
-
-	// Found a model.
-	model = ast.Model().Make(
-		notice,
-		header,
-		imports,
-		types,
-		functionals,
-		classes,
-		instances,
-		aspects,
-	)
-	return model, token, true
-}
-
-func (v *parser_) parseModule() (
-	module ast.ModuleLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the module.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not a module.
-		return module, token, false
-	}
-
-	// Attempt to parse the path of the module.
-	var path string
-	path, token, ok = v.parseToken(PathToken, "")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("path",
-			"Module",
-		)
-		panic(message)
-	}
-
-	// Found a module.
-	module = ast.Module().Make(name, path)
-	return module, token, true
-}
-
-func (v *parser_) parseModules() (
-	modules ast.ModulesLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a sequence of modules.
-	var list = col.List[ast.ModuleLike]()
-	var module ast.ModuleLike
-	module, token, ok = v.parseModule()
-	for ok {
-		list.AppendValue(module)
-		module, token, ok = v.parseModule()
-	}
-
-	// Found a sequence of modules.
-	list.SortValuesWithRanker(func(first, second ast.ModuleLike) col.Rank {
-		var firstPath = first.GetPath()
-		var secondPath = second.GetPath()
-		switch {
-		case firstPath < secondPath:
-			return col.LesserRank
-		case firstPath > secondPath:
-			return col.GreaterRank
-		default:
-			return col.EqualRank
-		}
-	})
-	modules = ast.Modules().Make(list)
-	return modules, token, true
-}
-
-func (v *parser_) parseNotice() (
-	notice ast.NoticeLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a comment.
-	var comment string
-	comment, token, ok = v.parseToken(CommentToken, "")
-	if !ok {
-		// This is not a notice.
-		return notice, token, false
-	}
-
-	// Found a notice.
-	notice = ast.Notice().Make(comment)
-	return notice, token, true
-}
-
-func (v *parser_) parseParameter() (
-	parameter ast.ParameterLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the parameter.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not a parameter.
-		return parameter, token, false
-	}
-
-	// Attempt to parse the abstract type of the parameter.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Abstraction",
-			"Parameter",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Found a parameter.
-	parameter = ast.Parameter().Make(name, abstraction)
-	return parameter, token, true
-}
-
-func (v *parser_) parseParameterized() (
-	parameterized ast.ParameterizedLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the opening "(" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		// This is not a parameterized result.
-		return parameterized, token, false
-	}
-
-	// Attempt to parse a sequence of parameters.
-	var parameters ast.ParametersLike
-	parameters, token, ok = v.parseParameters()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Parameters",
-			"Parameterized",
-			"Parameters",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the closing ")" bracket.
-	_, token, ok = v.parseToken(DelimiterToken, ")")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(")",
-			"Parameterized",
-			"Parameters",
-		)
-		panic(message)
-	}
-
-	// Found a parameterized result.
-	parameterized = ast.Parameterized().Make(parameters)
-	return parameterized, token, true
-}
-
-func (v *parser_) parseParameters() (
-	parameters ast.ParametersLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a parameter.
-	var parameter ast.ParameterLike
-	parameter, token, ok = v.parseParameter()
-	if !ok {
-		// This is not a sequence of parameters.
-		return parameters, token, false
-	}
-
-	// Attempt to parse zero or more additional parameters.
-	var additionalParameters = col.List[ast.AdditionalParameterLike]()
-	var additionalParameter ast.AdditionalParameterLike
-	additionalParameter, token, ok = v.parseAdditionalParameter()
-	for ok {
-		additionalParameters.AppendValue(additionalParameter)
-		additionalParameter, token, ok = v.parseAdditionalParameter()
-	}
-
-	// Attempt to parse an optional trailing "," for the last parameter.
-	v.parseToken(DelimiterToken, ",")
-
-	// Found a sequence of parameters.
-	parameters = ast.Parameters().Make(parameter, additionalParameters)
-	return parameters, token, true
-}
-
-func (v *parser_) parsePrefix() (
-	prefix ast.PrefixLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse an array prefix.
-	var array ast.ArrayLike
-	array, token, ok = v.parseArray()
-	if ok {
-		prefix = ast.Prefix().Make(array)
-		return prefix, token, true
-	}
-
-	// Attempt to parse an map prefix.
-	var map_ ast.MapLike
-	map_, token, ok = v.parseMap()
-	if ok {
-		prefix = ast.Prefix().Make(map_)
-		return prefix, token, true
-	}
-
-	// Attempt to parse an channel prefix.
-	var channel ast.ChannelLike
-	channel, token, ok = v.parseChannel()
-	if ok {
-		prefix = ast.Prefix().Make(channel)
-		return prefix, token, true
-	}
-
-	// This is not a prefix.
-	return prefix, token, false
-}
-
-func (v *parser_) parseResult() (
-	result ast.ResultLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse an abstract result type.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if ok {
-		result = ast.Result().Make(abstraction)
-		return result, token, true
-	}
-
-	// Attempt to parse a parameterized result type.
-	var parameterized ast.ParameterizedLike
-	parameterized, token, ok = v.parseParameterized()
-	if ok {
-		result = ast.Result().Make(parameterized)
-		return result, token, true
-	}
-
-	// This is not a result.
-	return result, token, false
-}
-
-func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
-	value string,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a specific token type.
-	token = v.getNextToken()
-	if token.GetType() == expectedType {
-		// Found the right token type.
-		value = token.GetValue()
-		if col.IsUndefined(expectedValue) || value == expectedValue {
-			// Found the right token value.
-			return value, token, true
-		}
-	}
-
-	// This is not the right token.
-	v.putBack(token)
-	return value, token, false
-}
-
-func (v *parser_) parseType() (
-	type_ ast.TypeLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a declaration.
-	var declaration ast.DeclarationLike
-	declaration, token, ok = v.parseDeclaration()
-	if !ok {
-		// This is not a type.
-		return type_, token, false
-	}
-
-	// Attempt to parse an abstraction.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Abstraction",
-			"Type",
-			"Declaration",
-			"Abstraction",
-			"Enumeration",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse an optional enumeration.
-	var enumeration ast.EnumerationLike
-	enumeration, _, _ = v.parseEnumeration()
-
-	// Found a type.
-	type_ = ast.Type().Make(declaration, abstraction, enumeration)
-	return type_, token, true
-}
-
-func (v *parser_) parseTypes() (
-	types ast.TypesLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a note.
-	var note string
-	note, token, ok = v.parseToken(NoteToken, "// Types")
-	if !ok {
-		// This is not a sequence of types.
-		return types, token, false
-	}
-
-	// Attempt to parse one or more types.
-	var type_ ast.TypeLike
-	type_, token, ok = v.parseType()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Type",
-			"Types",
-			"Type",
-		)
-		panic(message)
-	}
-	var list = col.List[ast.TypeLike]()
-	for ok {
-		list.AppendValue(type_)
-		type_, token, ok = v.parseType()
-	}
-
-	// Found a sequence of types.
-	list.SortValuesWithRanker(func(first, second ast.TypeLike) col.Rank {
-		var firstName = first.GetDeclaration().GetName()
-		var secondName = second.GetDeclaration().GetName()
-		switch {
-		case firstName < secondName:
-			return col.LesserRank
-		case firstName > secondName:
-			return col.GreaterRank
-		default:
-			return col.EqualRank
-		}
-	})
-	types = ast.Types().Make(note, list)
-	return types, token, true
-}
-
-func (v *parser_) parseValue() (
-	value ast.ValueLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse the name of the enumerated value.
-	var name string
-	name, token, ok = v.parseToken(NameToken, "")
-	if !ok {
-		// This is not an enumerated value.
-		return value, token, false
-	}
-
-	// Attempt to parse the abstract type of the enumerated value.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("Abstraction",
-			"Value",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the "=" operator.
-	_, token, ok = v.parseToken(DelimiterToken, "=")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("=",
-			"Value",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the "iota" keyword.
-	_, token, ok = v.parseToken(NameToken, "iota")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax(`"iota"`,
-			"Value",
-			"Abstraction",
-		)
-		panic(message)
-	}
-
-	// Found an enumerated value.
-	value = ast.Value().Make(name, abstraction)
-	return value, token, true
-}
-
-func (v *parser_) parseValues() (
-	values ast.ValuesLike,
-	token TokenLike,
-	ok bool,
-) {
-	// Attempt to parse a value.
-	var value ast.ValueLike
-	value, token, ok = v.parseValue()
-	if !ok {
-		// This is not a sequence of values.
-		return values, token, false
-	}
-
-	// Attempt to parse zero or more additional values.
-	var additionalValues = col.List[ast.AdditionalValueLike]()
-	var additionalValue ast.AdditionalValueLike
-	additionalValue, token, ok = v.parseAdditionalValue()
-	for ok {
-		additionalValues.AppendValue(additionalValue)
-		additionalValue, token, ok = v.parseAdditionalValue()
-	}
-
-	// Found a sequence of values.
-	values = ast.Values().Make(value, additionalValues)
-	return values, token, true
-}
-
 func (v *parser_) putBack(token TokenLike) {
-	//fmt.Printf("Put Back %v\n", token)
 	v.next_.AddValue(token)
 }
 
-var syntax = map[string]string{
-	"Model":               `Notice Header Imports? Types? Functionals? Classes Instances Aspects? EOF`,
-	"Notice":              `comment`,
-	"Header":              `comment "package" name`,
-	"Imports":             `"import" "(" Modules ")"`,
-	"Modules":             `Module+`,
-	"Module":              `name path`,
-	"Types":               `note Type+`,
-	"Type":                `Declaration Abstraction Enumeration?`,
-	"Declaration":         `comment "type" name GenericParameters?`,
-	"GenericParameters":   `"[" Parameters "]"`,
-	"Parameters":          `Parameter AdditionalParameter* ","?`,
-	"Parameter":           `name Abstraction`,
-	"AdditionalParameter": `"," Parameter`,
-	"Abstraction":         `Prefix? Alias? name GenericArguments?`,
-	"Prefix": `
-    Array
-    Map
-    Channel`,
-	"Array":              `"[" "]"`,
-	"Map":                `"map" "[" name "]"`,
-	"Channel":            `"chan"`,
-	"Alias":              `name "."`,
-	"GenericArguments":   `"[" Arguments "]"`,
-	"Arguments":          `Argument AdditionalArgument*`,
-	"Argument":           `Abstraction`,
-	"AdditionalArgument": `"," Argument`,
-	"Enumeration":        `"const" "(" Values ")"`,
-	"Values":             `Value AdditionalValue*`,
-	"Value":              `name Abstraction "=" "iota"`,
-	"AdditionalValue":    `name`,
-	"Functionals":        `note Functional+`,
-	"Functional":         `Declaration "func" "(" Parameters? ")" Result`,
-	"Result": `
-    Abstraction
-    Parameterized`,
-	"Parameterized": `"(" Parameters ")"`,
-	"Classes":       `note Class+`,
-	"Class":         `Declaration "interface" "{" Constructors Constants? Functions? "}"`,
-	"Constructors":  `note Constructor+`,
-	"Constructor":   `name "(" Parameters? ")" Abstraction`,
-	"Constants":     `note Constant+`,
-	"Constant":      `name "(" ")" Abstraction`,
-	"Functions":     `note Function+`,
-	"Function":      `name "(" Parameters? ")" Result`,
-	"Instances":     `note Instance+`,
-	"Instance":      `Declaration "interface" "{" Attributes Abstractions? Methods? "}"`,
-	"Attributes":    `note Attribute+`,
-	"Attribute":     `name "(" Parameter? ")" Abstraction?`,
-	"Abstractions":  `note Abstraction+`,
-	"Methods":       `note Method+`,
-	"Method":        `name "(" Parameters? ")" Result?`,
-	"Aspects":       `note Aspect+`,
-	"Aspect":        `Declaration "interface" "{" Method+ "}"`,
-}
+// PRIVATE GLOBALS
+
+// Constants
+
+const unlimited = 4294967295 // Default to a reasonable value.
+
+var syntax_ = col.Catalog[string, string](
+	map[string]string{
+		"Model":                `ModuleDefinition PrimitiveDefinitions InterfaceDefinitions`,
+		"ModuleDefinition":     `Notice Header Imports?`,
+		"PrimitiveDefinitions": `TypeDefinitions? FunctionalDefinitions?`,
+		"InterfaceDefinitions": `ClassDefinitions InstanceDefinitions AspectDefinitions?`,
+		"Notice":               `comment`,
+		"Header":               `comment "package" name`,
+		"Imports":              `"import" "(" Module+ ")"`,
+		"Module":               `name path`,
+		"TypeDefinitions":      `"// Types" Type+`,
+		"Type":                 `Declaration Abstraction Enumeration?`,
+		"Declaration":          `comment "type" name GenericParameters?`,
+		"GenericParameters":    `"[" Parameter+ "]"`,
+		"Parameter":            `name Abstraction ","`,
+		"Abstraction":          `Prefix? name Suffix? GenericArguments?`,
+		"Prefix": `
+  - Array
+  - Map
+  - Channel`,
+		"Array":                 `"[" "]"`,
+		"Map":                   `"map" "[" name "]"`,
+		"Channel":               `"chan"`,
+		"Suffix":                `"." name`,
+		"GenericArguments":      `"[" Argument AdditionalArgument* "]"`,
+		"Argument":              `Abstraction`,
+		"AdditionalArgument":    `"," Argument`,
+		"Enumeration":           `"const" "(" Value AdditionalValue* ")"`,
+		"Value":                 `name Abstraction "=" "iota"`,
+		"AdditionalValue":       `name`,
+		"FunctionalDefinitions": `"// Functionals" Functional+`,
+		"Functional":            `Declaration "func" "(" Parameter* ")" Result`,
+		"Result": `
+  - None
+  - Abstraction
+  - Parameterized`,
+		"None":                `newline`,
+		"Parameterized":       `"(" Parameter+ ")"`,
+		"ClassDefinitions":    `"// Classes" Class+`,
+		"Class":               `Declaration "interface" "{" ClassMethods "}"`,
+		"ClassMethods":        `ConstructorMethods ConstantMethods? FunctionMethods?`,
+		"ConstructorMethods":  `"// Constructor" Constructor+`,
+		"Constructor":         `name "(" Parameter* ")" Abstraction`,
+		"ConstantMethods":     `"// Constant" Constant+`,
+		"Constant":            `name "(" ")" Abstraction`,
+		"FunctionMethods":     `"// Function" Function+`,
+		"Function":            `name "(" Parameter* ")" Result`,
+		"InstanceDefinitions": `"// Instances" Instance+`,
+		"Instance":            `Declaration "interface" "{" InstanceMethods "}"`,
+		"InstanceMethods":     `PublicMethods AttributeMethods? AspectInterfaces?`,
+		"PublicMethods":       `"// Public" Method+`,
+		"Method":              `name "(" Parameter* ")" Result?`,
+		"AttributeMethods":    `"// Attribute" Attribute+`,
+		"Attribute":           `name "(" Parameter? ")" Abstraction?`,
+		"AspectInterfaces":    `"// Aspect" Interface+`,
+		"Interface":           `name Suffix? GenericArguments?`,
+		"AspectDefinitions":   `"// Aspects" Aspect+`,
+		"Aspect":              `Declaration "interface" "{" Method+ "}"`,
+	},
+)

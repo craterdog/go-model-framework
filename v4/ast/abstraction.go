@@ -42,8 +42,8 @@ type abstractionClass_ struct {
 
 func (c *abstractionClass_) Make(
 	optionalPrefix PrefixLike,
-	optionalAlias AliasLike,
 	name string,
+	optionalSuffix SuffixLike,
 	optionalGenericArguments GenericArgumentsLike,
 ) AbstractionLike {
 	// Validate the arguments.
@@ -55,8 +55,8 @@ func (c *abstractionClass_) Make(
 			// Initialize instance attributes.
 			class_:                    c,
 			optionalPrefix_:           optionalPrefix,
-			optionalAlias_:            optionalAlias,
 			name_:                     name,
+			optionalSuffix_:           optionalSuffix,
 			optionalGenericArguments_: optionalGenericArguments,
 		}
 	}
@@ -70,27 +70,29 @@ type abstraction_ struct {
 	// Define instance attributes.
 	class_                    AbstractionClassLike
 	optionalPrefix_           PrefixLike
-	optionalAlias_            AliasLike
 	name_                     string
+	optionalSuffix_           SuffixLike
 	optionalGenericArguments_ GenericArgumentsLike
 }
 
-// Attributes
+// Public
 
 func (v *abstraction_) GetClass() AbstractionClassLike {
 	return v.class_
 }
 
+// Attribute
+
 func (v *abstraction_) GetOptionalPrefix() PrefixLike {
 	return v.optionalPrefix_
 }
 
-func (v *abstraction_) GetOptionalAlias() AliasLike {
-	return v.optionalAlias_
-}
-
 func (v *abstraction_) GetName() string {
 	return v.name_
+}
+
+func (v *abstraction_) GetOptionalSuffix() SuffixLike {
+	return v.optionalSuffix_
 }
 
 func (v *abstraction_) GetOptionalGenericArguments() GenericArgumentsLike {

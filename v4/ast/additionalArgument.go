@@ -20,36 +20,36 @@ import (
 
 // Reference
 
-var aliasClass = &aliasClass_{
+var additionalArgumentClass = &additionalArgumentClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Alias() AliasClassLike {
-	return aliasClass
+func AdditionalArgument() AdditionalArgumentClassLike {
+	return additionalArgumentClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type aliasClass_ struct {
+type additionalArgumentClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *aliasClass_) Make(name string) AliasLike {
+func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
+	case col.IsUndefined(argument):
+		panic("The argument attribute is required by this class.")
 	default:
-		return &alias_{
+		return &additionalArgument_{
 			// Initialize instance attributes.
-			class_: c,
-			name_:  name,
+			class_:    c,
+			argument_: argument,
 		}
 	}
 }
@@ -58,20 +58,22 @@ func (c *aliasClass_) Make(name string) AliasLike {
 
 // Target
 
-type alias_ struct {
+type additionalArgument_ struct {
 	// Define instance attributes.
-	class_ AliasClassLike
-	name_  string
+	class_    AdditionalArgumentClassLike
+	argument_ ArgumentLike
 }
 
-// Attributes
+// Public
 
-func (v *alias_) GetClass() AliasClassLike {
+func (v *additionalArgument_) GetClass() AdditionalArgumentClassLike {
 	return v.class_
 }
 
-func (v *alias_) GetName() string {
-	return v.name_
+// Attribute
+
+func (v *additionalArgument_) GetArgument() ArgumentLike {
+	return v.argument_
 }
 
 // Private

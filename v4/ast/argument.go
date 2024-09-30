@@ -64,11 +64,13 @@ type argument_ struct {
 	abstraction_ AbstractionLike
 }
 
-// Attributes
+// Public
 
 func (v *argument_) GetClass() ArgumentClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *argument_) GetAbstraction() AbstractionLike {
 	return v.abstraction_

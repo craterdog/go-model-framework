@@ -21,42 +21,36 @@ import (
 
 // Reference
 
-var parametersClass = &parametersClass_{
+var publicMethodsClass = &publicMethodsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Parameters() ParametersClassLike {
-	return parametersClass
+func PublicMethods() PublicMethodsClassLike {
+	return publicMethodsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type parametersClass_ struct {
+type publicMethodsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *parametersClass_) Make(
-	parameter ParameterLike,
-	additionalParameters abs.Sequential[AdditionalParameterLike],
-) ParametersLike {
+func (c *publicMethodsClass_) Make(methods abs.Sequential[MethodLike]) PublicMethodsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(parameter):
-		panic("The parameter attribute is required by this class.")
-	case col.IsUndefined(additionalParameters):
-		panic("The additionalParameters attribute is required by this class.")
+	case col.IsUndefined(methods):
+		panic("The methods attribute is required by this class.")
 	default:
-		return &parameters_{
+		return &publicMethods_{
 			// Initialize instance attributes.
-			class_:                c,
-			parameter_:            parameter,
-			additionalParameters_: additionalParameters,
+			class_:   c,
+			methods_: methods,
 		}
 	}
 }
@@ -65,25 +59,22 @@ func (c *parametersClass_) Make(
 
 // Target
 
-type parameters_ struct {
+type publicMethods_ struct {
 	// Define instance attributes.
-	class_                ParametersClassLike
-	parameter_            ParameterLike
-	additionalParameters_ abs.Sequential[AdditionalParameterLike]
+	class_   PublicMethodsClassLike
+	methods_ abs.Sequential[MethodLike]
 }
 
-// Attributes
+// Public
 
-func (v *parameters_) GetClass() ParametersClassLike {
+func (v *publicMethods_) GetClass() PublicMethodsClassLike {
 	return v.class_
 }
 
-func (v *parameters_) GetParameter() ParameterLike {
-	return v.parameter_
-}
+// Attribute
 
-func (v *parameters_) GetAdditionalParameters() abs.Sequential[AdditionalParameterLike] {
-	return v.additionalParameters_
+func (v *publicMethods_) GetMethods() abs.Sequential[MethodLike] {
+	return v.methods_
 }
 
 // Private

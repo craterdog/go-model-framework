@@ -56,10 +56,12 @@ type channel_ struct {
 	class_ ChannelClassLike
 }
 
-// Attributes
+// Public
 
 func (v *channel_) GetClass() ChannelClassLike {
 	return v.class_
 }
+
+// Attribute
 
 // Private

@@ -71,11 +71,13 @@ type module_ struct {
 	path_  string
 }
 
-// Attributes
+// Public
 
 func (v *module_) GetClass() ModuleClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *module_) GetName() string {
 	return v.name_

@@ -21,42 +21,42 @@ import (
 
 // Reference
 
-var instancesClass = &instancesClass_{
+var genericArgumentsClass = &genericArgumentsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Instances() InstancesClassLike {
-	return instancesClass
+func GenericArguments() GenericArgumentsClassLike {
+	return genericArgumentsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type instancesClass_ struct {
+type genericArgumentsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *instancesClass_) Make(
-	note string,
-	instances abs.Sequential[InstanceLike],
-) InstancesLike {
+func (c *genericArgumentsClass_) Make(
+	argument ArgumentLike,
+	additionalArguments abs.Sequential[AdditionalArgumentLike],
+) GenericArgumentsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(instances):
-		panic("The instances attribute is required by this class.")
+	case col.IsUndefined(argument):
+		panic("The argument attribute is required by this class.")
+	case col.IsUndefined(additionalArguments):
+		panic("The additional arguments attribute is required by this class.")
 	default:
-		return &instances_{
+		return &genericArguments_{
 			// Initialize instance attributes.
-			class_:     c,
-			note_:      note,
-			instances_: instances,
+			class_:               c,
+			argument_:            argument,
+			additionalArguments_: additionalArguments,
 		}
 	}
 }
@@ -65,25 +65,27 @@ func (c *instancesClass_) Make(
 
 // Target
 
-type instances_ struct {
+type genericArguments_ struct {
 	// Define instance attributes.
-	class_     InstancesClassLike
-	note_      string
-	instances_ abs.Sequential[InstanceLike]
+	class_               GenericArgumentsClassLike
+	argument_            ArgumentLike
+	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
 }
 
-// Attributes
+// Public
 
-func (v *instances_) GetClass() InstancesClassLike {
+func (v *genericArguments_) GetClass() GenericArgumentsClassLike {
 	return v.class_
 }
 
-func (v *instances_) GetNote() string {
-	return v.note_
+// Attribute
+
+func (v *genericArguments_) GetArgument() ArgumentLike {
+	return v.argument_
 }
 
-func (v *instances_) GetInstances() abs.Sequential[InstanceLike] {
-	return v.instances_
+func (v *genericArguments_) GetAdditionalArguments() abs.Sequential[AdditionalArgumentLike] {
+	return v.additionalArguments_
 }
 
 // Private

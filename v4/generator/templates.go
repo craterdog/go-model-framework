@@ -132,7 +132,7 @@ const instanceMethodsTemplate_ = `
 // INSTANCE METHODS
 
 // Target
-<Target><Attributes><Abstractions><Methods>
+<Target><Methods><Attributes><Abstractions>
 // Private
 `
 
@@ -240,7 +240,9 @@ const (
 TrigonometricFunction is a functional type that defines the signature for any
 trigonometric function.
 */
-type TrigonometricFunction func(angle AngleLike) float64
+type TrigonometricFunction func(
+	angle AngleLike,
+) float64
 
 // Classes
 
@@ -250,9 +252,13 @@ constructors and functions that must be supported by each angle-like concrete
 class.
 */
 type AngleClassLike interface {
-	// Constructors
-	MakeFromValue(value float64) AngleLike
-	MakeFromString(value string) AngleLike
+	// Constructor
+	MakeFromValue(
+		value float64,
+	) AngleLike
+	MakeFromString(
+		value string,
+	) AngleLike
 
 	// Constants
 	Pi() AngleLike
@@ -263,9 +269,15 @@ type AngleClassLike interface {
 		function TrigonometricFunction,
 		angle AngleLike,
 	) float64
-	Sine(angle AngleLike) float64
-	Cosine(angle AngleLike) float64
-	Tangent(angle AngleLike) float64
+	Sine(
+		angle AngleLike,
+	) float64
+	Cosine(
+		angle AngleLike,
+	) float64
+	Tangent(
+		angle AngleLike,
+	) float64
 }
 
 // Instances
@@ -276,15 +288,13 @@ abstractions and methods that must be supported by each instance of a concrete
 angle-like class.
 */
 type AngleLike interface {
-	// Attributes
+	// Public
 	GetClass() AngleClassLike
-
-	// Abstractions
-	Angular
-
-	// Methods
 	AsFloat() float64
 	IsZero() bool
+
+	// Aspect
+	Angular
 }
 
 // Aspects
@@ -295,7 +305,9 @@ must be supported by each instance of an angular concrete class.
 */
 type Angular interface {
 	AsNormalized() AngleLike
-	InUnits(units Units) float64
+	InUnits(
+		units Units,
+	) float64
 }`
 
 const arrayTemplate_ = `/*
@@ -356,10 +368,16 @@ class constants, constructors and functions that must be supported by each
 concrete array-like class.
 */
 type ArrayClassLike[V any] interface {
-	// Constructors
-	MakeWithSize(size uint) ArrayLike[V]
-	MakeFromValue(value []V) ArrayLike[V]
-	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+	// Constructor
+	MakeWithSize(
+		size uint,
+	) ArrayLike[V]
+	MakeFromValue(
+		value []V,
+	) ArrayLike[V]
+	MakeFromSequence(
+		values Sequential[V],
+	) ArrayLike[V]
 
 	// Constants
 	DefaultRanker() RankingFunction[V]
@@ -378,17 +396,17 @@ uses ORDINAL based indexing rather than the more common—and nonsensical—ZERO
 based indexing scheme.
 */
 type ArrayLike[V any] interface {
-	// Attributes
+	// Public
 	GetClass() ArrayClassLike[V]
+	SortValues()
+	SortValuesWithRanker(
+		ranker RankingFunction[V],
+	)
 
-	// Abstractions
+	// Aspect
 	Accessible[V]
 	Sequential[V]
 	Updatable[V]
-
-	// Methods
-	SortValues()
-	SortValuesWithRanker(ranker RankingFunction[V])
 }
 
 // Aspects
@@ -411,7 +429,9 @@ Notice that because the indices are ordinal based, the positive and negative
 indices are symmetrical.
 */
 type Accessible[V any] interface {
-	GetValue(index int) V
+	GetValue(
+		index int,
+	) V
 	GetValues(
 		first int,
 		last int,
@@ -492,7 +512,9 @@ const (
 NormFunction[V any] is a functional type that defines the signature for any
 mathematical norm function.
 */
-type NormFunction[V any] func(value V) float64
+type NormFunction[V any] func(
+	value V,
+) float64
 
 // Classes
 
@@ -502,20 +524,24 @@ constructors and functions that must be supported by each complex-like concrete
 class.
 */
 type ComplexClassLike interface {
-	// Constructors
+	// Constructor
 	Make(
 		realPart float64,
 		imaginaryPart float64,
 		form Form,
 	) ComplexLike
-	MakeFromValue(value complex128) ComplexLike
+	MakeFromValue(
+		value complex128,
+	) ComplexLike
 
 	// Constants
 	Zero() ComplexLike
 	Infinity() ComplexLike
 
 	// Functions
-	Inverse(value ComplexLike) ComplexLike
+	Inverse(
+		value ComplexLike,
+	) ComplexLike
 	Sum(
 		first ComplexLike,
 		second ComplexLike,
@@ -524,7 +550,9 @@ type ComplexClassLike interface {
 		first ComplexLike,
 		second ComplexLike,
 	) ComplexLike
-	Reciprocal(value ComplexLike) ComplexLike
+	Reciprocal(
+		value ComplexLike,
+	) ComplexLike
 	Product(
 		first ComplexLike,
 		second ComplexLike,
@@ -547,19 +575,21 @@ abstractions and methods that must be supported by each instance of a concrete
 complex-like class.
 */
 type ComplexLike interface {
-	// Attributes
+	// Public
 	GetClass() ComplexClassLike
+	IsReal() bool
+	IsImaginary() bool
+
+	// Attribute
 	GetRealPart() float64
 	GetImaginaryPart() float64
 	GetForm() Form
-	SetForm(form Form)
+	SetForm(
+		form Form,
+	)
 
-	// Abstractions
+	// Aspect
 	Continuous
-
-	// Methods
-	IsReal() bool
-	IsImaginary() bool
 }
 
 // Aspects
@@ -632,7 +662,7 @@ the complete set of class constants, constructors and functions that must be
 supported by each concrete association-like class.
 */
 type AssociationClassLike[K comparable, V any] interface {
-	// Constructors
+	// Constructor
 	Make(
 		key K,
 		value V,
@@ -656,11 +686,17 @@ key is present in both catalogs, the value of the key from the second
 catalog takes precedence.
 */
 type CatalogClassLike[K comparable, V any] interface {
-	// Constructors
+	// Constructor
 	Make() CatalogLike[K, V]
-	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
-	MakeFromMap(associations map[K]V) CatalogLike[K, V]
-	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
+	MakeFromArray(
+		associations []AssociationLike[K, V],
+	) CatalogLike[K, V]
+	MakeFromMap(
+		associations map[K]V,
+	) CatalogLike[K, V]
+	MakeFromSequence(
+		associations Sequential[AssociationLike[K, V]],
+	) CatalogLike[K, V]
 
 	// Constants
 	DefaultRanker() RankingFunction[AssociationLike[K, V]]
@@ -684,11 +720,15 @@ complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete association-like class.
 */
 type AssociationLike[K comparable, V any] interface {
-	// Attributes
+	// Public
 	GetClass() AssociationClassLike[K, V]
+
+	// Attribute
 	GetKey() K
 	GetValue() V
-	SetValue(value V)
+	SetValue(
+		value V,
+	)
 }
 
 /*
@@ -697,16 +737,16 @@ complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete catalog-like class.
 */
 type CatalogLike[K comparable, V any] interface {
-	// Attributes
+	// Public
 	GetClass() CatalogClassLike[K, V]
+	SortValues()
+	SortValuesWithRanker(
+		ranker RankingFunction[AssociationLike[K, V]],
+	)
 
-	// Abstractions
+	// Aspect
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
-
-	// Methods
-	SortValues()
-	SortValuesWithRanker(ranker RankingFunction[AssociationLike[K, V]])
 }
 
 // Aspects
@@ -717,8 +757,12 @@ must be supported by all sequences of key-value associations.
 */
 type Associative[K comparable, V any] interface {
 	GetKeys() Sequential[K]
-	GetValue(key K) V
-	RemoveValue(key K) V
+	GetValue(
+		key K,
+	) V
+	RemoveValue(
+		key K,
+	) V
 	SetValue(
 		key K,
 		value V,

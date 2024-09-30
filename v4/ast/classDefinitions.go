@@ -21,36 +21,36 @@ import (
 
 // Reference
 
-var modulesClass = &modulesClass_{
+var classDefinitionsClass = &classDefinitionsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Modules() ModulesClassLike {
-	return modulesClass
+func ClassDefinitions() ClassDefinitionsClassLike {
+	return classDefinitionsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type modulesClass_ struct {
+type classDefinitionsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *modulesClass_) Make(modules abs.Sequential[ModuleLike]) ModulesLike {
+func (c *classDefinitionsClass_) Make(classes abs.Sequential[ClassLike]) ClassDefinitionsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(modules):
-		panic("The modules attribute is required by this class.")
+	case col.IsUndefined(classes):
+		panic("The classes attribute is required by this class.")
 	default:
-		return &modules_{
+		return &classDefinitions_{
 			// Initialize instance attributes.
 			class_:   c,
-			modules_: modules,
+			classes_: classes,
 		}
 	}
 }
@@ -59,20 +59,22 @@ func (c *modulesClass_) Make(modules abs.Sequential[ModuleLike]) ModulesLike {
 
 // Target
 
-type modules_ struct {
+type classDefinitions_ struct {
 	// Define instance attributes.
-	class_   ModulesClassLike
-	modules_ abs.Sequential[ModuleLike]
+	class_   ClassDefinitionsClassLike
+	classes_ abs.Sequential[ClassLike]
 }
 
-// Attributes
+// Public
 
-func (v *modules_) GetClass() ModulesClassLike {
+func (v *classDefinitions_) GetClass() ClassDefinitionsClassLike {
 	return v.class_
 }
 
-func (v *modules_) GetModules() abs.Sequential[ModuleLike] {
-	return v.modules_
+// Attribute
+
+func (v *classDefinitions_) GetClasses() abs.Sequential[ClassLike] {
+	return v.classes_
 }
 
 // Private

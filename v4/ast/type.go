@@ -74,11 +74,13 @@ type type_ struct {
 	optionalEnumeration_ EnumerationLike
 }
 
-// Attributes
+// Public
 
 func (v *type_) GetClass() TypeClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *type_) GetDeclaration() DeclarationLike {
 	return v.declaration_

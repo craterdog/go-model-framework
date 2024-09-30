@@ -74,11 +74,13 @@ type declaration_ struct {
 	optionalGenericParameters_ GenericParametersLike
 }
 
-// Attributes
+// Public
 
 func (v *declaration_) GetClass() DeclarationClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *declaration_) GetComment() string {
 	return v.comment_

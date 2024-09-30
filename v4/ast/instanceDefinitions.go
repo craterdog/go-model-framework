@@ -14,42 +14,43 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var genericParametersClass = &genericParametersClass_{
+var instanceDefinitionsClass = &instanceDefinitionsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func GenericParameters() GenericParametersClassLike {
-	return genericParametersClass
+func InstanceDefinitions() InstanceDefinitionsClassLike {
+	return instanceDefinitionsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type genericParametersClass_ struct {
+type instanceDefinitionsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *genericParametersClass_) Make(parameters ParametersLike) GenericParametersLike {
+func (c *instanceDefinitionsClass_) Make(instances abs.Sequential[InstanceLike]) InstanceDefinitionsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(parameters):
-		panic("The parameters attribute is required by this class.")
+	case col.IsUndefined(instances):
+		panic("The instances attribute is required by this class.")
 	default:
-		return &genericParameters_{
+		return &instanceDefinitions_{
 			// Initialize instance attributes.
-			class_:      c,
-			parameters_: parameters,
+			class_:     c,
+			instances_: instances,
 		}
 	}
 }
@@ -58,20 +59,22 @@ func (c *genericParametersClass_) Make(parameters ParametersLike) GenericParamet
 
 // Target
 
-type genericParameters_ struct {
+type instanceDefinitions_ struct {
 	// Define instance attributes.
-	class_      GenericParametersClassLike
-	parameters_ ParametersLike
+	class_     InstanceDefinitionsClassLike
+	instances_ abs.Sequential[InstanceLike]
 }
 
-// Attributes
+// Public
 
-func (v *genericParameters_) GetClass() GenericParametersClassLike {
+func (v *instanceDefinitions_) GetClass() InstanceDefinitionsClassLike {
 	return v.class_
 }
 
-func (v *genericParameters_) GetParameters() ParametersLike {
-	return v.parameters_
+// Attribute
+
+func (v *instanceDefinitions_) GetInstances() abs.Sequential[InstanceLike] {
+	return v.instances_
 }
 
 // Private

@@ -72,11 +72,13 @@ type aspect_ struct {
 	methods_     abs.Sequential[MethodLike]
 }
 
-// Attributes
+// Public
 
 func (v *aspect_) GetClass() AspectClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *aspect_) GetDeclaration() DeclarationLike {
 	return v.declaration_

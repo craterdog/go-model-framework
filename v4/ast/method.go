@@ -14,6 +14,7 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -42,20 +43,22 @@ type methodClass_ struct {
 
 func (c *methodClass_) Make(
 	name string,
-	optionalParameters ParametersLike,
+	parameters abs.Sequential[ParameterLike],
 	optionalResult ResultLike,
 ) MethodLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(name):
 		panic("The name attribute is required by this class.")
+	case col.IsUndefined(parameters):
+		panic("The parameters attribute is required by this class.")
 	default:
 		return &method_{
 			// Initialize instance attributes.
-			class_:              c,
-			name_:               name,
-			optionalParameters_: optionalParameters,
-			optionalResult_:     optionalResult,
+			class_:          c,
+			name_:           name,
+			parameters_:     parameters,
+			optionalResult_: optionalResult,
 		}
 	}
 }
@@ -66,24 +69,26 @@ func (c *methodClass_) Make(
 
 type method_ struct {
 	// Define instance attributes.
-	class_              MethodClassLike
-	name_               string
-	optionalParameters_ ParametersLike
-	optionalResult_     ResultLike
+	class_          MethodClassLike
+	name_           string
+	parameters_     abs.Sequential[ParameterLike]
+	optionalResult_ ResultLike
 }
 
-// Attributes
+// Public
 
 func (v *method_) GetClass() MethodClassLike {
 	return v.class_
 }
 
+// Attribute
+
 func (v *method_) GetName() string {
 	return v.name_
 }
 
-func (v *method_) GetOptionalParameters() ParametersLike {
-	return v.optionalParameters_
+func (v *method_) GetParameters() abs.Sequential[ParameterLike] {
+	return v.parameters_
 }
 
 func (v *method_) GetOptionalResult() ResultLike {

@@ -21,42 +21,36 @@ import (
 
 // Reference
 
-var typesClass = &typesClass_{
+var attributeMethodsClass = &attributeMethodsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Types() TypesClassLike {
-	return typesClass
+func AttributeMethods() AttributeMethodsClassLike {
+	return attributeMethodsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type typesClass_ struct {
+type attributeMethodsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *typesClass_) Make(
-	note string,
-	types abs.Sequential[TypeLike],
-) TypesLike {
+func (c *attributeMethodsClass_) Make(attributes abs.Sequential[AttributeLike]) AttributeMethodsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(types):
-		panic("The types attribute is required by this class.")
+	case col.IsUndefined(attributes):
+		panic("The attributes attribute is required by this class.")
 	default:
-		return &types_{
+		return &attributeMethods_{
 			// Initialize instance attributes.
-			class_: c,
-			note_:  note,
-			types_: types,
+			class_:      c,
+			attributes_: attributes,
 		}
 	}
 }
@@ -65,25 +59,22 @@ func (c *typesClass_) Make(
 
 // Target
 
-type types_ struct {
+type attributeMethods_ struct {
 	// Define instance attributes.
-	class_ TypesClassLike
-	note_  string
-	types_ abs.Sequential[TypeLike]
+	class_      AttributeMethodsClassLike
+	attributes_ abs.Sequential[AttributeLike]
 }
 
-// Attributes
+// Public
 
-func (v *types_) GetClass() TypesClassLike {
+func (v *attributeMethods_) GetClass() AttributeMethodsClassLike {
 	return v.class_
 }
 
-func (v *types_) GetNote() string {
-	return v.note_
-}
+// Attribute
 
-func (v *types_) GetTypes() abs.Sequential[TypeLike] {
-	return v.types_
+func (v *attributeMethods_) GetAttributes() abs.Sequential[AttributeLike] {
+	return v.attributes_
 }
 
 // Private

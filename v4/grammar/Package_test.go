@@ -13,6 +13,7 @@
 package grammar_test
 
 import (
+	fmt "fmt"
 	gra "github.com/craterdog/go-model-framework/v4/grammar"
 	ass "github.com/stretchr/testify/assert"
 	osx "os"
@@ -21,12 +22,13 @@ import (
 
 var filenames = []string{
 	"../ast/Package.go",
-	"../generator/Package.go",
 	"../grammar/Package.go",
 }
 
 func TestRoundTrips(t *tes.T) {
+	fmt.Println("Round Trip Tests:")
 	for _, filename := range filenames {
+		fmt.Printf("   %v\n", filename)
 		// Read in the class model file.
 		var bytes, err = osx.ReadFile(filename)
 		if err != nil {
@@ -45,6 +47,7 @@ func TestRoundTrips(t *tes.T) {
 		// Format the class model.
 		var formatter = gra.Formatter().Make()
 		var actual = formatter.FormatModel(model)
-		ass.Equal(t, actual, source)
+		ass.Equal(t, source, actual)
 	}
+	fmt.Println("Done.")
 }

@@ -14,42 +14,43 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var additionalArgumentClass = &additionalArgumentClass_{
+var aspectInterfacesClass = &aspectInterfacesClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func AdditionalArgument() AdditionalArgumentClassLike {
-	return additionalArgumentClass
+func AspectInterfaces() AspectInterfacesClassLike {
+	return aspectInterfacesClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type additionalArgumentClass_ struct {
+type aspectInterfacesClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
+func (c *aspectInterfacesClass_) Make(interfaces abs.Sequential[InterfaceLike]) AspectInterfacesLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(argument):
-		panic("The argument attribute is required by this class.")
+	case col.IsUndefined(interfaces):
+		panic("The interfaces attribute is required by this class.")
 	default:
-		return &additionalArgument_{
+		return &aspectInterfaces_{
 			// Initialize instance attributes.
-			class_:    c,
-			argument_: argument,
+			class_:      c,
+			interfaces_: interfaces,
 		}
 	}
 }
@@ -58,20 +59,22 @@ func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumen
 
 // Target
 
-type additionalArgument_ struct {
+type aspectInterfaces_ struct {
 	// Define instance attributes.
-	class_    AdditionalArgumentClassLike
-	argument_ ArgumentLike
+	class_      AspectInterfacesClassLike
+	interfaces_ abs.Sequential[InterfaceLike]
 }
 
-// Attributes
+// Public
 
-func (v *additionalArgument_) GetClass() AdditionalArgumentClassLike {
+func (v *aspectInterfaces_) GetClass() AspectInterfacesClassLike {
 	return v.class_
 }
 
-func (v *additionalArgument_) GetArgument() ArgumentLike {
-	return v.argument_
+// Attribute
+
+func (v *aspectInterfaces_) GetInterfaces() abs.Sequential[InterfaceLike] {
+	return v.interfaces_
 }
 
 // Private

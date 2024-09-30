@@ -14,6 +14,7 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -40,16 +41,22 @@ type enumerationClass_ struct {
 
 // Constructors
 
-func (c *enumerationClass_) Make(values ValuesLike) EnumerationLike {
+func (c *enumerationClass_) Make(
+	value ValueLike,
+	additionalValues abs.Sequential[AdditionalValueLike],
+) EnumerationLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(values):
-		panic("The values attribute is required by this class.")
+	case col.IsUndefined(value):
+		panic("The value attribute is required by this class.")
+	case col.IsUndefined(additionalValues):
+		panic("The additional values attribute is required by this class.")
 	default:
 		return &enumeration_{
 			// Initialize instance attributes.
-			class_:  c,
-			values_: values,
+			class_:            c,
+			value_:            value,
+			additionalValues_: additionalValues,
 		}
 	}
 }
@@ -60,18 +67,25 @@ func (c *enumerationClass_) Make(values ValuesLike) EnumerationLike {
 
 type enumeration_ struct {
 	// Define instance attributes.
-	class_  EnumerationClassLike
-	values_ ValuesLike
+	class_            EnumerationClassLike
+	value_            ValueLike
+	additionalValues_ abs.Sequential[AdditionalValueLike]
 }
 
-// Attributes
+// Public
 
 func (v *enumeration_) GetClass() EnumerationClassLike {
 	return v.class_
 }
 
-func (v *enumeration_) GetValues() ValuesLike {
-	return v.values_
+// Attribute
+
+func (v *enumeration_) GetValue() ValueLike {
+	return v.value_
+}
+
+func (v *enumeration_) GetAdditionalValues() abs.Sequential[AdditionalValueLike] {
+	return v.additionalValues_
 }
 
 // Private

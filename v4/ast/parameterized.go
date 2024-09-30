@@ -14,6 +14,7 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -40,7 +41,7 @@ type parameterizedClass_ struct {
 
 // Constructors
 
-func (c *parameterizedClass_) Make(parameters ParametersLike) ParameterizedLike {
+func (c *parameterizedClass_) Make(parameters abs.Sequential[ParameterLike]) ParameterizedLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(parameters):
@@ -61,16 +62,18 @@ func (c *parameterizedClass_) Make(parameters ParametersLike) ParameterizedLike 
 type parameterized_ struct {
 	// Define instance attributes.
 	class_      ParameterizedClassLike
-	parameters_ ParametersLike
+	parameters_ abs.Sequential[ParameterLike]
 }
 
-// Attributes
+// Public
 
 func (v *parameterized_) GetClass() ParameterizedClassLike {
 	return v.class_
 }
 
-func (v *parameterized_) GetParameters() ParametersLike {
+// Attribute
+
+func (v *parameterized_) GetParameters() abs.Sequential[ParameterLike] {
 	return v.parameters_
 }
 

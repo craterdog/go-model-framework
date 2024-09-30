@@ -14,49 +14,48 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
-	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var constructorsClass = &constructorsClass_{
+var interfaceClass = &interfaceClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Constructors() ConstructorsClassLike {
-	return constructorsClass
+func Interface() InterfaceClassLike {
+	return interfaceClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type constructorsClass_ struct {
+type interfaceClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *constructorsClass_) Make(
-	note string,
-	constructors abs.Sequential[ConstructorLike],
-) ConstructorsLike {
+func (c *interfaceClass_) Make(
+	name string,
+	optionalSuffix SuffixLike,
+	optionalGenericArguments GenericArgumentsLike,
+) InterfaceLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(constructors):
-		panic("The constructors attribute is required by this class.")
+	case col.IsUndefined(name):
+		panic("The name attribute is required by this class.")
 	default:
-		return &constructors_{
+		return &interface_{
 			// Initialize instance attributes.
-			class_:        c,
-			note_:         note,
-			constructors_: constructors,
+			class_:                    c,
+			name_:                     name,
+			optionalSuffix_:           optionalSuffix,
+			optionalGenericArguments_: optionalGenericArguments,
 		}
 	}
 }
@@ -65,25 +64,32 @@ func (c *constructorsClass_) Make(
 
 // Target
 
-type constructors_ struct {
+type interface_ struct {
 	// Define instance attributes.
-	class_        ConstructorsClassLike
-	note_         string
-	constructors_ abs.Sequential[ConstructorLike]
+	class_                    InterfaceClassLike
+	name_                     string
+	optionalSuffix_           SuffixLike
+	optionalGenericArguments_ GenericArgumentsLike
 }
 
-// Attributes
+// Public
 
-func (v *constructors_) GetClass() ConstructorsClassLike {
+func (v *interface_) GetClass() InterfaceClassLike {
 	return v.class_
 }
 
-func (v *constructors_) GetNote() string {
-	return v.note_
+// Attribute
+
+func (v *interface_) GetName() string {
+	return v.name_
 }
 
-func (v *constructors_) GetConstructors() abs.Sequential[ConstructorLike] {
-	return v.constructors_
+func (v *interface_) GetOptionalSuffix() SuffixLike {
+	return v.optionalSuffix_
+}
+
+func (v *interface_) GetOptionalGenericArguments() GenericArgumentsLike {
+	return v.optionalGenericArguments_
 }
 
 // Private

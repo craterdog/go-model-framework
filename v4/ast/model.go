@@ -41,37 +41,25 @@ type modelClass_ struct {
 // Constructors
 
 func (c *modelClass_) Make(
-	notice NoticeLike,
-	header HeaderLike,
-	optionalImports ImportsLike,
-	optionalTypes TypesLike,
-	optionalFunctionals FunctionalsLike,
-	classes ClassesLike,
-	instances InstancesLike,
-	optionalAspects AspectsLike,
+	moduleDefinition ModuleDefinitionLike,
+	primitiveDefinitions PrimitiveDefinitionsLike,
+	interfaceDefinitions InterfaceDefinitionsLike,
 ) ModelLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(notice):
-		panic("The notice attribute is required by this class.")
-	case col.IsUndefined(header):
-		panic("The header attribute is required by this class.")
-	case col.IsUndefined(classes):
-		panic("The classes attribute is required by this class.")
-	case col.IsUndefined(instances):
-		panic("The instances attribute is required by this class.")
+	case col.IsUndefined(moduleDefinition):
+		panic("The moduleDefinition attribute is required by this class.")
+	case col.IsUndefined(primitiveDefinitions):
+		panic("The primitiveDefinitions attribute is required by this class.")
+	case col.IsUndefined(interfaceDefinitions):
+		panic("The interfaceDefinitions attribute is required by this class.")
 	default:
 		return &model_{
 			// Initialize instance attributes.
-			class_:               c,
-			notice_:              notice,
-			header_:              header,
-			optionalImports_:     optionalImports,
-			optionalTypes_:       optionalTypes,
-			optionalFunctionals_: optionalFunctionals,
-			classes_:             classes,
-			instances_:           instances,
-			optionalAspects_:     optionalAspects,
+			class_:                c,
+			moduleDefinition_:     moduleDefinition,
+			primitiveDefinitions_: primitiveDefinitions,
+			interfaceDefinitions_: interfaceDefinitions,
 		}
 	}
 }
@@ -82,53 +70,30 @@ func (c *modelClass_) Make(
 
 type model_ struct {
 	// Define instance attributes.
-	class_               ModelClassLike
-	notice_              NoticeLike
-	header_              HeaderLike
-	optionalImports_     ImportsLike
-	optionalTypes_       TypesLike
-	optionalFunctionals_ FunctionalsLike
-	classes_             ClassesLike
-	instances_           InstancesLike
-	optionalAspects_     AspectsLike
+	class_                ModelClassLike
+	moduleDefinition_     ModuleDefinitionLike
+	primitiveDefinitions_ PrimitiveDefinitionsLike
+	interfaceDefinitions_ InterfaceDefinitionsLike
 }
 
-// Attributes
+// Public
 
 func (v *model_) GetClass() ModelClassLike {
 	return v.class_
 }
 
-func (v *model_) GetNotice() NoticeLike {
-	return v.notice_
+// Attribute
+
+func (v *model_) GetModuleDefinition() ModuleDefinitionLike {
+	return v.moduleDefinition_
 }
 
-func (v *model_) GetHeader() HeaderLike {
-	return v.header_
+func (v *model_) GetPrimitiveDefinitions() PrimitiveDefinitionsLike {
+	return v.primitiveDefinitions_
 }
 
-func (v *model_) GetOptionalImports() ImportsLike {
-	return v.optionalImports_
-}
-
-func (v *model_) GetOptionalTypes() TypesLike {
-	return v.optionalTypes_
-}
-
-func (v *model_) GetOptionalFunctionals() FunctionalsLike {
-	return v.optionalFunctionals_
-}
-
-func (v *model_) GetClasses() ClassesLike {
-	return v.classes_
-}
-
-func (v *model_) GetInstances() InstancesLike {
-	return v.instances_
-}
-
-func (v *model_) GetOptionalAspects() AspectsLike {
-	return v.optionalAspects_
+func (v *model_) GetInterfaceDefinitions() InterfaceDefinitionsLike {
+	return v.interfaceDefinitions_
 }
 
 // Private

@@ -14,6 +14,7 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -40,7 +41,7 @@ type importsClass_ struct {
 
 // Constructors
 
-func (c *importsClass_) Make(modules ModulesLike) ImportsLike {
+func (c *importsClass_) Make(modules abs.Sequential[ModuleLike]) ImportsLike {
 	// Validate the arguments.
 	switch {
 	case col.IsUndefined(modules):
@@ -61,16 +62,18 @@ func (c *importsClass_) Make(modules ModulesLike) ImportsLike {
 type imports_ struct {
 	// Define instance attributes.
 	class_   ImportsClassLike
-	modules_ ModulesLike
+	modules_ abs.Sequential[ModuleLike]
 }
 
-// Attributes
+// Public
 
 func (v *imports_) GetClass() ImportsClassLike {
 	return v.class_
 }
 
-func (v *imports_) GetModules() ModulesLike {
+// Attribute
+
+func (v *imports_) GetModules() abs.Sequential[ModuleLike] {
 	return v.modules_
 }
 

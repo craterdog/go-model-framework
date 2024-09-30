@@ -21,42 +21,36 @@ import (
 
 // Reference
 
-var methodsClass = &methodsClass_{
+var constantMethodsClass = &constantMethodsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Methods() MethodsClassLike {
-	return methodsClass
+func ConstantMethods() ConstantMethodsClassLike {
+	return constantMethodsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type methodsClass_ struct {
+type constantMethodsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *methodsClass_) Make(
-	note string,
-	methods abs.Sequential[MethodLike],
-) MethodsLike {
+func (c *constantMethodsClass_) Make(constants abs.Sequential[ConstantLike]) ConstantMethodsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(methods):
-		panic("The methods attribute is required by this class.")
+	case col.IsUndefined(constants):
+		panic("The constants attribute is required by this class.")
 	default:
-		return &methods_{
+		return &constantMethods_{
 			// Initialize instance attributes.
-			class_:   c,
-			note_:    note,
-			methods_: methods,
+			class_:     c,
+			constants_: constants,
 		}
 	}
 }
@@ -65,25 +59,22 @@ func (c *methodsClass_) Make(
 
 // Target
 
-type methods_ struct {
+type constantMethods_ struct {
 	// Define instance attributes.
-	class_   MethodsClassLike
-	note_    string
-	methods_ abs.Sequential[MethodLike]
+	class_     ConstantMethodsClassLike
+	constants_ abs.Sequential[ConstantLike]
 }
 
-// Attributes
+// Public
 
-func (v *methods_) GetClass() MethodsClassLike {
+func (v *constantMethods_) GetClass() ConstantMethodsClassLike {
 	return v.class_
 }
 
-func (v *methods_) GetNote() string {
-	return v.note_
-}
+// Attribute
 
-func (v *methods_) GetMethods() abs.Sequential[MethodLike] {
-	return v.methods_
+func (v *constantMethods_) GetConstants() abs.Sequential[ConstantLike] {
+	return v.constants_
 }
 
 // Private

@@ -12,50 +12,42 @@
 
 package ast
 
-import (
-	col "github.com/craterdog/go-collection-framework/v4"
-)
-
 // CLASS ACCESS
 
 // Reference
 
-var parameterClass = &parameterClass_{
+var primitiveDefinitionsClass = &primitiveDefinitionsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Parameter() ParameterClassLike {
-	return parameterClass
+func PrimitiveDefinitions() PrimitiveDefinitionsClassLike {
+	return primitiveDefinitionsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type parameterClass_ struct {
+type primitiveDefinitionsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *parameterClass_) Make(
-	name string,
-	abstraction AbstractionLike,
-) ParameterLike {
+func (c *primitiveDefinitionsClass_) Make(
+	optionalTypeDefinitions TypeDefinitionsLike,
+	optionalFunctionalDefinitions FunctionalDefinitionsLike,
+) PrimitiveDefinitionsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
-	case col.IsUndefined(abstraction):
-		panic("The abstraction attribute is required by this class.")
 	default:
-		return &parameter_{
+		return &primitiveDefinitions_{
 			// Initialize instance attributes.
-			class_:       c,
-			name_:        name,
-			abstraction_: abstraction,
+			class_:                         c,
+			optionalTypeDefinitions_:       optionalTypeDefinitions,
+			optionalFunctionalDefinitions_: optionalFunctionalDefinitions,
 		}
 	}
 }
@@ -64,27 +56,27 @@ func (c *parameterClass_) Make(
 
 // Target
 
-type parameter_ struct {
+type primitiveDefinitions_ struct {
 	// Define instance attributes.
-	class_       ParameterClassLike
-	name_        string
-	abstraction_ AbstractionLike
+	class_                         PrimitiveDefinitionsClassLike
+	optionalTypeDefinitions_       TypeDefinitionsLike
+	optionalFunctionalDefinitions_ FunctionalDefinitionsLike
 }
 
 // Public
 
-func (v *parameter_) GetClass() ParameterClassLike {
+func (v *primitiveDefinitions_) GetClass() PrimitiveDefinitionsClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *parameter_) GetName() string {
-	return v.name_
+func (v *primitiveDefinitions_) GetOptionalTypeDefinitions() TypeDefinitionsLike {
+	return v.optionalTypeDefinitions_
 }
 
-func (v *parameter_) GetAbstraction() AbstractionLike {
-	return v.abstraction_
+func (v *primitiveDefinitions_) GetOptionalFunctionalDefinitions() FunctionalDefinitionsLike {
+	return v.optionalFunctionalDefinitions_
 }
 
 // Private

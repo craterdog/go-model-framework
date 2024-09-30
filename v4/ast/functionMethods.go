@@ -21,42 +21,36 @@ import (
 
 // Reference
 
-var attributesClass = &attributesClass_{
+var functionMethodsClass = &functionMethodsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Attributes() AttributesClassLike {
-	return attributesClass
+func FunctionMethods() FunctionMethodsClassLike {
+	return functionMethodsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type attributesClass_ struct {
+type functionMethodsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *attributesClass_) Make(
-	note string,
-	attributes abs.Sequential[AttributeLike],
-) AttributesLike {
+func (c *functionMethodsClass_) Make(functions abs.Sequential[FunctionLike]) FunctionMethodsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(attributes):
-		panic("The attributes attribute is required by this class.")
+	case col.IsUndefined(functions):
+		panic("The functions attribute is required by this class.")
 	default:
-		return &attributes_{
+		return &functionMethods_{
 			// Initialize instance attributes.
-			class_:      c,
-			note_:       note,
-			attributes_: attributes,
+			class_:     c,
+			functions_: functions,
 		}
 	}
 }
@@ -65,25 +59,22 @@ func (c *attributesClass_) Make(
 
 // Target
 
-type attributes_ struct {
+type functionMethods_ struct {
 	// Define instance attributes.
-	class_      AttributesClassLike
-	note_       string
-	attributes_ abs.Sequential[AttributeLike]
+	class_     FunctionMethodsClassLike
+	functions_ abs.Sequential[FunctionLike]
 }
 
-// Attributes
+// Public
 
-func (v *attributes_) GetClass() AttributesClassLike {
+func (v *functionMethods_) GetClass() FunctionMethodsClassLike {
 	return v.class_
 }
 
-func (v *attributes_) GetNote() string {
-	return v.note_
-}
+// Attribute
 
-func (v *attributes_) GetAttributes() abs.Sequential[AttributeLike] {
-	return v.attributes_
+func (v *functionMethods_) GetFunctions() abs.Sequential[FunctionLike] {
+	return v.functions_
 }
 
 // Private

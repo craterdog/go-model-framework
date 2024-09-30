@@ -138,6 +138,14 @@ func (v *generator_) GenerateClass(
 			instance.GetDeclaration().GetName(),
 			"Like",
 		))
+		if className != instanceName {
+			var message = fmt.Sprintf(
+				"The classes and instances in the model are out of sync: %v vs %v",
+				className,
+				instanceName,
+			)
+			panic(message)
+		}
 		if className == name && instanceName == name {
 			implementation = v.generateClass(model, class, instance)
 			return implementation

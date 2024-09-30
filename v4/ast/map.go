@@ -64,11 +64,13 @@ type map_ struct {
 	name_  string
 }
 
-// Attributes
+// Public
 
 func (v *map_) GetClass() MapClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *map_) GetName() string {
 	return v.name_

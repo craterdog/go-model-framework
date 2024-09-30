@@ -14,6 +14,7 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
@@ -42,7 +43,7 @@ type functionalClass_ struct {
 
 func (c *functionalClass_) Make(
 	declaration DeclarationLike,
-	optionalParameters ParametersLike,
+	parameters abs.Sequential[ParameterLike],
 	result ResultLike,
 ) FunctionalLike {
 	// Validate the arguments.
@@ -54,10 +55,10 @@ func (c *functionalClass_) Make(
 	default:
 		return &functional_{
 			// Initialize instance attributes.
-			class_:              c,
-			declaration_:        declaration,
-			optionalParameters_: optionalParameters,
-			result_:             result,
+			class_:       c,
+			declaration_: declaration,
+			parameters_:  parameters,
+			result_:      result,
 		}
 	}
 }
@@ -68,24 +69,26 @@ func (c *functionalClass_) Make(
 
 type functional_ struct {
 	// Define instance attributes.
-	class_              FunctionalClassLike
-	declaration_        DeclarationLike
-	optionalParameters_ ParametersLike
-	result_             ResultLike
+	class_       FunctionalClassLike
+	declaration_ DeclarationLike
+	parameters_  abs.Sequential[ParameterLike]
+	result_      ResultLike
 }
 
-// Attributes
+// Public
 
 func (v *functional_) GetClass() FunctionalClassLike {
 	return v.class_
 }
 
+// Attribute
+
 func (v *functional_) GetDeclaration() DeclarationLike {
 	return v.declaration_
 }
 
-func (v *functional_) GetOptionalParameters() ParametersLike {
-	return v.optionalParameters_
+func (v *functional_) GetParameters() abs.Sequential[ParameterLike] {
+	return v.parameters_
 }
 
 func (v *functional_) GetResult() ResultLike {

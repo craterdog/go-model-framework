@@ -56,10 +56,12 @@ type array_ struct {
 	class_ ArrayClassLike
 }
 
-// Attributes
+// Public
 
 func (v *array_) GetClass() ArrayClassLike {
 	return v.class_
 }
+
+// Attribute
 
 // Private

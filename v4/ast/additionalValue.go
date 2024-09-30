@@ -14,49 +14,42 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
-	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var functionalsClass = &functionalsClass_{
+var additionalValueClass = &additionalValueClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Functionals() FunctionalsClassLike {
-	return functionalsClass
+func AdditionalValue() AdditionalValueClassLike {
+	return additionalValueClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type functionalsClass_ struct {
+type additionalValueClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *functionalsClass_) Make(
-	note string,
-	functionals abs.Sequential[FunctionalLike],
-) FunctionalsLike {
+func (c *additionalValueClass_) Make(name string) AdditionalValueLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(functionals):
-		panic("The functionals attribute is required by this class.")
+	case col.IsUndefined(name):
+		panic("The name attribute is required by this class.")
 	default:
-		return &functionals_{
+		return &additionalValue_{
 			// Initialize instance attributes.
-			class_:       c,
-			note_:        note,
-			functionals_: functionals,
+			class_: c,
+			name_:  name,
 		}
 	}
 }
@@ -65,25 +58,22 @@ func (c *functionalsClass_) Make(
 
 // Target
 
-type functionals_ struct {
+type additionalValue_ struct {
 	// Define instance attributes.
-	class_       FunctionalsClassLike
-	note_        string
-	functionals_ abs.Sequential[FunctionalLike]
+	class_ AdditionalValueClassLike
+	name_  string
 }
 
-// Attributes
+// Public
 
-func (v *functionals_) GetClass() FunctionalsClassLike {
+func (v *additionalValue_) GetClass() AdditionalValueClassLike {
 	return v.class_
 }
 
-func (v *functionals_) GetNote() string {
-	return v.note_
-}
+// Attribute
 
-func (v *functionals_) GetFunctionals() abs.Sequential[FunctionalLike] {
-	return v.functionals_
+func (v *additionalValue_) GetName() string {
+	return v.name_
 }
 
 // Private

@@ -71,11 +71,13 @@ type constant_ struct {
 	abstraction_ AbstractionLike
 }
 
-// Attributes
+// Public
 
 func (v *constant_) GetClass() ConstantClassLike {
 	return v.class_
 }
+
+// Attribute
 
 func (v *constant_) GetName() string {
 	return v.name_

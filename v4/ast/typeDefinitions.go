@@ -14,42 +14,43 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var additionalParameterClass = &additionalParameterClass_{
+var typeDefinitionsClass = &typeDefinitionsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func AdditionalParameter() AdditionalParameterClassLike {
-	return additionalParameterClass
+func TypeDefinitions() TypeDefinitionsClassLike {
+	return typeDefinitionsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type additionalParameterClass_ struct {
+type typeDefinitionsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *additionalParameterClass_) Make(parameter ParameterLike) AdditionalParameterLike {
+func (c *typeDefinitionsClass_) Make(types abs.Sequential[TypeLike]) TypeDefinitionsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(parameter):
-		panic("The parameter attribute is required by this class.")
+	case col.IsUndefined(types):
+		panic("The types attribute is required by this class.")
 	default:
-		return &additionalParameter_{
+		return &typeDefinitions_{
 			// Initialize instance attributes.
-			class_:     c,
-			parameter_: parameter,
+			class_: c,
+			types_: types,
 		}
 	}
 }
@@ -58,20 +59,22 @@ func (c *additionalParameterClass_) Make(parameter ParameterLike) AdditionalPara
 
 // Target
 
-type additionalParameter_ struct {
+type typeDefinitions_ struct {
 	// Define instance attributes.
-	class_     AdditionalParameterClassLike
-	parameter_ ParameterLike
+	class_ TypeDefinitionsClassLike
+	types_ abs.Sequential[TypeLike]
 }
 
-// Attributes
+// Public
 
-func (v *additionalParameter_) GetClass() AdditionalParameterClassLike {
+func (v *typeDefinitions_) GetClass() TypeDefinitionsClassLike {
 	return v.class_
 }
 
-func (v *additionalParameter_) GetParameter() ParameterLike {
-	return v.parameter_
+// Attribute
+
+func (v *typeDefinitions_) GetTypes() abs.Sequential[TypeLike] {
+	return v.types_
 }
 
 // Private

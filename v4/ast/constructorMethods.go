@@ -21,42 +21,36 @@ import (
 
 // Reference
 
-var functionsClass = &functionsClass_{
+var constructorMethodsClass = &constructorMethodsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Functions() FunctionsClassLike {
-	return functionsClass
+func ConstructorMethods() ConstructorMethodsClassLike {
+	return constructorMethodsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type functionsClass_ struct {
+type constructorMethodsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *functionsClass_) Make(
-	note string,
-	functions abs.Sequential[FunctionLike],
-) FunctionsLike {
+func (c *constructorMethodsClass_) Make(constructors abs.Sequential[ConstructorLike]) ConstructorMethodsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(note):
-		panic("The note attribute is required by this class.")
-	case col.IsUndefined(functions):
-		panic("The functions attribute is required by this class.")
+	case col.IsUndefined(constructors):
+		panic("The constructors attribute is required by this class.")
 	default:
-		return &functions_{
+		return &constructorMethods_{
 			// Initialize instance attributes.
-			class_:     c,
-			note_:      note,
-			functions_: functions,
+			class_:        c,
+			constructors_: constructors,
 		}
 	}
 }
@@ -65,25 +59,22 @@ func (c *functionsClass_) Make(
 
 // Target
 
-type functions_ struct {
+type constructorMethods_ struct {
 	// Define instance attributes.
-	class_     FunctionsClassLike
-	note_      string
-	functions_ abs.Sequential[FunctionLike]
+	class_        ConstructorMethodsClassLike
+	constructors_ abs.Sequential[ConstructorLike]
 }
 
-// Attributes
+// Public
 
-func (v *functions_) GetClass() FunctionsClassLike {
+func (v *constructorMethods_) GetClass() ConstructorMethodsClassLike {
 	return v.class_
 }
 
-func (v *functions_) GetNote() string {
-	return v.note_
-}
+// Attribute
 
-func (v *functions_) GetFunctions() abs.Sequential[FunctionLike] {
-	return v.functions_
+func (v *constructorMethods_) GetConstructors() abs.Sequential[ConstructorLike] {
+	return v.constructors_
 }
 
 // Private

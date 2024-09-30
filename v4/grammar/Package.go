@@ -18,6 +18,8 @@ abstract syntax tree (AST) for this module:
   - Parser is used to process the token stream and generate the AST.
   - Validator is used to validate the semantics associated with an AST.
   - Formatter is used to format an AST back into a canonical version of its source.
+  - Visitor walks the AST and calls processor methods for each node in the tree.
+  - Processor provides empty processor methods to be inherited by the processors.
 
 For detailed documentation on this package refer to the wiki:
   - https://github.com/craterdog/go-model-framework/wiki
@@ -50,10 +52,8 @@ const (
 	ErrorToken TokenType = iota
 	CommentToken
 	DelimiterToken
-	EofToken
-	EolToken
 	NameToken
-	NoteToken
+	NewlineToken
 	PathToken
 	SpaceToken
 )
@@ -66,7 +66,7 @@ class constants, constructors and functions that must be supported by each
 concrete formatter-like class.
 */
 type FormatterClassLike interface {
-	// Constructors
+	// Constructor
 	Make() FormatterLike
 }
 
@@ -76,8 +76,18 @@ class constants, constructors and functions that must be supported by each
 concrete parser-like class.
 */
 type ParserClassLike interface {
-	// Constructors
+	// Constructor
 	Make() ParserLike
+}
+
+/*
+ProcessorClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete processor-like class.
+*/
+type ProcessorClassLike interface {
+	// Constructor
+	Make() ProcessorLike
 }
 
 /*
@@ -85,29 +95,30 @@ ScannerClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete scanner-like class.  The following functions are supported:
 
-AsString() returns the string version of the token type.
-
 FormatToken() returns a formatted string containing the attributes of the token.
 
-MatchToken() a list of strings representing any matches found in the specified
-text of the specified token type using the regular expression defined for that
-token type.  If the regular expression contains submatch patterns the matching
-substrings are returned as additional values in the list.
+FormatType() returns the string version of the token type.
+
+MatchesType() determines whether or not a token value is of a specified type.
 */
 type ScannerClassLike interface {
-	// Constructors
+	// Constructor
 	Make(
 		source string,
 		tokens abs.QueueLike[TokenLike],
 	) ScannerLike
 
-	// Functions
-	AsString(type_ TokenType) string
-	FormatToken(token TokenLike) string
-	MatchToken(
-		type_ TokenType,
-		text string,
-	) abs.ListLike[string]
+	// Function
+	FormatToken(
+		token TokenLike,
+	) string
+	FormatType(
+		tokenType TokenType,
+	) string
+	MatchesType(
+		tokenValue string,
+		tokenType TokenType,
+	) bool
 }
 
 /*
@@ -116,10 +127,10 @@ class constants, constructors and functions that must be supported by each
 concrete token-like class.
 */
 type TokenClassLike interface {
-	// Constructors
+	// Constructor
 	Make(
-		line int,
-		position int,
+		line uint,
+		position uint,
 		type_ TokenType,
 		value string,
 	) TokenLike
@@ -131,8 +142,20 @@ class constants, constructors and functions that must be supported by each
 concrete validator-like class.
 */
 type ValidatorClassLike interface {
-	// Constructors
+	// Constructor
 	Make() ValidatorLike
+}
+
+/*
+VisitorClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete visitor-like class.
+*/
+type VisitorClassLike interface {
+	// Constructor
+	Make(
+		processor Methodical,
+	) VisitorLike
 }
 
 // Instances
@@ -143,18 +166,14 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete formatter-like class.
 */
 type FormatterLike interface {
-	// Attributes
+	// Public
 	GetClass() FormatterClassLike
-	GetDepth() uint
+	FormatModel(
+		model ast.ModelLike,
+	) string
 
-	// Methods
-	FormatAbstraction(abstraction ast.AbstractionLike) string
-	FormatArguments(arguments ast.ArgumentsLike) string
-	FormatMethod(method ast.MethodLike) string
-	FormatModel(model ast.ModelLike) string
-	FormatParameter(parameter ast.ParameterLike) string
-	FormatParameters(parameters ast.ParametersLike) string
-	FormatResult(result ast.ResultLike) string
+	// Aspect
+	Methodical
 }
 
 /*
@@ -163,11 +182,24 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete parser-like class.
 */
 type ParserLike interface {
-	// Attributes
+	// Public
 	GetClass() ParserClassLike
+	ParseSource(
+		source string,
+	) ast.ModelLike
+}
 
-	// Methods
-	ParseSource(source string) ast.ModelLike
+/*
+ProcessorLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete processor-like class.
+*/
+type ProcessorLike interface {
+	// Public
+	GetClass() ProcessorClassLike
+
+	// Aspect
+	Methodical
 }
 
 /*
@@ -176,7 +208,7 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete scanner-like class.
 */
 type ScannerLike interface {
-	// Attributes
+	// Public
 	GetClass() ScannerClassLike
 }
 
@@ -186,10 +218,12 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete token-like class.
 */
 type TokenLike interface {
-	// Attributes
+	// Public
 	GetClass() TokenClassLike
-	GetLine() int
-	GetPosition() int
+
+	// Attribute
+	GetLine() uint
+	GetPosition() uint
 	GetType() TokenType
 	GetValue() string
 }
@@ -200,9 +234,559 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete validator-like class.
 */
 type ValidatorLike interface {
-	// Attributes
+	// Public
 	GetClass() ValidatorClassLike
+	ValidateModel(
+		model ast.ModelLike,
+	)
 
-	// Methods
-	ValidateModel(model ast.ModelLike)
+	// Aspect
+	Methodical
+}
+
+/*
+VisitorLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete visitor-like class.
+*/
+type VisitorLike interface {
+	// Public
+	GetClass() VisitorClassLike
+	VisitModel(
+		model ast.ModelLike,
+	)
+}
+
+// Aspects
+
+/*
+Methodical defines the set of method signatures that must be supported
+by all methodical processors.
+*/
+type Methodical interface {
+	ProcessComment(
+		comment string,
+	)
+	ProcessName(
+		name string,
+	)
+	ProcessNewline(
+		newline string,
+	)
+	ProcessPath(
+		path string,
+	)
+	ProcessSpace(
+		space string,
+	)
+	PreprocessAbstraction(
+		abstraction ast.AbstractionLike,
+	)
+	ProcessAbstractionSlot(
+		slot uint,
+	)
+	PostprocessAbstraction(
+		abstraction ast.AbstractionLike,
+	)
+	PreprocessAdditionalArgument(
+		additionalArgument ast.AdditionalArgumentLike,
+		index uint,
+		size uint,
+	)
+	ProcessAdditionalArgumentSlot(
+		slot uint,
+	)
+	PostprocessAdditionalArgument(
+		additionalArgument ast.AdditionalArgumentLike,
+		index uint,
+		size uint,
+	)
+	PreprocessAdditionalValue(
+		additionalValue ast.AdditionalValueLike,
+		index uint,
+		size uint,
+	)
+	ProcessAdditionalValueSlot(
+		slot uint,
+	)
+	PostprocessAdditionalValue(
+		additionalValue ast.AdditionalValueLike,
+		index uint,
+		size uint,
+	)
+	PreprocessArgument(
+		argument ast.ArgumentLike,
+	)
+	ProcessArgumentSlot(
+		slot uint,
+	)
+	PostprocessArgument(
+		argument ast.ArgumentLike,
+	)
+	PreprocessArray(
+		array ast.ArrayLike,
+	)
+	ProcessArraySlot(
+		slot uint,
+	)
+	PostprocessArray(
+		array ast.ArrayLike,
+	)
+	PreprocessAspect(
+		aspect ast.AspectLike,
+		index uint,
+		size uint,
+	)
+	ProcessAspectSlot(
+		slot uint,
+	)
+	PostprocessAspect(
+		aspect ast.AspectLike,
+		index uint,
+		size uint,
+	)
+	PreprocessAspectDefinitions(
+		aspectDefinitions ast.AspectDefinitionsLike,
+	)
+	ProcessAspectDefinitionsSlot(
+		slot uint,
+	)
+	PostprocessAspectDefinitions(
+		aspectDefinitions ast.AspectDefinitionsLike,
+	)
+	PreprocessAspectInterfaces(
+		aspectInterfaces ast.AspectInterfacesLike,
+	)
+	ProcessAspectInterfacesSlot(
+		slot uint,
+	)
+	PostprocessAspectInterfaces(
+		aspectInterfaces ast.AspectInterfacesLike,
+	)
+	PreprocessAttribute(
+		attribute ast.AttributeLike,
+		index uint,
+		size uint,
+	)
+	ProcessAttributeSlot(
+		slot uint,
+	)
+	PostprocessAttribute(
+		attribute ast.AttributeLike,
+		index uint,
+		size uint,
+	)
+	PreprocessAttributeMethods(
+		attributeMethods ast.AttributeMethodsLike,
+	)
+	ProcessAttributeMethodsSlot(
+		slot uint,
+	)
+	PostprocessAttributeMethods(
+		attributeMethods ast.AttributeMethodsLike,
+	)
+	PreprocessChannel(
+		channel ast.ChannelLike,
+	)
+	ProcessChannelSlot(
+		slot uint,
+	)
+	PostprocessChannel(
+		channel ast.ChannelLike,
+	)
+	PreprocessClass(
+		class ast.ClassLike,
+		index uint,
+		size uint,
+	)
+	ProcessClassSlot(
+		slot uint,
+	)
+	PostprocessClass(
+		class ast.ClassLike,
+		index uint,
+		size uint,
+	)
+	PreprocessClassDefinitions(
+		classDefinitions ast.ClassDefinitionsLike,
+	)
+	ProcessClassDefinitionsSlot(
+		slot uint,
+	)
+	PostprocessClassDefinitions(
+		classDefinitions ast.ClassDefinitionsLike,
+	)
+	PreprocessClassMethods(
+		classMethods ast.ClassMethodsLike,
+	)
+	ProcessClassMethodsSlot(
+		slot uint,
+	)
+	PostprocessClassMethods(
+		classMethods ast.ClassMethodsLike,
+	)
+	PreprocessConstant(
+		constant ast.ConstantLike,
+		index uint,
+		size uint,
+	)
+	ProcessConstantSlot(
+		slot uint,
+	)
+	PostprocessConstant(
+		constant ast.ConstantLike,
+		index uint,
+		size uint,
+	)
+	PreprocessConstantMethods(
+		constantMethods ast.ConstantMethodsLike,
+	)
+	ProcessConstantMethodsSlot(
+		slot uint,
+	)
+	PostprocessConstantMethods(
+		constantMethods ast.ConstantMethodsLike,
+	)
+	PreprocessConstructor(
+		constructor ast.ConstructorLike,
+		index uint,
+		size uint,
+	)
+	ProcessConstructorSlot(
+		slot uint,
+	)
+	PostprocessConstructor(
+		constructor ast.ConstructorLike,
+		index uint,
+		size uint,
+	)
+	PreprocessConstructorMethods(
+		constructorMethods ast.ConstructorMethodsLike,
+	)
+	ProcessConstructorMethodsSlot(
+		slot uint,
+	)
+	PostprocessConstructorMethods(
+		constructorMethods ast.ConstructorMethodsLike,
+	)
+	PreprocessDeclaration(
+		declaration ast.DeclarationLike,
+	)
+	ProcessDeclarationSlot(
+		slot uint,
+	)
+	PostprocessDeclaration(
+		declaration ast.DeclarationLike,
+	)
+	PreprocessEnumeration(
+		enumeration ast.EnumerationLike,
+	)
+	ProcessEnumerationSlot(
+		slot uint,
+	)
+	PostprocessEnumeration(
+		enumeration ast.EnumerationLike,
+	)
+	PreprocessFunction(
+		function ast.FunctionLike,
+		index uint,
+		size uint,
+	)
+	ProcessFunctionSlot(
+		slot uint,
+	)
+	PostprocessFunction(
+		function ast.FunctionLike,
+		index uint,
+		size uint,
+	)
+	PreprocessFunctionMethods(
+		functionMethods ast.FunctionMethodsLike,
+	)
+	ProcessFunctionMethodsSlot(
+		slot uint,
+	)
+	PostprocessFunctionMethods(
+		functionMethods ast.FunctionMethodsLike,
+	)
+	PreprocessFunctional(
+		functional ast.FunctionalLike,
+		index uint,
+		size uint,
+	)
+	ProcessFunctionalSlot(
+		slot uint,
+	)
+	PostprocessFunctional(
+		functional ast.FunctionalLike,
+		index uint,
+		size uint,
+	)
+	PreprocessFunctionalDefinitions(
+		functionalDefinitions ast.FunctionalDefinitionsLike,
+	)
+	ProcessFunctionalDefinitionsSlot(
+		slot uint,
+	)
+	PostprocessFunctionalDefinitions(
+		functionalDefinitions ast.FunctionalDefinitionsLike,
+	)
+	PreprocessGenericArguments(
+		genericArguments ast.GenericArgumentsLike,
+	)
+	ProcessGenericArgumentsSlot(
+		slot uint,
+	)
+	PostprocessGenericArguments(
+		genericArguments ast.GenericArgumentsLike,
+	)
+	PreprocessGenericParameters(
+		genericParameters ast.GenericParametersLike,
+	)
+	ProcessGenericParametersSlot(
+		slot uint,
+	)
+	PostprocessGenericParameters(
+		genericParameters ast.GenericParametersLike,
+	)
+	PreprocessHeader(
+		header ast.HeaderLike,
+	)
+	ProcessHeaderSlot(
+		slot uint,
+	)
+	PostprocessHeader(
+		header ast.HeaderLike,
+	)
+	PreprocessImports(
+		imports ast.ImportsLike,
+	)
+	ProcessImportsSlot(
+		slot uint,
+	)
+	PostprocessImports(
+		imports ast.ImportsLike,
+	)
+	PreprocessInstance(
+		instance ast.InstanceLike,
+		index uint,
+		size uint,
+	)
+	ProcessInstanceSlot(
+		slot uint,
+	)
+	PostprocessInstance(
+		instance ast.InstanceLike,
+		index uint,
+		size uint,
+	)
+	PreprocessInstanceDefinitions(
+		instanceDefinitions ast.InstanceDefinitionsLike,
+	)
+	ProcessInstanceDefinitionsSlot(
+		slot uint,
+	)
+	PostprocessInstanceDefinitions(
+		instanceDefinitions ast.InstanceDefinitionsLike,
+	)
+	PreprocessInstanceMethods(
+		instanceMethods ast.InstanceMethodsLike,
+	)
+	ProcessInstanceMethodsSlot(
+		slot uint,
+	)
+	PostprocessInstanceMethods(
+		instanceMethods ast.InstanceMethodsLike,
+	)
+	PreprocessInterface(
+		interface_ ast.InterfaceLike,
+		index uint,
+		size uint,
+	)
+	ProcessInterfaceSlot(
+		slot uint,
+	)
+	PostprocessInterface(
+		interface_ ast.InterfaceLike,
+		index uint,
+		size uint,
+	)
+	PreprocessInterfaceDefinitions(
+		interfaceDefinitions ast.InterfaceDefinitionsLike,
+	)
+	ProcessInterfaceDefinitionsSlot(
+		slot uint,
+	)
+	PostprocessInterfaceDefinitions(
+		interfaceDefinitions ast.InterfaceDefinitionsLike,
+	)
+	PreprocessMap(
+		map_ ast.MapLike,
+	)
+	ProcessMapSlot(
+		slot uint,
+	)
+	PostprocessMap(
+		map_ ast.MapLike,
+	)
+	PreprocessMethod(
+		method ast.MethodLike,
+		index uint,
+		size uint,
+	)
+	ProcessMethodSlot(
+		slot uint,
+	)
+	PostprocessMethod(
+		method ast.MethodLike,
+		index uint,
+		size uint,
+	)
+	PreprocessModel(
+		model ast.ModelLike,
+	)
+	ProcessModelSlot(
+		slot uint,
+	)
+	PostprocessModel(
+		model ast.ModelLike,
+	)
+	PreprocessModule(
+		module ast.ModuleLike,
+		index uint,
+		size uint,
+	)
+	ProcessModuleSlot(
+		slot uint,
+	)
+	PostprocessModule(
+		module ast.ModuleLike,
+		index uint,
+		size uint,
+	)
+	PreprocessModuleDefinition(
+		moduleDefinition ast.ModuleDefinitionLike,
+	)
+	ProcessModuleDefinitionSlot(
+		slot uint,
+	)
+	PostprocessModuleDefinition(
+		moduleDefinition ast.ModuleDefinitionLike,
+	)
+	PreprocessNone(
+		none ast.NoneLike,
+	)
+	ProcessNoneSlot(
+		slot uint,
+	)
+	PostprocessNone(
+		none ast.NoneLike,
+	)
+	PreprocessNotice(
+		notice ast.NoticeLike,
+	)
+	ProcessNoticeSlot(
+		slot uint,
+	)
+	PostprocessNotice(
+		notice ast.NoticeLike,
+	)
+	PreprocessParameter(
+		parameter ast.ParameterLike,
+		index uint,
+		size uint,
+	)
+	ProcessParameterSlot(
+		slot uint,
+	)
+	PostprocessParameter(
+		parameter ast.ParameterLike,
+		index uint,
+		size uint,
+	)
+	PreprocessParameterized(
+		parameterized ast.ParameterizedLike,
+	)
+	ProcessParameterizedSlot(
+		slot uint,
+	)
+	PostprocessParameterized(
+		parameterized ast.ParameterizedLike,
+	)
+	PreprocessPrefix(
+		prefix ast.PrefixLike,
+	)
+	ProcessPrefixSlot(
+		slot uint,
+	)
+	PostprocessPrefix(
+		prefix ast.PrefixLike,
+	)
+	PreprocessPrimitiveDefinitions(
+		primitiveDefinitions ast.PrimitiveDefinitionsLike,
+	)
+	ProcessPrimitiveDefinitionsSlot(
+		slot uint,
+	)
+	PostprocessPrimitiveDefinitions(
+		primitiveDefinitions ast.PrimitiveDefinitionsLike,
+	)
+	PreprocessPublicMethods(
+		publicMethods ast.PublicMethodsLike,
+	)
+	ProcessPublicMethodsSlot(
+		slot uint,
+	)
+	PostprocessPublicMethods(
+		publicMethods ast.PublicMethodsLike,
+	)
+	PreprocessResult(
+		result ast.ResultLike,
+	)
+	ProcessResultSlot(
+		slot uint,
+	)
+	PostprocessResult(
+		result ast.ResultLike,
+	)
+	PreprocessSuffix(
+		suffix ast.SuffixLike,
+	)
+	ProcessSuffixSlot(
+		slot uint,
+	)
+	PostprocessSuffix(
+		suffix ast.SuffixLike,
+	)
+	PreprocessType(
+		type_ ast.TypeLike,
+		index uint,
+		size uint,
+	)
+	ProcessTypeSlot(
+		slot uint,
+	)
+	PostprocessType(
+		type_ ast.TypeLike,
+		index uint,
+		size uint,
+	)
+	PreprocessTypeDefinitions(
+		typeDefinitions ast.TypeDefinitionsLike,
+	)
+	ProcessTypeDefinitionsSlot(
+		slot uint,
+	)
+	PostprocessTypeDefinitions(
+		typeDefinitions ast.TypeDefinitionsLike,
+	)
+	PreprocessValue(
+		value ast.ValueLike,
+	)
+	ProcessValueSlot(
+		slot uint,
+	)
+	PostprocessValue(
+		value ast.ValueLike,
+	)
 }

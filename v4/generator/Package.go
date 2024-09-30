@@ -38,7 +38,7 @@ class constants, constructors and functions that must be supported by each
 concrete generator-like class.
 */
 type GeneratorClassLike interface {
-	// Constructors
+	// Constructor
 	Make() GeneratorLike
 }
 
@@ -50,10 +50,8 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete generator-like class.
 */
 type GeneratorLike interface {
-	// Attributes
+	// Public
 	GetClass() GeneratorClassLike
-
-	// Methods
 	CreateClassType(
 		name string,
 		copyright string,

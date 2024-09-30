@@ -21,42 +21,36 @@ import (
 
 // Reference
 
-var argumentsClass = &argumentsClass_{
+var genericParametersClass = &genericParametersClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Arguments() ArgumentsClassLike {
-	return argumentsClass
+func GenericParameters() GenericParametersClassLike {
+	return genericParametersClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type argumentsClass_ struct {
+type genericParametersClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *argumentsClass_) Make(
-	argument ArgumentLike,
-	additionalArguments abs.Sequential[AdditionalArgumentLike],
-) ArgumentsLike {
+func (c *genericParametersClass_) Make(parameters abs.Sequential[ParameterLike]) GenericParametersLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(argument):
-		panic("The argument attribute is required by this class.")
-	case col.IsUndefined(additionalArguments):
-		panic("The additionalArguments attribute is required by this class.")
+	case col.IsUndefined(parameters):
+		panic("The parameters attribute is required by this class.")
 	default:
-		return &arguments_{
+		return &genericParameters_{
 			// Initialize instance attributes.
-			class_:               c,
-			argument_:            argument,
-			additionalArguments_: additionalArguments,
+			class_:      c,
+			parameters_: parameters,
 		}
 	}
 }
@@ -65,25 +59,22 @@ func (c *argumentsClass_) Make(
 
 // Target
 
-type arguments_ struct {
+type genericParameters_ struct {
 	// Define instance attributes.
-	class_               ArgumentsClassLike
-	argument_            ArgumentLike
-	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
+	class_      GenericParametersClassLike
+	parameters_ abs.Sequential[ParameterLike]
 }
 
-// Attributes
+// Public
 
-func (v *arguments_) GetClass() ArgumentsClassLike {
+func (v *genericParameters_) GetClass() GenericParametersClassLike {
 	return v.class_
 }
 
-func (v *arguments_) GetArgument() ArgumentLike {
-	return v.argument_
-}
+// Attribute
 
-func (v *arguments_) GetAdditionalArguments() abs.Sequential[AdditionalArgumentLike] {
-	return v.additionalArguments_
+func (v *genericParameters_) GetParameters() abs.Sequential[ParameterLike] {
+	return v.parameters_
 }
 
 // Private
