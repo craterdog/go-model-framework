@@ -1,0 +1,175 @@
+/*
+................................................................................
+.    Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved.    .
+................................................................................
+.  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               .
+.                                                                              .
+.  This code is free software; you can redistribute it and/or modify it under  .
+.  the terms of The MIT License (MIT), as published by the Open Source         .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
+................................................................................
+*/
+
+package <packagename>
+
+import (
+	uti "github.com/craterdog/go-missing-utilities/v2"
+	...
+)
+
+// CLASS INTERFACE
+
+// Access Function
+
+func <ClassName>() <ClassName>ClassLike {
+	return <className>Class
+}
+
+// Constructor Methods
+
+func (c *<className>Class_) Make(
+	<booleanAttributeName> bool,
+	...
+	<publicAttributeName> <PublicAttributeType>,
+	...
+) <ClassName>Like {
+	switch {
+	case uti.IsUndefined(<publicAttributeName>):
+		panic("The <publicAttributeName> attribute is required by this class.")
+	...
+	default:
+		return &<className>_{
+			class_:                  c,
+			<booleanAttributeName>_: <booleanAttributeName>,
+			...
+			<publicAttributeName>_:  <publicAttributeName>,
+			...
+		}
+	}
+}
+
+...
+
+// Constant Methods
+
+func (v *<className>Class_) <ConstantName>() <ConstantType> {
+	return v.<constantName>_
+}
+
+...
+
+// Function Methods
+
+func (v *<className>Class_) <FunctionName>() <ResultType> {
+	var result <ResultType>
+	<Implementation>
+	return result
+}
+
+...
+
+// INSTANCE INTERFACE
+
+// Attribute Methods
+
+func (v *<className>_) Is<BooleanAttributeName>() bool {
+	return v.<booleanAttributeName>_
+}
+
+...
+
+func (v *<className>_) Get<PublicAttributeName>() <PublicAttributeType> {
+	return v.<publicAttributeName>_
+}
+
+func (v *<className>_) Set<PublicAttributeName>(
+	<publicAttributeName> <PublicAttributeType>,
+) {
+	if uti.IsUndefined(<publicAttributeName>) {
+		panic("The <publicAttributeName> attribute is required by this class.")
+	}
+	v.<publicAttributeName>_ = <publicAttributeName>
+}
+
+...
+
+// <AspectName> Methods
+
+func (v *<className>_) <MethodName>(
+	<parameterName> <ParameterType>,
+	...
+) (
+	<resultName> <ResultType>,
+	...
+) {
+	<Implementation>
+	return
+}
+
+...
+
+// Public Methods
+
+func (v *<className>_) GetClass() <ClassName>ClassLike {
+	return v.class_
+}
+
+func (v *<className>_) <PublicMethodName>(
+	<parameterName> <ParameterType>,
+	...
+) (
+	<resultName> <ResultType>,
+	...
+) {
+	<Implementation>
+	return
+}
+
+...
+
+// Private Methods
+
+func (v *<className>_) getClass() *<className>Class_ {
+	return v.class_
+}
+
+func (v *<className>_) <privateMethodName>(
+	<parameterName> <ParameterType>,
+	...
+) (
+	<resultName> <ResultType>,
+	...
+) {
+	<Implementation>
+	return
+}
+
+...
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type <className>_ struct {
+	class_                  *<className>Class_
+	<booleanAttributeName>_ bool
+	...
+	<publicAttributeName>_  <PublicAttributeType>
+	...
+	<privateAttributeName>_ <PrivateAttributeType>
+	...
+}
+
+// Class Structure
+
+type <className>Class_ struct {
+	<constantName>_ <ConstantType>
+	...
+}
+
+// Class Reference
+
+var <className>Class = &<className>Class_{
+	<constantName>_: <ConstantValue>,
+	...
+}

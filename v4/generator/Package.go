@@ -27,10 +27,21 @@ on interfaces, not on each other.
 package generator
 
 import (
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
 
 // Classes
+
+/*
+ClassesClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete classes-like class.
+*/
+type ClassesClassLike interface {
+	// Constructor
+	Make() ClassesLike
+}
 
 /*
 GeneratorClassLike is a class interface that defines the complete set of
@@ -43,6 +54,19 @@ type GeneratorClassLike interface {
 }
 
 // Instances
+
+/*
+ClassesLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete classes-like class.
+*/
+type ClassesLike interface {
+	// Public
+	GetClass() ClassesClassLike
+	GenerateModelClasses(
+		model ast.ModelLike,
+	) abs.CatalogLike[string, string]
+}
 
 /*
 GeneratorLike is an instance interface that defines the complete set of
@@ -68,8 +92,4 @@ type GeneratorLike interface {
 		name string,
 		copyright string,
 	) ast.ModelLike
-	GenerateClass(
-		model ast.ModelLike,
-		name string,
-	) string
 }
