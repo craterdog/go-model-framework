@@ -41,21 +41,17 @@ type interfaceClass_ struct {
 // Constructors
 
 func (c *interfaceClass_) Make(
-	name string,
-	optionalSuffix SuffixLike,
-	optionalGenericArguments GenericArgumentsLike,
+	abstraction AbstractionLike,
 ) InterfaceLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
+	case col.IsUndefined(abstraction):
+		panic("The abstraction attribute is required by this class.")
 	default:
 		return &interface_{
 			// Initialize instance attributes.
-			class_:                    c,
-			name_:                     name,
-			optionalSuffix_:           optionalSuffix,
-			optionalGenericArguments_: optionalGenericArguments,
+			class_:       c,
+			abstraction_: abstraction,
 		}
 	}
 }
@@ -66,10 +62,8 @@ func (c *interfaceClass_) Make(
 
 type interface_ struct {
 	// Define instance attributes.
-	class_                    InterfaceClassLike
-	name_                     string
-	optionalSuffix_           SuffixLike
-	optionalGenericArguments_ GenericArgumentsLike
+	class_       InterfaceClassLike
+	abstraction_ AbstractionLike
 }
 
 // Public
@@ -80,16 +74,8 @@ func (v *interface_) GetClass() InterfaceClassLike {
 
 // Attribute
 
-func (v *interface_) GetName() string {
-	return v.name_
-}
-
-func (v *interface_) GetOptionalSuffix() SuffixLike {
-	return v.optionalSuffix_
-}
-
-func (v *interface_) GetOptionalGenericArguments() GenericArgumentsLike {
-	return v.optionalGenericArguments_
+func (v *interface_) GetAbstraction() AbstractionLike {
+	return v.abstraction_
 }
 
 // Private

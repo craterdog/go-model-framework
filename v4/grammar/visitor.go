@@ -105,12 +105,12 @@ func (v *visitor_) visitAbstraction(abstraction ast.AbstractionLike) {
 	// Visit slot 3 between references.
 	v.processor_.ProcessAbstractionSlot(3)
 
-	// Visit the optional genericArguments rule.
-	var optionalGenericArguments = abstraction.GetOptionalGenericArguments()
-	if col.IsDefined(optionalGenericArguments) {
-		v.processor_.PreprocessGenericArguments(optionalGenericArguments)
-		v.visitGenericArguments(optionalGenericArguments)
-		v.processor_.PostprocessGenericArguments(optionalGenericArguments)
+	// Visit the optional arguments rule.
+	var optionalArguments = abstraction.GetOptionalArguments()
+	if col.IsDefined(optionalArguments) {
+		v.processor_.PreprocessArguments(optionalArguments)
+		v.visitArguments(optionalArguments)
+		v.processor_.PostprocessArguments(optionalArguments)
 	}
 }
 
@@ -120,6 +120,14 @@ func (v *visitor_) visitAdditionalArgument(additionalArgument ast.AdditionalArgu
 	v.processor_.PreprocessArgument(argument)
 	v.visitArgument(argument)
 	v.processor_.PostprocessArgument(argument)
+}
+
+func (v *visitor_) visitAdditionalConstraint(additionalConstraint ast.AdditionalConstraintLike) {
+	// Visit the constraint rule.
+	var constraint = additionalConstraint.GetConstraint()
+	v.processor_.PreprocessConstraint(constraint)
+	v.visitConstraint(constraint)
+	v.processor_.PostprocessConstraint(constraint)
 }
 
 func (v *visitor_) visitAdditionalValue(additionalValue ast.AdditionalValueLike) {
@@ -446,12 +454,12 @@ func (v *visitor_) visitDeclaration(declaration ast.DeclarationLike) {
 	// Visit slot 2 between references.
 	v.processor_.ProcessDeclarationSlot(2)
 
-	// Visit the optional genericParameters rule.
-	var optionalGenericParameters = declaration.GetOptionalGenericParameters()
-	if col.IsDefined(optionalGenericParameters) {
-		v.processor_.PreprocessGenericParameters(optionalGenericParameters)
-		v.visitGenericParameters(optionalGenericParameters)
-		v.processor_.PostprocessGenericParameters(optionalGenericParameters)
+	// Visit the optional constraints rule.
+	var optionalConstraints = declaration.GetOptionalConstraints()
+	if col.IsDefined(optionalConstraints) {
+		v.processor_.PreprocessConstraints(optionalConstraints)
+		v.visitConstraints(optionalConstraints)
+		v.processor_.PostprocessConstraints(optionalConstraints)
 	}
 }
 
@@ -608,19 +616,19 @@ func (v *visitor_) visitFunctionalDefinitions(functionalDefinitions ast.Function
 	}
 }
 
-func (v *visitor_) visitGenericArguments(genericArguments ast.GenericArgumentsLike) {
+func (v *visitor_) visitArguments(arguments ast.ArgumentsLike) {
 	// Visit the argument rule.
-	var argument = genericArguments.GetArgument()
+	var argument = arguments.GetArgument()
 	v.processor_.PreprocessArgument(argument)
 	v.visitArgument(argument)
 	v.processor_.PostprocessArgument(argument)
 
 	// Visit slot 1 between references.
-	v.processor_.ProcessGenericArgumentsSlot(1)
+	v.processor_.ProcessArgumentsSlot(1)
 
 	// Visit each additionalArgument rule.
 	var additionalArgumentIndex uint
-	var additionalArguments = genericArguments.GetAdditionalArguments().GetIterator()
+	var additionalArguments = arguments.GetAdditionalArguments().GetIterator()
 	var additionalArgumentsSize = uint(additionalArguments.GetSize())
 	for additionalArguments.HasNext() {
 		additionalArgumentIndex++
@@ -639,24 +647,48 @@ func (v *visitor_) visitGenericArguments(genericArguments ast.GenericArgumentsLi
 	}
 }
 
-func (v *visitor_) visitGenericParameters(genericParameters ast.GenericParametersLike) {
-	// Visit each parameter rule.
-	var parameterIndex uint
-	var parameters = genericParameters.GetParameters().GetIterator()
-	var parametersSize = uint(parameters.GetSize())
-	for parameters.HasNext() {
-		parameterIndex++
-		var parameter = parameters.GetNext()
-		v.processor_.PreprocessParameter(
-			parameter,
-			parameterIndex,
-			parametersSize,
+func (v *visitor_) visitConstraint(constraint ast.ConstraintLike) {
+	// Visit the name token.
+	var name = constraint.GetName()
+	v.processor_.ProcessName(name)
+
+	// Visit slot 1 between references.
+	v.processor_.ProcessConstraintSlot(1)
+
+	// Visit the abstraction rule.
+	var abstraction = constraint.GetAbstraction()
+	v.processor_.PreprocessAbstraction(abstraction)
+	v.visitAbstraction(abstraction)
+	v.processor_.PostprocessAbstraction(abstraction)
+}
+
+func (v *visitor_) visitConstraints(constraints ast.ConstraintsLike) {
+	// Visit the constraint rule.
+	var constraint = constraints.GetConstraint()
+	v.processor_.PreprocessConstraint(constraint)
+	v.visitConstraint(constraint)
+	v.processor_.PostprocessConstraint(constraint)
+
+	// Visit slot 1 between references.
+	v.processor_.ProcessConstraintsSlot(1)
+
+	// Visit each additionalConstraint rule.
+	var additionalConstraintIndex uint
+	var additionalConstraints = constraints.GetAdditionalConstraints().GetIterator()
+	var additionalConstraintsSize = uint(additionalConstraints.GetSize())
+	for additionalConstraints.HasNext() {
+		additionalConstraintIndex++
+		var additionalConstraint = additionalConstraints.GetNext()
+		v.processor_.PreprocessAdditionalConstraint(
+			additionalConstraint,
+			additionalConstraintIndex,
+			additionalConstraintsSize,
 		)
-		v.visitParameter(parameter)
-		v.processor_.PostprocessParameter(
-			parameter,
-			parameterIndex,
-			parametersSize,
+		v.visitAdditionalConstraint(additionalConstraint)
+		v.processor_.PostprocessAdditionalConstraint(
+			additionalConstraint,
+			additionalConstraintIndex,
+			additionalConstraintsSize,
 		)
 	}
 }
@@ -766,31 +798,14 @@ func (v *visitor_) visitInstanceMethods(instanceMethods ast.InstanceMethodsLike)
 }
 
 func (v *visitor_) visitInterface(interface_ ast.InterfaceLike) {
-	// Visit the name token.
-	var name = interface_.GetName()
-	v.processor_.ProcessName(name)
+	// Visit the abstraction rule.
+	var abstraction = interface_.GetAbstraction()
+	v.processor_.PreprocessAbstraction(abstraction)
+	v.visitAbstraction(abstraction)
+	v.processor_.PostprocessAbstraction(abstraction)
 
 	// Visit slot 1 between references.
 	v.processor_.ProcessInterfaceSlot(1)
-
-	// Visit the optional suffix rule.
-	var optionalSuffix = interface_.GetOptionalSuffix()
-	if col.IsDefined(optionalSuffix) {
-		v.processor_.PreprocessSuffix(optionalSuffix)
-		v.visitSuffix(optionalSuffix)
-		v.processor_.PostprocessSuffix(optionalSuffix)
-	}
-
-	// Visit slot 2 between references.
-	v.processor_.ProcessInterfaceSlot(2)
-
-	// Visit the optional genericArguments rule.
-	var optionalGenericArguments = interface_.GetOptionalGenericArguments()
-	if col.IsDefined(optionalGenericArguments) {
-		v.processor_.PreprocessGenericArguments(optionalGenericArguments)
-		v.visitGenericArguments(optionalGenericArguments)
-		v.processor_.PostprocessGenericArguments(optionalGenericArguments)
-	}
 }
 
 func (v *visitor_) visitInterfaceDefinitions(interfaceDefinitions ast.InterfaceDefinitionsLike) {

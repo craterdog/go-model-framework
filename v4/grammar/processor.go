@@ -106,6 +106,25 @@ func (v *processor_) PostprocessAdditionalArgument(
 ) {
 }
 
+func (v *processor_) PreprocessAdditionalConstraint(
+	additionalConstraint ast.AdditionalConstraintLike,
+	index uint,
+	size uint,
+) {
+}
+
+func (v *processor_) ProcessAdditionalConstraintSlot(
+	slot uint,
+) {
+}
+
+func (v *processor_) PostprocessAdditionalConstraint(
+	additionalConstraint ast.AdditionalConstraintLike,
+	index uint,
+	size uint,
+) {
+}
+
 func (v *processor_) PreprocessAdditionalValue(
 	additionalValue ast.AdditionalValueLike,
 	index uint,
@@ -130,6 +149,15 @@ func (v *processor_) ProcessArgumentSlot(slot uint) {
 }
 
 func (v *processor_) PostprocessArgument(argument ast.ArgumentLike) {
+}
+
+func (v *processor_) PreprocessArguments(Arguments ast.ArgumentsLike) {
+}
+
+func (v *processor_) ProcessArgumentsSlot(slot uint) {
+}
+
+func (v *processor_) PostprocessArguments(Arguments ast.ArgumentsLike) {
 }
 
 func (v *processor_) PreprocessArray(array ast.ArrayLike) {
@@ -272,6 +300,36 @@ func (v *processor_) ProcessConstantMethodsSlot(slot uint) {
 func (v *processor_) PostprocessConstantMethods(constantMethods ast.ConstantMethodsLike) {
 }
 
+func (v *processor_) PreprocessConstraint(
+	constraint ast.ConstraintLike,
+) {
+}
+
+func (v *processor_) ProcessConstraintSlot(
+	slot uint,
+) {
+}
+
+func (v *processor_) PostprocessConstraint(
+	constraint ast.ConstraintLike,
+) {
+}
+
+func (v *processor_) PreprocessConstraints(
+	constraints ast.ConstraintsLike,
+) {
+}
+
+func (v *processor_) ProcessConstraintsSlot(
+	slot uint,
+) {
+}
+
+func (v *processor_) PostprocessConstraints(
+	constraints ast.ConstraintsLike,
+) {
+}
+
 func (v *processor_) PreprocessConstructor(
 	constructor ast.ConstructorLike,
 	index uint,
@@ -366,24 +424,6 @@ func (v *processor_) ProcessFunctionalDefinitionsSlot(slot uint) {
 }
 
 func (v *processor_) PostprocessFunctionalDefinitions(functionalDefinitions ast.FunctionalDefinitionsLike) {
-}
-
-func (v *processor_) PreprocessGenericArguments(genericArguments ast.GenericArgumentsLike) {
-}
-
-func (v *processor_) ProcessGenericArgumentsSlot(slot uint) {
-}
-
-func (v *processor_) PostprocessGenericArguments(genericArguments ast.GenericArgumentsLike) {
-}
-
-func (v *processor_) PreprocessGenericParameters(genericParameters ast.GenericParametersLike) {
-}
-
-func (v *processor_) ProcessGenericParametersSlot(slot uint) {
-}
-
-func (v *processor_) PostprocessGenericParameters(genericParameters ast.GenericParametersLike) {
 }
 
 func (v *processor_) PreprocessHeader(header ast.HeaderLike) {

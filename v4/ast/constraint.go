@@ -14,49 +14,48 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
-	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var genericArgumentsClass = &genericArgumentsClass_{
+var constraintClass = &constraintClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func GenericArguments() GenericArgumentsClassLike {
-	return genericArgumentsClass
+func Constraint() ConstraintClassLike {
+	return constraintClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type genericArgumentsClass_ struct {
+type constraintClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *genericArgumentsClass_) Make(
-	argument ArgumentLike,
-	additionalArguments abs.Sequential[AdditionalArgumentLike],
-) GenericArgumentsLike {
+func (c *constraintClass_) Make(
+	name string,
+	abstraction AbstractionLike,
+) ConstraintLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(argument):
-		panic("The argument attribute is required by this class.")
-	case col.IsUndefined(additionalArguments):
-		panic("The additional arguments attribute is required by this class.")
+	case col.IsUndefined(name):
+		panic("The name attribute is required by this class.")
+	case col.IsUndefined(abstraction):
+		panic("The abstraction attribute is required by this class.")
 	default:
-		return &genericArguments_{
+		return &constraint_{
 			// Initialize instance attributes.
-			class_:               c,
-			argument_:            argument,
-			additionalArguments_: additionalArguments,
+			class_:       c,
+			name_:        name,
+			abstraction_: abstraction,
 		}
 	}
 }
@@ -65,27 +64,27 @@ func (c *genericArgumentsClass_) Make(
 
 // Target
 
-type genericArguments_ struct {
+type constraint_ struct {
 	// Define instance attributes.
-	class_               GenericArgumentsClassLike
-	argument_            ArgumentLike
-	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
+	class_       ConstraintClassLike
+	name_        string
+	abstraction_ AbstractionLike
 }
 
 // Public
 
-func (v *genericArguments_) GetClass() GenericArgumentsClassLike {
+func (v *constraint_) GetClass() ConstraintClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *genericArguments_) GetArgument() ArgumentLike {
-	return v.argument_
+func (v *constraint_) GetName() string {
+	return v.name_
 }
 
-func (v *genericArguments_) GetAdditionalArguments() abs.Sequential[AdditionalArgumentLike] {
-	return v.additionalArguments_
+func (v *constraint_) GetAbstraction() AbstractionLike {
+	return v.abstraction_
 }
 
 // Private

@@ -13,7 +13,6 @@
 package generator_test
 
 import (
-	fmt "fmt"
 	gen "github.com/craterdog/go-model-framework/v4/generator"
 	gra "github.com/craterdog/go-model-framework/v4/grammar"
 	//ass "github.com/stretchr/testify/assert"
@@ -42,11 +41,7 @@ func TestGenerateClasses(t *tes.T) {
 	validator.ValidateModel(model)
 
 	// Generate the classes.
-	var catalog = creator.GenerateModelClasses(model)
-	var names = catalog.GetKeys().GetIterator()
-	var name = names.GetNext()
-	var class = catalog.GetValue(name)
-	fmt.Println(name, class)
+	creator.GenerateModelClasses(model)
 }
 
 func TestCreateClassType(t *tes.T) {

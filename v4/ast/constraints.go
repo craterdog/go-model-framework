@@ -21,36 +21,42 @@ import (
 
 // Reference
 
-var genericParametersClass = &genericParametersClass_{
+var constraintsClass = &constraintsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func GenericParameters() GenericParametersClassLike {
-	return genericParametersClass
+func Constraints() ConstraintsClassLike {
+	return constraintsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type genericParametersClass_ struct {
+type constraintsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *genericParametersClass_) Make(parameters abs.Sequential[ParameterLike]) GenericParametersLike {
+func (c *constraintsClass_) Make(
+	constraint ConstraintLike,
+	additionalConstraints abs.Sequential[AdditionalConstraintLike],
+) ConstraintsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(parameters):
-		panic("The parameters attribute is required by this class.")
+	case col.IsUndefined(constraint):
+		panic("The constraint attribute is required by this class.")
+	case col.IsUndefined(additionalConstraints):
+		panic("The additional constraints attribute is required by this class.")
 	default:
-		return &genericParameters_{
+		return &constraints_{
 			// Initialize instance attributes.
-			class_:      c,
-			parameters_: parameters,
+			class_:                 c,
+			constraint_:            constraint,
+			additionalConstraints_: additionalConstraints,
 		}
 	}
 }
@@ -59,22 +65,27 @@ func (c *genericParametersClass_) Make(parameters abs.Sequential[ParameterLike])
 
 // Target
 
-type genericParameters_ struct {
+type constraints_ struct {
 	// Define instance attributes.
-	class_      GenericParametersClassLike
-	parameters_ abs.Sequential[ParameterLike]
+	class_                 ConstraintsClassLike
+	constraint_            ConstraintLike
+	additionalConstraints_ abs.Sequential[AdditionalConstraintLike]
 }
 
 // Public
 
-func (v *genericParameters_) GetClass() GenericParametersClassLike {
+func (v *constraints_) GetClass() ConstraintsClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *genericParameters_) GetParameters() abs.Sequential[ParameterLike] {
-	return v.parameters_
+func (v *constraints_) GetConstraint() ConstraintLike {
+	return v.constraint_
+}
+
+func (v *constraints_) GetAdditionalConstraints() abs.Sequential[AdditionalConstraintLike] {
+	return v.additionalConstraints_
 }
 
 // Private

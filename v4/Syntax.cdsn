@@ -71,13 +71,15 @@ TypeDefinitions: "// Types" Type+
 
 Type: Declaration Abstraction Enumeration?
 
-Declaration: comment "type" name GenericParameters?
+Declaration: comment "type" name Constraints?
 
-GenericParameters: "[" Parameter+ "]"
+Constraints: "[" Constraint AdditionalConstraint* "]"
 
-Parameter: name Abstraction ","
+Constraint: name Abstraction
 
-Abstraction: Prefix? name Suffix? GenericArguments?
+AdditionalConstraint: "," Constraint
+
+Abstraction: Prefix? name Suffix? Arguments?
 
 Prefix:
   - Array
@@ -92,7 +94,7 @@ Channel: "chan"
 
 Suffix: "." name
 
-GenericArguments: "[" Argument AdditionalArgument* "]"
+Arguments: "[" Argument AdditionalArgument* "]"
 
 Argument: Abstraction
 
@@ -107,6 +109,8 @@ AdditionalValue: name
 FunctionalDefinitions: "// Functionals" Functional+
 
 Functional: Declaration "func" "(" Parameter* ")" Result
+
+Parameter: name Abstraction ","
 
 Result:
   - None
@@ -151,7 +155,7 @@ Attribute: name "(" Parameter? ")" Abstraction?
 
 AspectInterfaces: "// Aspect" Interface+
 
-Interface: name Suffix? GenericArguments?
+Interface: Abstraction
 
 AspectDefinitions: "// Aspects" Aspect+
 

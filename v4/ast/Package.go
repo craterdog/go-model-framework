@@ -46,7 +46,7 @@ type AbstractionClassLike interface {
 		optionalPrefix PrefixLike,
 		name string,
 		optionalSuffix SuffixLike,
-		optionalGenericArguments GenericArgumentsLike,
+		optionalArguments ArgumentsLike,
 	) AbstractionLike
 }
 
@@ -60,6 +60,18 @@ type AdditionalArgumentClassLike interface {
 	Make(
 		argument ArgumentLike,
 	) AdditionalArgumentLike
+}
+
+/*
+AdditionalConstraintClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete additional-constraint-like class.
+*/
+type AdditionalConstraintClassLike interface {
+	// Constructor
+	Make(
+		constraint ConstraintLike,
+	) AdditionalConstraintLike
 }
 
 /*
@@ -269,7 +281,7 @@ type DeclarationClassLike interface {
 	Make(
 		comment string,
 		name string,
-		optionalGenericParameters GenericParametersLike,
+		optionalConstraints ConstraintsLike,
 	) DeclarationLike
 }
 
@@ -339,28 +351,42 @@ type FunctionalDefinitionsClassLike interface {
 }
 
 /*
-GenericArgumentsClassLike is a class interface that defines the complete set of
+ArgumentsClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete generic-arguments-like class.
+concrete arguments-like class.
 */
-type GenericArgumentsClassLike interface {
+type ArgumentsClassLike interface {
 	// Constructor
 	Make(
 		argument ArgumentLike,
 		additionalArguments abs.Sequential[AdditionalArgumentLike],
-	) GenericArgumentsLike
+	) ArgumentsLike
 }
 
 /*
-GenericParametersClassLike is a class interface that defines the complete set of
+ConstraintClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete generic-parameters-like class.
+concrete constraint-like class.
 */
-type GenericParametersClassLike interface {
+type ConstraintClassLike interface {
 	// Constructor
 	Make(
-		parameters abs.Sequential[ParameterLike],
-	) GenericParametersLike
+		name string,
+		abstraction AbstractionLike,
+	) ConstraintLike
+}
+
+/*
+ConstraintsClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete constraints-like class.
+*/
+type ConstraintsClassLike interface {
+	// Constructor
+	Make(
+		constraint ConstraintLike,
+		additionalConstraints abs.Sequential[AdditionalConstraintLike],
+	) ConstraintsLike
 }
 
 /*
@@ -435,9 +461,7 @@ concrete interface-like class.
 type InterfaceClassLike interface {
 	// Constructor
 	Make(
-		name string,
-		optionalSuffix SuffixLike,
-		optionalGenericArguments GenericArgumentsLike,
+		abstraction AbstractionLike,
 	) InterfaceLike
 }
 
@@ -686,7 +710,7 @@ type AbstractionLike interface {
 	GetOptionalPrefix() PrefixLike
 	GetName() string
 	GetOptionalSuffix() SuffixLike
-	GetOptionalGenericArguments() GenericArgumentsLike
+	GetOptionalArguments() ArgumentsLike
 }
 
 /*
@@ -700,6 +724,19 @@ type AdditionalArgumentLike interface {
 
 	// Attribute
 	GetArgument() ArgumentLike
+}
+
+/*
+AdditionalConstraintLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete additional-constraint-like class.
+*/
+type AdditionalConstraintLike interface {
+	// Public
+	GetClass() AdditionalConstraintClassLike
+
+	// Attribute
+	GetConstraint() ConstraintLike
 }
 
 /*
@@ -925,7 +962,7 @@ type DeclarationLike interface {
 	// Attribute
 	GetComment() string
 	GetName() string
-	GetOptionalGenericParameters() GenericParametersLike
+	GetOptionalConstraints() ConstraintsLike
 }
 
 /*
@@ -999,13 +1036,13 @@ type FunctionalDefinitionsLike interface {
 }
 
 /*
-GenericArgumentsLike is an instance interface that defines the complete set of
+ArgumentsLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete generic-arguments-like class.
+instance of a concrete arguments-like class.
 */
-type GenericArgumentsLike interface {
+type ArgumentsLike interface {
 	// Public
-	GetClass() GenericArgumentsClassLike
+	GetClass() ArgumentsClassLike
 
 	// Attribute
 	GetArgument() ArgumentLike
@@ -1013,16 +1050,31 @@ type GenericArgumentsLike interface {
 }
 
 /*
-GenericParametersLike is an instance interface that defines the complete set of
+ConstraintLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete generic-parameters-like class.
+instance of a concrete constraint-like class.
 */
-type GenericParametersLike interface {
+type ConstraintLike interface {
 	// Public
-	GetClass() GenericParametersClassLike
+	GetClass() ConstraintClassLike
 
 	// Attribute
-	GetParameters() abs.Sequential[ParameterLike]
+	GetName() string
+	GetAbstraction() AbstractionLike
+}
+
+/*
+ConstraintsLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete constraints-like class.
+*/
+type ConstraintsLike interface {
+	// Public
+	GetClass() ConstraintsClassLike
+
+	// Attribute
+	GetConstraint() ConstraintLike
+	GetAdditionalConstraints() abs.Sequential[AdditionalConstraintLike]
 }
 
 /*
@@ -1104,9 +1156,7 @@ type InterfaceLike interface {
 	GetClass() InterfaceClassLike
 
 	// Attribute
-	GetName() string
-	GetOptionalSuffix() SuffixLike
-	GetOptionalGenericArguments() GenericArgumentsLike
+	GetAbstraction() AbstractionLike
 }
 
 /*

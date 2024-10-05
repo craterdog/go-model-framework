@@ -113,8 +113,8 @@ func (v *classes_) analyzeClassGenerics(
 ) {
 	v.isGeneric_ = false
 	var declaration = class.GetDeclaration()
-	var genericParameters = declaration.GetOptionalGenericParameters()
-	if uti.IsDefined(genericParameters) {
+	var constraints = declaration.GetOptionalConstraints()
+	if uti.IsDefined(constraints) {
 		v.isGeneric_ = true
 	}
 }
@@ -237,7 +237,7 @@ func (v *classes_) extractType(abstraction ast.AbstractionLike) string {
 		abstractType += "." + suffix.GetName()
 	}
 	if v.isGeneric_ {
-		var arguments = abstraction.GetOptionalGenericArguments()
+		var arguments = abstraction.GetOptionalArguments()
 		var argument = v.extractType(arguments.GetArgument().GetAbstraction())
 		abstractType += "[" + argument
 		var additionalArguments = arguments.GetAdditionalArguments().GetIterator()
@@ -310,50 +310,50 @@ func (v *classes_) generateModules(
 	return implementation
 }
 
-func (v *classes_) generateGenericArguments(
+func (v *classes_) generateArguments(
 	declaration ast.DeclarationLike,
 ) (
-	genericArguments string,
+	arguments string,
 ) {
-	var genericParameters = declaration.GetOptionalGenericParameters()
-	if uti.IsDefined(genericParameters) {
-		genericArguments = "["
-		var parameters = genericParameters.GetParameters().GetIterator()
-		var parameter = parameters.GetNext()
-		var genericArgument = parameter.GetName()
-		genericArguments += genericArgument
-		for parameters.HasNext() {
-			parameter = parameters.GetNext()
-			genericArgument = parameter.GetName()
-			genericArguments += ", " + genericArgument
+	var optionalConstraints = declaration.GetOptionalConstraints()
+	if uti.IsDefined(optionalConstraints) {
+		arguments = "["
+		var constraint = optionalConstraints.GetConstraint()
+		var argument = constraint.GetName()
+		arguments += argument
+		var additionalConstraints = optionalConstraints.GetAdditionalConstraints().GetIterator()
+		for additionalConstraints.HasNext() {
+			constraint = additionalConstraints.GetNext().GetConstraint()
+			argument = constraint.GetName()
+			arguments += ", " + argument
 		}
-		genericArguments += "]"
+		arguments += "]"
 	}
-	return genericArguments
+	return arguments
 }
 
-func (v *classes_) generateGenericParameters(
+func (v *classes_) generateConstraints(
 	declaration ast.DeclarationLike,
 ) (
-	genericParameters string,
+	constraints string,
 ) {
-	var optionalGenericParameters = declaration.GetOptionalGenericParameters()
-	if uti.IsDefined(optionalGenericParameters) {
-		genericParameters = "["
-		var parameters = optionalGenericParameters.GetParameters().GetIterator()
-		var parameter = parameters.GetNext()
-		var parameterName = parameter.GetName()
-		var parameterType = v.extractType(parameter.GetAbstraction())
-		genericParameters += parameterName + " " + parameterType
-		for parameters.HasNext() {
-			parameter = parameters.GetNext()
-			parameterName = parameter.GetName()
-			parameterType = v.extractType(parameter.GetAbstraction())
-			genericParameters += ", " + parameterName + " " + parameterType
+	var optionalConstraints = declaration.GetOptionalConstraints()
+	if uti.IsDefined(optionalConstraints) {
+		constraints = "["
+		var constraint = optionalConstraints.GetConstraint()
+		var constraintName = constraint.GetName()
+		var constraintType = v.extractType(constraint.GetAbstraction())
+		constraints += constraintName + " " + constraintType
+		var additionalConstraints = optionalConstraints.GetAdditionalConstraints().GetIterator()
+		for additionalConstraints.HasNext() {
+			constraint = additionalConstraints.GetNext().GetConstraint()
+			constraintName = constraint.GetName()
+			constraintType = v.extractType(constraint.GetAbstraction())
+			constraints += ", " + constraintName + " " + constraintType
 		}
-		genericParameters += "]"
+		constraints += "]"
 	}
-	return genericParameters
+	return constraints
 }
 
 func (v *classes_) generateImports(
@@ -453,10 +453,10 @@ func (v *classes_) generateClass(
 
 	// Insert generics if necessary.
 	if v.isGeneric_ {
-		var parameters = v.generateGenericParameters(classDeclaration)
-		implementation = uti.ReplaceAll(implementation, "genericParameters", parameters)
-		var arguments = v.generateGenericArguments(classDeclaration)
-		implementation = uti.ReplaceAll(implementation, "genericArguments", arguments)
+		var parameters = v.generateConstraints(classDeclaration)
+		implementation = uti.ReplaceAll(implementation, "constraints", parameters)
+		var arguments = v.generateArguments(classDeclaration)
+		implementation = uti.ReplaceAll(implementation, "arguments", arguments)
 	}
 
 	// Insert any imported modules (this must be done last).
@@ -480,9 +480,9 @@ func (v *classes_) generateAccessFunction(class ast.ClassLike) (
 ) {
 	implementation = v.getClass().accessFunction_
 	var declaration = class.GetDeclaration()
-	var genericParameters = declaration.GetOptionalGenericParameters()
+	var constraints = declaration.GetOptionalConstraints()
 	var function = v.getClass().classFunction_
-	if uti.IsDefined(genericParameters) {
+	if uti.IsDefined(constraints) {
 		function = v.getClass().genericFunction_
 	}
 	implementation = uti.ReplaceAll(implementation, "function", function)
@@ -629,9 +629,9 @@ func (v *classes_) generateClassReference(class ast.ClassLike) (
 ) {
 	implementation = v.getClass().classReference_
 	var declaration = class.GetDeclaration()
-	var genericParameters = declaration.GetOptionalGenericParameters()
+	var constraints = declaration.GetOptionalConstraints()
 	var variables = v.getClass().classVariables_
-	if uti.IsDefined(genericParameters) {
+	if uti.IsDefined(constraints) {
 		variables = v.getClass().genericVariables_
 	}
 	implementation = uti.ReplaceAll(implementation, "variables", variables)
@@ -718,18 +718,18 @@ func (v *classes_) generateConstantInitializations() (
 
 /*
 func (v *classes_) extractConcreteMappings(
-	genericParameters ast.GenericParametersLike,
-	genericArguments ast.GenericArgumentsLike,
+	constraints ast.ConstraintsLike,
+	arguments ast.ArgumentsLike,
 ) abs.CatalogLike[string, ast.AbstractionLike] {
 	// Create the mappings catalog.
 	var mappings = col.Catalog[string, ast.AbstractionLike]()
-	var parameters = genericParameters.GetParameters().GetIterator()
-	var arguments = genericArguments.GetAdditionalArguments().GetIterator()
+	var parameters = constraints.GetParameters().GetIterator()
+	var arguments = arguments.GetAdditionalArguments().GetIterator()
 
 	// Map the name of the first parameter to its concrete type.
 	var parameter = parameters.GetNext()
 	var parameterName = parameter.GetName()
-	var argument = genericArguments.GetArgument()
+	var argument = arguments.GetArgument()
 	var concreteType = argument.GetAbstraction()
 	mappings.SetValue(parameterName, concreteType)
 
@@ -898,10 +898,10 @@ func (v *classes_) generateAspects(
 			var mappings abs.CatalogLike[string, ast.AbstractionLike]
 			var aspect = v.retrieveAspect(model, interface_.GetName())
 			var declaration = aspect.GetDeclaration()
-			var genericParameters = declaration.GetOptionalGenericParameters()
-			var genericArguments = interface_.GetOptionalGenericArguments()
-			if uti.IsDefined(genericParameters) && uti.IsDefined(genericArguments) {
-				mappings = v.extractConcreteMappings(genericParameters, genericArguments)
+			var constraints = declaration.GetOptionalConstraints()
+			var arguments = interface_.GetOptionalArguments()
+			if uti.IsDefined(constraints) && uti.IsDefined(arguments) {
+				mappings = v.extractConcreteMappings(constraints, arguments)
 			}
 			methods = v.generateAspectMethods(aspect, mappings)
 		}
@@ -1441,10 +1441,10 @@ func (v *classes_) replaceAbstractionType(
 	}
 
 	// Replace the generic types in a sequence of arguments with concrete types.
-	var genericArguments = abstraction.GetOptionalGenericArguments()
-	if uti.IsDefined(genericArguments) {
-		arguments = v.replaceArgumentTypes(genericArguments, mappings)
-		genericArguments = ast.GenericArguments().Make(arguments)
+	var arguments = abstraction.GetOptionalArguments()
+	if uti.IsDefined(arguments) {
+		arguments = v.replaceArgumentTypes(arguments, mappings)
+		arguments = ast.Arguments().Make(arguments)
 	}
 
 	// Replace a non-aliased generic type with its concrete type.
@@ -1455,7 +1455,7 @@ func (v *classes_) replaceAbstractionType(
 		if uti.IsDefined(concreteType) {
 			alias = concreteType.GetOptionalAlias()
 			typeName = concreteType.GetName()
-			genericArguments = concreteType.GetOptionalGenericArguments()
+			arguments = concreteType.GetOptionalArguments()
 		}
 	}
 
@@ -1464,7 +1464,7 @@ func (v *classes_) replaceAbstractionType(
 		prefix,
 		alias,
 		typeName,
-		genericArguments,
+		arguments,
 	)
 
 	return abstraction
@@ -1481,7 +1481,7 @@ func (v *classes_) replaceArgumentType(
 }
 
 func (v *classes_) replaceArgumentTypes(
-	arguments ast.GenericArgumentsLike,
+	arguments ast.ArgumentsLike,
 	mappings abs.CatalogLike[string, ast.AbstractionLike],
 ) ast.ArgumentsLike {
 	// Ignore the non-generic case.
@@ -1630,7 +1630,7 @@ func <~ClassName>() <~ClassName>ClassLike {
 `,
 
 		classTarget: `
-type <className>Class_<GenericParameters> struct {
+type <className>Class_<Constraints> struct {
 	// Define class constants.<Constants>
 }
 `,
@@ -1644,7 +1644,7 @@ type <className>Class_<GenericParameters> struct {
 
 		typeBody: `
 	// TBA - Validate the value.
-	return <className>_<GenericArguments>(value)
+	return <className>_<Arguments>(value)
 `,
 
 		functionBody: `
@@ -1654,11 +1654,11 @@ type <className>Class_<GenericParameters> struct {
 `,
 
 		typeTarget: `
-type <className>_<GenericParameters> <TargetType>
+type <className>_<Constraints> <TargetType>
 `,
 
 		instanceTarget: `
-type <className>_<GenericParameters> struct {
+type <className>_<Constraints> struct {
 	// Define instance attributes.<Attributes>
 }
 `,
@@ -1671,11 +1671,11 @@ type <className>_<GenericParameters> struct {
 <Methods>`,
 
 		typeMethod: `
-func (v <className>_<GenericArguments>) <MethodName>(<Parameters>)<ResultType> {<Body>}
+func (v <className>_<Arguments>) <MethodName>(<Parameters>)<ResultType> {<Body>}
 `,
 
 		instanceMethod: `
-func (v *<className>_<GenericArguments>) <MethodName>(<Parameters>)<ResultType> {<Body>}
+func (v *<className>_<Arguments>) <MethodName>(<Parameters>)<ResultType> {<Body>}
 `,
 
 		methodBody: `
@@ -1694,7 +1694,7 @@ func (v *<className>_<GenericArguments>) <MethodName>(<Parameters>)<ResultType> 
 `,
 
 		getterType: `
-	return <~ClassName><GenericArguments>()
+	return <~ClassName><Arguments>()
 `,
 
 		getterClass: `
@@ -1796,21 +1796,21 @@ func <~ClassName>() <~ClassName>ClassLike {
 `,
 
 	genericFunction_: `
-func <~ClassName><GenericParameters>() <~ClassName>ClassLike<GenericArguments> {
+func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 	// Generate the name of the bound class type.
-	var class *<className>Class_<GenericArguments>
+	var class *<className>Class_<Arguments>
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	<className>Mutex.Lock()
 	var value = <className>Class[name]
 	switch actual := value.(type) {
-	case *<className>Class_<GenericArguments>:
+	case *<className>Class_<Arguments>:
 		// This bound class type already exists.
 		class = actual
 	default:
 		// Add a new bound class type.
-		class = &<className>Class_<GenericArguments>{
+		class = &<className>Class_<Arguments>{
 			// Initialize class constants.
 		}
 		<className>Class[name] = class
@@ -1823,7 +1823,7 @@ func <~ClassName><GenericParameters>() <~ClassName>ClassLike<GenericArguments> {
 `,
 
 	classMethod_: `
-func (c *<~className>Class_<GenericArguments>) <MethodName>(<Parameters>) <ResultType> {<Body>}
+func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <ResultType> {<Body>}
 `,
 
 	methodParameter_: `

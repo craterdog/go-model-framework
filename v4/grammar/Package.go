@@ -301,6 +301,19 @@ type Methodical interface {
 		index uint,
 		size uint,
 	)
+	PreprocessAdditionalConstraint(
+		additionalConstraint ast.AdditionalConstraintLike,
+		index uint,
+		size uint,
+	)
+	ProcessAdditionalConstraintSlot(
+		slot uint,
+	)
+	PostprocessAdditionalConstraint(
+		additionalConstraint ast.AdditionalConstraintLike,
+		index uint,
+		size uint,
+	)
 	PreprocessAdditionalValue(
 		additionalValue ast.AdditionalValueLike,
 		index uint,
@@ -322,6 +335,15 @@ type Methodical interface {
 	)
 	PostprocessArgument(
 		argument ast.ArgumentLike,
+	)
+	PreprocessArguments(
+		arguments ast.ArgumentsLike,
+	)
+	ProcessArgumentsSlot(
+		slot uint,
+	)
+	PostprocessArguments(
+		arguments ast.ArgumentsLike,
 	)
 	PreprocessArray(
 		array ast.ArrayLike,
@@ -447,6 +469,24 @@ type Methodical interface {
 	PostprocessConstantMethods(
 		constantMethods ast.ConstantMethodsLike,
 	)
+	PreprocessConstraint(
+		constraint ast.ConstraintLike,
+	)
+	ProcessConstraintSlot(
+		slot uint,
+	)
+	PostprocessConstraint(
+		constraint ast.ConstraintLike,
+	)
+	PreprocessConstraints(
+		constraints ast.ConstraintsLike,
+	)
+	ProcessConstraintsSlot(
+		slot uint,
+	)
+	PostprocessConstraints(
+		constraints ast.ConstraintsLike,
+	)
 	PreprocessConstructor(
 		constructor ast.ConstructorLike,
 		index uint,
@@ -530,24 +570,6 @@ type Methodical interface {
 	)
 	PostprocessFunctionalDefinitions(
 		functionalDefinitions ast.FunctionalDefinitionsLike,
-	)
-	PreprocessGenericArguments(
-		genericArguments ast.GenericArgumentsLike,
-	)
-	ProcessGenericArgumentsSlot(
-		slot uint,
-	)
-	PostprocessGenericArguments(
-		genericArguments ast.GenericArgumentsLike,
-	)
-	PreprocessGenericParameters(
-		genericParameters ast.GenericParametersLike,
-	)
-	ProcessGenericParametersSlot(
-		slot uint,
-	)
-	PostprocessGenericParameters(
-		genericParameters ast.GenericParametersLike,
 	)
 	PreprocessHeader(
 		header ast.HeaderLike,

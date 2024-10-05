@@ -131,9 +131,9 @@ func (v *parser_) parseAbstraction() (
 		ruleFound_ = true
 	}
 
-	// Attempt to parse an optional genericArguments rule.
-	var optionalGenericArguments ast.GenericArgumentsLike
-	optionalGenericArguments, _, ok = v.parseGenericArguments()
+	// Attempt to parse an optional arguments rule.
+	var optionalArguments ast.ArgumentsLike
+	optionalArguments, _, ok = v.parseArguments()
 	if ok {
 		ruleFound_ = true
 	}
@@ -144,7 +144,7 @@ func (v *parser_) parseAbstraction() (
 		optionalPrefix,
 		name,
 		optionalSuffix,
-		optionalGenericArguments,
+		optionalArguments,
 	)
 	return abstraction, token, ruleFound_
 }
@@ -189,6 +189,48 @@ func (v *parser_) parseAdditionalArgument() (
 	ruleFound_ = true
 	additionalArgument = ast.AdditionalArgument().Make(argument)
 	return additionalArgument, token, ruleFound_
+}
+
+func (v *parser_) parseAdditionalConstraint() (
+	additionalConstraint ast.AdditionalConstraintLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "," delimiter.
+	_, token, ok = v.parseDelimiter(",")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AdditionalConstraint")
+			panic(message)
+		} else {
+			// This is not a single additionalConstraint rule.
+			return additionalConstraint, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single constraint rule.
+	var constraint ast.ConstraintLike
+	constraint, token, ok = v.parseConstraint()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AdditionalConstraint")
+			panic(message)
+		} else {
+			// This is not a single additionalConstraint rule.
+			return additionalConstraint, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single additionalConstraint rule.
+	ruleFound_ = true
+	additionalConstraint = ast.AdditionalConstraint().Make(constraint)
+	return additionalConstraint, token, ruleFound_
 }
 
 func (v *parser_) parseAdditionalValue() (
@@ -1150,9 +1192,9 @@ func (v *parser_) parseDeclaration() (
 	}
 	ruleFound_ = true
 
-	// Attempt to parse an optional genericParameters rule.
-	var optionalGenericParameters ast.GenericParametersLike
-	optionalGenericParameters, _, ok = v.parseGenericParameters()
+	// Attempt to parse an optional constraints rule.
+	var optionalConstraints ast.ConstraintsLike
+	optionalConstraints, _, ok = v.parseConstraints()
 	if ok {
 		ruleFound_ = true
 	}
@@ -1162,7 +1204,7 @@ func (v *parser_) parseDeclaration() (
 	declaration = ast.Declaration().Make(
 		comment,
 		name,
-		optionalGenericParameters,
+		optionalConstraints,
 	)
 	return declaration, token, ruleFound_
 }
@@ -1578,8 +1620,8 @@ functionalsLoop:
 	return functionalDefinitions, token, ruleFound_
 }
 
-func (v *parser_) parseGenericArguments() (
-	genericArguments ast.GenericArgumentsLike,
+func (v *parser_) parseArguments() (
+	arguments ast.ArgumentsLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1590,11 +1632,11 @@ func (v *parser_) parseGenericArguments() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "GenericArguments")
+			var message = v.formatError(token, "Arguments")
 			panic(message)
 		} else {
-			// This is not a single genericArguments rule.
-			return genericArguments, token, false
+			// This is not a single arguments rule.
+			return arguments, token, false
 		}
 	}
 	ruleFound_ = true
@@ -1605,11 +1647,11 @@ func (v *parser_) parseGenericArguments() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "GenericArguments")
+			var message = v.formatError(token, "Arguments")
 			panic(message)
 		} else {
-			// This is not a single genericArguments rule.
-			return genericArguments, token, false
+			// This is not a single arguments rule.
+			return arguments, token, false
 		}
 	}
 	ruleFound_ = true
@@ -1624,11 +1666,11 @@ additionalArgumentsLoop:
 			switch {
 			case numberFound_ < 0:
 				if !ruleFound_ {
-					// This is not a single genericArguments rule.
-					return genericArguments, token, false
+					// This is not a single arguments rule.
+					return arguments, token, false
 				}
 				// Found a syntax error.
-				var message = v.formatError(token, "GenericArguments")
+				var message = v.formatError(token, "Arguments")
 				message += "The number of additionalArgument rules must be at least 0."
 				panic(message)
 			default:
@@ -1643,26 +1685,72 @@ additionalArgumentsLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "GenericArguments")
+			var message = v.formatError(token, "Arguments")
 			panic(message)
 		} else {
-			// This is not a single genericArguments rule.
-			return genericArguments, token, false
+			// This is not a single arguments rule.
+			return arguments, token, false
 		}
 	}
 	ruleFound_ = true
 
-	// Found a single genericArguments rule.
+	// Found a single arguments rule.
 	ruleFound_ = true
-	genericArguments = ast.GenericArguments().Make(
+	arguments = ast.Arguments().Make(
 		argument,
 		additionalArguments,
 	)
-	return genericArguments, token, ruleFound_
+	return arguments, token, ruleFound_
 }
 
-func (v *parser_) parseGenericParameters() (
-	genericParameters ast.GenericParametersLike,
+func (v *parser_) parseConstraint() (
+	constraint ast.ConstraintLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraint")
+			panic(message)
+		} else {
+			// This is not a single constraint rule.
+			return constraint, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraint")
+			panic(message)
+		} else {
+			// This is not a single constraint rule.
+			return constraint, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single constraint rule.
+	ruleFound_ = true
+	constraint = ast.Constraint().Make(
+		name,
+		abstraction,
+	)
+	return constraint, token, ruleFound_
+}
+
+func (v *parser_) parseConstraints() (
+	constraints ast.ConstraintsLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1673,37 +1761,52 @@ func (v *parser_) parseGenericParameters() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "GenericParameters")
+			var message = v.formatError(token, "Constraints")
 			panic(message)
 		} else {
-			// This is not a single genericParameters rule.
-			return genericParameters, token, false
+			// This is not a single constraints rule.
+			return constraints, token, false
 		}
 	}
 	ruleFound_ = true
 
-	// Attempt to parse 1 to unlimited parameter rules.
-	var parameters = col.List[ast.ParameterLike]()
-parametersLoop:
+	// Attempt to parse a single constraint rule.
+	var constraint ast.ConstraintLike
+	constraint, token, ok = v.parseConstraint()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraints")
+			panic(message)
+		} else {
+			// This is not a single constraints rule.
+			return constraints, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited additionalConstraint rules.
+	var additionalConstraints = col.List[ast.AdditionalConstraintLike]()
+additionalConstraintsLoop:
 	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
-		var parameter ast.ParameterLike
-		parameter, token, ok = v.parseParameter()
+		var additionalConstraint ast.AdditionalConstraintLike
+		additionalConstraint, token, ok = v.parseAdditionalConstraint()
 		if !ok {
 			switch {
-			case numberFound_ < 1:
+			case numberFound_ < 0:
 				if !ruleFound_ {
-					// This is not a single genericParameters rule.
-					return genericParameters, token, false
+					// This is not a single constraints rule.
+					return constraints, token, false
 				}
 				// Found a syntax error.
-				var message = v.formatError(token, "GenericParameters")
-				message += "The number of parameter rules must be at least 1."
+				var message = v.formatError(token, "Constraints")
+				message += "The number of additionalConstraint rules must be at least 0."
 				panic(message)
 			default:
-				break parametersLoop
+				break additionalConstraintsLoop
 			}
 		}
-		parameters.AppendValue(parameter)
+		additionalConstraints.AppendValue(additionalConstraint)
 	}
 
 	// Attempt to parse a single "]" delimiter.
@@ -1711,19 +1814,22 @@ parametersLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "GenericParameters")
+			var message = v.formatError(token, "Constraints")
 			panic(message)
 		} else {
-			// This is not a single genericParameters rule.
-			return genericParameters, token, false
+			// This is not a single constraints rule.
+			return constraints, token, false
 		}
 	}
 	ruleFound_ = true
 
-	// Found a single genericParameters rule.
+	// Found a single constraints rule.
 	ruleFound_ = true
-	genericParameters = ast.GenericParameters().Make(parameters)
-	return genericParameters, token, ruleFound_
+	constraints = ast.Constraints().Make(
+		constraint,
+		additionalConstraints,
+	)
+	return constraints, token, ruleFound_
 }
 
 func (v *parser_) parseHeader() (
@@ -2057,9 +2163,9 @@ func (v *parser_) parseInterface() (
 ) {
 	var ruleFound_ bool
 
-	// Attempt to parse a single name token.
-	var name string
-	name, token, ok = v.parseToken(NameToken)
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
@@ -2072,26 +2178,10 @@ func (v *parser_) parseInterface() (
 	}
 	ruleFound_ = true
 
-	// Attempt to parse an optional suffix rule.
-	var optionalSuffix ast.SuffixLike
-	optionalSuffix, _, ok = v.parseSuffix()
-	if ok {
-		ruleFound_ = true
-	}
-
-	// Attempt to parse an optional genericArguments rule.
-	var optionalGenericArguments ast.GenericArgumentsLike
-	optionalGenericArguments, _, ok = v.parseGenericArguments()
-	if ok {
-		ruleFound_ = true
-	}
-
 	// Found a single interface rule.
 	ruleFound_ = true
 	interface_ = ast.Interface().Make(
-		name,
-		optionalSuffix,
-		optionalGenericArguments,
+		abstraction,
 	)
 	return interface_, token, ruleFound_
 }
@@ -3166,10 +3256,10 @@ var syntax_ = col.Catalog[string, string](
 		"Module":               `name path`,
 		"TypeDefinitions":      `"// Types" Type+`,
 		"Type":                 `Declaration Abstraction Enumeration?`,
-		"Declaration":          `comment "type" name GenericParameters?`,
-		"GenericParameters":    `"[" Parameter+ "]"`,
+		"Declaration":          `comment "type" name Constraints?`,
+		"Constraints":          `"[" Parameter+ "]"`,
 		"Parameter":            `name Abstraction ","`,
-		"Abstraction":          `Prefix? name Suffix? GenericArguments?`,
+		"Abstraction":          `Prefix? name Suffix? Arguments?`,
 		"Prefix": `
   - Array
   - Map
@@ -3178,7 +3268,7 @@ var syntax_ = col.Catalog[string, string](
 		"Map":                   `"map" "[" name "]"`,
 		"Channel":               `"chan"`,
 		"Suffix":                `"." name`,
-		"GenericArguments":      `"[" Argument AdditionalArgument* "]"`,
+		"Arguments":             `"[" Argument AdditionalArgument* "]"`,
 		"Argument":              `Abstraction`,
 		"AdditionalArgument":    `"," Argument`,
 		"Enumeration":           `"const" "(" Value AdditionalValue* ")"`,
@@ -3209,7 +3299,7 @@ var syntax_ = col.Catalog[string, string](
 		"AttributeMethods":    `"// Attribute" Attribute+`,
 		"Attribute":           `name "(" Parameter? ")" Abstraction?`,
 		"AspectInterfaces":    `"// Aspect" Interface+`,
-		"Interface":           `name Suffix? GenericArguments?`,
+		"Interface":           `Abstraction newline`,
 		"AspectDefinitions":   `"// Aspects" Aspect+`,
 		"Aspect":              `Declaration "interface" "{" Method+ "}"`,
 	},

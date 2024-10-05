@@ -20,44 +20,36 @@ import (
 
 // Reference
 
-var declarationClass = &declarationClass_{
+var additionalConstraintClass = &additionalConstraintClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Declaration() DeclarationClassLike {
-	return declarationClass
+func AdditionalConstraint() AdditionalConstraintClassLike {
+	return additionalConstraintClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type declarationClass_ struct {
+type additionalConstraintClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *declarationClass_) Make(
-	comment string,
-	name string,
-	optionalConstraints ConstraintsLike,
-) DeclarationLike {
-	// Validate the arguments.
+func (c *additionalConstraintClass_) Make(constraint ConstraintLike) AdditionalConstraintLike {
+	// Validate the constraints.
 	switch {
-	case col.IsUndefined(comment):
-		panic("The comment attribute is required by this class.")
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
+	case col.IsUndefined(constraint):
+		panic("The constraint attribute is required by this class.")
 	default:
-		return &declaration_{
+		return &additionalConstraint_{
 			// Initialize instance attributes.
-			class_:               c,
-			comment_:             comment,
-			name_:                name,
-			optionalConstraints_: optionalConstraints,
+			class_:      c,
+			constraint_: constraint,
 		}
 	}
 }
@@ -66,32 +58,22 @@ func (c *declarationClass_) Make(
 
 // Target
 
-type declaration_ struct {
+type additionalConstraint_ struct {
 	// Define instance attributes.
-	class_               DeclarationClassLike
-	comment_             string
-	name_                string
-	optionalConstraints_ ConstraintsLike
+	class_      AdditionalConstraintClassLike
+	constraint_ ConstraintLike
 }
 
 // Public
 
-func (v *declaration_) GetClass() DeclarationClassLike {
+func (v *additionalConstraint_) GetClass() AdditionalConstraintClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *declaration_) GetComment() string {
-	return v.comment_
-}
-
-func (v *declaration_) GetName() string {
-	return v.name_
-}
-
-func (v *declaration_) GetOptionalConstraints() ConstraintsLike {
-	return v.optionalConstraints_
+func (v *additionalConstraint_) GetConstraint() ConstraintLike {
+	return v.constraint_
 }
 
 // Private

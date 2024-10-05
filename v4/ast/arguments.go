@@ -14,50 +14,49 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
+	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var abstractionClass = &abstractionClass_{
+var argumentsClass = &argumentsClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Abstraction() AbstractionClassLike {
-	return abstractionClass
+func Arguments() ArgumentsClassLike {
+	return argumentsClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type abstractionClass_ struct {
+type argumentsClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *abstractionClass_) Make(
-	optionalPrefix PrefixLike,
-	name string,
-	optionalSuffix SuffixLike,
-	optionalArguments ArgumentsLike,
-) AbstractionLike {
+func (c *argumentsClass_) Make(
+	argument ArgumentLike,
+	additionalArguments abs.Sequential[AdditionalArgumentLike],
+) ArgumentsLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
+	case col.IsUndefined(argument):
+		panic("The argument attribute is required by this class.")
+	case col.IsUndefined(additionalArguments):
+		panic("The additional arguments attribute is required by this class.")
 	default:
-		return &abstraction_{
+		return &arguments_{
 			// Initialize instance attributes.
-			class_:             c,
-			optionalPrefix_:    optionalPrefix,
-			name_:              name,
-			optionalSuffix_:    optionalSuffix,
-			optionalArguments_: optionalArguments,
+			class_:               c,
+			argument_:            argument,
+			additionalArguments_: additionalArguments,
 		}
 	}
 }
@@ -66,37 +65,27 @@ func (c *abstractionClass_) Make(
 
 // Target
 
-type abstraction_ struct {
+type arguments_ struct {
 	// Define instance attributes.
-	class_             AbstractionClassLike
-	optionalPrefix_    PrefixLike
-	name_              string
-	optionalSuffix_    SuffixLike
-	optionalArguments_ ArgumentsLike
+	class_               ArgumentsClassLike
+	argument_            ArgumentLike
+	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
 }
 
 // Public
 
-func (v *abstraction_) GetClass() AbstractionClassLike {
+func (v *arguments_) GetClass() ArgumentsClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *abstraction_) GetOptionalPrefix() PrefixLike {
-	return v.optionalPrefix_
+func (v *arguments_) GetArgument() ArgumentLike {
+	return v.argument_
 }
 
-func (v *abstraction_) GetName() string {
-	return v.name_
-}
-
-func (v *abstraction_) GetOptionalSuffix() SuffixLike {
-	return v.optionalSuffix_
-}
-
-func (v *abstraction_) GetOptionalArguments() ArgumentsLike {
-	return v.optionalArguments_
+func (v *arguments_) GetAdditionalArguments() abs.Sequential[AdditionalArgumentLike] {
+	return v.additionalArguments_
 }
 
 // Private

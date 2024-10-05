@@ -331,20 +331,20 @@ func (v *formatter_) PreprocessFunctionalDefinitions(functionalDefinitions ast.F
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessGenericArguments(genericArguments ast.GenericArgumentsLike) {
+func (v *formatter_) PreprocessArguments(arguments ast.ArgumentsLike) {
 	v.appendString("[")
 }
 
-func (v *formatter_) PostprocessGenericArguments(genericArguments ast.GenericArgumentsLike) {
+func (v *formatter_) PostprocessArguments(arguments ast.ArgumentsLike) {
 	v.appendString("]")
 }
 
-func (v *formatter_) PreprocessGenericParameters(genericParameters ast.GenericParametersLike) {
+func (v *formatter_) PreprocessConstraints(constraints ast.ConstraintsLike) {
 	v.appendString("[")
 	v.depth_++
 }
 
-func (v *formatter_) PostprocessGenericParameters(genericParameters ast.GenericParametersLike) {
+func (v *formatter_) PostprocessConstraints(constraints ast.ConstraintsLike) {
 	v.depth_--
 	v.appendString("]")
 }
