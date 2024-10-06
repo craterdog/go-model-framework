@@ -13,6 +13,7 @@
 package generator_test
 
 import (
+	fmt "fmt"
 	gen "github.com/craterdog/go-model-framework/v4/generator"
 	gra "github.com/craterdog/go-model-framework/v4/grammar"
 	ass "github.com/stretchr/testify/assert"
@@ -27,7 +28,9 @@ var testDirectories = []string{
 }
 
 func TestRoundTrips(t *tes.T) {
+	fmt.Println("Round Trip Tests:")
 	for _, directory := range testDirectories {
+		fmt.Printf("   %v\n", directory)
 		var bytes, err = osx.ReadFile(directory + "Package.go")
 		if err != nil {
 			panic(err)
@@ -54,4 +57,5 @@ func TestRoundTrips(t *tes.T) {
 			}
 		}
 	}
+	fmt.Println("Done.")
 }

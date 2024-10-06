@@ -14,43 +14,46 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
-	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var attributeMethodsClass = &attributeMethodsClass_{
+var setterClass = &setterClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func AttributeMethods() AttributeMethodsClassLike {
-	return attributeMethodsClass
+func Setter() SetterClassLike {
+	return setterClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type attributeMethodsClass_ struct {
+type setterClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *attributeMethodsClass_) Make(accessors abs.Sequential[AccessorLike]) AttributeMethodsLike {
+func (c *setterClass_) Make(
+	name string,
+	parameter ParameterLike,
+) SetterLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(accessors):
-		panic("The accessors attribute is required by this class.")
+	case col.IsUndefined(name):
+		panic("The name attribute is required by this class.")
 	default:
-		return &attributeMethods_{
+		return &setter_{
 			// Initialize instance attributes.
 			class_:     c,
-			accessors_: accessors,
+			name_:      name,
+			parameter_: parameter,
 		}
 	}
 }
@@ -59,22 +62,27 @@ func (c *attributeMethodsClass_) Make(accessors abs.Sequential[AccessorLike]) At
 
 // Target
 
-type attributeMethods_ struct {
+type setter_ struct {
 	// Define instance attributes.
-	class_     AttributeMethodsClassLike
-	accessors_ abs.Sequential[AccessorLike]
+	class_     SetterClassLike
+	name_      string
+	parameter_ ParameterLike
 }
 
 // Public
 
-func (v *attributeMethods_) GetClass() AttributeMethodsClassLike {
+func (v *setter_) GetClass() SetterClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *attributeMethods_) GetAccessors() abs.Sequential[AccessorLike] {
-	return v.accessors_
+func (v *setter_) GetName() string {
+	return v.name_
+}
+
+func (v *setter_) GetParameter() ParameterLike {
+	return v.parameter_
 }
 
 // Private

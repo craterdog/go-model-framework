@@ -204,21 +204,39 @@ func (v *processor_) ProcessAspectInterfacesSlot(slot uint) {
 func (v *processor_) PostprocessAspectInterfaces(aspectInterfaces ast.AspectInterfacesLike) {
 }
 
-func (v *processor_) PreprocessAttribute(
-	attribute ast.AttributeLike,
+func (v *processor_) PreprocessAccessor(
+	accessor ast.AccessorLike,
 	index uint,
 	size uint,
 ) {
 }
 
-func (v *processor_) ProcessAttributeSlot(slot uint) {
+func (v *processor_) ProcessAccessorSlot(slot uint) {
 }
 
-func (v *processor_) PostprocessAttribute(
-	attribute ast.AttributeLike,
+func (v *processor_) PostprocessAccessor(
+	accessor ast.AccessorLike,
 	index uint,
 	size uint,
 ) {
+}
+
+func (v *processor_) PreprocessGetter(getter ast.GetterLike) {
+}
+
+func (v *processor_) ProcessGetterSlot(slot uint) {
+}
+
+func (v *processor_) PostprocessGetter(getter ast.GetterLike) {
+}
+
+func (v *processor_) PreprocessSetter(setter ast.SetterLike) {
+}
+
+func (v *processor_) ProcessSetterSlot(slot uint) {
+}
+
+func (v *processor_) PostprocessSetter(setter ast.SetterLike) {
 }
 
 func (v *processor_) PreprocessAttributeMethods(attributeMethods ast.AttributeMethodsLike) {

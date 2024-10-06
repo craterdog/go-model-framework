@@ -105,6 +105,14 @@ func (v *formatter_) PreprocessAdditionalArgument(
 	v.appendString(", ")
 }
 
+func (v *formatter_) PreprocessAdditionalConstraint(
+	additionalConstraint ast.AdditionalConstraintLike,
+	index uint,
+	size uint,
+) {
+	v.appendString(", ")
+}
+
 func (v *formatter_) PreprocessAdditionalValue(
 	additionalValue ast.AdditionalValueLike,
 	index uint,
@@ -160,21 +168,30 @@ func (v *formatter_) PreprocessAspectInterfaces(aspectInterfaces ast.AspectInter
 	v.appendString("// Aspect")
 }
 
-func (v *formatter_) PreprocessAttribute(
-	attribute ast.AttributeLike,
+func (v *formatter_) PreprocessAccessor(
+	accessor ast.AccessorLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessAttributeSlot(slot uint) {
+func (v *formatter_) ProcessGetterSlot(slot uint) {
+	switch slot {
+	case 1:
+		v.appendString("() ")
+	}
+}
+
+func (v *formatter_) ProcessSetterSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString("(")
-	case 2:
-		v.appendString(") ")
 	}
+}
+
+func (v *formatter_) PostprocessSetter(setter ast.SetterLike) {
+	v.appendString(")")
 }
 
 func (v *formatter_) PreprocessAttributeMethods(attributeMethods ast.AttributeMethodsLike) {
@@ -185,6 +202,13 @@ func (v *formatter_) PreprocessAttributeMethods(attributeMethods ast.AttributeMe
 
 func (v *formatter_) PreprocessChannel(channel ast.ChannelLike) {
 	v.appendString("chan ")
+}
+
+func (v *formatter_) ProcessConstraintSlot(slot uint) {
+	switch slot {
+	case 1:
+		v.appendString(" ")
+	}
 }
 
 func (v *formatter_) PreprocessClass(
@@ -231,9 +255,7 @@ func (v *formatter_) PreprocessConstant(
 func (v *formatter_) ProcessConstantSlot(slot uint) {
 	switch slot {
 	case 1:
-		v.appendString("(")
-	case 2:
-		v.appendString(") ")
+		v.appendString("() ")
 	}
 }
 
@@ -325,6 +347,14 @@ func (v *formatter_) ProcessFunctionalSlot(slot uint) {
 	}
 }
 
+func (v *formatter_) PostprocessFunctional(
+	functional ast.FunctionalLike,
+	index uint,
+	size uint,
+) {
+	v.appendNewline()
+}
+
 func (v *formatter_) PreprocessFunctionalDefinitions(functionalDefinitions ast.FunctionalDefinitionsLike) {
 	v.appendNewline()
 	v.appendString("// Functionals")
@@ -353,11 +383,8 @@ func (v *formatter_) ProcessHeaderSlot(slot uint) {
 	v.appendString("package ")
 }
 
-func (v *formatter_) PostprocessHeader(header ast.HeaderLike) {
-	v.appendNewline()
-}
-
 func (v *formatter_) PreprocessImports(imports ast.ImportsLike) {
+	v.appendNewline()
 	v.appendNewline()
 	v.appendString("import (")
 	v.depth_++

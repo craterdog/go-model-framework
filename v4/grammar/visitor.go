@@ -221,52 +221,74 @@ func (v *visitor_) visitAspectInterfaces(aspectInterfaces ast.AspectInterfacesLi
 	}
 }
 
-func (v *visitor_) visitAttribute(attribute ast.AttributeLike) {
+func (v *visitor_) visitAccessor(accessor ast.AccessorLike) {
+	// Visit the possible accessor types.
+	switch actual := accessor.GetAny().(type) {
+	case ast.GetterLike:
+		v.processor_.PreprocessGetter(actual)
+		v.visitGetter(actual)
+		v.processor_.PostprocessGetter(actual)
+	case ast.SetterLike:
+		v.processor_.PreprocessSetter(actual)
+		v.visitSetter(actual)
+		v.processor_.PostprocessSetter(actual)
+	default:
+		panic(fmt.Sprintf("Invalid rule type: %T", actual))
+	}
+}
+
+func (v *visitor_) visitGetter(accessor ast.GetterLike) {
 	// Visit the name token.
-	var name = attribute.GetName()
+	var name = accessor.GetName()
 	v.processor_.ProcessName(name)
 
 	// Visit slot 1 between references.
-	v.processor_.ProcessAttributeSlot(1)
+	v.processor_.ProcessGetterSlot(1)
+
+	// Visit the single abstraction rule.
+	var abstraction = accessor.GetAbstraction()
+	if col.IsDefined(abstraction) {
+		v.processor_.PreprocessAbstraction(abstraction)
+		v.visitAbstraction(abstraction)
+		v.processor_.PostprocessAbstraction(abstraction)
+	}
+}
+
+func (v *visitor_) visitSetter(accessor ast.SetterLike) {
+	// Visit the name token.
+	var name = accessor.GetName()
+	v.processor_.ProcessName(name)
+
+	// Visit slot 1 between references.
+	v.processor_.ProcessSetterSlot(1)
 
 	// Visit the parameter rule.
-	var optionalParameter = attribute.GetOptionalParameter()
-	if col.IsDefined(optionalParameter) {
-		v.processor_.PreprocessParameter(optionalParameter, 1, 1)
-		v.visitParameter(optionalParameter)
-		v.processor_.PostprocessParameter(optionalParameter, 1, 1)
-	}
-
-	// Visit slot 2 between references.
-	v.processor_.ProcessAttributeSlot(2)
-
-	// Visit the optional abstraction rule.
-	var optionalAbstraction = attribute.GetOptionalAbstraction()
-	if col.IsDefined(optionalAbstraction) {
-		v.processor_.PreprocessAbstraction(optionalAbstraction)
-		v.visitAbstraction(optionalAbstraction)
-		v.processor_.PostprocessAbstraction(optionalAbstraction)
+	var parameter = accessor.GetParameter()
+	if col.IsDefined(parameter) {
+		v.processor_.PreprocessParameter(parameter, 1, 1)
+		v.visitParameter(parameter)
+		v.processor_.PostprocessParameter(parameter, 1, 1)
 	}
 }
 
 func (v *visitor_) visitAttributeMethods(attributeMethods ast.AttributeMethodsLike) {
-	// Visit each attribute rule.
-	var attributeIndex uint
-	var attributes = attributeMethods.GetAttributes().GetIterator()
-	var attributesSize = uint(attributes.GetSize())
-	for attributes.HasNext() {
-		attributeIndex++
-		var attribute = attributes.GetNext()
-		v.processor_.PreprocessAttribute(
-			attribute,
-			attributeIndex,
-			attributesSize,
+	// Visit each accessor rule.
+	var accessorIndex uint
+	var accessors = attributeMethods.GetAccessors().GetIterator()
+	var accessorsSize = uint(accessors.GetSize())
+	for accessors.HasNext() {
+		accessorIndex++
+		var accessor = accessors.GetNext()
+		v.processor_.PreprocessAccessor(
+			accessor,
+			accessorIndex,
+			accessorsSize,
 		)
-		v.visitAttribute(attribute)
-		v.processor_.PostprocessAttribute(
-			attribute,
-			attributeIndex,
-			attributesSize,
+		v.visitAccessor(accessor)
+		v.processor_.PostprocessAccessor(
+			accessor,
+			accessorIndex,
+			accessorsSize,
 		)
 	}
 }

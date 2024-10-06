@@ -155,14 +155,18 @@ func (v *classes_) analyzePublicAttributes(
 	var instanceMethods = instance.GetInstanceMethods()
 	var attributeMethods = instanceMethods.GetOptionalAttributeMethods()
 	if uti.IsDefined(attributeMethods) {
-		var attributes = attributeMethods.GetAttributes().GetIterator()
-		for attributes.HasNext() {
-			var attribute = attributes.GetNext()
-			var attributeName = v.extractName(attribute)
-			var abstraction = attribute.GetOptionalAbstraction()
-			if uti.IsUndefined(abstraction) {
-				var parameter = attribute.GetOptionalParameter()
-				abstraction = parameter.GetAbstraction()
+		var accessors = attributeMethods.GetAccessors().GetIterator()
+		for accessors.HasNext() {
+			var accessor = accessors.GetNext()
+			var attributeName string
+			var abstraction ast.AbstractionLike
+			switch actual := accessor.GetAny().(type) {
+			case ast.GetterLike:
+				attributeName = v.extractName(actual.GetName())
+				abstraction = actual.GetAbstraction()
+			case ast.SetterLike:
+				attributeName = v.extractName(actual.GetName())
+				abstraction = actual.GetParameter().GetAbstraction()
 			}
 			var attributeType = v.extractType(abstraction)
 			v.attributes_.SetValue(attributeName, attributeType)
@@ -188,30 +192,33 @@ func (v *classes_) extractInstanceName(
 	return instanceName
 }
 
-func (v *classes_) extractName(attribute ast.AttributeLike) string {
-	var attributeName = attribute.GetName()
-	var abstraction = attribute.GetOptionalAbstraction()
-	if uti.IsDefined(abstraction) {
-		switch {
-		case sts.HasPrefix(attributeName, "Get"):
-			attributeName = sts.TrimPrefix(attributeName, "Get")
-		case sts.HasPrefix(attributeName, "Is"):
-			attributeName = sts.TrimPrefix(attributeName, "Is")
-		case sts.HasPrefix(attributeName, "Was"):
-			attributeName = sts.TrimPrefix(attributeName, "Was")
-		case sts.HasPrefix(attributeName, "Are"):
-			attributeName = sts.TrimPrefix(attributeName, "Are")
-		case sts.HasPrefix(attributeName, "Were"):
-			attributeName = sts.TrimPrefix(attributeName, "Were")
-		case sts.HasPrefix(attributeName, "Has"):
-			attributeName = sts.TrimPrefix(attributeName, "Has")
-		case sts.HasPrefix(attributeName, "Had"):
-			attributeName = sts.TrimPrefix(attributeName, "Had")
-		case sts.HasPrefix(attributeName, "Have"):
-			attributeName = sts.TrimPrefix(attributeName, "Have")
-		}
-	} else {
-		attributeName = sts.TrimPrefix(attributeName, "Set")
+func (v *classes_) extractName(accessorName string) string {
+	var attributeName string
+	switch {
+	case sts.HasPrefix(accessorName, "Get"):
+		attributeName = sts.TrimPrefix(accessorName, "Get")
+	case sts.HasPrefix(accessorName, "Set"):
+		attributeName = sts.TrimPrefix(accessorName, "Set")
+	case sts.HasPrefix(accessorName, "Is"):
+		attributeName = sts.TrimPrefix(accessorName, "Is")
+	case sts.HasPrefix(accessorName, "Was"):
+		attributeName = sts.TrimPrefix(accessorName, "Was")
+	case sts.HasPrefix(accessorName, "Are"):
+		attributeName = sts.TrimPrefix(accessorName, "Are")
+	case sts.HasPrefix(accessorName, "Were"):
+		attributeName = sts.TrimPrefix(accessorName, "Were")
+	case sts.HasPrefix(accessorName, "Has"):
+		attributeName = sts.TrimPrefix(accessorName, "Has")
+	case sts.HasPrefix(accessorName, "Had"):
+		attributeName = sts.TrimPrefix(accessorName, "Had")
+	case sts.HasPrefix(accessorName, "Have"):
+		attributeName = sts.TrimPrefix(accessorName, "Have")
+	default:
+		var message = fmt.Sprintf(
+			"An unknown accessor name was found: %q",
+			accessorName,
+		)
+		panic(message)
 	}
 	attributeName = uti.MakeLowerCase(attributeName)
 	return attributeName
@@ -236,8 +243,8 @@ func (v *classes_) extractType(abstraction ast.AbstractionLike) string {
 	if uti.IsDefined(suffix) {
 		abstractType += "." + suffix.GetName()
 	}
-	if v.isGeneric_ {
-		var arguments = abstraction.GetOptionalArguments()
+	var arguments = abstraction.GetOptionalArguments()
+	if uti.IsDefined(arguments) {
 		var argument = v.extractType(arguments.GetArgument().GetAbstraction())
 		abstractType += "[" + argument
 		var additionalArguments = arguments.GetAdditionalArguments().GetIterator()

@@ -385,21 +385,39 @@ type Methodical interface {
 	PostprocessAspectInterfaces(
 		aspectInterfaces ast.AspectInterfacesLike,
 	)
-	PreprocessAttribute(
-		attribute ast.AttributeLike,
+	PreprocessAccessor(
+		accessor ast.AccessorLike,
 		index uint,
 		size uint,
 	)
-	ProcessAttributeSlot(
+	ProcessAccessorSlot(
 		slot uint,
 	)
-	PostprocessAttribute(
-		attribute ast.AttributeLike,
+	PostprocessAccessor(
+		accessor ast.AccessorLike,
 		index uint,
 		size uint,
 	)
+	PreprocessGetter(
+		getter ast.GetterLike,
+	)
+	ProcessGetterSlot(
+		slot uint,
+	)
+	PostprocessGetter(
+		getter ast.GetterLike,
+	)
+	PreprocessSetter(
+		setter ast.SetterLike,
+	)
+	ProcessSetterSlot(
+		slot uint,
+	)
+	PostprocessSetter(
+		setter ast.SetterLike,
+	)
 	PreprocessAttributeMethods(
-		attributeMethods ast.AttributeMethodsLike,
+		accessorMethods ast.AttributeMethodsLike,
 	)
 	ProcessAttributeMethodsSlot(
 		slot uint,

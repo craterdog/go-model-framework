@@ -20,42 +20,38 @@ import (
 
 // Reference
 
-var attributeClass = &attributeClass_{
+var accessorClass = &accessorClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func Attribute() AttributeClassLike {
-	return attributeClass
+func Accessor() AccessorClassLike {
+	return accessorClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type attributeClass_ struct {
+type accessorClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *attributeClass_) Make(
-	name string,
-	optionalParameter ParameterLike,
-	optionalAbstraction AbstractionLike,
-) AttributeLike {
+func (c *accessorClass_) Make(
+	any_ any,
+) AccessorLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
+	case col.IsUndefined(any_):
+		panic("The any attribute is required by this class.")
 	default:
-		return &attribute_{
+		return &accessor_{
 			// Initialize instance attributes.
-			class_:               c,
-			name_:                name,
-			optionalParameter_:   optionalParameter,
-			optionalAbstraction_: optionalAbstraction,
+			class_: c,
+			any_:   any_,
 		}
 	}
 }
@@ -64,32 +60,22 @@ func (c *attributeClass_) Make(
 
 // Target
 
-type attribute_ struct {
+type accessor_ struct {
 	// Define instance attributes.
-	class_               AttributeClassLike
-	name_                string
-	optionalParameter_   ParameterLike
-	optionalAbstraction_ AbstractionLike
+	class_ AccessorClassLike
+	any_   any
 }
 
 // Public
 
-func (v *attribute_) GetClass() AttributeClassLike {
+func (v *accessor_) GetClass() AccessorClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *attribute_) GetName() string {
-	return v.name_
-}
-
-func (v *attribute_) GetOptionalParameter() ParameterLike {
-	return v.optionalParameter_
-}
-
-func (v *attribute_) GetOptionalAbstraction() AbstractionLike {
-	return v.optionalAbstraction_
+func (v *accessor_) GetAny() any {
+	return v.any_
 }
 
 // Private

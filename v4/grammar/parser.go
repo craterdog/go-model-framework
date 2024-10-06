@@ -529,8 +529,94 @@ interfacesLoop:
 	return aspectInterfaces, token, ruleFound_
 }
 
-func (v *parser_) parseAttribute() (
-	attribute ast.AttributeLike,
+func (v *parser_) parseAccessor() (
+	accessor ast.AccessorLike,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a single getter rule.
+	var getter ast.GetterLike
+	getter, token, ok = v.parseGetter()
+	if ok {
+		// Found a single getter accessor.
+		accessor = ast.Accessor().Make(getter)
+		return accessor, token, true
+	}
+
+	// Attempt to parse a single setter rule.
+	var setter ast.SetterLike
+	setter, token, ok = v.parseSetter()
+	if ok {
+		// Found a single setter accessor.
+		accessor = ast.Accessor().Make(setter)
+		return accessor, token, true
+	}
+
+	// This is not a single accessor rule.
+	return accessor, token, false
+}
+
+func (v *parser_) parseGetter() (
+	getter ast.GetterLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	var nameToken TokenLike
+	name, nameToken, ok = v.parseToken(NameToken)
+	if !ok {
+		// This is not a single getter rule.
+		return getter, nameToken, false
+	}
+
+	// Attempt to parse a single "(" delimiter.
+	var leftToken TokenLike
+	_, leftToken, ok = v.parseDelimiter("(")
+	if !ok {
+		// This is not a single getter rule.
+		v.putBack(nameToken)
+		return getter, leftToken, false
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		// This is not a single getter rule.
+		v.putBack(leftToken)
+		v.putBack(nameToken)
+		return getter, token, false
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Getter")
+			panic(message)
+		} else {
+			// This is not a single getter rule.
+			return getter, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single getter rule.
+	ruleFound_ = true
+	getter = ast.Getter().Make(
+		name,
+		abstraction,
+	)
+	return getter, token, ruleFound_
+}
+
+func (v *parser_) parseSetter() (
+	setter ast.SetterLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -542,11 +628,11 @@ func (v *parser_) parseAttribute() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Attribute")
+			var message = v.formatError(token, "Setter")
 			panic(message)
 		} else {
-			// This is not a single attribute rule.
-			return attribute, token, false
+			// This is not a single setter rule.
+			return setter, token, false
 		}
 	}
 	ruleFound_ = true
@@ -556,51 +642,50 @@ func (v *parser_) parseAttribute() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Attribute")
+			var message = v.formatError(token, "Setter")
 			panic(message)
 		} else {
-			// This is not a single attribute rule.
-			return attribute, token, false
+			// This is not a single setter rule.
+			return setter, token, false
 		}
 	}
 	ruleFound_ = true
 
-	// Attempt to parse an optional parameter rule.
-	var optionalParameter ast.ParameterLike
-	optionalParameter, _, ok = v.parseParameter()
-	if ok {
-		ruleFound_ = true
+	// Attempt to parse a single parameter rule.
+	var parameter ast.ParameterLike
+	parameter, token, ok = v.parseParameter()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Setter")
+			panic(message)
+		} else {
+			// This is not a single setter rule.
+			return setter, token, false
+		}
 	}
+	ruleFound_ = true
 
 	// Attempt to parse a single ")" delimiter.
 	_, token, ok = v.parseDelimiter(")")
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Attribute")
+			var message = v.formatError(token, "Setter")
 			panic(message)
 		} else {
-			// This is not a single attribute rule.
-			return attribute, token, false
+			// This is not a single setter rule.
+			return setter, token, false
 		}
 	}
 	ruleFound_ = true
 
-	// Attempt to parse an optional abstraction rule.
-	var optionalAbstraction ast.AbstractionLike
-	optionalAbstraction, _, ok = v.parseAbstraction()
-	if ok {
-		ruleFound_ = true
-	}
-
-	// Found a single attribute rule.
-	ruleFound_ = true
-	attribute = ast.Attribute().Make(
+	// Found a single setter rule.
+	setter = ast.Setter().Make(
 		name,
-		optionalParameter,
-		optionalAbstraction,
+		parameter,
 	)
-	return attribute, token, ruleFound_
+	return setter, token, ruleFound_
 }
 
 func (v *parser_) parseAttributeMethods() (
@@ -624,12 +709,12 @@ func (v *parser_) parseAttributeMethods() (
 	}
 	ruleFound_ = true
 
-	// Attempt to parse 1 to unlimited attribute rules.
-	var attributes = col.List[ast.AttributeLike]()
-attributesLoop:
+	// Attempt to parse 1 to unlimited accessor rules.
+	var accessors = col.List[ast.AccessorLike]()
+accessorsLoop:
 	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
-		var attribute ast.AttributeLike
-		attribute, token, ok = v.parseAttribute()
+		var accessor ast.AccessorLike
+		accessor, token, ok = v.parseAccessor()
 		if !ok {
 			switch {
 			case numberFound_ < 1:
@@ -639,18 +724,18 @@ attributesLoop:
 				}
 				// Found a syntax error.
 				var message = v.formatError(token, "AttributeMethods")
-				message += "The number of attribute rules must be at least 1."
+				message += "The number of accessor rules must be at least 1."
 				panic(message)
 			default:
-				break attributesLoop
+				break accessorsLoop
 			}
 		}
-		attributes.AppendValue(attribute)
+		accessors.AppendValue(accessor)
 	}
 
 	// Found a single attributeMethods rule.
 	ruleFound_ = true
-	attributeMethods = ast.AttributeMethods().Make(attributes)
+	attributeMethods = ast.AttributeMethods().Make(accessors)
 	return attributeMethods, token, ruleFound_
 }
 
@@ -2778,7 +2863,6 @@ func (v *parser_) parsePrefix() (
 
 	// This is not a single prefix rule.
 	return prefix, token, false
-
 }
 
 func (v *parser_) parsePrimitiveDefinitions() (

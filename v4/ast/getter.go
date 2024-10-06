@@ -14,43 +14,46 @@ package ast
 
 import (
 	col "github.com/craterdog/go-collection-framework/v4"
-	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
 // CLASS ACCESS
 
 // Reference
 
-var attributeMethodsClass = &attributeMethodsClass_{
+var getterClass = &getterClass_{
 	// Initialize class constants.
 }
 
 // Function
 
-func AttributeMethods() AttributeMethodsClassLike {
-	return attributeMethodsClass
+func Getter() GetterClassLike {
+	return getterClass
 }
 
 // CLASS METHODS
 
 // Target
 
-type attributeMethodsClass_ struct {
+type getterClass_ struct {
 	// Define class constants.
 }
 
 // Constructors
 
-func (c *attributeMethodsClass_) Make(accessors abs.Sequential[AccessorLike]) AttributeMethodsLike {
+func (c *getterClass_) Make(
+	name string,
+	abstraction AbstractionLike,
+) GetterLike {
 	// Validate the arguments.
 	switch {
-	case col.IsUndefined(accessors):
-		panic("The accessors attribute is required by this class.")
+	case col.IsUndefined(name):
+		panic("The name attribute is required by this class.")
 	default:
-		return &attributeMethods_{
+		return &getter_{
 			// Initialize instance attributes.
-			class_:     c,
-			accessors_: accessors,
+			class_:       c,
+			name_:        name,
+			abstraction_: abstraction,
 		}
 	}
 }
@@ -59,22 +62,27 @@ func (c *attributeMethodsClass_) Make(accessors abs.Sequential[AccessorLike]) At
 
 // Target
 
-type attributeMethods_ struct {
+type getter_ struct {
 	// Define instance attributes.
-	class_     AttributeMethodsClassLike
-	accessors_ abs.Sequential[AccessorLike]
+	class_       GetterClassLike
+	name_        string
+	abstraction_ AbstractionLike
 }
 
 // Public
 
-func (v *attributeMethods_) GetClass() AttributeMethodsClassLike {
+func (v *getter_) GetClass() GetterClassLike {
 	return v.class_
 }
 
 // Attribute
 
-func (v *attributeMethods_) GetAccessors() abs.Sequential[AccessorLike] {
-	return v.accessors_
+func (v *getter_) GetName() string {
+	return v.name_
+}
+
+func (v *getter_) GetAbstraction() AbstractionLike {
+	return v.abstraction_
 }
 
 // Private
