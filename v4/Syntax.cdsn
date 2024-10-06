@@ -149,9 +149,15 @@ PublicMethods: "// Public" Method+
 
 Method: name "(" Parameter* ")" Result?
 
-AttributeMethods: "// Attribute" Attribute+
+AttributeMethods: "// Attribute" Accessor+
 
-Attribute: name "(" Parameter? ")" Abstraction?
+Accessor:
+  - Getter
+  - Setter
+
+Getter: name "(" ")" Abstraction
+
+Setter: name "(" Parameter ")"
 
 AspectInterfaces: "// Aspect" Interface+
 

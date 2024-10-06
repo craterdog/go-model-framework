@@ -50,7 +50,7 @@ func TestRoundTrips(t *tes.T) {
 			var className = association.GetKey()
 			var classSource = association.GetValue()
 			bytes = []byte(classSource)
-			var filename = directory + className
+			var filename = directory + className + ".go"
 			err = osx.WriteFile(filename, bytes, 0644)
 			if err != nil {
 				panic(err)
