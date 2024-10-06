@@ -43,16 +43,6 @@ type ClassesClassLike interface {
 	Make() ClassesLike
 }
 
-/*
-GeneratorClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete generator-like class.
-*/
-type GeneratorClassLike interface {
-	// Constructor
-	Make() GeneratorLike
-}
-
 // Instances
 
 /*
@@ -66,30 +56,4 @@ type ClassesLike interface {
 	GenerateModelClasses(
 		model ast.ModelLike,
 	) abs.CatalogLike[string, string]
-}
-
-/*
-GeneratorLike is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete generator-like class.
-*/
-type GeneratorLike interface {
-	// Public
-	GetClass() GeneratorClassLike
-	CreateClassType(
-		name string,
-		copyright string,
-	) ast.ModelLike
-	CreateGenericType(
-		name string,
-		copyright string,
-	) ast.ModelLike
-	CreateClassStructure(
-		name string,
-		copyright string,
-	) ast.ModelLike
-	CreateGenericStructure(
-		name string,
-		copyright string,
-	) ast.ModelLike
 }
