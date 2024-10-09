@@ -31,7 +31,7 @@ import (
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
 
-// Classes
+// Class Definitions
 
 /*
 ClassesClassLike is a class interface that defines the complete set of
@@ -43,7 +43,7 @@ type ClassesClassLike interface {
 	Make() ClassesLike
 }
 
-// Instances
+// Instance Definitions
 
 /*
 ClassesLike is an instance interface that defines the complete set of
