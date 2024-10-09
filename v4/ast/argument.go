@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var argumentClass = &argumentClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Argument() ArgumentClassLike {
 	return argumentClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type argumentClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *argumentClass_) Make(abstraction AbstractionLike) ArgumentLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(abstraction):
+func (c *argumentClass_) Make(
+	abstraction AbstractionLike,
+) ArgumentLike {
+	if uti.IsUndefined(abstraction) {
 		panic("The abstraction attribute is required by this class.")
-	default:
-		return &argument_{
-			// Initialize instance attributes.
-			class_:       c,
-			abstraction_: abstraction,
-		}
 	}
+	var instance = &argument_{
+		class_:       c,
+		abstraction_: abstraction,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type argument_ struct {
-	// Define instance attributes.
-	class_       ArgumentClassLike
-	abstraction_ AbstractionLike
-}
-
-// Public
-
-func (v *argument_) GetClass() ArgumentClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *argument_) GetAbstraction() AbstractionLike {
 	return v.abstraction_
 }
 
-// Private
+// Public Methods
+
+func (v *argument_) GetClass() ArgumentClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *argument_) getClass() *argumentClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type argument_ struct {
+	class_       *argumentClass_
+	abstraction_ AbstractionLike
+}
+
+// Class Structure
+
+type argumentClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var argumentClass = &argumentClass_{
+	// Initialize the class constants.
+}

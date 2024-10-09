@@ -129,15 +129,15 @@ func (v *formatter_) PostprocessArray(array ast.ArrayLike) {
 	v.appendString("]")
 }
 
-func (v *formatter_) PreprocessAspect(
-	aspect ast.AspectLike,
+func (v *formatter_) PreprocessAspectDefinition(
+	aspectDefinition ast.AspectDefinitionLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessAspectSlot(slot uint) {
+func (v *formatter_) ProcessAspectDefinitionSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString(" interface {")
@@ -145,8 +145,8 @@ func (v *formatter_) ProcessAspectSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PostprocessAspect(
-	aspect ast.AspectLike,
+func (v *formatter_) PostprocessAspectDefinition(
+	aspectDefinition ast.AspectDefinitionLike,
 	index uint,
 	size uint,
 ) {
@@ -156,48 +156,55 @@ func (v *formatter_) PostprocessAspect(
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessAspectDefinitions(aspectDefinitions ast.AspectDefinitionsLike) {
+func (v *formatter_) PreprocessAspectMethod(
+	aspectMethod ast.AspectMethodLike,
+	index uint,
+	size uint,
+) {
+}
+
+func (v *formatter_) PreprocessAspectSection(aspectSection ast.AspectSectionLike) {
 	v.appendNewline()
-	v.appendString("// Aspects")
+	v.appendString("// Aspect Definitions")
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessAspectInterfaces(aspectInterfaces ast.AspectInterfacesLike) {
+func (v *formatter_) PreprocessAspectSubsection(aspectSubsection ast.AspectSubsectionLike) {
 	v.appendString("\n")
 	v.appendNewline()
-	v.appendString("// Aspect")
+	v.appendString("// Aspect Methods")
 }
 
-func (v *formatter_) PreprocessAccessor(
-	accessor ast.AccessorLike,
+func (v *formatter_) PreprocessAttributeMethod(
+	attributeMethod ast.AttributeMethodLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessGetterSlot(slot uint) {
+func (v *formatter_) ProcessGetterMethodSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString("() ")
 	}
 }
 
-func (v *formatter_) ProcessSetterSlot(slot uint) {
+func (v *formatter_) ProcessSetterMethodSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString("(")
 	}
 }
 
-func (v *formatter_) PostprocessSetter(setter ast.SetterLike) {
+func (v *formatter_) PostprocessSetterMethod(setterMethod ast.SetterMethodLike) {
 	v.appendString(")")
 }
 
-func (v *formatter_) PreprocessAttributeMethods(attributeMethods ast.AttributeMethodsLike) {
+func (v *formatter_) PreprocessAttributeSubsection(attributeSubsection ast.AttributeSubsectionLike) {
 	v.appendString("\n")
 	v.appendNewline()
-	v.appendString("// Attribute")
+	v.appendString("// Attribute Methods")
 }
 
 func (v *formatter_) PreprocessChannel(channel ast.ChannelLike) {
@@ -211,15 +218,15 @@ func (v *formatter_) ProcessConstraintSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PreprocessClass(
-	class ast.ClassLike,
+func (v *formatter_) PreprocessClassDefinition(
+	classDefinition ast.ClassDefinitionLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessClassSlot(slot uint) {
+func (v *formatter_) ProcessClassDefinitionSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString(" interface {")
@@ -227,8 +234,8 @@ func (v *formatter_) ProcessClassSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PostprocessClass(
-	class ast.ClassLike,
+func (v *formatter_) PostprocessClassDefinition(
+	classDefinition ast.ClassDefinitionLike,
 	index uint,
 	size uint,
 ) {
@@ -238,42 +245,42 @@ func (v *formatter_) PostprocessClass(
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessClassDefinitions(classDefinitions ast.ClassDefinitionsLike) {
+func (v *formatter_) PreprocessClassSection(classSection ast.ClassSectionLike) {
 	v.appendNewline()
-	v.appendString("// Classes")
+	v.appendString("// Class Definitions")
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessConstant(
-	constant ast.ConstantLike,
+func (v *formatter_) PreprocessConstantMethod(
+	constantMethod ast.ConstantMethodLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessConstantSlot(slot uint) {
+func (v *formatter_) ProcessConstantMethodSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString("() ")
 	}
 }
 
-func (v *formatter_) PreprocessConstantMethods(constantMethods ast.ConstantMethodsLike) {
+func (v *formatter_) PreprocessConstantSubsection(constantSubsection ast.ConstantSubsectionLike) {
 	v.appendString("\n")
 	v.appendNewline()
-	v.appendString("// Constant")
+	v.appendString("// Constant Methods")
 }
 
-func (v *formatter_) PreprocessConstructor(
-	constructor ast.ConstructorLike,
+func (v *formatter_) PreprocessConstructorMethod(
+	constructorMethod ast.ConstructorMethodLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessConstructorSlot(slot uint) {
+func (v *formatter_) ProcessConstructorMethodSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString("(")
@@ -282,9 +289,9 @@ func (v *formatter_) ProcessConstructorSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PreprocessConstructorMethods(constructorMethods ast.ConstructorMethodsLike) {
+func (v *formatter_) PreprocessConstructorSubsection(constructorSubsection ast.ConstructorSubsectionLike) {
 	v.appendNewline()
-	v.appendString("// Constructor")
+	v.appendString("// Constructor Methods")
 }
 
 func (v *formatter_) ProcessDeclarationSlot(slot uint) {
@@ -307,15 +314,15 @@ func (v *formatter_) PostprocessEnumeration(enumeration ast.EnumerationLike) {
 	v.appendString(")")
 }
 
-func (v *formatter_) PreprocessFunction(
-	function ast.FunctionLike,
+func (v *formatter_) PreprocessFunctionMethod(
+	functionMethod ast.FunctionMethodLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessFunctionSlot(slot uint) {
+func (v *formatter_) ProcessFunctionMethodSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString("(")
@@ -324,21 +331,21 @@ func (v *formatter_) ProcessFunctionSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PreprocessFunctionMethods(functionMethods ast.FunctionMethodsLike) {
+func (v *formatter_) PreprocessFunctionSubsection(functionSubsection ast.FunctionSubsectionLike) {
 	v.appendString("\n")
 	v.appendNewline()
-	v.appendString("// Function")
+	v.appendString("// Function Methods")
 }
 
-func (v *formatter_) PreprocessFunctional(
-	functional ast.FunctionalLike,
+func (v *formatter_) PreprocessFunctionalDefinition(
+	functionalDefinition ast.FunctionalDefinitionLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessFunctionalSlot(slot uint) {
+func (v *formatter_) ProcessFunctionalDefinitionSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString(" func(")
@@ -347,17 +354,17 @@ func (v *formatter_) ProcessFunctionalSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PostprocessFunctional(
-	functional ast.FunctionalLike,
+func (v *formatter_) PostprocessFunctionalDefinition(
+	functionalDefinition ast.FunctionalDefinitionLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessFunctionalDefinitions(functionalDefinitions ast.FunctionalDefinitionsLike) {
+func (v *formatter_) PreprocessFunctionalSection(functionalSection ast.FunctionalSectionLike) {
 	v.appendNewline()
-	v.appendString("// Functionals")
+	v.appendString("// Functional Definitions")
 	v.appendNewline()
 }
 
@@ -396,15 +403,15 @@ func (v *formatter_) PostprocessImports(imports ast.ImportsLike) {
 	v.appendString(")")
 }
 
-func (v *formatter_) PreprocessInstance(
-	instance ast.InstanceLike,
+func (v *formatter_) PreprocessInstanceDefinition(
+	instanceDefinition ast.InstanceDefinitionLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessInstanceSlot(slot uint) {
+func (v *formatter_) ProcessInstanceDefinitionSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString(" interface {")
@@ -412,8 +419,8 @@ func (v *formatter_) ProcessInstanceSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PostprocessInstance(
-	instance ast.InstanceLike,
+func (v *formatter_) PostprocessInstanceDefinition(
+	instanceDefinition ast.InstanceDefinitionLike,
 	index uint,
 	size uint,
 ) {
@@ -423,14 +430,14 @@ func (v *formatter_) PostprocessInstance(
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessInstanceDefinitions(instanceDefinitions ast.InstanceDefinitionsLike) {
+func (v *formatter_) PreprocessInstanceSection(instanceSection ast.InstanceSectionLike) {
 	v.appendNewline()
-	v.appendString("// Instances")
+	v.appendString("// Instance Definitions")
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessInterface(
-	interface_ ast.InterfaceLike,
+func (v *formatter_) PreprocessAspectInterface(
+	aspectInterface ast.AspectInterfaceLike,
 	index uint,
 	size uint,
 ) {
@@ -447,8 +454,6 @@ func (v *formatter_) PostprocessMap(map_ ast.MapLike) {
 
 func (v *formatter_) PreprocessMethod(
 	method ast.MethodLike,
-	index uint,
-	size uint,
 ) {
 	v.appendNewline()
 }
@@ -521,9 +526,9 @@ func (v *formatter_) ProcessParameterizedSlot(slot uint) {
 	}
 }
 
-func (v *formatter_) PreprocessPublicMethods(publicMethods ast.PublicMethodsLike) {
+func (v *formatter_) PreprocessPublicSubsection(publicSubsection ast.PublicSubsectionLike) {
 	v.appendNewline()
-	v.appendString("// Public")
+	v.appendString("// Public Methods")
 }
 
 func (v *formatter_) PreprocessResult(result ast.ResultLike) {
@@ -538,32 +543,32 @@ func (v *formatter_) PreprocessSuffix(suffix ast.SuffixLike) {
 	v.appendString(".")
 }
 
-func (v *formatter_) PreprocessType(
-	type_ ast.TypeLike,
+func (v *formatter_) PreprocessTypeDefinition(
+	typeDefinition ast.TypeDefinitionLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessTypeSlot(slot uint) {
+func (v *formatter_) ProcessTypeDefinitionSlot(slot uint) {
 	switch slot {
 	case 1:
 		v.appendString(" ")
 	}
 }
 
-func (v *formatter_) PostprocessType(
-	type_ ast.TypeLike,
+func (v *formatter_) PostprocessTypeDefinition(
+	typeDefinition ast.TypeDefinitionLike,
 	index uint,
 	size uint,
 ) {
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessTypeDefinitions(typeDefinitions ast.TypeDefinitionsLike) {
+func (v *formatter_) PreprocessTypeSection(typeSection ast.TypeSectionLike) {
 	v.appendNewline()
-	v.appendString("// Types")
+	v.appendString("// Type Definitions")
 	v.appendNewline()
 }
 

@@ -33,7 +33,7 @@ import (
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
-// Classes
+// Class Definitions
 
 /*
 AbstractionClassLike is a class interface that defines the complete set of
@@ -41,7 +41,7 @@ class constants, constructors and functions that must be supported by each
 concrete abstraction-like class.
 */
 type AbstractionClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		optionalPrefix PrefixLike,
 		name string,
@@ -51,24 +51,12 @@ type AbstractionClassLike interface {
 }
 
 /*
-AccessorClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete accessor-like class.
-*/
-type AccessorClassLike interface {
-	// Constructor
-	Make(
-		any_ any,
-	) AccessorLike
-}
-
-/*
 AdditionalArgumentClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete additional-argument-like class.
 */
 type AdditionalArgumentClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		argument ArgumentLike,
 	) AdditionalArgumentLike
@@ -80,7 +68,7 @@ class constants, constructors and functions that must be supported by each
 concrete additional-constraint-like class.
 */
 type AdditionalConstraintClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		constraint ConstraintLike,
 	) AdditionalConstraintLike
@@ -92,7 +80,7 @@ class constants, constructors and functions that must be supported by each
 concrete additional-value-like class.
 */
 type AdditionalValueClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 	) AdditionalValueLike
@@ -104,7 +92,7 @@ class constants, constructors and functions that must be supported by each
 concrete argument-like class.
 */
 type ArgumentClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		abstraction AbstractionLike,
 	) ArgumentLike
@@ -116,7 +104,7 @@ class constants, constructors and functions that must be supported by each
 concrete arguments-like class.
 */
 type ArgumentsClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		argument ArgumentLike,
 		additionalArguments abs.Sequential[AdditionalArgumentLike],
@@ -129,57 +117,93 @@ class constants, constructors and functions that must be supported by each
 concrete array-like class.
 */
 type ArrayClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make() ArrayLike
 }
 
 /*
-AspectClassLike is a class interface that defines the complete set of
+AspectDefinitionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete aspect-like class.
+concrete aspect-definition-like class.
 */
-type AspectClassLike interface {
-	// Constructor
+type AspectDefinitionClassLike interface {
+	// Constructor Methods
 	Make(
 		declaration DeclarationLike,
-		methods abs.Sequential[MethodLike],
-	) AspectLike
+		aspectMethods abs.Sequential[AspectMethodLike],
+	) AspectDefinitionLike
 }
 
 /*
-AspectDefinitionsClassLike is a class interface that defines the complete set of
+AspectInterfaceClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete aspect-definitions-like class.
+concrete aspect-interface-like class.
 */
-type AspectDefinitionsClassLike interface {
-	// Constructor
+type AspectInterfaceClassLike interface {
+	// Constructor Methods
 	Make(
-		aspects abs.Sequential[AspectLike],
-	) AspectDefinitionsLike
+		abstraction AbstractionLike,
+	) AspectInterfaceLike
 }
 
 /*
-AspectInterfacesClassLike is a class interface that defines the complete set of
+AspectMethodClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete aspect-interfaces-like class.
+concrete aspect-method-like class.
 */
-type AspectInterfacesClassLike interface {
-	// Constructor
+type AspectMethodClassLike interface {
+	// Constructor Methods
 	Make(
-		interfaces abs.Sequential[InterfaceLike],
-	) AspectInterfacesLike
+		method MethodLike,
+	) AspectMethodLike
 }
 
 /*
-AttributeMethodsClassLike is a class interface that defines the complete set of
+AspectSectionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete attribute-methods-like class.
+concrete aspect-section-like class.
 */
-type AttributeMethodsClassLike interface {
-	// Constructor
+type AspectSectionClassLike interface {
+	// Constructor Methods
 	Make(
-		accessors abs.Sequential[AccessorLike],
-	) AttributeMethodsLike
+		aspectDefinitions abs.Sequential[AspectDefinitionLike],
+	) AspectSectionLike
+}
+
+/*
+AspectSubsectionClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete aspect-subsection-like class.
+*/
+type AspectSubsectionClassLike interface {
+	// Constructor Methods
+	Make(
+		aspectInterfaces abs.Sequential[AspectInterfaceLike],
+	) AspectSubsectionLike
+}
+
+/*
+AttributeMethodClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete attribute-method-like class.
+*/
+type AttributeMethodClassLike interface {
+	// Constructor Methods
+	Make(
+		any_ any,
+	) AttributeMethodLike
+}
+
+/*
+AttributeSubsectionClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete attribute-subsection-like class.
+*/
+type AttributeSubsectionClassLike interface {
+	// Constructor Methods
+	Make(
+		attributeMethods abs.Sequential[AttributeMethodLike],
+	) AttributeSubsectionLike
 }
 
 /*
@@ -188,33 +212,21 @@ class constants, constructors and functions that must be supported by each
 concrete channel-like class.
 */
 type ChannelClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make() ChannelLike
 }
 
 /*
-ClassClassLike is a class interface that defines the complete set of
+ClassDefinitionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete class-like class.
+concrete class-definition-like class.
 */
-type ClassClassLike interface {
-	// Constructor
+type ClassDefinitionClassLike interface {
+	// Constructor Methods
 	Make(
 		declaration DeclarationLike,
 		classMethods ClassMethodsLike,
-	) ClassLike
-}
-
-/*
-ClassDefinitionsClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete class-definitions-like class.
-*/
-type ClassDefinitionsClassLike interface {
-	// Constructor
-	Make(
-		classes abs.Sequential[ClassLike],
-	) ClassDefinitionsLike
+	) ClassDefinitionLike
 }
 
 /*
@@ -223,37 +235,49 @@ class constants, constructors and functions that must be supported by each
 concrete class-methods-like class.
 */
 type ClassMethodsClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
-		constructorMethods ConstructorMethodsLike,
-		optionalConstantMethods ConstantMethodsLike,
-		optionalFunctionMethods FunctionMethodsLike,
+		constructorSubsection ConstructorSubsectionLike,
+		optionalConstantSubsection ConstantSubsectionLike,
+		optionalFunctionSubsection FunctionSubsectionLike,
 	) ClassMethodsLike
 }
 
 /*
-ConstantClassLike is a class interface that defines the complete set of
+ClassSectionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete constant-like class.
+concrete class-section-like class.
 */
-type ConstantClassLike interface {
-	// Constructor
+type ClassSectionClassLike interface {
+	// Constructor Methods
 	Make(
-		name string,
-		abstraction AbstractionLike,
-	) ConstantLike
+		classDefinitions abs.Sequential[ClassDefinitionLike],
+	) ClassSectionLike
 }
 
 /*
-ConstantMethodsClassLike is a class interface that defines the complete set of
+ConstantMethodClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete constant-methods-like class.
+concrete constant-method-like class.
 */
-type ConstantMethodsClassLike interface {
-	// Constructor
+type ConstantMethodClassLike interface {
+	// Constructor Methods
 	Make(
-		constants abs.Sequential[ConstantLike],
-	) ConstantMethodsLike
+		name string,
+		abstraction AbstractionLike,
+	) ConstantMethodLike
+}
+
+/*
+ConstantSubsectionClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete constant-subsection-like class.
+*/
+type ConstantSubsectionClassLike interface {
+	// Constructor Methods
+	Make(
+		constantMethods abs.Sequential[ConstantMethodLike],
+	) ConstantSubsectionLike
 }
 
 /*
@@ -262,7 +286,7 @@ class constants, constructors and functions that must be supported by each
 concrete constraint-like class.
 */
 type ConstraintClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 		abstraction AbstractionLike,
@@ -275,7 +299,7 @@ class constants, constructors and functions that must be supported by each
 concrete constraints-like class.
 */
 type ConstraintsClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		constraint ConstraintLike,
 		additionalConstraints abs.Sequential[AdditionalConstraintLike],
@@ -283,29 +307,29 @@ type ConstraintsClassLike interface {
 }
 
 /*
-ConstructorClassLike is a class interface that defines the complete set of
+ConstructorMethodClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete constructor-like class.
+concrete constructor-method-like class.
 */
-type ConstructorClassLike interface {
-	// Constructor
+type ConstructorMethodClassLike interface {
+	// Constructor Methods
 	Make(
 		name string,
 		parameters abs.Sequential[ParameterLike],
 		abstraction AbstractionLike,
-	) ConstructorLike
+	) ConstructorMethodLike
 }
 
 /*
-ConstructorMethodsClassLike is a class interface that defines the complete set of
+ConstructorSubsectionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete constructor-methods-like class.
+concrete constructor-subsection-like class.
 */
-type ConstructorMethodsClassLike interface {
-	// Constructor
+type ConstructorSubsectionClassLike interface {
+	// Constructor Methods
 	Make(
-		constructors abs.Sequential[ConstructorLike],
-	) ConstructorMethodsLike
+		constructorMethods abs.Sequential[ConstructorMethodLike],
+	) ConstructorSubsectionLike
 }
 
 /*
@@ -314,7 +338,7 @@ class constants, constructors and functions that must be supported by each
 concrete declaration-like class.
 */
 type DeclarationClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		comment string,
 		name string,
@@ -328,7 +352,7 @@ class constants, constructors and functions that must be supported by each
 concrete enumeration-like class.
 */
 type EnumerationClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		value ValueLike,
 		additionalValues abs.Sequential[AdditionalValueLike],
@@ -336,68 +360,68 @@ type EnumerationClassLike interface {
 }
 
 /*
-FunctionClassLike is a class interface that defines the complete set of
+FunctionMethodClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete function-like class.
+concrete function-method-like class.
 */
-type FunctionClassLike interface {
-	// Constructor
+type FunctionMethodClassLike interface {
+	// Constructor Methods
 	Make(
 		name string,
 		parameters abs.Sequential[ParameterLike],
 		result ResultLike,
-	) FunctionLike
+	) FunctionMethodLike
 }
 
 /*
-FunctionMethodsClassLike is a class interface that defines the complete set of
+FunctionSubsectionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete function-methods-like class.
+concrete function-subsection-like class.
 */
-type FunctionMethodsClassLike interface {
-	// Constructor
+type FunctionSubsectionClassLike interface {
+	// Constructor Methods
 	Make(
-		functions abs.Sequential[FunctionLike],
-	) FunctionMethodsLike
+		functionMethods abs.Sequential[FunctionMethodLike],
+	) FunctionSubsectionLike
 }
 
 /*
-FunctionalClassLike is a class interface that defines the complete set of
+FunctionalDefinitionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete functional-like class.
+concrete functional-definition-like class.
 */
-type FunctionalClassLike interface {
-	// Constructor
+type FunctionalDefinitionClassLike interface {
+	// Constructor Methods
 	Make(
 		declaration DeclarationLike,
 		parameters abs.Sequential[ParameterLike],
 		result ResultLike,
-	) FunctionalLike
+	) FunctionalDefinitionLike
 }
 
 /*
-FunctionalDefinitionsClassLike is a class interface that defines the complete set of
+FunctionalSectionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete functional-definitions-like class.
+concrete functional-section-like class.
 */
-type FunctionalDefinitionsClassLike interface {
-	// Constructor
+type FunctionalSectionClassLike interface {
+	// Constructor Methods
 	Make(
-		functionals abs.Sequential[FunctionalLike],
-	) FunctionalDefinitionsLike
+		functionalDefinitions abs.Sequential[FunctionalDefinitionLike],
+	) FunctionalSectionLike
 }
 
 /*
-GetterClassLike is a class interface that defines the complete set of
+GetterMethodClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete getter-like class.
+concrete getter-method-like class.
 */
-type GetterClassLike interface {
-	// Constructor
+type GetterMethodClassLike interface {
+	// Constructor Methods
 	Make(
 		name string,
 		abstraction AbstractionLike,
-	) GetterLike
+	) GetterMethodLike
 }
 
 /*
@@ -406,7 +430,7 @@ class constants, constructors and functions that must be supported by each
 concrete header-like class.
 */
 type HeaderClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		comment string,
 		name string,
@@ -419,35 +443,23 @@ class constants, constructors and functions that must be supported by each
 concrete imports-like class.
 */
 type ImportsClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		modules abs.Sequential[ModuleLike],
 	) ImportsLike
 }
 
 /*
-InstanceClassLike is a class interface that defines the complete set of
+InstanceDefinitionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete instance-like class.
+concrete instance-definition-like class.
 */
-type InstanceClassLike interface {
-	// Constructor
+type InstanceDefinitionClassLike interface {
+	// Constructor Methods
 	Make(
 		declaration DeclarationLike,
 		instanceMethods InstanceMethodsLike,
-	) InstanceLike
-}
-
-/*
-InstanceDefinitionsClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete instance-definitions-like class.
-*/
-type InstanceDefinitionsClassLike interface {
-	// Constructor
-	Make(
-		instances abs.Sequential[InstanceLike],
-	) InstanceDefinitionsLike
+	) InstanceDefinitionLike
 }
 
 /*
@@ -456,24 +468,24 @@ class constants, constructors and functions that must be supported by each
 concrete instance-methods-like class.
 */
 type InstanceMethodsClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
-		publicMethods PublicMethodsLike,
-		optionalAttributeMethods AttributeMethodsLike,
-		optionalAspectInterfaces AspectInterfacesLike,
+		publicSubsection PublicSubsectionLike,
+		optionalAttributeSubsection AttributeSubsectionLike,
+		optionalAspectSubsection AspectSubsectionLike,
 	) InstanceMethodsLike
 }
 
 /*
-InterfaceClassLike is a class interface that defines the complete set of
+InstanceSectionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete interface-like class.
+concrete instance-section-like class.
 */
-type InterfaceClassLike interface {
-	// Constructor
+type InstanceSectionClassLike interface {
+	// Constructor Methods
 	Make(
-		abstraction AbstractionLike,
-	) InterfaceLike
+		instanceDefinitions abs.Sequential[InstanceDefinitionLike],
+	) InstanceSectionLike
 }
 
 /*
@@ -482,11 +494,11 @@ class constants, constructors and functions that must be supported by each
 concrete interface-definitions-like class.
 */
 type InterfaceDefinitionsClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
-		classDefinitions ClassDefinitionsLike,
-		instanceDefinitions InstanceDefinitionsLike,
-		optionalAspectDefinitions AspectDefinitionsLike,
+		classSection ClassSectionLike,
+		instanceSection InstanceSectionLike,
+		optionalAspectSection AspectSectionLike,
 	) InterfaceDefinitionsLike
 }
 
@@ -496,7 +508,7 @@ class constants, constructors and functions that must be supported by each
 concrete map-like class.
 */
 type MapClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 	) MapLike
@@ -508,7 +520,7 @@ class constants, constructors and functions that must be supported by each
 concrete method-like class.
 */
 type MethodClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 		parameters abs.Sequential[ParameterLike],
@@ -522,7 +534,7 @@ class constants, constructors and functions that must be supported by each
 concrete model-like class.
 */
 type ModelClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		moduleDefinition ModuleDefinitionLike,
 		primitiveDefinitions PrimitiveDefinitionsLike,
@@ -536,7 +548,7 @@ class constants, constructors and functions that must be supported by each
 concrete module-like class.
 */
 type ModuleClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 		path string,
@@ -549,7 +561,7 @@ class constants, constructors and functions that must be supported by each
 concrete module-definition-like class.
 */
 type ModuleDefinitionClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		notice NoticeLike,
 		header HeaderLike,
@@ -563,7 +575,7 @@ class constants, constructors and functions that must be supported by each
 concrete none-like class.
 */
 type NoneClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		newline string,
 	) NoneLike
@@ -575,7 +587,7 @@ class constants, constructors and functions that must be supported by each
 concrete notice-like class.
 */
 type NoticeClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		comment string,
 	) NoticeLike
@@ -587,7 +599,7 @@ class constants, constructors and functions that must be supported by each
 concrete parameter-like class.
 */
 type ParameterClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 		abstraction AbstractionLike,
@@ -600,7 +612,7 @@ class constants, constructors and functions that must be supported by each
 concrete parameterized-like class.
 */
 type ParameterizedClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		parameters abs.Sequential[ParameterLike],
 	) ParameterizedLike
@@ -612,7 +624,7 @@ class constants, constructors and functions that must be supported by each
 concrete prefix-like class.
 */
 type PrefixClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		any_ any,
 	) PrefixLike
@@ -624,23 +636,35 @@ class constants, constructors and functions that must be supported by each
 concrete primitive-definitions-like class.
 */
 type PrimitiveDefinitionsClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
-		optionalTypeDefinitions TypeDefinitionsLike,
-		optionalFunctionalDefinitions FunctionalDefinitionsLike,
+		optionalTypeSection TypeSectionLike,
+		optionalFunctionalSection FunctionalSectionLike,
 	) PrimitiveDefinitionsLike
 }
 
 /*
-PublicMethodsClassLike is a class interface that defines the complete set of
+PublicMethodClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete public-methods-like class.
+concrete public-method-like class.
 */
-type PublicMethodsClassLike interface {
-	// Constructor
+type PublicMethodClassLike interface {
+	// Constructor Methods
 	Make(
-		methods abs.Sequential[MethodLike],
-	) PublicMethodsLike
+		method MethodLike,
+	) PublicMethodLike
+}
+
+/*
+PublicSubsectionClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete public-subsection-like class.
+*/
+type PublicSubsectionClassLike interface {
+	// Constructor Methods
+	Make(
+		publicMethods abs.Sequential[PublicMethodLike],
+	) PublicSubsectionLike
 }
 
 /*
@@ -649,23 +673,23 @@ class constants, constructors and functions that must be supported by each
 concrete result-like class.
 */
 type ResultClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		any_ any,
 	) ResultLike
 }
 
 /*
-SetterClassLike is a class interface that defines the complete set of
+SetterMethodClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete setter-like class.
+concrete setter-method-like class.
 */
-type SetterClassLike interface {
-	// Constructor
+type SetterMethodClassLike interface {
+	// Constructor Methods
 	Make(
 		name string,
 		parameter ParameterLike,
-	) SetterLike
+	) SetterMethodLike
 }
 
 /*
@@ -674,36 +698,36 @@ class constants, constructors and functions that must be supported by each
 concrete suffix-like class.
 */
 type SuffixClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 	) SuffixLike
 }
 
 /*
-TypeClassLike is a class interface that defines the complete set of
+TypeDefinitionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete type-like class.
+concrete type-definition-like class.
 */
-type TypeClassLike interface {
-	// Constructor
+type TypeDefinitionClassLike interface {
+	// Constructor Methods
 	Make(
 		declaration DeclarationLike,
 		abstraction AbstractionLike,
 		optionalEnumeration EnumerationLike,
-	) TypeLike
+	) TypeDefinitionLike
 }
 
 /*
-TypeDefinitionsClassLike is a class interface that defines the complete set of
+TypeSectionClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete type-definitions-like class.
+concrete type-section-like class.
 */
-type TypeDefinitionsClassLike interface {
-	// Constructor
+type TypeSectionClassLike interface {
+	// Constructor Methods
 	Make(
-		types abs.Sequential[TypeLike],
-	) TypeDefinitionsLike
+		typeDefinitions abs.Sequential[TypeDefinitionLike],
+	) TypeSectionLike
 }
 
 /*
@@ -712,14 +736,14 @@ class constants, constructors and functions that must be supported by each
 concrete value-like class.
 */
 type ValueClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		name string,
 		abstraction AbstractionLike,
 	) ValueLike
 }
 
-// Instances
+// Instance Definitions
 
 /*
 AbstractionLike is an instance interface that defines the complete set of
@@ -727,27 +751,14 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete abstraction-like class.
 */
 type AbstractionLike interface {
-	// Public
+	// Public Methods
 	GetClass() AbstractionClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetOptionalPrefix() PrefixLike
 	GetName() string
 	GetOptionalSuffix() SuffixLike
 	GetOptionalArguments() ArgumentsLike
-}
-
-/*
-AccessorLike is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete accessor-like class.
-*/
-type AccessorLike interface {
-	// Public
-	GetClass() AccessorClassLike
-
-	// Attribute
-	GetAny() any
 }
 
 /*
@@ -756,10 +767,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete additional-argument-like class.
 */
 type AdditionalArgumentLike interface {
-	// Public
+	// Public Methods
 	GetClass() AdditionalArgumentClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetArgument() ArgumentLike
 }
 
@@ -769,10 +780,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete additional-constraint-like class.
 */
 type AdditionalConstraintLike interface {
-	// Public
+	// Public Methods
 	GetClass() AdditionalConstraintClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetConstraint() ConstraintLike
 }
 
@@ -782,10 +793,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete additional-value-like class.
 */
 type AdditionalValueLike interface {
-	// Public
+	// Public Methods
 	GetClass() AdditionalValueClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 }
 
@@ -795,10 +806,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete argument-like class.
 */
 type ArgumentLike interface {
-	// Public
+	// Public Methods
 	GetClass() ArgumentClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetAbstraction() AbstractionLike
 }
 
@@ -808,10 +819,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete arguments-like class.
 */
 type ArgumentsLike interface {
-	// Public
+	// Public Methods
 	GetClass() ArgumentsClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetArgument() ArgumentLike
 	GetAdditionalArguments() abs.Sequential[AdditionalArgumentLike]
 }
@@ -822,61 +833,100 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete array-like class.
 */
 type ArrayLike interface {
-	// Public
+	// Public Methods
 	GetClass() ArrayClassLike
 }
 
 /*
-AspectLike is an instance interface that defines the complete set of
+AspectDefinitionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete aspect-like class.
+instance of a concrete aspect-definition-like class.
 */
-type AspectLike interface {
-	// Public
-	GetClass() AspectClassLike
+type AspectDefinitionLike interface {
+	// Public Methods
+	GetClass() AspectDefinitionClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetDeclaration() DeclarationLike
-	GetMethods() abs.Sequential[MethodLike]
+	GetAspectMethods() abs.Sequential[AspectMethodLike]
 }
 
 /*
-AspectDefinitionsLike is an instance interface that defines the complete set of
+AspectInterfaceLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete aspect-definitions-like class.
+instance of a concrete aspect-interface-like class.
 */
-type AspectDefinitionsLike interface {
-	// Public
-	GetClass() AspectDefinitionsClassLike
+type AspectInterfaceLike interface {
+	// Public Methods
+	GetClass() AspectInterfaceClassLike
 
-	// Attribute
-	GetAspects() abs.Sequential[AspectLike]
+	// Attribute Methods
+	GetAbstraction() AbstractionLike
 }
 
 /*
-AspectInterfacesLike is an instance interface that defines the complete set of
+AspectMethodLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete aspect-interfaces-like class.
+instance of a concrete aspect-method-like class.
 */
-type AspectInterfacesLike interface {
-	// Public
-	GetClass() AspectInterfacesClassLike
+type AspectMethodLike interface {
+	// Public Methods
+	GetClass() AspectMethodClassLike
 
-	// Attribute
-	GetInterfaces() abs.Sequential[InterfaceLike]
+	// Attribute Methods
+	GetMethod() MethodLike
 }
 
 /*
-AttributeMethodsLike is an instance interface that defines the complete set of
+AspectSectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete attribute-methods-like class.
+instance of a concrete aspect-section-like class.
 */
-type AttributeMethodsLike interface {
-	// Public
-	GetClass() AttributeMethodsClassLike
+type AspectSectionLike interface {
+	// Public Methods
+	GetClass() AspectSectionClassLike
 
-	// Attribute
-	GetAccessors() abs.Sequential[AccessorLike]
+	// Attribute Methods
+	GetAspectDefinitions() abs.Sequential[AspectDefinitionLike]
+}
+
+/*
+AspectSubsectionLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete aspect-subsection-like class.
+*/
+type AspectSubsectionLike interface {
+	// Public Methods
+	GetClass() AspectSubsectionClassLike
+
+	// Attribute Methods
+	GetAspectInterfaces() abs.Sequential[AspectInterfaceLike]
+}
+
+/*
+AttributeMethodLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete attribute-method-like class.
+*/
+type AttributeMethodLike interface {
+	// Public Methods
+	GetClass() AttributeMethodClassLike
+
+	// Attribute Methods
+	GetAny() any
+}
+
+/*
+AttributeSubsectionLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete attribute-subsection-like class.
+*/
+type AttributeSubsectionLike interface {
+	// Public Methods
+	GetClass() AttributeSubsectionClassLike
+
+	// Attribute Methods
+	GetAttributeMethods() abs.Sequential[AttributeMethodLike]
 }
 
 /*
@@ -885,35 +935,22 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete channel-like class.
 */
 type ChannelLike interface {
-	// Public
+	// Public Methods
 	GetClass() ChannelClassLike
 }
 
 /*
-ClassLike is an instance interface that defines the complete set of
+ClassDefinitionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete class-like class.
+instance of a concrete class-definition-like class.
 */
-type ClassLike interface {
-	// Public
-	GetClass() ClassClassLike
+type ClassDefinitionLike interface {
+	// Public Methods
+	GetClass() ClassDefinitionClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetDeclaration() DeclarationLike
 	GetClassMethods() ClassMethodsLike
-}
-
-/*
-ClassDefinitionsLike is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete class-definitions-like class.
-*/
-type ClassDefinitionsLike interface {
-	// Public
-	GetClass() ClassDefinitionsClassLike
-
-	// Attribute
-	GetClasses() abs.Sequential[ClassLike]
 }
 
 /*
@@ -922,40 +959,53 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete class-methods-like class.
 */
 type ClassMethodsLike interface {
-	// Public
+	// Public Methods
 	GetClass() ClassMethodsClassLike
 
-	// Attribute
-	GetConstructorMethods() ConstructorMethodsLike
-	GetOptionalConstantMethods() ConstantMethodsLike
-	GetOptionalFunctionMethods() FunctionMethodsLike
+	// Attribute Methods
+	GetConstructorSubsection() ConstructorSubsectionLike
+	GetOptionalConstantSubsection() ConstantSubsectionLike
+	GetOptionalFunctionSubsection() FunctionSubsectionLike
 }
 
 /*
-ConstantLike is an instance interface that defines the complete set of
+ClassSectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete constant-like class.
+instance of a concrete class-section-like class.
 */
-type ConstantLike interface {
-	// Public
-	GetClass() ConstantClassLike
+type ClassSectionLike interface {
+	// Public Methods
+	GetClass() ClassSectionClassLike
 
-	// Attribute
+	// Attribute Methods
+	GetClassDefinitions() abs.Sequential[ClassDefinitionLike]
+}
+
+/*
+ConstantMethodLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete constant-method-like class.
+*/
+type ConstantMethodLike interface {
+	// Public Methods
+	GetClass() ConstantMethodClassLike
+
+	// Attribute Methods
 	GetName() string
 	GetAbstraction() AbstractionLike
 }
 
 /*
-ConstantMethodsLike is an instance interface that defines the complete set of
+ConstantSubsectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete constant-methods-like class.
+instance of a concrete constant-subsection-like class.
 */
-type ConstantMethodsLike interface {
-	// Public
-	GetClass() ConstantMethodsClassLike
+type ConstantSubsectionLike interface {
+	// Public Methods
+	GetClass() ConstantSubsectionClassLike
 
-	// Attribute
-	GetConstants() abs.Sequential[ConstantLike]
+	// Attribute Methods
+	GetConstantMethods() abs.Sequential[ConstantMethodLike]
 }
 
 /*
@@ -964,10 +1014,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete constraint-like class.
 */
 type ConstraintLike interface {
-	// Public
+	// Public Methods
 	GetClass() ConstraintClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetAbstraction() AbstractionLike
 }
@@ -978,40 +1028,40 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete constraints-like class.
 */
 type ConstraintsLike interface {
-	// Public
+	// Public Methods
 	GetClass() ConstraintsClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetConstraint() ConstraintLike
 	GetAdditionalConstraints() abs.Sequential[AdditionalConstraintLike]
 }
 
 /*
-ConstructorLike is an instance interface that defines the complete set of
+ConstructorMethodLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete constructor-like class.
+instance of a concrete constructor-method-like class.
 */
-type ConstructorLike interface {
-	// Public
-	GetClass() ConstructorClassLike
+type ConstructorMethodLike interface {
+	// Public Methods
+	GetClass() ConstructorMethodClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetParameters() abs.Sequential[ParameterLike]
 	GetAbstraction() AbstractionLike
 }
 
 /*
-ConstructorMethodsLike is an instance interface that defines the complete set of
+ConstructorSubsectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete constructor-methods-like class.
+instance of a concrete constructor-subsection-like class.
 */
-type ConstructorMethodsLike interface {
-	// Public
-	GetClass() ConstructorMethodsClassLike
+type ConstructorSubsectionLike interface {
+	// Public Methods
+	GetClass() ConstructorSubsectionClassLike
 
-	// Attribute
-	GetConstructors() abs.Sequential[ConstructorLike]
+	// Attribute Methods
+	GetConstructorMethods() abs.Sequential[ConstructorMethodLike]
 }
 
 /*
@@ -1020,10 +1070,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete declaration-like class.
 */
 type DeclarationLike interface {
-	// Public
+	// Public Methods
 	GetClass() DeclarationClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetComment() string
 	GetName() string
 	GetOptionalConstraints() ConstraintsLike
@@ -1035,80 +1085,80 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete enumeration-like class.
 */
 type EnumerationLike interface {
-	// Public
+	// Public Methods
 	GetClass() EnumerationClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetValue() ValueLike
 	GetAdditionalValues() abs.Sequential[AdditionalValueLike]
 }
 
 /*
-FunctionLike is an instance interface that defines the complete set of
+FunctionMethodLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete function-like class.
+instance of a concrete function-method-like class.
 */
-type FunctionLike interface {
-	// Public
-	GetClass() FunctionClassLike
+type FunctionMethodLike interface {
+	// Public Methods
+	GetClass() FunctionMethodClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetParameters() abs.Sequential[ParameterLike]
 	GetResult() ResultLike
 }
 
 /*
-FunctionMethodsLike is an instance interface that defines the complete set of
+FunctionSubsectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete function-methods-like class.
+instance of a concrete function-subsection-like class.
 */
-type FunctionMethodsLike interface {
-	// Public
-	GetClass() FunctionMethodsClassLike
+type FunctionSubsectionLike interface {
+	// Public Methods
+	GetClass() FunctionSubsectionClassLike
 
-	// Attribute
-	GetFunctions() abs.Sequential[FunctionLike]
+	// Attribute Methods
+	GetFunctionMethods() abs.Sequential[FunctionMethodLike]
 }
 
 /*
-FunctionalLike is an instance interface that defines the complete set of
+FunctionalDefinitionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete functional-like class.
+instance of a concrete functional-definition-like class.
 */
-type FunctionalLike interface {
-	// Public
-	GetClass() FunctionalClassLike
+type FunctionalDefinitionLike interface {
+	// Public Methods
+	GetClass() FunctionalDefinitionClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetDeclaration() DeclarationLike
 	GetParameters() abs.Sequential[ParameterLike]
 	GetResult() ResultLike
 }
 
 /*
-FunctionalDefinitionsLike is an instance interface that defines the complete set of
+FunctionalSectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete functional-definitions-like class.
+instance of a concrete functional-section-like class.
 */
-type FunctionalDefinitionsLike interface {
-	// Public
-	GetClass() FunctionalDefinitionsClassLike
+type FunctionalSectionLike interface {
+	// Public Methods
+	GetClass() FunctionalSectionClassLike
 
-	// Attribute
-	GetFunctionals() abs.Sequential[FunctionalLike]
+	// Attribute Methods
+	GetFunctionalDefinitions() abs.Sequential[FunctionalDefinitionLike]
 }
 
 /*
-GetterLike is an instance interface that defines the complete set of
+GetterMethodLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete getter-like class.
+instance of a concrete getter-method-like class.
 */
-type GetterLike interface {
-	// Public
-	GetClass() GetterClassLike
+type GetterMethodLike interface {
+	// Public Methods
+	GetClass() GetterMethodClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetAbstraction() AbstractionLike
 }
@@ -1119,10 +1169,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete header-like class.
 */
 type HeaderLike interface {
-	// Public
+	// Public Methods
 	GetClass() HeaderClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetComment() string
 	GetName() string
 }
@@ -1133,38 +1183,25 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete imports-like class.
 */
 type ImportsLike interface {
-	// Public
+	// Public Methods
 	GetClass() ImportsClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetModules() abs.Sequential[ModuleLike]
 }
 
 /*
-InstanceLike is an instance interface that defines the complete set of
+InstanceDefinitionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete instance-like class.
+instance of a concrete instance-definition-like class.
 */
-type InstanceLike interface {
-	// Public
-	GetClass() InstanceClassLike
+type InstanceDefinitionLike interface {
+	// Public Methods
+	GetClass() InstanceDefinitionClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetDeclaration() DeclarationLike
 	GetInstanceMethods() InstanceMethodsLike
-}
-
-/*
-InstanceDefinitionsLike is an instance interface that defines the complete set of
-instance attributes, abstractions and methods that must be supported by each
-instance of a concrete instance-definitions-like class.
-*/
-type InstanceDefinitionsLike interface {
-	// Public
-	GetClass() InstanceDefinitionsClassLike
-
-	// Attribute
-	GetInstances() abs.Sequential[InstanceLike]
 }
 
 /*
@@ -1173,26 +1210,26 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete instance-methods-like class.
 */
 type InstanceMethodsLike interface {
-	// Public
+	// Public Methods
 	GetClass() InstanceMethodsClassLike
 
-	// Attribute
-	GetPublicMethods() PublicMethodsLike
-	GetOptionalAttributeMethods() AttributeMethodsLike
-	GetOptionalAspectInterfaces() AspectInterfacesLike
+	// Attribute Methods
+	GetPublicSubsection() PublicSubsectionLike
+	GetOptionalAttributeSubsection() AttributeSubsectionLike
+	GetOptionalAspectSubsection() AspectSubsectionLike
 }
 
 /*
-InterfaceLike is an instance interface that defines the complete set of
+InstanceSectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete interface-like class.
+instance of a concrete instance-section-like class.
 */
-type InterfaceLike interface {
-	// Public
-	GetClass() InterfaceClassLike
+type InstanceSectionLike interface {
+	// Public Methods
+	GetClass() InstanceSectionClassLike
 
-	// Attribute
-	GetAbstraction() AbstractionLike
+	// Attribute Methods
+	GetInstanceDefinitions() abs.Sequential[InstanceDefinitionLike]
 }
 
 /*
@@ -1201,13 +1238,13 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete interface-definitions-like class.
 */
 type InterfaceDefinitionsLike interface {
-	// Public
+	// Public Methods
 	GetClass() InterfaceDefinitionsClassLike
 
-	// Attribute
-	GetClassDefinitions() ClassDefinitionsLike
-	GetInstanceDefinitions() InstanceDefinitionsLike
-	GetOptionalAspectDefinitions() AspectDefinitionsLike
+	// Attribute Methods
+	GetClassSection() ClassSectionLike
+	GetInstanceSection() InstanceSectionLike
+	GetOptionalAspectSection() AspectSectionLike
 }
 
 /*
@@ -1216,10 +1253,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete map-like class.
 */
 type MapLike interface {
-	// Public
+	// Public Methods
 	GetClass() MapClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 }
 
@@ -1229,10 +1266,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete method-like class.
 */
 type MethodLike interface {
-	// Public
+	// Public Methods
 	GetClass() MethodClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetParameters() abs.Sequential[ParameterLike]
 	GetOptionalResult() ResultLike
@@ -1244,10 +1281,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete model-like class.
 */
 type ModelLike interface {
-	// Public
+	// Public Methods
 	GetClass() ModelClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetModuleDefinition() ModuleDefinitionLike
 	GetPrimitiveDefinitions() PrimitiveDefinitionsLike
 	GetInterfaceDefinitions() InterfaceDefinitionsLike
@@ -1259,10 +1296,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete module-like class.
 */
 type ModuleLike interface {
-	// Public
+	// Public Methods
 	GetClass() ModuleClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetPath() string
 }
@@ -1273,10 +1310,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete module-definition-like class.
 */
 type ModuleDefinitionLike interface {
-	// Public
+	// Public Methods
 	GetClass() ModuleDefinitionClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetNotice() NoticeLike
 	GetHeader() HeaderLike
 	GetOptionalImports() ImportsLike
@@ -1288,10 +1325,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete none-like class.
 */
 type NoneLike interface {
-	// Public
+	// Public Methods
 	GetClass() NoneClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetNewline() string
 }
 
@@ -1301,10 +1338,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete notice-like class.
 */
 type NoticeLike interface {
-	// Public
+	// Public Methods
 	GetClass() NoticeClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetComment() string
 }
 
@@ -1314,10 +1351,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete parameter-like class.
 */
 type ParameterLike interface {
-	// Public
+	// Public Methods
 	GetClass() ParameterClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetAbstraction() AbstractionLike
 }
@@ -1328,10 +1365,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete parameterized-like class.
 */
 type ParameterizedLike interface {
-	// Public
+	// Public Methods
 	GetClass() ParameterizedClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetParameters() abs.Sequential[ParameterLike]
 }
 
@@ -1341,10 +1378,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete prefix-like class.
 */
 type PrefixLike interface {
-	// Public
+	// Public Methods
 	GetClass() PrefixClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetAny() any
 }
 
@@ -1354,25 +1391,38 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete primitive-definitions-like class.
 */
 type PrimitiveDefinitionsLike interface {
-	// Public
+	// Public Methods
 	GetClass() PrimitiveDefinitionsClassLike
 
-	// Attribute
-	GetOptionalTypeDefinitions() TypeDefinitionsLike
-	GetOptionalFunctionalDefinitions() FunctionalDefinitionsLike
+	// Attribute Methods
+	GetOptionalTypeSection() TypeSectionLike
+	GetOptionalFunctionalSection() FunctionalSectionLike
 }
 
 /*
-PublicMethodsLike is an instance interface that defines the complete set of
+PublicMethodLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete public-methods-like class.
+instance of a concrete public-method-like class.
 */
-type PublicMethodsLike interface {
-	// Public
-	GetClass() PublicMethodsClassLike
+type PublicMethodLike interface {
+	// Public Methods
+	GetClass() PublicMethodClassLike
 
-	// Attribute
-	GetMethods() abs.Sequential[MethodLike]
+	// Attribute Methods
+	GetMethod() MethodLike
+}
+
+/*
+PublicSubsectionLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete public-subsection-like class.
+*/
+type PublicSubsectionLike interface {
+	// Public Methods
+	GetClass() PublicSubsectionClassLike
+
+	// Attribute Methods
+	GetPublicMethods() abs.Sequential[PublicMethodLike]
 }
 
 /*
@@ -1381,23 +1431,23 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete result-like class.
 */
 type ResultLike interface {
-	// Public
+	// Public Methods
 	GetClass() ResultClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetAny() any
 }
 
 /*
-SetterLike is an instance interface that defines the complete set of
+SetterMethodLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete setter-like class.
+instance of a concrete setter-method-like class.
 */
-type SetterLike interface {
-	// Public
-	GetClass() SetterClassLike
+type SetterMethodLike interface {
+	// Public Methods
+	GetClass() SetterMethodClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetParameter() ParameterLike
 }
@@ -1408,39 +1458,39 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete suffix-like class.
 */
 type SuffixLike interface {
-	// Public
+	// Public Methods
 	GetClass() SuffixClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 }
 
 /*
-TypeLike is an instance interface that defines the complete set of
+TypeDefinitionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete type-like class.
+instance of a concrete type-definition-like class.
 */
-type TypeLike interface {
-	// Public
-	GetClass() TypeClassLike
+type TypeDefinitionLike interface {
+	// Public Methods
+	GetClass() TypeDefinitionClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetDeclaration() DeclarationLike
 	GetAbstraction() AbstractionLike
 	GetOptionalEnumeration() EnumerationLike
 }
 
 /*
-TypeDefinitionsLike is an instance interface that defines the complete set of
+TypeSectionLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete type-definitions-like class.
+instance of a concrete type-section-like class.
 */
-type TypeDefinitionsLike interface {
-	// Public
-	GetClass() TypeDefinitionsClassLike
+type TypeSectionLike interface {
+	// Public Methods
+	GetClass() TypeSectionClassLike
 
-	// Attribute
-	GetTypes() abs.Sequential[TypeLike]
+	// Attribute Methods
+	GetTypeDefinitions() abs.Sequential[TypeDefinitionLike]
 }
 
 /*
@@ -1449,10 +1499,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete value-like class.
 */
 type ValueLike interface {
-	// Public
+	// Public Methods
 	GetClass() ValueClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetName() string
 	GetAbstraction() AbstractionLike
 }

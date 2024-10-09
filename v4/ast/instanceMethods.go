@@ -13,83 +13,83 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var instanceMethodsClass = &instanceMethodsClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func InstanceMethods() InstanceMethodsClassLike {
 	return instanceMethodsClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type instanceMethodsClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *instanceMethodsClass_) Make(
-	publicMethods PublicMethodsLike,
-	optionalAttributeMethods AttributeMethodsLike,
-	optionalAspectInterfaces AspectInterfacesLike,
+	publicSubsection PublicSubsectionLike,
+	optionalAttributeSubsection AttributeSubsectionLike,
+	optionalAspectSubsection AspectSubsectionLike,
 ) InstanceMethodsLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(publicMethods):
-		panic("The publicMethods attribute is required by this class.")
-	default:
-		return &instanceMethods_{
-			// Initialize instance attributes.
-			class_:                    c,
-			publicMethods_:            publicMethods,
-			optionalAttributeMethods_: optionalAttributeMethods,
-			optionalAspectInterfaces_: optionalAspectInterfaces,
-		}
+	if uti.IsUndefined(publicSubsection) {
+		panic("The publicSubsection attribute is required by this class.")
 	}
+	var instance = &instanceMethods_{
+		class_:                       c,
+		publicSubsection_:            publicSubsection,
+		optionalAttributeSubsection_: optionalAttributeSubsection,
+		optionalAspectSubsection_:    optionalAspectSubsection,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
+// Attribute Methods
 
-type instanceMethods_ struct {
-	// Define instance attributes.
-	class_                    InstanceMethodsClassLike
-	publicMethods_            PublicMethodsLike
-	optionalAttributeMethods_ AttributeMethodsLike
-	optionalAspectInterfaces_ AspectInterfacesLike
+func (v *instanceMethods_) GetPublicSubsection() PublicSubsectionLike {
+	return v.publicSubsection_
 }
 
-// Public
+func (v *instanceMethods_) GetOptionalAttributeSubsection() AttributeSubsectionLike {
+	return v.optionalAttributeSubsection_
+}
+
+func (v *instanceMethods_) GetOptionalAspectSubsection() AspectSubsectionLike {
+	return v.optionalAspectSubsection_
+}
+
+// Public Methods
 
 func (v *instanceMethods_) GetClass() InstanceMethodsClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *instanceMethods_) getClass() *instanceMethodsClass_ {
 	return v.class_
 }
 
-// Attribute
+// PRIVATE INTERFACE
 
-func (v *instanceMethods_) GetPublicMethods() PublicMethodsLike {
-	return v.publicMethods_
+// Instance Structure
+
+type instanceMethods_ struct {
+	class_                       *instanceMethodsClass_
+	publicSubsection_            PublicSubsectionLike
+	optionalAttributeSubsection_ AttributeSubsectionLike
+	optionalAspectSubsection_    AspectSubsectionLike
 }
 
-func (v *instanceMethods_) GetOptionalAttributeMethods() AttributeMethodsLike {
-	return v.optionalAttributeMethods_
+// Class Structure
+
+type instanceMethodsClass_ struct {
+	// Define the class constants.
 }
 
-func (v *instanceMethods_) GetOptionalAspectInterfaces() AspectInterfacesLike {
-	return v.optionalAspectInterfaces_
-}
+// Class Reference
 
-// Private
+var instanceMethodsClass = &instanceMethodsClass_{
+	// Initialize the class constants.
+}

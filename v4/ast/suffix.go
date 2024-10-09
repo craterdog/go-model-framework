@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var suffixClass = &suffixClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Suffix() SuffixClassLike {
 	return suffixClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type suffixClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *suffixClass_) Make(name string) SuffixLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(name):
+func (c *suffixClass_) Make(
+	name string,
+) SuffixLike {
+	if uti.IsUndefined(name) {
 		panic("The name attribute is required by this class.")
-	default:
-		return &suffix_{
-			// Initialize instance attributes.
-			class_: c,
-			name_:  name,
-		}
 	}
+	var instance = &suffix_{
+		class_: c,
+		name_:  name,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type suffix_ struct {
-	// Define instance attributes.
-	class_ SuffixClassLike
-	name_  string
-}
-
-// Public
-
-func (v *suffix_) GetClass() SuffixClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *suffix_) GetName() string {
 	return v.name_
 }
 
-// Private
+// Public Methods
+
+func (v *suffix_) GetClass() SuffixClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *suffix_) getClass() *suffixClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type suffix_ struct {
+	class_ *suffixClass_
+	name_  string
+}
+
+// Class Structure
+
+type suffixClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var suffixClass = &suffixClass_{
+	// Initialize the class constants.
+}

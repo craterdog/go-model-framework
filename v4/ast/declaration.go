@@ -13,74 +13,42 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var declarationClass = &declarationClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Declaration() DeclarationClassLike {
 	return declarationClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type declarationClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *declarationClass_) Make(
 	comment string,
 	name string,
 	optionalConstraints ConstraintsLike,
 ) DeclarationLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(comment):
+	if uti.IsUndefined(comment) {
 		panic("The comment attribute is required by this class.")
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
-	default:
-		return &declaration_{
-			// Initialize instance attributes.
-			class_:               c,
-			comment_:             comment,
-			name_:                name,
-			optionalConstraints_: optionalConstraints,
-		}
 	}
+	if uti.IsUndefined(name) {
+		panic("The name attribute is required by this class.")
+	}
+	var instance = &declaration_{
+		class_:               c,
+		comment_:             comment,
+		name_:                name,
+		optionalConstraints_: optionalConstraints,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type declaration_ struct {
-	// Define instance attributes.
-	class_               DeclarationClassLike
-	comment_             string
-	name_                string
-	optionalConstraints_ ConstraintsLike
-}
-
-// Public
-
-func (v *declaration_) GetClass() DeclarationClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *declaration_) GetComment() string {
 	return v.comment_
@@ -94,4 +62,37 @@ func (v *declaration_) GetOptionalConstraints() ConstraintsLike {
 	return v.optionalConstraints_
 }
 
-// Private
+// Public Methods
+
+func (v *declaration_) GetClass() DeclarationClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *declaration_) getClass() *declarationClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type declaration_ struct {
+	class_               *declarationClass_
+	comment_             string
+	name_                string
+	optionalConstraints_ ConstraintsLike
+}
+
+// Class Structure
+
+type declarationClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var declarationClass = &declarationClass_{
+	// Initialize the class constants.
+}

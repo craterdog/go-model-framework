@@ -13,75 +13,43 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var methodClass = &methodClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Method() MethodClassLike {
 	return methodClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type methodClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *methodClass_) Make(
 	name string,
 	parameters abs.Sequential[ParameterLike],
 	optionalResult ResultLike,
 ) MethodLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(name):
+	if uti.IsUndefined(name) {
 		panic("The name attribute is required by this class.")
-	case col.IsUndefined(parameters):
-		panic("The parameters attribute is required by this class.")
-	default:
-		return &method_{
-			// Initialize instance attributes.
-			class_:          c,
-			name_:           name,
-			parameters_:     parameters,
-			optionalResult_: optionalResult,
-		}
 	}
+	if uti.IsUndefined(parameters) {
+		panic("The parameters attribute is required by this class.")
+	}
+	var instance = &method_{
+		class_:          c,
+		name_:           name,
+		parameters_:     parameters,
+		optionalResult_: optionalResult,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type method_ struct {
-	// Define instance attributes.
-	class_          MethodClassLike
-	name_           string
-	parameters_     abs.Sequential[ParameterLike]
-	optionalResult_ ResultLike
-}
-
-// Public
-
-func (v *method_) GetClass() MethodClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *method_) GetName() string {
 	return v.name_
@@ -95,4 +63,37 @@ func (v *method_) GetOptionalResult() ResultLike {
 	return v.optionalResult_
 }
 
-// Private
+// Public Methods
+
+func (v *method_) GetClass() MethodClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *method_) getClass() *methodClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type method_ struct {
+	class_          *methodClass_
+	name_           string
+	parameters_     abs.Sequential[ParameterLike]
+	optionalResult_ ResultLike
+}
+
+// Class Structure
+
+type methodClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var methodClass = &methodClass_{
+	// Initialize the class constants.
+}

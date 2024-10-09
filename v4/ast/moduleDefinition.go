@@ -13,74 +13,42 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var moduleDefinitionClass = &moduleDefinitionClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func ModuleDefinition() ModuleDefinitionClassLike {
 	return moduleDefinitionClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type moduleDefinitionClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *moduleDefinitionClass_) Make(
 	notice NoticeLike,
 	header HeaderLike,
 	optionalImports ImportsLike,
 ) ModuleDefinitionLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(notice):
+	if uti.IsUndefined(notice) {
 		panic("The notice attribute is required by this class.")
-	case col.IsUndefined(header):
-		panic("The header attribute is required by this class.")
-	default:
-		return &moduleDefinition_{
-			// Initialize instance attributes.
-			class_:           c,
-			notice_:          notice,
-			header_:          header,
-			optionalImports_: optionalImports,
-		}
 	}
+	if uti.IsUndefined(header) {
+		panic("The header attribute is required by this class.")
+	}
+	var instance = &moduleDefinition_{
+		class_:           c,
+		notice_:          notice,
+		header_:          header,
+		optionalImports_: optionalImports,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type moduleDefinition_ struct {
-	// Define instance attributes.
-	class_           ModuleDefinitionClassLike
-	notice_          NoticeLike
-	header_          HeaderLike
-	optionalImports_ ImportsLike
-}
-
-// Public
-
-func (v *moduleDefinition_) GetClass() ModuleDefinitionClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *moduleDefinition_) GetNotice() NoticeLike {
 	return v.notice_
@@ -94,4 +62,37 @@ func (v *moduleDefinition_) GetOptionalImports() ImportsLike {
 	return v.optionalImports_
 }
 
-// Private
+// Public Methods
+
+func (v *moduleDefinition_) GetClass() ModuleDefinitionClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *moduleDefinition_) getClass() *moduleDefinitionClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type moduleDefinition_ struct {
+	class_           *moduleDefinitionClass_
+	notice_          NoticeLike
+	header_          HeaderLike
+	optionalImports_ ImportsLike
+}
+
+// Class Structure
+
+type moduleDefinitionClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var moduleDefinitionClass = &moduleDefinitionClass_{
+	// Initialize the class constants.
+}

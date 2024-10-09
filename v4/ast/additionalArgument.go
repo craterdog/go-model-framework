@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var additionalArgumentClass = &additionalArgumentClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func AdditionalArgument() AdditionalArgumentClassLike {
 	return additionalArgumentClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type additionalArgumentClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *additionalArgumentClass_) Make(argument ArgumentLike) AdditionalArgumentLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(argument):
+func (c *additionalArgumentClass_) Make(
+	argument ArgumentLike,
+) AdditionalArgumentLike {
+	if uti.IsUndefined(argument) {
 		panic("The argument attribute is required by this class.")
-	default:
-		return &additionalArgument_{
-			// Initialize instance attributes.
-			class_:    c,
-			argument_: argument,
-		}
 	}
+	var instance = &additionalArgument_{
+		class_:    c,
+		argument_: argument,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type additionalArgument_ struct {
-	// Define instance attributes.
-	class_    AdditionalArgumentClassLike
-	argument_ ArgumentLike
-}
-
-// Public
-
-func (v *additionalArgument_) GetClass() AdditionalArgumentClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *additionalArgument_) GetArgument() ArgumentLike {
 	return v.argument_
 }
 
-// Private
+// Public Methods
+
+func (v *additionalArgument_) GetClass() AdditionalArgumentClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *additionalArgument_) getClass() *additionalArgumentClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type additionalArgument_ struct {
+	class_    *additionalArgumentClass_
+	argument_ ArgumentLike
+}
+
+// Class Structure
+
+type additionalArgumentClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var additionalArgumentClass = &additionalArgumentClass_{
+	// Initialize the class constants.
+}

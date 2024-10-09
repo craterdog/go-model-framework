@@ -13,32 +13,18 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var abstractionClass = &abstractionClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Abstraction() AbstractionClassLike {
 	return abstractionClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type abstractionClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *abstractionClass_) Make(
 	optionalPrefix PrefixLike,
@@ -46,42 +32,22 @@ func (c *abstractionClass_) Make(
 	optionalSuffix SuffixLike,
 	optionalArguments ArgumentsLike,
 ) AbstractionLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(name):
+	if uti.IsUndefined(name) {
 		panic("The name attribute is required by this class.")
-	default:
-		return &abstraction_{
-			// Initialize instance attributes.
-			class_:             c,
-			optionalPrefix_:    optionalPrefix,
-			name_:              name,
-			optionalSuffix_:    optionalSuffix,
-			optionalArguments_: optionalArguments,
-		}
 	}
+	var instance = &abstraction_{
+		class_:             c,
+		optionalPrefix_:    optionalPrefix,
+		name_:              name,
+		optionalSuffix_:    optionalSuffix,
+		optionalArguments_: optionalArguments,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type abstraction_ struct {
-	// Define instance attributes.
-	class_             AbstractionClassLike
-	optionalPrefix_    PrefixLike
-	name_              string
-	optionalSuffix_    SuffixLike
-	optionalArguments_ ArgumentsLike
-}
-
-// Public
-
-func (v *abstraction_) GetClass() AbstractionClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *abstraction_) GetOptionalPrefix() PrefixLike {
 	return v.optionalPrefix_
@@ -99,4 +65,38 @@ func (v *abstraction_) GetOptionalArguments() ArgumentsLike {
 	return v.optionalArguments_
 }
 
-// Private
+// Public Methods
+
+func (v *abstraction_) GetClass() AbstractionClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *abstraction_) getClass() *abstractionClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type abstraction_ struct {
+	class_             *abstractionClass_
+	optionalPrefix_    PrefixLike
+	name_              string
+	optionalSuffix_    SuffixLike
+	optionalArguments_ ArgumentsLike
+}
+
+// Class Structure
+
+type abstractionClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var abstractionClass = &abstractionClass_{
+	// Initialize the class constants.
+}

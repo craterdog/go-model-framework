@@ -13,71 +13,40 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var headerClass = &headerClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Header() HeaderClassLike {
 	return headerClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type headerClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *headerClass_) Make(
 	comment string,
 	name string,
 ) HeaderLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(comment):
+	if uti.IsUndefined(comment) {
 		panic("The comment attribute is required by this class.")
-	case col.IsUndefined(name):
-		panic("The name attribute is required by this class.")
-	default:
-		return &header_{
-			// Initialize instance attributes.
-			class_:   c,
-			comment_: comment,
-			name_:    name,
-		}
 	}
+	if uti.IsUndefined(name) {
+		panic("The name attribute is required by this class.")
+	}
+	var instance = &header_{
+		class_:   c,
+		comment_: comment,
+		name_:    name,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type header_ struct {
-	// Define instance attributes.
-	class_   HeaderClassLike
-	comment_ string
-	name_    string
-}
-
-// Public
-
-func (v *header_) GetClass() HeaderClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *header_) GetComment() string {
 	return v.comment_
@@ -87,4 +56,36 @@ func (v *header_) GetName() string {
 	return v.name_
 }
 
-// Private
+// Public Methods
+
+func (v *header_) GetClass() HeaderClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *header_) getClass() *headerClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type header_ struct {
+	class_   *headerClass_
+	comment_ string
+	name_    string
+}
+
+// Class Structure
+
+type headerClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var headerClass = &headerClass_{
+	// Initialize the class constants.
+}

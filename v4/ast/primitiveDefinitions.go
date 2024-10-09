@@ -12,71 +12,70 @@
 
 package ast
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var primitiveDefinitionsClass = &primitiveDefinitionsClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func PrimitiveDefinitions() PrimitiveDefinitionsClassLike {
 	return primitiveDefinitionsClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type primitiveDefinitionsClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *primitiveDefinitionsClass_) Make(
-	optionalTypeDefinitions TypeDefinitionsLike,
-	optionalFunctionalDefinitions FunctionalDefinitionsLike,
+	optionalTypeSection TypeSectionLike,
+	optionalFunctionalSection FunctionalSectionLike,
 ) PrimitiveDefinitionsLike {
-	// Validate the arguments.
-	switch {
-	default:
-		return &primitiveDefinitions_{
-			// Initialize instance attributes.
-			class_:                         c,
-			optionalTypeDefinitions_:       optionalTypeDefinitions,
-			optionalFunctionalDefinitions_: optionalFunctionalDefinitions,
-		}
+	var instance = &primitiveDefinitions_{
+		class_:                     c,
+		optionalTypeSection_:       optionalTypeSection,
+		optionalFunctionalSection_: optionalFunctionalSection,
 	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
+// Attribute Methods
 
-type primitiveDefinitions_ struct {
-	// Define instance attributes.
-	class_                         PrimitiveDefinitionsClassLike
-	optionalTypeDefinitions_       TypeDefinitionsLike
-	optionalFunctionalDefinitions_ FunctionalDefinitionsLike
+func (v *primitiveDefinitions_) GetOptionalTypeSection() TypeSectionLike {
+	return v.optionalTypeSection_
 }
 
-// Public
+func (v *primitiveDefinitions_) GetOptionalFunctionalSection() FunctionalSectionLike {
+	return v.optionalFunctionalSection_
+}
+
+// Public Methods
 
 func (v *primitiveDefinitions_) GetClass() PrimitiveDefinitionsClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *primitiveDefinitions_) getClass() *primitiveDefinitionsClass_ {
 	return v.class_
 }
 
-// Attribute
+// PRIVATE INTERFACE
 
-func (v *primitiveDefinitions_) GetOptionalTypeDefinitions() TypeDefinitionsLike {
-	return v.optionalTypeDefinitions_
+// Instance Structure
+
+type primitiveDefinitions_ struct {
+	class_                     *primitiveDefinitionsClass_
+	optionalTypeSection_       TypeSectionLike
+	optionalFunctionalSection_ FunctionalSectionLike
 }
 
-func (v *primitiveDefinitions_) GetOptionalFunctionalDefinitions() FunctionalDefinitionsLike {
-	return v.optionalFunctionalDefinitions_
+// Class Structure
+
+type primitiveDefinitionsClass_ struct {
+	// Define the class constants.
 }
 
-// Private
+// Class Reference
+
+var primitiveDefinitionsClass = &primitiveDefinitionsClass_{
+	// Initialize the class constants.
+}

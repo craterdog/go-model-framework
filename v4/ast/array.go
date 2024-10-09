@@ -12,56 +12,53 @@
 
 package ast
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var arrayClass = &arrayClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Array() ArrayClassLike {
 	return arrayClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type arrayClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *arrayClass_) Make() ArrayLike {
-	// Validate the arguments.
-	switch {
-	default:
-		return &array_{
-			// Initialize instance attributes.
-			class_: c,
-		}
+	var instance = &array_{
+		class_: c,
 	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type array_ struct {
-	// Define instance attributes.
-	class_ ArrayClassLike
-}
-
-// Public
+// Public Methods
 
 func (v *array_) GetClass() ArrayClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *array_) getClass() *arrayClass_ {
 	return v.class_
 }
 
-// Attribute
+// PRIVATE INTERFACE
 
-// Private
+// Instance Structure
+
+type array_ struct {
+	class_ *arrayClass_
+}
+
+// Class Structure
+
+type arrayClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var arrayClass = &arrayClass_{
+	// Initialize the class constants.
+}

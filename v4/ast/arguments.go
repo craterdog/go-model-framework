@@ -13,72 +13,41 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var argumentsClass = &argumentsClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Arguments() ArgumentsClassLike {
 	return argumentsClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type argumentsClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *argumentsClass_) Make(
 	argument ArgumentLike,
 	additionalArguments abs.Sequential[AdditionalArgumentLike],
 ) ArgumentsLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(argument):
+	if uti.IsUndefined(argument) {
 		panic("The argument attribute is required by this class.")
-	case col.IsUndefined(additionalArguments):
-		panic("The additional arguments attribute is required by this class.")
-	default:
-		return &arguments_{
-			// Initialize instance attributes.
-			class_:               c,
-			argument_:            argument,
-			additionalArguments_: additionalArguments,
-		}
 	}
+	if uti.IsUndefined(additionalArguments) {
+		panic("The additionalArguments attribute is required by this class.")
+	}
+	var instance = &arguments_{
+		class_:               c,
+		argument_:            argument,
+		additionalArguments_: additionalArguments,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type arguments_ struct {
-	// Define instance attributes.
-	class_               ArgumentsClassLike
-	argument_            ArgumentLike
-	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
-}
-
-// Public
-
-func (v *arguments_) GetClass() ArgumentsClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *arguments_) GetArgument() ArgumentLike {
 	return v.argument_
@@ -88,4 +57,36 @@ func (v *arguments_) GetAdditionalArguments() abs.Sequential[AdditionalArgumentL
 	return v.additionalArguments_
 }
 
-// Private
+// Public Methods
+
+func (v *arguments_) GetClass() ArgumentsClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *arguments_) getClass() *argumentsClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type arguments_ struct {
+	class_               *argumentsClass_
+	argument_            ArgumentLike
+	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
+}
+
+// Class Structure
+
+type argumentsClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var argumentsClass = &argumentsClass_{
+	// Initialize the class constants.
+}

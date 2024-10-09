@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var mapClass = &mapClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Map() MapClassLike {
 	return mapClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type mapClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *mapClass_) Make(name string) MapLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(name):
+func (c *mapClass_) Make(
+	name string,
+) MapLike {
+	if uti.IsUndefined(name) {
 		panic("The name attribute is required by this class.")
-	default:
-		return &map_{
-			// Initialize instance attributes.
-			class_: c,
-			name_:  name,
-		}
 	}
+	var instance = &map_{
+		class_: c,
+		name_:  name,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type map_ struct {
-	// Define instance attributes.
-	class_ MapClassLike
-	name_  string
-}
-
-// Public
-
-func (v *map_) GetClass() MapClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *map_) GetName() string {
 	return v.name_
 }
 
-// Private
+// Public Methods
+
+func (v *map_) GetClass() MapClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *map_) getClass() *mapClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type map_ struct {
+	class_ *mapClass_
+	name_  string
+}
+
+// Class Structure
+
+type mapClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var mapClass = &mapClass_{
+	// Initialize the class constants.
+}

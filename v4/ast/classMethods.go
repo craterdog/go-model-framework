@@ -1,5 +1,3 @@
-// Public
-
 /*
 ................................................................................
 .    Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved.    .
@@ -15,81 +13,83 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var classMethodsClass = &classMethodsClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func ClassMethods() ClassMethodsClassLike {
 	return classMethodsClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type classMethodsClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *classMethodsClass_) Make(
-	constructorMethods ConstructorMethodsLike,
-	optionalConstantMethods ConstantMethodsLike,
-	optionalFunctionMethods FunctionMethodsLike,
+	constructorSubsection ConstructorSubsectionLike,
+	optionalConstantSubsection ConstantSubsectionLike,
+	optionalFunctionSubsection FunctionSubsectionLike,
 ) ClassMethodsLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(constructorMethods):
-		panic("The constructorMethods attribute is required by this class.")
-	default:
-		return &classMethods_{
-			// Initialize instance attributes.
-			class_:                   c,
-			constructorMethods_:      constructorMethods,
-			optionalConstantMethods_: optionalConstantMethods,
-			optionalFunctionMethods_: optionalFunctionMethods,
-		}
+	if uti.IsUndefined(constructorSubsection) {
+		panic("The constructorSubsection attribute is required by this class.")
 	}
+	var instance = &classMethods_{
+		class_:                      c,
+		constructorSubsection_:      constructorSubsection,
+		optionalConstantSubsection_: optionalConstantSubsection,
+		optionalFunctionSubsection_: optionalFunctionSubsection,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
+// Attribute Methods
 
-type classMethods_ struct {
-	// Define instance attributes.
-	class_                   ClassMethodsClassLike
-	constructorMethods_      ConstructorMethodsLike
-	optionalConstantMethods_ ConstantMethodsLike
-	optionalFunctionMethods_ FunctionMethodsLike
+func (v *classMethods_) GetConstructorSubsection() ConstructorSubsectionLike {
+	return v.constructorSubsection_
 }
+
+func (v *classMethods_) GetOptionalConstantSubsection() ConstantSubsectionLike {
+	return v.optionalConstantSubsection_
+}
+
+func (v *classMethods_) GetOptionalFunctionSubsection() FunctionSubsectionLike {
+	return v.optionalFunctionSubsection_
+}
+
+// Public Methods
 
 func (v *classMethods_) GetClass() ClassMethodsClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *classMethods_) getClass() *classMethodsClass_ {
 	return v.class_
 }
 
-// Attribute
+// PRIVATE INTERFACE
 
-func (v *classMethods_) GetConstructorMethods() ConstructorMethodsLike {
-	return v.constructorMethods_
+// Instance Structure
+
+type classMethods_ struct {
+	class_                      *classMethodsClass_
+	constructorSubsection_      ConstructorSubsectionLike
+	optionalConstantSubsection_ ConstantSubsectionLike
+	optionalFunctionSubsection_ FunctionSubsectionLike
 }
 
-func (v *classMethods_) GetOptionalConstantMethods() ConstantMethodsLike {
-	return v.optionalConstantMethods_
+// Class Structure
+
+type classMethodsClass_ struct {
+	// Define the class constants.
 }
 
-func (v *classMethods_) GetOptionalFunctionMethods() FunctionMethodsLike {
-	return v.optionalFunctionMethods_
-}
+// Class Reference
 
-// Private
+var classMethodsClass = &classMethodsClass_{
+	// Initialize the class constants.
+}

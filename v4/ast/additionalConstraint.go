@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var additionalConstraintClass = &additionalConstraintClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func AdditionalConstraint() AdditionalConstraintClassLike {
 	return additionalConstraintClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type additionalConstraintClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *additionalConstraintClass_) Make(constraint ConstraintLike) AdditionalConstraintLike {
-	// Validate the constraints.
-	switch {
-	case col.IsUndefined(constraint):
+func (c *additionalConstraintClass_) Make(
+	constraint ConstraintLike,
+) AdditionalConstraintLike {
+	if uti.IsUndefined(constraint) {
 		panic("The constraint attribute is required by this class.")
-	default:
-		return &additionalConstraint_{
-			// Initialize instance attributes.
-			class_:      c,
-			constraint_: constraint,
-		}
 	}
+	var instance = &additionalConstraint_{
+		class_:      c,
+		constraint_: constraint,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type additionalConstraint_ struct {
-	// Define instance attributes.
-	class_      AdditionalConstraintClassLike
-	constraint_ ConstraintLike
-}
-
-// Public
-
-func (v *additionalConstraint_) GetClass() AdditionalConstraintClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *additionalConstraint_) GetConstraint() ConstraintLike {
 	return v.constraint_
 }
 
-// Private
+// Public Methods
+
+func (v *additionalConstraint_) GetClass() AdditionalConstraintClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *additionalConstraint_) getClass() *additionalConstraintClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type additionalConstraint_ struct {
+	class_      *additionalConstraintClass_
+	constraint_ ConstraintLike
+}
+
+// Class Structure
+
+type additionalConstraintClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var additionalConstraintClass = &additionalConstraintClass_{
+	// Initialize the class constants.
+}

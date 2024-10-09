@@ -162,10 +162,10 @@ func (v *classes_) analyzePublicAttributes(
 			var abstraction ast.AbstractionLike
 			switch actual := accessor.GetAny().(type) {
 			case ast.GetterLike:
-				attributeName = v.extractName(actual.GetName())
+				attributeName = v.extractAttributeName(actual.GetName())
 				abstraction = actual.GetAbstraction()
 			case ast.SetterLike:
-				attributeName = v.extractName(actual.GetName())
+				attributeName = v.extractAttributeName(actual.GetName())
 				abstraction = actual.GetParameter().GetAbstraction()
 			}
 			var attributeType = v.extractType(abstraction)
@@ -192,7 +192,7 @@ func (v *classes_) extractInstanceName(
 	return instanceName
 }
 
-func (v *classes_) extractName(accessorName string) string {
+func (v *classes_) extractAttributeName(accessorName string) string {
 	var attributeName string
 	switch {
 	case sts.HasPrefix(accessorName, "Get"):
@@ -259,28 +259,10 @@ func (v *classes_) extractType(abstraction ast.AbstractionLike) string {
 }
 
 func (v *classes_) generateModules(
-	model ast.ModelLike,
 	class string,
 ) (
 	implementation string,
 ) {
-	// First process any module imports declared in the model.
-	var moduleDefinition = model.GetModuleDefinition()
-	var imports = moduleDefinition.GetOptionalImports()
-	if uti.IsDefined(imports) {
-		var modules = imports.GetModules().GetIterator()
-		for modules.HasNext() {
-			var module = modules.GetNext()
-			var moduleName = module.GetName()
-			var modulePath = module.GetPath()
-			var alias = v.getClass().moduleAlias_
-			alias = uti.ReplaceAll(alias, "moduleName", moduleName)
-			alias = uti.ReplaceAll(alias, "modulePath", modulePath)
-			implementation += alias
-		}
-	}
-
-	// Next look for common modules used in the class definition.
 	if sts.Contains(class, "fmt.") && !sts.Contains(implementation, "fmt.") {
 		var alias = v.getClass().moduleAlias_
 		alias = uti.ReplaceAll(alias, "moduleName", "fmt")
@@ -322,9 +304,9 @@ func (v *classes_) generateArguments(
 ) (
 	arguments string,
 ) {
-	var optionalConstraints = declaration.GetOptionalConstraints()
-	if uti.IsDefined(optionalConstraints) {
+	if v.isGeneric_ {
 		arguments = "["
+		var optionalConstraints = declaration.GetOptionalConstraints()
 		var constraint = optionalConstraints.GetConstraint()
 		var argument = constraint.GetName()
 		arguments += argument
@@ -344,9 +326,9 @@ func (v *classes_) generateConstraints(
 ) (
 	constraints string,
 ) {
-	var optionalConstraints = declaration.GetOptionalConstraints()
-	if uti.IsDefined(optionalConstraints) {
+	if v.isGeneric_ {
 		constraints = "["
+		var optionalConstraints = declaration.GetOptionalConstraints()
 		var constraint = optionalConstraints.GetConstraint()
 		var constraintName = constraint.GetName()
 		var constraintType = v.extractType(constraint.GetAbstraction())
@@ -364,12 +346,11 @@ func (v *classes_) generateConstraints(
 }
 
 func (v *classes_) generateImports(
-	model ast.ModelLike,
 	class string,
 ) (
 	implementation string,
 ) {
-	var modules = v.generateModules(model, class)
+	var modules = v.generateModules(class)
 	if uti.IsDefined(modules) {
 		implementation = v.getClass().moduleImports_
 		implementation = uti.ReplaceAll(implementation, "modules", modules)
@@ -459,15 +440,17 @@ func (v *classes_) generateClass(
 	implementation = uti.ReplaceAll(implementation, "className", className)
 
 	// Insert generics if necessary.
+	var constraints string
+	var arguments string
 	if v.isGeneric_ {
-		var parameters = v.generateConstraints(classDeclaration)
-		implementation = uti.ReplaceAll(implementation, "constraints", parameters)
-		var arguments = v.generateArguments(classDeclaration)
-		implementation = uti.ReplaceAll(implementation, "arguments", arguments)
+		constraints = v.generateConstraints(classDeclaration)
+		arguments = v.generateArguments(classDeclaration)
 	}
+	implementation = uti.ReplaceAll(implementation, "constraints", constraints)
+	implementation = uti.ReplaceAll(implementation, "arguments", arguments)
 
 	// Insert any imported modules (this must be done last).
-	var moduleImports = v.generateImports(model, implementation)
+	var moduleImports = v.generateImports(implementation)
 	implementation = uti.ReplaceAll(implementation, "moduleImports", moduleImports)
 
 	return implementation
@@ -486,13 +469,25 @@ func (v *classes_) generateAccessFunction(class ast.ClassLike) (
 	implementation string,
 ) {
 	implementation = v.getClass().accessFunction_
-	var declaration = class.GetDeclaration()
-	var constraints = declaration.GetOptionalConstraints()
 	var function = v.getClass().classFunction_
-	if uti.IsDefined(constraints) {
+	if v.isGeneric_ {
 		function = v.getClass().genericFunction_
 	}
 	implementation = uti.ReplaceAll(implementation, "function", function)
+	return implementation
+}
+
+func (v *classes_) generateAttributeCheck(parameter ast.ParameterLike) (
+	implementation string,
+) {
+	var parameterName = parameter.GetName()
+	var attributeName = sts.TrimSuffix(parameterName, "_")
+	// Ignore optional attributes.
+	if !sts.HasPrefix(attributeName, "optional") {
+		var template = v.getClass().attributeCheck_
+		template = uti.ReplaceAll(template, "attributeName", attributeName)
+		implementation += template
+	}
 	return implementation
 }
 
@@ -502,14 +497,8 @@ func (v *classes_) generateAttributeChecks(constructor ast.ConstructorLike) (
 	var parameters = constructor.GetParameters().GetIterator()
 	for parameters.HasNext() {
 		var parameter = parameters.GetNext()
-		var parameterName = parameter.GetName()
-		var attributeName = sts.TrimSuffix(parameterName, "_")
-		// Ignore optional attributes.
-		if !sts.HasPrefix(attributeName, "optional") {
-			var template = v.getClass().attributeCheck_
-			template = uti.ReplaceAll(template, "attributeName", attributeName)
-			implementation += template
-		}
+		var attributeCheck = v.generateAttributeCheck(parameter)
+		implementation += attributeCheck
 	}
 	return implementation
 }
@@ -529,12 +518,14 @@ func (v *classes_) generateAttributeInitializations(constructor ast.ConstructorL
 	return implementation
 }
 
-func (v *classes_) generateConstructorParameters(constructor ast.ConstructorLike) (
+func (v *classes_) generateParameters(
+	parameters abs.Sequential[ast.ParameterLike],
+) (
 	implementation string,
 ) {
-	var parameters = constructor.GetParameters().GetIterator()
-	for parameters.HasNext() {
-		var parameter = parameters.GetNext()
+	var iterator = parameters.GetIterator()
+	for iterator.HasNext() {
+		var parameter = iterator.GetNext()
 		var parameterName = parameter.GetName()
 		var parameterType = v.extractType(parameter.GetAbstraction())
 		var template = v.getClass().methodParameter_
@@ -542,17 +533,25 @@ func (v *classes_) generateConstructorParameters(constructor ast.ConstructorLike
 		template = uti.ReplaceAll(template, "parameterType", parameterType)
 		implementation += template
 	}
+	if uti.IsDefined(implementation) {
+		implementation += "\n"
+	}
 	return implementation
 }
 
-func (v *classes_) generateConstructorBody(constructor ast.ConstructorLike) (
+func (v *classes_) generateResult(
+	result ast.ResultLike,
+) (
 	implementation string,
 ) {
-	implementation = v.getClass().constructorBody_
-	var attributeChecks = v.generateAttributeChecks(constructor)
-	implementation = uti.ReplaceAll(implementation, "attributeChecks", attributeChecks)
-	var attributeInitializations = v.generateAttributeInitializations(constructor)
-	implementation = uti.ReplaceAll(implementation, "attributeInitializations", attributeInitializations)
+	if uti.IsDefined(result) {
+		switch actual := result.GetAny().(type) {
+		case ast.AbstractionLike:
+			implementation = " " + v.extractType(actual)
+		case ast.ParameterizedLike:
+			implementation = " (" + v.generateParameters(actual.GetParameters()) + "\n)"
+		}
+	}
 	return implementation
 }
 
@@ -560,17 +559,16 @@ func (v *classes_) generateConstructorMethod(constructor ast.ConstructorLike) (
 	implementation string,
 ) {
 	var methodName = constructor.GetName()
-	var parameters = v.generateConstructorParameters(constructor)
-	if uti.IsDefined(parameters) {
-		parameters += "\n"
-	}
-	var body = v.generateConstructorBody(constructor)
-	var class = v.extractType(constructor.GetAbstraction())
-	implementation = v.getClass().classMethod_
+	var parameters = v.generateParameters(constructor.GetParameters())
+	var resultType = v.extractType(constructor.GetAbstraction())
+	var attributeChecks = v.generateAttributeChecks(constructor)
+	var attributeInitializations = v.generateAttributeInitializations(constructor)
+	implementation = v.getClass().constructorMethod_
 	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
 	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
-	implementation = uti.ReplaceAll(implementation, "body", body)
-	implementation = uti.ReplaceAll(implementation, "resultType", class)
+	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
+	implementation = uti.ReplaceAll(implementation, "attributeChecks", attributeChecks)
+	implementation = uti.ReplaceAll(implementation, "attributeInitializations", attributeInitializations)
 	return implementation
 }
 
@@ -589,38 +587,165 @@ func (v *classes_) generateConstructorMethods(class ast.ClassLike) (
 	return implementation
 }
 
+func (v *classes_) generateConstantMethod(constant ast.ConstantLike) (
+	implementation string,
+) {
+	var methodName = constant.GetName()
+	var resultType = v.extractType(constant.GetAbstraction())
+	implementation = v.getClass().constantMethod_
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
+	return implementation
+}
+
 func (v *classes_) generateConstantMethods(class ast.ClassLike) (
 	implementation string,
 ) {
-	implementation = v.getClass().constantMethods_
+	var classMethods = class.GetClassMethods()
+	var constantMethods = classMethods.GetOptionalConstantMethods()
+	if uti.IsDefined(constantMethods) {
+		var methods string
+		var constants = constantMethods.GetConstants().GetIterator()
+		for constants.HasNext() {
+			var constant = constants.GetNext()
+			methods += v.generateConstantMethod(constant)
+		}
+		implementation = v.getClass().constantMethods_
+		implementation = uti.ReplaceAll(implementation, "methods", methods)
+	}
+	return implementation
+}
+
+func (v *classes_) generateFunctionMethod(function ast.FunctionLike) (
+	implementation string,
+) {
+	var methodName = function.GetName()
+	var parameters = v.generateParameters(function.GetParameters())
+	var resultType = v.generateResult(function.GetResult())
+	implementation = v.getClass().functionMethod_
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
+	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
 	return implementation
 }
 
 func (v *classes_) generateFunctionMethods(class ast.ClassLike) (
 	implementation string,
 ) {
-	implementation = v.getClass().functionMethods_
+	var classMethods = class.GetClassMethods()
+	var functionMethods = classMethods.GetOptionalFunctionMethods()
+	if uti.IsDefined(functionMethods) {
+		var methods string
+		var functions = functionMethods.GetFunctions().GetIterator()
+		for functions.HasNext() {
+			var function = functions.GetNext()
+			methods += v.generateFunctionMethod(function)
+		}
+		implementation = v.getClass().functionMethods_
+		implementation = uti.ReplaceAll(implementation, "methods", methods)
+	}
+	return implementation
+}
+
+func (v *classes_) generateGetterMethod(getter ast.GetterLike) (
+	implementation string,
+) {
+	var methodName = getter.GetName()
+	var attributeName = v.extractAttributeName(methodName)
+	var attributeType = v.extractType(getter.GetAbstraction())
+	implementation = v.getClass().getterMethod_
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "attributeName", attributeName)
+	implementation = uti.ReplaceAll(implementation, "attributeType", attributeType)
+	return implementation
+}
+
+func (v *classes_) generateSetterMethod(setter ast.SetterLike) (
+	implementation string,
+) {
+	var methodName = setter.GetName()
+	var attributeName = v.extractAttributeName(methodName)
+	var parameter = setter.GetParameter()
+	var attributeType = v.extractType(parameter.GetAbstraction())
+	var attributeCheck = v.generateAttributeCheck(parameter)
+	implementation = v.getClass().setterMethod_
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "attributeName", attributeName)
+	implementation = uti.ReplaceAll(implementation, "attributeType", attributeType)
+	implementation = uti.ReplaceAll(implementation, "attributeCheck", attributeCheck)
 	return implementation
 }
 
 func (v *classes_) generateAttributeMethods(instance ast.InstanceLike) (
 	implementation string,
 ) {
-	implementation = v.getClass().attributeMethods_
+	var instanceMethods = instance.GetInstanceMethods()
+	var attributeMethods = instanceMethods.GetOptionalAttributeMethods()
+	if uti.IsDefined(attributeMethods) {
+		var methods string
+		var accessors = attributeMethods.GetAccessors().GetIterator()
+		for accessors.HasNext() {
+			var method string
+			var accessor = accessors.GetNext()
+			switch actual := accessor.GetAny().(type) {
+			case ast.GetterLike:
+				method = v.generateGetterMethod(actual)
+			case ast.SetterLike:
+				method = v.generateSetterMethod(actual)
+			}
+			methods += method
+		}
+		implementation = v.getClass().attributeMethods_
+		implementation = uti.ReplaceAll(implementation, "methods", methods)
+	}
 	return implementation
 }
 
 func (v *classes_) generateAspectMethods(instance ast.InstanceLike) (
 	implementation string,
 ) {
-	implementation = v.getClass().aspectMethods_
+	var instanceMethods = instance.GetInstanceMethods()
+	var aspectInterfaces = instanceMethods.GetOptionalAspectInterfaces()
+	if uti.IsDefined(aspectInterfaces) {
+		var interfaces = aspectInterfaces.GetInterfaces().GetIterator()
+		for interfaces.HasNext() {
+			var aspectName = v.extractType(interfaces.GetNext().GetAbstraction())
+			var aspect = v.getClass().aspectInterface_
+			aspect = uti.ReplaceAll(aspect, "aspectName", aspectName)
+			implementation += aspect
+		}
+	}
+	return implementation
+}
+
+func (v *classes_) generatePublicMethod(method ast.MethodLike) (
+	implementation string,
+) {
+	var methodName = method.GetName()
+	var parameters = v.generateParameters(method.GetParameters())
+	var resultType = v.generateResult(method.GetOptionalResult())
+	implementation = v.getClass().instanceMethod_
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
+	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
 	return implementation
 }
 
 func (v *classes_) generatePublicMethods(instance ast.InstanceLike) (
 	implementation string,
 ) {
+	var methods string
+	var instanceMethods = instance.GetInstanceMethods()
+	var publicMethods = instanceMethods.GetPublicMethods()
+	var publics = publicMethods.GetMethods().GetIterator()
+	for publics.HasNext() {
+		var public = publics.GetNext()
+		if public.GetName() != "GetClass" {
+			methods += v.generatePublicMethod(public)
+		}
+	}
 	implementation = v.getClass().publicMethods_
+	implementation = uti.ReplaceAll(implementation, "methods", methods)
 	return implementation
 }
 
@@ -635,10 +760,8 @@ func (v *classes_) generateClassReference(class ast.ClassLike) (
 	implementation string,
 ) {
 	implementation = v.getClass().classReference_
-	var declaration = class.GetDeclaration()
-	var constraints = declaration.GetOptionalConstraints()
 	var variables = v.getClass().classVariables_
-	if uti.IsDefined(constraints) {
+	if v.isGeneric_ {
 		variables = v.getClass().genericVariables_
 	}
 	implementation = uti.ReplaceAll(implementation, "variables", variables)
@@ -1625,17 +1748,6 @@ func (v *classes_) retrieveAspect(
 
 // PRIVATE GLOBALS
 
-		genericReference: `
-var <~className>Class = map[string]any{}
-var <~className>Mutex syn.Mutex
-`,
-
-		classFunction: `
-func <~ClassName>() <~ClassName>ClassLike {
-	return <~className>Class
-}
-`,
-
 		classTarget: `
 type <className>Class_<Constraints> struct {
 	// Define class constants.<Constants>
@@ -1746,18 +1858,22 @@ type classesClass_ struct {
 	accessFunction_          string
 	classFunction_           string
 	genericFunction_         string
-	classMethod_             string
 	methodParameter_         string
 	constructorMethods_      string
-	constructorBody_         string
+	constructorMethod_       string
 	attributeCheck_          string
 	attributeInitialization_ string
 	constantMethods_         string
+	constantMethod_          string
 	functionMethods_         string
+	functionMethod_          string
 	attributeMethods_        string
-	aspectMethods_           string
+	getterMethod_            string
+	setterMethod_            string
+	aspectInterface_         string
 	publicMethods_           string
 	privateMethods_          string
+	instanceMethod_          string
 	instanceStructure_       string
 	attributeDeclaration_    string
 	classStructure_          string
@@ -1829,10 +1945,6 @@ func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 }
 `,
 
-	classMethod_: `
-func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <ResultType> {<Body>}
-`,
-
 	methodParameter_: `
 	<parameterName_> <ParameterType>,`,
 
@@ -1841,11 +1953,13 @@ func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <ResultType> 
 <Methods>
 `,
 
-	constructorBody_: `<AttributeChecks>
-	var <~className> = &<~className>_{
+	constructorMethod_: `
+func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>Like {<AttributeChecks>
+	var instance = &<~className>_{
 		class_: c,<AttributeInitializations>
 	}
-	return <~className>
+	return instance
+}
 `,
 
 	attributeCheck_: `
@@ -1858,29 +1972,57 @@ func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <ResultType> 
 
 	constantMethods_: `
 // Constant Methods
+<Methods>
+`,
 
+	constantMethod_: `
+func (c *<~className>Class_<Arguments>) <~ConstantName>() <ConstantType> {
+	return c.<~constantName>_
+}
 `,
 
 	functionMethods_: `
 // Function Methods
+<Methods>
+`,
 
+	functionMethod_: `
+func (c *<~className>Class_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
+	var result_ <ResultType>
+	// TBD - Add the function implementation.
+	return result_
+}
 `,
 
 	attributeMethods_: `
 // Attribute Methods
-
+<Methods>
 `,
 
-	aspectMethods_: `
-// <~AspectName> Methods
+	getterMethod_: `
+func (v *<~className>_<Arguments>) <~MethodName>() <AttributeType> {
+	return v.<~attributeName>_
+}
+`,
 
+	setterMethod_: `
+func (v *<~className>_<Arguments>) <~MethodName>(
+	<attributeName_> <AttributeType>,
+) {<AttributeChecks>
+	v.<~attributeName>_ = <attributeName_>
+}
+`,
+
+	aspectInterface_: `
+// <AspectName> Methods
+<Methods>
 `,
 
 	publicMethods_: `
 // Public Methods
 
 func (v *<~className>_) GetClass() <~ClassName>ClassLike {
-	return v.class_
+	return v.getClass()
 }
 <Methods>
 `,
@@ -1893,6 +2035,12 @@ func (v *<~className>_) getClass() *<~className>Class_ {
 }
 `,
 
+	instanceMethod_: `
+func (v *<~className>_<Arguments>) <MethodName>(<Parameters>)<ResultType> {
+	// TBD - Add the method implementation.
+}
+`,
+
 	instanceStructure_: `
 // Instance Structure
 
@@ -1902,7 +2050,7 @@ type <~className>_ struct {
 `,
 
 	attributeDeclaration_: `
-	<~attributeName>_: <AttributeType>`,
+	<~attributeName>_ <AttributeType>`,
 
 	classStructure_: `
 // Class Structure

@@ -13,68 +13,70 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var parameterizedClass = &parameterizedClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Parameterized() ParameterizedClassLike {
 	return parameterizedClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type parameterizedClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *parameterizedClass_) Make(parameters abs.Sequential[ParameterLike]) ParameterizedLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(parameters):
+func (c *parameterizedClass_) Make(
+	parameters abs.Sequential[ParameterLike],
+) ParameterizedLike {
+	if uti.IsUndefined(parameters) {
 		panic("The parameters attribute is required by this class.")
-	default:
-		return &parameterized_{
-			// Initialize instance attributes.
-			class_:      c,
-			parameters_: parameters,
-		}
 	}
+	var instance = &parameterized_{
+		class_:      c,
+		parameters_: parameters,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type parameterized_ struct {
-	// Define instance attributes.
-	class_      ParameterizedClassLike
-	parameters_ abs.Sequential[ParameterLike]
-}
-
-// Public
-
-func (v *parameterized_) GetClass() ParameterizedClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *parameterized_) GetParameters() abs.Sequential[ParameterLike] {
 	return v.parameters_
 }
 
-// Private
+// Public Methods
+
+func (v *parameterized_) GetClass() ParameterizedClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *parameterized_) getClass() *parameterizedClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type parameterized_ struct {
+	class_      *parameterizedClass_
+	parameters_ abs.Sequential[ParameterLike]
+}
+
+// Class Structure
+
+type parameterizedClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var parameterizedClass = &parameterizedClass_{
+	// Initialize the class constants.
+}

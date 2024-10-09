@@ -13,68 +13,70 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var importsClass = &importsClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Imports() ImportsClassLike {
 	return importsClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type importsClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *importsClass_) Make(modules abs.Sequential[ModuleLike]) ImportsLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(modules):
+func (c *importsClass_) Make(
+	modules abs.Sequential[ModuleLike],
+) ImportsLike {
+	if uti.IsUndefined(modules) {
 		panic("The modules attribute is required by this class.")
-	default:
-		return &imports_{
-			// Initialize instance attributes.
-			class_:   c,
-			modules_: modules,
-		}
 	}
+	var instance = &imports_{
+		class_:   c,
+		modules_: modules,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type imports_ struct {
-	// Define instance attributes.
-	class_   ImportsClassLike
-	modules_ abs.Sequential[ModuleLike]
-}
-
-// Public
-
-func (v *imports_) GetClass() ImportsClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *imports_) GetModules() abs.Sequential[ModuleLike] {
 	return v.modules_
 }
 
-// Private
+// Public Methods
+
+func (v *imports_) GetClass() ImportsClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *imports_) getClass() *importsClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type imports_ struct {
+	class_   *importsClass_
+	modules_ abs.Sequential[ModuleLike]
+}
+
+// Class Structure
+
+type importsClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var importsClass = &importsClass_{
+	// Initialize the class constants.
+}

@@ -12,56 +12,53 @@
 
 package ast
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var channelClass = &channelClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Channel() ChannelClassLike {
 	return channelClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type channelClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *channelClass_) Make() ChannelLike {
-	// Validate the arguments.
-	switch {
-	default:
-		return &channel_{
-			// Initialize instance attributes.
-			class_: c,
-		}
+	var instance = &channel_{
+		class_: c,
 	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type channel_ struct {
-	// Define instance attributes.
-	class_ ChannelClassLike
-}
-
-// Public
+// Public Methods
 
 func (v *channel_) GetClass() ChannelClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *channel_) getClass() *channelClass_ {
 	return v.class_
 }
 
-// Attribute
+// PRIVATE INTERFACE
 
-// Private
+// Instance Structure
+
+type channel_ struct {
+	class_ *channelClass_
+}
+
+// Class Structure
+
+type channelClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var channelClass = &channelClass_{
+	// Initialize the class constants.
+}

@@ -13,72 +13,41 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var enumerationClass = &enumerationClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Enumeration() EnumerationClassLike {
 	return enumerationClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type enumerationClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *enumerationClass_) Make(
 	value ValueLike,
 	additionalValues abs.Sequential[AdditionalValueLike],
 ) EnumerationLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(value):
+	if uti.IsUndefined(value) {
 		panic("The value attribute is required by this class.")
-	case col.IsUndefined(additionalValues):
-		panic("The additional values attribute is required by this class.")
-	default:
-		return &enumeration_{
-			// Initialize instance attributes.
-			class_:            c,
-			value_:            value,
-			additionalValues_: additionalValues,
-		}
 	}
+	if uti.IsUndefined(additionalValues) {
+		panic("The additionalValues attribute is required by this class.")
+	}
+	var instance = &enumeration_{
+		class_:            c,
+		value_:            value,
+		additionalValues_: additionalValues,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type enumeration_ struct {
-	// Define instance attributes.
-	class_            EnumerationClassLike
-	value_            ValueLike
-	additionalValues_ abs.Sequential[AdditionalValueLike]
-}
-
-// Public
-
-func (v *enumeration_) GetClass() EnumerationClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *enumeration_) GetValue() ValueLike {
 	return v.value_
@@ -88,4 +57,36 @@ func (v *enumeration_) GetAdditionalValues() abs.Sequential[AdditionalValueLike]
 	return v.additionalValues_
 }
 
-// Private
+// Public Methods
+
+func (v *enumeration_) GetClass() EnumerationClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *enumeration_) getClass() *enumerationClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type enumeration_ struct {
+	class_            *enumerationClass_
+	value_            ValueLike
+	additionalValues_ abs.Sequential[AdditionalValueLike]
+}
+
+// Class Structure
+
+type enumerationClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var enumerationClass = &enumerationClass_{
+	// Initialize the class constants.
+}

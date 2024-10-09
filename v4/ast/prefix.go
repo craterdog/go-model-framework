@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var prefixClass = &prefixClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Prefix() PrefixClassLike {
 	return prefixClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type prefixClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *prefixClass_) Make(any_ any) PrefixLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(any_):
+func (c *prefixClass_) Make(
+	any_ any,
+) PrefixLike {
+	if uti.IsUndefined(any_) {
 		panic("The any attribute is required by this class.")
-	default:
-		return &prefix_{
-			// Initialize instance attributes.
-			class_: c,
-			any_:   any_,
-		}
 	}
+	var instance = &prefix_{
+		class_: c,
+		any_:   any_,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type prefix_ struct {
-	// Define instance attributes.
-	class_ PrefixClassLike
-	any_   any
-}
-
-// Public
-
-func (v *prefix_) GetClass() PrefixClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *prefix_) GetAny() any {
 	return v.any_
 }
 
-// Private
+// Public Methods
+
+func (v *prefix_) GetClass() PrefixClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *prefix_) getClass() *prefixClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type prefix_ struct {
+	class_ *prefixClass_
+	any_   any
+}
+
+// Class Structure
+
+type prefixClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var prefixClass = &prefixClass_{
+	// Initialize the class constants.
+}

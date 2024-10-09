@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var noneClass = &noneClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func None() NoneClassLike {
 	return noneClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type noneClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *noneClass_) Make(newline string) NoneLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(newline):
+func (c *noneClass_) Make(
+	newline string,
+) NoneLike {
+	if uti.IsUndefined(newline) {
 		panic("The newline attribute is required by this class.")
-	default:
-		return &none_{
-			// Initialize instance attributes.
-			class_:   c,
-			newline_: newline,
-		}
 	}
+	var instance = &none_{
+		class_:   c,
+		newline_: newline,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type none_ struct {
-	// Define instance attributes.
-	class_   NoneClassLike
-	newline_ string
-}
-
-// Public
-
-func (v *none_) GetClass() NoneClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *none_) GetNewline() string {
 	return v.newline_
 }
 
-// Private
+// Public Methods
+
+func (v *none_) GetClass() NoneClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *none_) getClass() *noneClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type none_ struct {
+	class_   *noneClass_
+	newline_ string
+}
+
+// Class Structure
+
+type noneClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var noneClass = &noneClass_{
+	// Initialize the class constants.
+}

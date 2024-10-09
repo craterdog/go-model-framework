@@ -13,76 +13,45 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var modelClass = &modelClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Model() ModelClassLike {
 	return modelClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type modelClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *modelClass_) Make(
 	moduleDefinition ModuleDefinitionLike,
 	primitiveDefinitions PrimitiveDefinitionsLike,
 	interfaceDefinitions InterfaceDefinitionsLike,
 ) ModelLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(moduleDefinition):
+	if uti.IsUndefined(moduleDefinition) {
 		panic("The moduleDefinition attribute is required by this class.")
-	case col.IsUndefined(primitiveDefinitions):
-		panic("The primitiveDefinitions attribute is required by this class.")
-	case col.IsUndefined(interfaceDefinitions):
-		panic("The interfaceDefinitions attribute is required by this class.")
-	default:
-		return &model_{
-			// Initialize instance attributes.
-			class_:                c,
-			moduleDefinition_:     moduleDefinition,
-			primitiveDefinitions_: primitiveDefinitions,
-			interfaceDefinitions_: interfaceDefinitions,
-		}
 	}
+	if uti.IsUndefined(primitiveDefinitions) {
+		panic("The primitiveDefinitions attribute is required by this class.")
+	}
+	if uti.IsUndefined(interfaceDefinitions) {
+		panic("The interfaceDefinitions attribute is required by this class.")
+	}
+	var instance = &model_{
+		class_:                c,
+		moduleDefinition_:     moduleDefinition,
+		primitiveDefinitions_: primitiveDefinitions,
+		interfaceDefinitions_: interfaceDefinitions,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type model_ struct {
-	// Define instance attributes.
-	class_                ModelClassLike
-	moduleDefinition_     ModuleDefinitionLike
-	primitiveDefinitions_ PrimitiveDefinitionsLike
-	interfaceDefinitions_ InterfaceDefinitionsLike
-}
-
-// Public
-
-func (v *model_) GetClass() ModelClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *model_) GetModuleDefinition() ModuleDefinitionLike {
 	return v.moduleDefinition_
@@ -96,4 +65,37 @@ func (v *model_) GetInterfaceDefinitions() InterfaceDefinitionsLike {
 	return v.interfaceDefinitions_
 }
 
-// Private
+// Public Methods
+
+func (v *model_) GetClass() ModelClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *model_) getClass() *modelClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type model_ struct {
+	class_                *modelClass_
+	moduleDefinition_     ModuleDefinitionLike
+	primitiveDefinitions_ PrimitiveDefinitionsLike
+	interfaceDefinitions_ InterfaceDefinitionsLike
+}
+
+// Class Structure
+
+type modelClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var modelClass = &modelClass_{
+	// Initialize the class constants.
+}

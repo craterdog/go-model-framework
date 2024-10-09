@@ -13,71 +13,40 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var moduleClass = &moduleClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Module() ModuleClassLike {
 	return moduleClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type moduleClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *moduleClass_) Make(
 	name string,
 	path string,
 ) ModuleLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(name):
+	if uti.IsUndefined(name) {
 		panic("The name attribute is required by this class.")
-	case col.IsUndefined(path):
-		panic("The path attribute is required by this class.")
-	default:
-		return &module_{
-			// Initialize instance attributes.
-			class_: c,
-			name_:  name,
-			path_:  path,
-		}
 	}
+	if uti.IsUndefined(path) {
+		panic("The path attribute is required by this class.")
+	}
+	var instance = &module_{
+		class_: c,
+		name_:  name,
+		path_:  path,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type module_ struct {
-	// Define instance attributes.
-	class_ ModuleClassLike
-	name_  string
-	path_  string
-}
-
-// Public
-
-func (v *module_) GetClass() ModuleClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *module_) GetName() string {
 	return v.name_
@@ -87,4 +56,36 @@ func (v *module_) GetPath() string {
 	return v.path_
 }
 
-// Private
+// Public Methods
+
+func (v *module_) GetClass() ModuleClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *module_) getClass() *moduleClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type module_ struct {
+	class_ *moduleClass_
+	name_  string
+	path_  string
+}
+
+// Class Structure
+
+type moduleClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var moduleClass = &moduleClass_{
+	// Initialize the class constants.
+}

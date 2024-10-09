@@ -13,71 +13,40 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var parameterClass = &parameterClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Parameter() ParameterClassLike {
 	return parameterClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type parameterClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *parameterClass_) Make(
 	name string,
 	abstraction AbstractionLike,
 ) ParameterLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(name):
+	if uti.IsUndefined(name) {
 		panic("The name attribute is required by this class.")
-	case col.IsUndefined(abstraction):
-		panic("The abstraction attribute is required by this class.")
-	default:
-		return &parameter_{
-			// Initialize instance attributes.
-			class_:       c,
-			name_:        name,
-			abstraction_: abstraction,
-		}
 	}
+	if uti.IsUndefined(abstraction) {
+		panic("The abstraction attribute is required by this class.")
+	}
+	var instance = &parameter_{
+		class_:       c,
+		name_:        name,
+		abstraction_: abstraction,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type parameter_ struct {
-	// Define instance attributes.
-	class_       ParameterClassLike
-	name_        string
-	abstraction_ AbstractionLike
-}
-
-// Public
-
-func (v *parameter_) GetClass() ParameterClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *parameter_) GetName() string {
 	return v.name_
@@ -87,4 +56,36 @@ func (v *parameter_) GetAbstraction() AbstractionLike {
 	return v.abstraction_
 }
 
-// Private
+// Public Methods
+
+func (v *parameter_) GetClass() ParameterClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *parameter_) getClass() *parameterClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type parameter_ struct {
+	class_       *parameterClass_
+	name_        string
+	abstraction_ AbstractionLike
+}
+
+// Class Structure
+
+type parameterClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var parameterClass = &parameterClass_{
+	// Initialize the class constants.
+}

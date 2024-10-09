@@ -55,9 +55,9 @@ Model: ModuleDefinition PrimitiveDefinitions InterfaceDefinitions
 
 ModuleDefinition: Notice Header Imports?
 
-PrimitiveDefinitions: TypeDefinitions? FunctionalDefinitions?
+PrimitiveDefinitions: TypeSection? FunctionalSection?
 
-InterfaceDefinitions: ClassDefinitions InstanceDefinitions AspectDefinitions?
+InterfaceDefinitions: ClassSection InstanceSection AspectSection?
 
 Notice: comment
 
@@ -67,9 +67,9 @@ Imports: "import" "(" Module+ ")"
 
 Module: name path
 
-TypeDefinitions: "// Types" Type+
+TypeSection: "// Type Definitions" TypeDefinition+
 
-Type: Declaration Abstraction Enumeration?
+TypeDefinition: Declaration Abstraction Enumeration?
 
 Declaration: comment "type" name Constraints?
 
@@ -106,9 +106,9 @@ Value: name Abstraction "=" "iota"
 
 AdditionalValue: name
 
-FunctionalDefinitions: "// Functionals" Functional+
+FunctionalSection: "// Functional Definitions" FunctionalDefinition+
 
-Functional: Declaration "func" "(" Parameter* ")" Result
+FunctionalDefinition: Declaration "func" "(" Parameter* ")" Result
 
 Parameter: name Abstraction ","
 
@@ -121,51 +121,55 @@ None: newline
 
 Parameterized: "(" Parameter+ ")"
 
-ClassDefinitions: "// Classes" Class+
+ClassSection: "// Class Definitions" ClassDefinition+
 
-Class: Declaration "interface" "{" ClassMethods "}"
+ClassDefinition: Declaration "interface" "{" ClassMethods "}"
 
-ClassMethods: ConstructorMethods ConstantMethods? FunctionMethods?
+ClassMethods: ConstructorSubsection ConstantSubsection? FunctionSubsection?
 
-ConstructorMethods: "// Constructor" Constructor+
+ConstructorSubsection: "// Constructor Methods" ConstructorMethod+
 
-Constructor: name "(" Parameter* ")" Abstraction
+ConstructorMethod: name "(" Parameter* ")" Abstraction
 
-ConstantMethods: "// Constant" Constant+
+ConstantSubsection: "// Constant Methods" ConstantMethod+
 
-Constant: name "(" ")" Abstraction
+ConstantMethod: name "(" ")" Abstraction
 
-FunctionMethods: "// Function" Function+
+FunctionSubsection: "// Function Methods" FunctionMethod+
 
-Function: name "(" Parameter* ")" Result
+FunctionMethod: name "(" Parameter* ")" Result
 
-InstanceDefinitions: "// Instances" Instance+
+InstanceSection: "// Instance Definitions" InstanceDefinition+
 
-Instance: Declaration "interface" "{" InstanceMethods "}"
+InstanceDefinition: Declaration "interface" "{" InstanceMethods "}"
 
-InstanceMethods: PublicMethods AttributeMethods? AspectInterfaces?
+InstanceMethods: PublicSubsection AttributeSubsection? AspectSubsection?
 
-PublicMethods: "// Public" Method+
+PublicSubsection: "// Public Methods" PublicMethod+
+
+PublicMethod: Method
 
 Method: name "(" Parameter* ")" Result?
 
-AttributeMethods: "// Attribute" Accessor+
+AttributeSubsection: "// Attribute Methods" AttributeMethod+
 
-Accessor:
-  - Getter
-  - Setter
+AttributeMethod:
+  - GetterMethod
+  - SetterMethod
 
-Getter: name "(" ")" Abstraction
+GetterMethod: name "(" ")" Abstraction
 
-Setter: name "(" Parameter ")"
+SetterMethod: name "(" Parameter ")"
 
-AspectInterfaces: "// Aspect" Interface+
+AspectSubsection: "// Aspect Interfaces" AspectInterface+
 
-Interface: Abstraction
+AspectInterface: Abstraction
 
-AspectDefinitions: "// Aspects" Aspect+
+AspectSection: "// Aspect Definitions" AspectDefinition+
 
-Aspect: Declaration "interface" "{" Method+ "}"
+AspectDefinition: Declaration "interface" "{" AspectMethod+ "}"
+
+AspectMethod: Method
 
 !>
 EXPRESSION PATTERNS

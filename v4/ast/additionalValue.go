@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var additionalValueClass = &additionalValueClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func AdditionalValue() AdditionalValueClassLike {
 	return additionalValueClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type additionalValueClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *additionalValueClass_) Make(name string) AdditionalValueLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(name):
+func (c *additionalValueClass_) Make(
+	name string,
+) AdditionalValueLike {
+	if uti.IsUndefined(name) {
 		panic("The name attribute is required by this class.")
-	default:
-		return &additionalValue_{
-			// Initialize instance attributes.
-			class_: c,
-			name_:  name,
-		}
 	}
+	var instance = &additionalValue_{
+		class_: c,
+		name_:  name,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type additionalValue_ struct {
-	// Define instance attributes.
-	class_ AdditionalValueClassLike
-	name_  string
-}
-
-// Public
-
-func (v *additionalValue_) GetClass() AdditionalValueClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *additionalValue_) GetName() string {
 	return v.name_
 }
 
-// Private
+// Public Methods
+
+func (v *additionalValue_) GetClass() AdditionalValueClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *additionalValue_) getClass() *additionalValueClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type additionalValue_ struct {
+	class_ *additionalValueClass_
+	name_  string
+}
+
+// Class Structure
+
+type additionalValueClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var additionalValueClass = &additionalValueClass_{
+	// Initialize the class constants.
+}

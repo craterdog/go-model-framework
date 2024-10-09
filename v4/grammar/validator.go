@@ -15,6 +15,7 @@ package grammar
 import (
 	fmt "fmt"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
+	sts "strings"
 )
 
 // CLASS ACCESS
@@ -110,6 +111,32 @@ func (v *validator_) ProcessPath(path string) {
 
 func (v *validator_) ProcessSpace(space string) {
 	v.ValidateToken(space, SpaceToken)
+}
+
+func (v *validator_) PreprocessInterfaceDefinitions(
+	interfaceDefinition ast.InterfaceDefinitionsLike,
+) {
+	var classSection = interfaceDefinition.GetClassSection()
+	var instanceSection = interfaceDefinition.GetInstanceSection()
+	var classes = classSection.GetClassDefinitions().GetIterator()
+	var instances = instanceSection.GetInstanceDefinitions().GetIterator()
+	if classes.GetSize() != instances.GetSize() {
+		panic("The class list and instance list are different sizes.")
+	}
+	for classes.HasNext() && instances.HasNext() {
+		var class = classes.GetNext()
+		var className = sts.TrimSuffix(class.GetDeclaration().GetName(), "ClassLike")
+		var instance = instances.GetNext()
+		var instanceName = sts.TrimSuffix(instance.GetDeclaration().GetName(), "Like")
+		if className != instanceName {
+			var message = fmt.Sprintf(
+				"The following class name and instance name don't match: %q, %q",
+				className,
+				instanceName,
+			)
+			panic(message)
+		}
+	}
 }
 
 func (v *validator_) PreprocessModel(model ast.ModelLike) {

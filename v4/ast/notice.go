@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var noticeClass = &noticeClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Notice() NoticeClassLike {
 	return noticeClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type noticeClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *noticeClass_) Make(comment string) NoticeLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(comment):
+func (c *noticeClass_) Make(
+	comment string,
+) NoticeLike {
+	if uti.IsUndefined(comment) {
 		panic("The comment attribute is required by this class.")
-	default:
-		return &notice_{
-			// Initialize instance attributes.
-			class_:   c,
-			comment_: comment,
-		}
 	}
+	var instance = &notice_{
+		class_:   c,
+		comment_: comment,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type notice_ struct {
-	// Define instance attributes.
-	class_   NoticeClassLike
-	comment_ string
-}
-
-// Public
-
-func (v *notice_) GetClass() NoticeClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *notice_) GetComment() string {
 	return v.comment_
 }
 
-// Private
+// Public Methods
+
+func (v *notice_) GetClass() NoticeClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *notice_) getClass() *noticeClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type notice_ struct {
+	class_   *noticeClass_
+	comment_ string
+}
+
+// Class Structure
+
+type noticeClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var noticeClass = &noticeClass_{
+	// Initialize the class constants.
+}

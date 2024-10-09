@@ -13,67 +13,69 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var resultClass = &resultClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Result() ResultClassLike {
 	return resultClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type resultClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
-
-func (c *resultClass_) Make(any_ any) ResultLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(any_):
+func (c *resultClass_) Make(
+	any_ any,
+) ResultLike {
+	if uti.IsUndefined(any_) {
 		panic("The any attribute is required by this class.")
-	default:
-		return &result_{
-			// Initialize instance attributes.
-			class_: c,
-			any_:   any_,
-		}
 	}
+	var instance = &result_{
+		class_: c,
+		any_:   any_,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type result_ struct {
-	// Define instance attributes.
-	class_ ResultClassLike
-	any_   any
-}
-
-// Public
-
-func (v *result_) GetClass() ResultClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *result_) GetAny() any {
 	return v.any_
 }
 
-// Private
+// Public Methods
+
+func (v *result_) GetClass() ResultClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *result_) getClass() *resultClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type result_ struct {
+	class_ *resultClass_
+	any_   any
+}
+
+// Class Structure
+
+type resultClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var resultClass = &resultClass_{
+	// Initialize the class constants.
+}

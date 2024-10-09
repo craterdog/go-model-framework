@@ -13,72 +13,41 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var constraintsClass = &constraintsClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func Constraints() ConstraintsClassLike {
 	return constraintsClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type constraintsClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *constraintsClass_) Make(
 	constraint ConstraintLike,
 	additionalConstraints abs.Sequential[AdditionalConstraintLike],
 ) ConstraintsLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(constraint):
+	if uti.IsUndefined(constraint) {
 		panic("The constraint attribute is required by this class.")
-	case col.IsUndefined(additionalConstraints):
-		panic("The additional constraints attribute is required by this class.")
-	default:
-		return &constraints_{
-			// Initialize instance attributes.
-			class_:                 c,
-			constraint_:            constraint,
-			additionalConstraints_: additionalConstraints,
-		}
 	}
+	if uti.IsUndefined(additionalConstraints) {
+		panic("The additionalConstraints attribute is required by this class.")
+	}
+	var instance = &constraints_{
+		class_:                 c,
+		constraint_:            constraint,
+		additionalConstraints_: additionalConstraints,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type constraints_ struct {
-	// Define instance attributes.
-	class_                 ConstraintsClassLike
-	constraint_            ConstraintLike
-	additionalConstraints_ abs.Sequential[AdditionalConstraintLike]
-}
-
-// Public
-
-func (v *constraints_) GetClass() ConstraintsClassLike {
-	return v.class_
-}
-
-// Attribute
+// Attribute Methods
 
 func (v *constraints_) GetConstraint() ConstraintLike {
 	return v.constraint_
@@ -88,4 +57,36 @@ func (v *constraints_) GetAdditionalConstraints() abs.Sequential[AdditionalConst
 	return v.additionalConstraints_
 }
 
-// Private
+// Public Methods
+
+func (v *constraints_) GetClass() ConstraintsClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *constraints_) getClass() *constraintsClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type constraints_ struct {
+	class_                 *constraintsClass_
+	constraint_            ConstraintLike
+	additionalConstraints_ abs.Sequential[AdditionalConstraintLike]
+}
+
+// Class Structure
+
+type constraintsClass_ struct {
+	// Define the class constants.
+}
+
+// Class Reference
+
+var constraintsClass = &constraintsClass_{
+	// Initialize the class constants.
+}

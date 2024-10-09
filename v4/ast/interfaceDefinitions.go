@@ -13,85 +13,86 @@
 package ast
 
 import (
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var interfaceDefinitionsClass = &interfaceDefinitionsClass_{
-	// Initialize class constants.
-}
-
-// Function
+// Access Function
 
 func InterfaceDefinitions() InterfaceDefinitionsClassLike {
 	return interfaceDefinitionsClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type interfaceDefinitionsClass_ struct {
-	// Define class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *interfaceDefinitionsClass_) Make(
-	classDefinitions ClassDefinitionsLike,
-	instanceDefinitions InstanceDefinitionsLike,
-	optionalAspectDefinitions AspectDefinitionsLike,
+	classSection ClassSectionLike,
+	instanceSection InstanceSectionLike,
+	optionalAspectSection AspectSectionLike,
 ) InterfaceDefinitionsLike {
-	// Validate the arguments.
-	switch {
-	case col.IsUndefined(classDefinitions):
-		panic("The classDefinitions attribute is required by this class.")
-	case col.IsUndefined(instanceDefinitions):
-		panic("The instanceDefinitions attribute is required by this class.")
-	default:
-		return &interfaceDefinitions_{
-			// Initialize instance attributes.
-			class_:                     c,
-			classDefinitions_:          classDefinitions,
-			instanceDefinitions_:       instanceDefinitions,
-			optionalAspectDefinitions_: optionalAspectDefinitions,
-		}
+	if uti.IsUndefined(classSection) {
+		panic("The classSection attribute is required by this class.")
 	}
+	if uti.IsUndefined(instanceSection) {
+		panic("The instanceSection attribute is required by this class.")
+	}
+	var instance = &interfaceDefinitions_{
+		class_:                 c,
+		classSection_:          classSection,
+		instanceSection_:       instanceSection,
+		optionalAspectSection_: optionalAspectSection,
+	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
+// Attribute Methods
 
-type interfaceDefinitions_ struct {
-	// Define instance attributes.
-	class_                     InterfaceDefinitionsClassLike
-	classDefinitions_          ClassDefinitionsLike
-	instanceDefinitions_       InstanceDefinitionsLike
-	optionalAspectDefinitions_ AspectDefinitionsLike
+func (v *interfaceDefinitions_) GetClassSection() ClassSectionLike {
+	return v.classSection_
 }
 
-// Public
+func (v *interfaceDefinitions_) GetInstanceSection() InstanceSectionLike {
+	return v.instanceSection_
+}
+
+func (v *interfaceDefinitions_) GetOptionalAspectSection() AspectSectionLike {
+	return v.optionalAspectSection_
+}
+
+// Public Methods
 
 func (v *interfaceDefinitions_) GetClass() InterfaceDefinitionsClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *interfaceDefinitions_) getClass() *interfaceDefinitionsClass_ {
 	return v.class_
 }
 
-// Attribute
+// PRIVATE INTERFACE
 
-func (v *interfaceDefinitions_) GetClassDefinitions() ClassDefinitionsLike {
-	return v.classDefinitions_
+// Instance Structure
+
+type interfaceDefinitions_ struct {
+	class_                 *interfaceDefinitionsClass_
+	classSection_          ClassSectionLike
+	instanceSection_       InstanceSectionLike
+	optionalAspectSection_ AspectSectionLike
 }
 
-func (v *interfaceDefinitions_) GetInstanceDefinitions() InstanceDefinitionsLike {
-	return v.instanceDefinitions_
+// Class Structure
+
+type interfaceDefinitionsClass_ struct {
+	// Define the class constants.
 }
 
-func (v *interfaceDefinitions_) GetOptionalAspectDefinitions() AspectDefinitionsLike {
-	return v.optionalAspectDefinitions_
-}
+// Class Reference
 
-// Private
+var interfaceDefinitionsClass = &interfaceDefinitionsClass_{
+	// Initialize the class constants.
+}

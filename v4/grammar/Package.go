@@ -40,7 +40,7 @@ import (
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
 
-// Types
+// Type Definitions
 
 /*
 TokenType is a constrained type representing any token type recognized by a
@@ -58,7 +58,7 @@ const (
 	SpaceToken
 )
 
-// Classes
+// Class Definitions
 
 /*
 FormatterClassLike is a class interface that defines the complete set of
@@ -66,7 +66,7 @@ class constants, constructors and functions that must be supported by each
 concrete formatter-like class.
 */
 type FormatterClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make() FormatterLike
 }
 
@@ -76,7 +76,7 @@ class constants, constructors and functions that must be supported by each
 concrete parser-like class.
 */
 type ParserClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make() ParserLike
 }
 
@@ -86,7 +86,7 @@ class constants, constructors and functions that must be supported by each
 concrete processor-like class.
 */
 type ProcessorClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make() ProcessorLike
 }
 
@@ -102,13 +102,13 @@ FormatType() returns the string version of the token type.
 MatchesType() determines whether or not a token value is of a specified type.
 */
 type ScannerClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		source string,
 		tokens abs.QueueLike[TokenLike],
 	) ScannerLike
 
-	// Function
+	// Function Methods
 	FormatToken(
 		token TokenLike,
 	) string
@@ -127,7 +127,7 @@ class constants, constructors and functions that must be supported by each
 concrete token-like class.
 */
 type TokenClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		line uint,
 		position uint,
@@ -142,7 +142,7 @@ class constants, constructors and functions that must be supported by each
 concrete validator-like class.
 */
 type ValidatorClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make() ValidatorLike
 }
 
@@ -152,13 +152,13 @@ class constants, constructors and functions that must be supported by each
 concrete visitor-like class.
 */
 type VisitorClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make(
 		processor Methodical,
 	) VisitorLike
 }
 
-// Instances
+// Instance Definitions
 
 /*
 FormatterLike is an instance interface that defines the complete set of
@@ -166,13 +166,13 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete formatter-like class.
 */
 type FormatterLike interface {
-	// Public
+	// Public Methods
 	GetClass() FormatterClassLike
 	FormatModel(
 		model ast.ModelLike,
 	) string
 
-	// Aspect
+	// Aspect Methods
 	Methodical
 }
 
@@ -182,7 +182,7 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete parser-like class.
 */
 type ParserLike interface {
-	// Public
+	// Public Methods
 	GetClass() ParserClassLike
 	ParseSource(
 		source string,
@@ -195,10 +195,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete processor-like class.
 */
 type ProcessorLike interface {
-	// Public
+	// Public Methods
 	GetClass() ProcessorClassLike
 
-	// Aspect
+	// Aspect Methods
 	Methodical
 }
 
@@ -208,7 +208,7 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete scanner-like class.
 */
 type ScannerLike interface {
-	// Public
+	// Public Methods
 	GetClass() ScannerClassLike
 }
 
@@ -218,10 +218,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete token-like class.
 */
 type TokenLike interface {
-	// Public
+	// Public Methods
 	GetClass() TokenClassLike
 
-	// Attribute
+	// Attribute Methods
 	GetLine() uint
 	GetPosition() uint
 	GetType() TokenType
@@ -234,13 +234,13 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete validator-like class.
 */
 type ValidatorLike interface {
-	// Public
+	// Public Methods
 	GetClass() ValidatorClassLike
 	ValidateModel(
 		model ast.ModelLike,
 	)
 
-	// Aspect
+	// Aspect Methods
 	Methodical
 }
 
@@ -250,14 +250,14 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete visitor-like class.
 */
 type VisitorLike interface {
-	// Public
+	// Public Methods
 	GetClass() VisitorClassLike
 	VisitModel(
 		model ast.ModelLike,
 	)
 }
 
-// Aspects
+// Aspect Definitions
 
 /*
 Methodical defines the set of method signatures that must be supported
@@ -354,76 +354,84 @@ type Methodical interface {
 	PostprocessArray(
 		array ast.ArrayLike,
 	)
-	PreprocessAspect(
-		aspect ast.AspectLike,
+	PreprocessAspectDefinition(
+		aspectDefinition ast.AspectDefinitionLike,
 		index uint,
 		size uint,
 	)
-	ProcessAspectSlot(
+	ProcessAspectDefinitionSlot(
 		slot uint,
 	)
-	PostprocessAspect(
-		aspect ast.AspectLike,
+	PostprocessAspectDefinition(
+		aspectDefinition ast.AspectDefinitionLike,
 		index uint,
 		size uint,
 	)
-	PreprocessAspectDefinitions(
-		aspectDefinitions ast.AspectDefinitionsLike,
-	)
-	ProcessAspectDefinitionsSlot(
-		slot uint,
-	)
-	PostprocessAspectDefinitions(
-		aspectDefinitions ast.AspectDefinitionsLike,
-	)
-	PreprocessAspectInterfaces(
-		aspectInterfaces ast.AspectInterfacesLike,
-	)
-	ProcessAspectInterfacesSlot(
-		slot uint,
-	)
-	PostprocessAspectInterfaces(
-		aspectInterfaces ast.AspectInterfacesLike,
-	)
-	PreprocessAccessor(
-		accessor ast.AccessorLike,
+	PreprocessAspectInterface(
+		aspectInterface ast.AspectInterfaceLike,
 		index uint,
 		size uint,
 	)
-	ProcessAccessorSlot(
+	ProcessAspectInterfaceSlot(
 		slot uint,
 	)
-	PostprocessAccessor(
-		accessor ast.AccessorLike,
+	PostprocessAspectInterface(
+		aspectInterface ast.AspectInterfaceLike,
 		index uint,
 		size uint,
 	)
-	PreprocessGetter(
-		getter ast.GetterLike,
+	PreprocessAspectMethod(
+		aspectMethod ast.AspectMethodLike,
+		index uint,
+		size uint,
 	)
-	ProcessGetterSlot(
+	ProcessAspectMethodSlot(
 		slot uint,
 	)
-	PostprocessGetter(
-		getter ast.GetterLike,
+	PostprocessAspectMethod(
+		aspectMethod ast.AspectMethodLike,
+		index uint,
+		size uint,
 	)
-	PreprocessSetter(
-		setter ast.SetterLike,
+	PreprocessAspectSection(
+		aspectSection ast.AspectSectionLike,
 	)
-	ProcessSetterSlot(
+	ProcessAspectSectionSlot(
 		slot uint,
 	)
-	PostprocessSetter(
-		setter ast.SetterLike,
+	PostprocessAspectSection(
+		aspectSection ast.AspectSectionLike,
 	)
-	PreprocessAttributeMethods(
-		accessorMethods ast.AttributeMethodsLike,
+	PreprocessAspectSubsection(
+		aspectSubsection ast.AspectSubsectionLike,
 	)
-	ProcessAttributeMethodsSlot(
+	ProcessAspectSubsectionSlot(
 		slot uint,
 	)
-	PostprocessAttributeMethods(
-		attributeMethods ast.AttributeMethodsLike,
+	PostprocessAspectSubsection(
+		aspectSubsection ast.AspectSubsectionLike,
+	)
+	PreprocessAttributeMethod(
+		attributeMethod ast.AttributeMethodLike,
+		index uint,
+		size uint,
+	)
+	ProcessAttributeMethodSlot(
+		slot uint,
+	)
+	PostprocessAttributeMethod(
+		attributeMethod ast.AttributeMethodLike,
+		index uint,
+		size uint,
+	)
+	PreprocessAttributeSubsection(
+		attributeSubsection ast.AttributeSubsectionLike,
+	)
+	ProcessAttributeSubsectionSlot(
+		slot uint,
+	)
+	PostprocessAttributeSubsection(
+		attributeSubsection ast.AttributeSubsectionLike,
 	)
 	PreprocessChannel(
 		channel ast.ChannelLike,
@@ -434,27 +442,18 @@ type Methodical interface {
 	PostprocessChannel(
 		channel ast.ChannelLike,
 	)
-	PreprocessClass(
-		class ast.ClassLike,
+	PreprocessClassDefinition(
+		classDefinition ast.ClassDefinitionLike,
 		index uint,
 		size uint,
 	)
-	ProcessClassSlot(
+	ProcessClassDefinitionSlot(
 		slot uint,
 	)
-	PostprocessClass(
-		class ast.ClassLike,
+	PostprocessClassDefinition(
+		classDefinition ast.ClassDefinitionLike,
 		index uint,
 		size uint,
-	)
-	PreprocessClassDefinitions(
-		classDefinitions ast.ClassDefinitionsLike,
-	)
-	ProcessClassDefinitionsSlot(
-		slot uint,
-	)
-	PostprocessClassDefinitions(
-		classDefinitions ast.ClassDefinitionsLike,
 	)
 	PreprocessClassMethods(
 		classMethods ast.ClassMethodsLike,
@@ -465,27 +464,36 @@ type Methodical interface {
 	PostprocessClassMethods(
 		classMethods ast.ClassMethodsLike,
 	)
-	PreprocessConstant(
-		constant ast.ConstantLike,
+	PreprocessClassSection(
+		classSection ast.ClassSectionLike,
+	)
+	ProcessClassSectionSlot(
+		slot uint,
+	)
+	PostprocessClassSection(
+		classSection ast.ClassSectionLike,
+	)
+	PreprocessConstantMethod(
+		constantMethod ast.ConstantMethodLike,
 		index uint,
 		size uint,
 	)
-	ProcessConstantSlot(
+	ProcessConstantMethodSlot(
 		slot uint,
 	)
-	PostprocessConstant(
-		constant ast.ConstantLike,
+	PostprocessConstantMethod(
+		constantMethod ast.ConstantMethodLike,
 		index uint,
 		size uint,
 	)
-	PreprocessConstantMethods(
-		constantMethods ast.ConstantMethodsLike,
+	PreprocessConstantSubsection(
+		constantSubsection ast.ConstantSubsectionLike,
 	)
-	ProcessConstantMethodsSlot(
+	ProcessConstantSubsectionSlot(
 		slot uint,
 	)
-	PostprocessConstantMethods(
-		constantMethods ast.ConstantMethodsLike,
+	PostprocessConstantSubsection(
+		constantSubsection ast.ConstantSubsectionLike,
 	)
 	PreprocessConstraint(
 		constraint ast.ConstraintLike,
@@ -505,27 +513,27 @@ type Methodical interface {
 	PostprocessConstraints(
 		constraints ast.ConstraintsLike,
 	)
-	PreprocessConstructor(
-		constructor ast.ConstructorLike,
+	PreprocessConstructorMethod(
+		constructorMethod ast.ConstructorMethodLike,
 		index uint,
 		size uint,
 	)
-	ProcessConstructorSlot(
+	ProcessConstructorMethodSlot(
 		slot uint,
 	)
-	PostprocessConstructor(
-		constructor ast.ConstructorLike,
+	PostprocessConstructorMethod(
+		constructorMethod ast.ConstructorMethodLike,
 		index uint,
 		size uint,
 	)
-	PreprocessConstructorMethods(
-		constructorMethods ast.ConstructorMethodsLike,
+	PreprocessConstructorSubsection(
+		constructorSubsection ast.ConstructorSubsectionLike,
 	)
-	ProcessConstructorMethodsSlot(
+	ProcessConstructorSubsectionSlot(
 		slot uint,
 	)
-	PostprocessConstructorMethods(
-		constructorMethods ast.ConstructorMethodsLike,
+	PostprocessConstructorSubsection(
+		constructorSubsection ast.ConstructorSubsectionLike,
 	)
 	PreprocessDeclaration(
 		declaration ast.DeclarationLike,
@@ -545,49 +553,58 @@ type Methodical interface {
 	PostprocessEnumeration(
 		enumeration ast.EnumerationLike,
 	)
-	PreprocessFunction(
-		function ast.FunctionLike,
+	PreprocessFunctionMethod(
+		functionMethod ast.FunctionMethodLike,
 		index uint,
 		size uint,
 	)
-	ProcessFunctionSlot(
+	ProcessFunctionMethodSlot(
 		slot uint,
 	)
-	PostprocessFunction(
-		function ast.FunctionLike,
+	PostprocessFunctionMethod(
+		functionMethod ast.FunctionMethodLike,
 		index uint,
 		size uint,
 	)
-	PreprocessFunctionMethods(
-		functionMethods ast.FunctionMethodsLike,
+	PreprocessFunctionSubsection(
+		functionSubsection ast.FunctionSubsectionLike,
 	)
-	ProcessFunctionMethodsSlot(
+	ProcessFunctionSubsectionSlot(
 		slot uint,
 	)
-	PostprocessFunctionMethods(
-		functionMethods ast.FunctionMethodsLike,
+	PostprocessFunctionSubsection(
+		functionSubsection ast.FunctionSubsectionLike,
 	)
-	PreprocessFunctional(
-		functional ast.FunctionalLike,
+	PreprocessFunctionalDefinition(
+		functionalDefinition ast.FunctionalDefinitionLike,
 		index uint,
 		size uint,
 	)
-	ProcessFunctionalSlot(
+	ProcessFunctionalDefinitionSlot(
 		slot uint,
 	)
-	PostprocessFunctional(
-		functional ast.FunctionalLike,
+	PostprocessFunctionalDefinition(
+		functionalDefinition ast.FunctionalDefinitionLike,
 		index uint,
 		size uint,
 	)
-	PreprocessFunctionalDefinitions(
-		functionalDefinitions ast.FunctionalDefinitionsLike,
+	PreprocessFunctionalSection(
+		functionalSection ast.FunctionalSectionLike,
 	)
-	ProcessFunctionalDefinitionsSlot(
+	ProcessFunctionalSectionSlot(
 		slot uint,
 	)
-	PostprocessFunctionalDefinitions(
-		functionalDefinitions ast.FunctionalDefinitionsLike,
+	PostprocessFunctionalSection(
+		functionalSection ast.FunctionalSectionLike,
+	)
+	PreprocessGetterMethod(
+		getterMethod ast.GetterMethodLike,
+	)
+	ProcessGetterMethodSlot(
+		slot uint,
+	)
+	PostprocessGetterMethod(
+		getterMethod ast.GetterMethodLike,
 	)
 	PreprocessHeader(
 		header ast.HeaderLike,
@@ -607,27 +624,18 @@ type Methodical interface {
 	PostprocessImports(
 		imports ast.ImportsLike,
 	)
-	PreprocessInstance(
-		instance ast.InstanceLike,
+	PreprocessInstanceDefinition(
+		instanceDefinition ast.InstanceDefinitionLike,
 		index uint,
 		size uint,
 	)
-	ProcessInstanceSlot(
+	ProcessInstanceDefinitionSlot(
 		slot uint,
 	)
-	PostprocessInstance(
-		instance ast.InstanceLike,
+	PostprocessInstanceDefinition(
+		instanceDefinition ast.InstanceDefinitionLike,
 		index uint,
 		size uint,
-	)
-	PreprocessInstanceDefinitions(
-		instanceDefinitions ast.InstanceDefinitionsLike,
-	)
-	ProcessInstanceDefinitionsSlot(
-		slot uint,
-	)
-	PostprocessInstanceDefinitions(
-		instanceDefinitions ast.InstanceDefinitionsLike,
 	)
 	PreprocessInstanceMethods(
 		instanceMethods ast.InstanceMethodsLike,
@@ -638,18 +646,14 @@ type Methodical interface {
 	PostprocessInstanceMethods(
 		instanceMethods ast.InstanceMethodsLike,
 	)
-	PreprocessInterface(
-		interface_ ast.InterfaceLike,
-		index uint,
-		size uint,
+	PreprocessInstanceSection(
+		instanceSection ast.InstanceSectionLike,
 	)
-	ProcessInterfaceSlot(
+	ProcessInstanceSectionSlot(
 		slot uint,
 	)
-	PostprocessInterface(
-		interface_ ast.InterfaceLike,
-		index uint,
-		size uint,
+	PostprocessInstanceSection(
+		instanceSection ast.InstanceSectionLike,
 	)
 	PreprocessInterfaceDefinitions(
 		interfaceDefinitions ast.InterfaceDefinitionsLike,
@@ -671,16 +675,12 @@ type Methodical interface {
 	)
 	PreprocessMethod(
 		method ast.MethodLike,
-		index uint,
-		size uint,
 	)
 	ProcessMethodSlot(
 		slot uint,
 	)
 	PostprocessMethod(
 		method ast.MethodLike,
-		index uint,
-		size uint,
 	)
 	PreprocessModel(
 		model ast.ModelLike,
@@ -771,14 +771,27 @@ type Methodical interface {
 	PostprocessPrimitiveDefinitions(
 		primitiveDefinitions ast.PrimitiveDefinitionsLike,
 	)
-	PreprocessPublicMethods(
-		publicMethods ast.PublicMethodsLike,
+	PreprocessPublicMethod(
+		publicMethod ast.PublicMethodLike,
+		index uint,
+		size uint,
 	)
-	ProcessPublicMethodsSlot(
+	ProcessPublicMethodSlot(
 		slot uint,
 	)
-	PostprocessPublicMethods(
-		publicMethods ast.PublicMethodsLike,
+	PostprocessPublicMethod(
+		publicMethod ast.PublicMethodLike,
+		index uint,
+		size uint,
+	)
+	PreprocessPublicSubsection(
+		publicSubsection ast.PublicSubsectionLike,
+	)
+	ProcessPublicSubsectionSlot(
+		slot uint,
+	)
+	PostprocessPublicSubsection(
+		publicSubsection ast.PublicSubsectionLike,
 	)
 	PreprocessResult(
 		result ast.ResultLike,
@@ -789,6 +802,15 @@ type Methodical interface {
 	PostprocessResult(
 		result ast.ResultLike,
 	)
+	PreprocessSetterMethod(
+		setterMethod ast.SetterMethodLike,
+	)
+	ProcessSetterMethodSlot(
+		slot uint,
+	)
+	PostprocessSetterMethod(
+		setterMethod ast.SetterMethodLike,
+	)
 	PreprocessSuffix(
 		suffix ast.SuffixLike,
 	)
@@ -798,27 +820,27 @@ type Methodical interface {
 	PostprocessSuffix(
 		suffix ast.SuffixLike,
 	)
-	PreprocessType(
-		type_ ast.TypeLike,
+	PreprocessTypeDefinition(
+		typeDefinition ast.TypeDefinitionLike,
 		index uint,
 		size uint,
 	)
-	ProcessTypeSlot(
+	ProcessTypeDefinitionSlot(
 		slot uint,
 	)
-	PostprocessType(
-		type_ ast.TypeLike,
+	PostprocessTypeDefinition(
+		typeDefinition ast.TypeDefinitionLike,
 		index uint,
 		size uint,
 	)
-	PreprocessTypeDefinitions(
-		typeDefinitions ast.TypeDefinitionsLike,
+	PreprocessTypeSection(
+		typeSection ast.TypeSectionLike,
 	)
-	ProcessTypeDefinitionsSlot(
+	ProcessTypeSectionSlot(
 		slot uint,
 	)
-	PostprocessTypeDefinitions(
-		typeDefinitions ast.TypeDefinitionsLike,
+	PostprocessTypeSection(
+		typeSection ast.TypeSectionLike,
 	)
 	PreprocessValue(
 		value ast.ValueLike,
