@@ -246,10 +246,28 @@ func (v *classes_) extractType(abstraction ast.AbstractionLike) string {
 }
 
 func (v *classes_) generateModules(
+	model ast.ModelLike,
 	class string,
 ) (
 	implementation string,
 ) {
+	var moduleDefinition = model.GetModuleDefinition()
+	var imports = moduleDefinition.GetOptionalImports()
+	if uti.IsDefined(imports) {
+		var modules = imports.GetModules().GetIterator()
+		for modules.HasNext() {
+			var module = modules.GetNext()
+			var moduleName = module.GetName()
+			var prefix = moduleName + "."
+			var modulePath = module.GetPath()
+			if sts.Contains(class, prefix) && !sts.Contains(implementation, prefix) {
+				var alias = v.getClass().moduleAlias_
+				alias = uti.ReplaceAll(alias, "moduleName", moduleName)
+				alias = uti.ReplaceAll(alias, "modulePath", modulePath)
+				implementation += alias
+			}
+		}
+	}
 	if sts.Contains(class, "fmt.") && !sts.Contains(implementation, "fmt.") {
 		var alias = v.getClass().moduleAlias_
 		alias = uti.ReplaceAll(alias, "moduleName", "fmt")
@@ -335,11 +353,12 @@ func (v *classes_) generateConstraints(
 }
 
 func (v *classes_) generateImports(
+	model ast.ModelLike,
 	class string,
 ) (
 	implementation string,
 ) {
-	var modules = v.generateModules(class)
+	var modules = v.generateModules(model, class)
 	if uti.IsDefined(modules) {
 		implementation = v.getClass().moduleImports_
 		implementation = uti.ReplaceAll(implementation, "modules", modules)
@@ -377,55 +396,114 @@ func (v *classes_) generateClass(
 
 	// Add in the package declaration.
 	var packageDeclaration = v.generatePackageDeclaration(model)
-	implementation = uti.ReplaceAll(implementation, "packageDeclaration", packageDeclaration)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"packageDeclaration",
+		packageDeclaration,
+	)
 
 	// Add in the class access function.
 	var accessFunction = v.generateAccessFunction()
-	implementation = uti.ReplaceAll(implementation, "accessFunction", accessFunction)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"accessFunction",
+		accessFunction,
+	)
 
 	// Add in the class constructor methods.
 	var constructorMethods = v.generateConstructorMethods(classDefinition)
-	implementation = uti.ReplaceAll(implementation, "constructorMethods", constructorMethods)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"constructorMethods",
+		constructorMethods,
+	)
 
 	// Add in the class constant methods.
 	var constantMethods = v.generateConstantMethods(classDefinition)
-	implementation = uti.ReplaceAll(implementation, "constantMethods", constantMethods)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"constantMethods",
+		constantMethods,
+	)
 
 	// Add in the class function methods.
 	var functionMethods = v.generateFunctionMethods(classDefinition)
-	implementation = uti.ReplaceAll(implementation, "functionMethods", functionMethods)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"functionMethods",
+		functionMethods,
+	)
 
 	// Add in the instance attribute methods.
 	var attributeMethods = v.generateAttributeMethods(instanceDefinition)
-	implementation = uti.ReplaceAll(implementation, "attributeMethods", attributeMethods)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"attributeMethods",
+		attributeMethods,
+	)
 
-	// Add in the instance aspect methods.
-	var aspectMethods = v.generateAspectMethods(instanceDefinition)
-	implementation = uti.ReplaceAll(implementation, "aspectMethods", aspectMethods)
+	// Add in the instance aspect interfaces.
+	var interfaceDefinitions = model.GetInterfaceDefinitions()
+	var aspectSection = interfaceDefinitions.GetOptionalAspectSection()
+	var instanceMethods = instanceDefinition.GetInstanceMethods()
+	var aspectSubsection = instanceMethods.GetOptionalAspectSubsection()
+	var aspectInterfaces = v.generateAspectInterfaces(
+		aspectSection,
+		aspectSubsection,
+	)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"aspectInterfaces",
+		aspectInterfaces,
+	)
 
 	// Add in the instance public methods.
 	var publicMethods = v.generatePublicMethods(instanceDefinition)
-	implementation = uti.ReplaceAll(implementation, "publicMethods", publicMethods)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"publicMethods",
+		publicMethods,
+	)
 
 	// Add in the instance private methods.
 	var privateMethods = v.generatePrivateMethods(instanceDefinition)
-	implementation = uti.ReplaceAll(implementation, "privateMethods", privateMethods)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"privateMethods",
+		privateMethods,
+	)
 
 	// Add in the private instance structure.
 	var instanceStructure = v.generateInstanceStructure()
-	implementation = uti.ReplaceAll(implementation, "instanceStructure", instanceStructure)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"instanceStructure",
+		instanceStructure,
+	)
 
 	// Add in the private class structure.
 	var classStructure = v.generateClassStructure()
-	implementation = uti.ReplaceAll(implementation, "classStructure", classStructure)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"classStructure",
+		classStructure,
+	)
 
 	// Add in the private class reference.
 	var classReference = v.generateClassReference()
-	implementation = uti.ReplaceAll(implementation, "classReference", classReference)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"classReference",
+		classReference,
+	)
 
 	// Set the classname.
 	var className = v.extractClassName(classDefinition)
-	implementation = uti.ReplaceAll(implementation, "className", className)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"className",
+		className,
+	)
 
 	// Insert generics if necessary.
 	var constraints string
@@ -434,12 +512,24 @@ func (v *classes_) generateClass(
 		constraints = v.generateConstraints(classDefinition)
 		arguments = v.generateArguments(classDefinition)
 	}
-	implementation = uti.ReplaceAll(implementation, "constraints", constraints)
-	implementation = uti.ReplaceAll(implementation, "arguments", arguments)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"constraints",
+		constraints,
+	)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"arguments",
+		arguments,
+	)
 
 	// Insert any imported modules (this must be done last).
-	var moduleImports = v.generateImports(implementation)
-	implementation = uti.ReplaceAll(implementation, "moduleImports", moduleImports)
+	var moduleImports = v.generateImports(model, implementation)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"moduleImports",
+		moduleImports,
+	)
 
 	return implementation
 }
@@ -539,9 +629,9 @@ func (v *classes_) generateResult(
 	if uti.IsDefined(result) {
 		switch actual := result.GetAny().(type) {
 		case ast.AbstractionLike:
-			implementation = " " + v.extractType(actual)
+			implementation = v.extractType(actual)
 		case ast.ParameterizedLike:
-			implementation = " (" + v.generateParameters(actual.GetParameters()) + "\n)"
+			implementation = "(" + v.generateParameters(actual.GetParameters()) + "\n)"
 		}
 	}
 	return implementation
@@ -704,22 +794,80 @@ func (v *classes_) generateAttributeMethods(
 	return implementation
 }
 
-func (v *classes_) generateAspectMethods(
-	instanceDefinition ast.InstanceDefinitionLike,
+func (v *classes_) generateAspectInterface(
+	aspectType ast.AbstractionLike,
+	aspectSection ast.AspectSectionLike,
 ) (
 	implementation string,
 ) {
-	var instanceMethods = instanceDefinition.GetInstanceMethods()
-	var aspectSubsection = instanceMethods.GetOptionalAspectSubsection()
+	var methods string
+	if uti.IsDefined(aspectSection) {
+		var aspectDefinitions = aspectSection.GetAspectDefinitions().GetIterator()
+		for aspectDefinitions.HasNext() {
+			var aspectDefinition = aspectDefinitions.GetNext()
+			var declaration = aspectDefinition.GetDeclaration()
+			if uti.IsUndefined(aspectType.GetOptionalSuffix()) &&
+				declaration.GetName() == aspectType.GetName() {
+				methods = v.generateAspectMethods(aspectDefinition)
+			}
+		}
+	}
+	implementation = v.getClass().aspectInterface_
+	implementation = uti.ReplaceAll(
+		implementation,
+		"aspectType",
+		v.extractType(aspectType),
+	)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"methods",
+		methods,
+	)
+	return implementation
+}
+
+func (v *classes_) generateAspectInterfaces(
+	aspectSection ast.AspectSectionLike,
+	aspectSubsection ast.AspectSubsectionLike,
+) (
+	implementation string,
+) {
 	if uti.IsDefined(aspectSubsection) {
 		var aspectInterfaces = aspectSubsection.GetAspectInterfaces().GetIterator()
 		for aspectInterfaces.HasNext() {
-			var aspectInterface = aspectInterfaces.GetNext()
-			var aspectName = v.extractType(aspectInterface.GetAbstraction())
-			var aspect = v.getClass().aspectInterface_
-			aspect = uti.ReplaceAll(aspect, "aspectName", aspectName)
-			implementation += aspect
+			var aspectType = aspectInterfaces.GetNext().GetAbstraction()
+			implementation += v.generateAspectInterface(aspectType, aspectSection)
 		}
+	}
+	return implementation
+}
+
+func (v *classes_) generateAspectMethod(aspectMethod ast.AspectMethodLike) (
+	implementation string,
+) {
+	var method = aspectMethod.GetMethod()
+	var methodName = method.GetName()
+	var parameters = v.generateParameters(method.GetParameters())
+	var resultType = v.generateResult(method.GetOptionalResult())
+	implementation = v.getClass().instanceMethod_
+	if uti.IsDefined(resultType) {
+		implementation = v.getClass().instanceFunction_
+		implementation = uti.ReplaceAll(implementation, "resultType", resultType)
+	}
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
+	return implementation
+}
+
+func (v *classes_) generateAspectMethods(
+	aspectDefinition ast.AspectDefinitionLike,
+) (
+	implementation string,
+) {
+	var aspectMethods = aspectDefinition.GetAspectMethods().GetIterator()
+	for aspectMethods.HasNext() {
+		var aspectMethod = aspectMethods.GetNext()
+		implementation += v.generateAspectMethod(aspectMethod)
 	}
 	return implementation
 }
@@ -732,9 +880,12 @@ func (v *classes_) generatePublicMethod(publicMethod ast.PublicMethodLike) (
 	var parameters = v.generateParameters(method.GetParameters())
 	var resultType = v.generateResult(method.GetOptionalResult())
 	implementation = v.getClass().instanceMethod_
+	if uti.IsDefined(resultType) {
+		implementation = v.getClass().instanceFunction_
+		implementation = uti.ReplaceAll(implementation, "resultType", resultType)
+	}
 	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
 	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
-	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
 	return implementation
 }
 
@@ -1778,7 +1929,7 @@ type <className>Class_<Constraints> struct {
 `,
 
 		functionBody: `
-	var result_<ResultType>
+	var result_ <ResultType>
 	// TBA - Implement the function.
 	return result_
 `,
@@ -1801,11 +1952,11 @@ type <className>_<Constraints> struct {
 <Methods>`,
 
 		typeMethod: `
-func (v <className>_<Arguments>) <MethodName>(<Parameters>)<ResultType> {<Body>}
+func (v <className>_<Arguments>) <MethodName>(<Parameters>) <ResultType> {<Body>}
 `,
 
 		instanceMethod: `
-func (v *<className>_<Arguments>) <MethodName>(<Parameters>)<ResultType> {<Body>}
+func (v *<className>_<Arguments>) <MethodName>(<Parameters>) <ResultType> {<Body>}
 `,
 
 		methodBody: `
@@ -1813,7 +1964,7 @@ func (v *<className>_<Arguments>) <MethodName>(<Parameters>)<ResultType> {<Body>
 `,
 
 		resultBody: `
-	var result_<ResultType>
+	var result_ <ResultType>
 	// TBA - Implement the method.
 	return result_
 `,
@@ -1885,6 +2036,7 @@ type classesClass_ struct {
 	publicMethods_           string
 	privateMethods_          string
 	instanceMethod_          string
+	instanceFunction_        string
 	instanceStructure_       string
 	attributeDeclaration_    string
 	classStructure_          string
@@ -1903,7 +2055,7 @@ var classesClass = &classesClass_{
 // CLASS INTERFACE
 <AccessFunction><ConstructorMethods><ConstantMethods><FunctionMethods>
 // INSTANCE INTERFACE
-<AttributeMethods><AspectMethods><PublicMethods><PrivateMethods>
+<AttributeMethods><AspectInterfaces><PublicMethods><PrivateMethods>
 // PRIVATE INTERFACE
 <InstanceStructure><ClassStructure><ClassReference>
 `,
@@ -2025,7 +2177,7 @@ func (v *<~className>_<Arguments>) <~MethodName>(
 `,
 
 	aspectInterface_: `
-// <AspectName> Methods
+// <AspectType> Methods
 <Methods>
 `,
 
@@ -2047,8 +2199,16 @@ func (v *<~className>_) getClass() *<~className>Class_ {
 `,
 
 	instanceMethod_: `
-func (v *<~className>_<Arguments>) <MethodName>(<Parameters>)<ResultType> {
+func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) {
 	// TBD - Add the method implementation.
+}
+`,
+
+	instanceFunction_: `
+func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
+	var result_ <ResultType>
+	// TBD - Add the method implementation.
+	return result_
 }
 `,
 
@@ -2090,5 +2250,5 @@ var <~className>Mutex syn.Mutex
 `,
 
 	constantInitialization_: `
-			//<~constantName>_: constantValue,`,
+	// <~constantName>_: constantValue,`,
 }
