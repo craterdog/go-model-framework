@@ -119,17 +119,12 @@ func (v *classes_) analyzeClassGenerics(
 func (v *classes_) analyzePrivateAttributes(
 	classDefinition ast.ClassDefinitionLike,
 ) {
-	var hasNoAttributes = v.attributes_.IsEmpty()
 	var classMethods = classDefinition.GetClassMethods()
 	var constructorSubsection = classMethods.GetConstructorSubsection()
 	var constructorMethods = constructorSubsection.GetConstructorMethods().GetIterator()
 	for constructorMethods.HasNext() {
 		var constructorMethod = constructorMethods.GetNext()
 		var name = constructorMethod.GetName()
-		if name == "MakeFromValue" && hasNoAttributes {
-			v.isPrimitive_ = true
-			continue
-		}
 		// Focus only on constructors that are passed attributes as arguments.
 		if name == "Make" || sts.HasPrefix(name, "MakeWith") {
 			var parameters = constructorMethod.GetParameters().GetIterator()
@@ -146,7 +141,6 @@ func (v *classes_) analyzePrivateAttributes(
 func (v *classes_) analyzePublicAttributes(
 	instanceDefinition ast.InstanceDefinitionLike,
 ) {
-	v.isPrimitive_ = false
 	v.attributes_ = col.Catalog[string, string]()
 	var instanceMethods = instanceDefinition.GetInstanceMethods()
 	var attributeSubsection = instanceMethods.GetOptionalAttributeSubsection()
@@ -570,13 +564,13 @@ func (v *classes_) generateAttributeCheck(parameter ast.ParameterLike) (
 }
 
 func (v *classes_) generateAttributeChecks(
-	constructorMethod ast.ConstructorMethodLike,
+	parameters abs.Sequential[ast.ParameterLike],
 ) (
 	implementation string,
 ) {
-	var parameters = constructorMethod.GetParameters().GetIterator()
-	for parameters.HasNext() {
-		var parameter = parameters.GetNext()
+	var iterator = parameters.GetIterator()
+	for iterator.HasNext() {
+		var parameter = iterator.GetNext()
 		var attributeCheck = v.generateAttributeCheck(parameter)
 		implementation += attributeCheck
 	}
@@ -584,18 +578,20 @@ func (v *classes_) generateAttributeChecks(
 }
 
 func (v *classes_) generateAttributeInitializations(
-	constructorMethod ast.ConstructorMethodLike,
+	parameters abs.Sequential[ast.ParameterLike],
 ) (
 	implementation string,
 ) {
-	var parameters = constructorMethod.GetParameters().GetIterator()
-	for parameters.HasNext() {
-		var parameter = parameters.GetNext()
+	var iterator = parameters.GetIterator()
+	for iterator.HasNext() {
+		var parameter = iterator.GetNext()
 		var parameterName = parameter.GetName()
 		var attributeName = sts.TrimSuffix(parameterName, "_")
-		var template = v.getClass().attributeInitialization_
-		template = uti.ReplaceAll(template, "attributeName", attributeName)
-		implementation += template
+		if uti.IsDefined(v.attributes_.GetValue(attributeName)) {
+			var template = v.getClass().attributeInitialization_
+			template = uti.ReplaceAll(template, "attributeName", attributeName)
+			implementation += template
+		}
 	}
 	return implementation
 }
@@ -643,10 +639,13 @@ func (v *classes_) generateConstructorMethod(
 	implementation string,
 ) {
 	var methodName = constructorMethod.GetName()
-	var parameters = v.generateParameters(constructorMethod.GetParameters())
+	var constructorParameters = constructorMethod.GetParameters()
+	var parameters = v.generateParameters(constructorParameters)
 	var resultType = v.extractType(constructorMethod.GetAbstraction())
-	var attributeChecks = v.generateAttributeChecks(constructorMethod)
-	var attributeInitializations = v.generateAttributeInitializations(constructorMethod)
+	var attributeChecks = v.generateAttributeChecks(constructorParameters)
+	var attributeInitializations = v.generateAttributeInitializations(
+		constructorParameters,
+	)
 	implementation = v.getClass().constructorMethod_
 	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
 	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
@@ -2002,11 +2001,10 @@ func (v *<className>_<Arguments>) <MethodName>(<Parameters>) <ResultType> {<Body
 
 type classes_ struct {
 	// Declare the instance attributes.
-	class_       *classesClass_
-	isPrimitive_ bool
-	isGeneric_   bool
-	constants_   abs.CatalogLike[string, string]
-	attributes_  abs.CatalogLike[string, string]
+	class_      *classesClass_
+	isGeneric_  bool
+	constants_  abs.CatalogLike[string, string]
+	attributes_ abs.CatalogLike[string, string]
 }
 
 // Class Structure
@@ -2117,8 +2115,8 @@ func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 `,
 
 	constructorMethod_: `
-func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>Like {<AttributeChecks>
-	var instance = &<~className>_{
+func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>Like<Arguments> {<AttributeChecks>
+	var instance = &<~className>_<Arguments>{
 		class_: c,<AttributeInitializations>
 	}
 	return instance
@@ -2139,8 +2137,8 @@ func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>L
 `,
 
 	constantMethod_: `
-func (c *<~className>Class_<Arguments>) <~ConstantName>() <ConstantType> {
-	return c.<~constantName>_
+func (c *<~className>Class_<Arguments>) <~MethodName>() <ResultType> {
+	return c.<~methodName>_
 }
 `,
 
@@ -2171,7 +2169,7 @@ func (v *<~className>_<Arguments>) <~MethodName>() <AttributeType> {
 	setterMethod_: `
 func (v *<~className>_<Arguments>) <~MethodName>(
 	<attributeName_> <AttributeType>,
-) {<AttributeChecks>
+) {<AttributeCheck>
 	v.<~attributeName>_ = <attributeName_>
 }
 `,
@@ -2184,7 +2182,7 @@ func (v *<~className>_<Arguments>) <~MethodName>(
 	publicMethods_: `
 // Public Methods
 
-func (v *<~className>_) GetClass() <~ClassName>ClassLike {
+func (v *<~className>_<Arguments>) GetClass() <~ClassName>ClassLike<Arguments> {
 	return v.getClass()
 }
 <Methods>
@@ -2193,7 +2191,7 @@ func (v *<~className>_) GetClass() <~ClassName>ClassLike {
 	privateMethods_: `
 // Private Methods
 
-func (v *<~className>_) getClass() *<~className>Class_ {
+func (v *<~className>_<Arguments>) getClass() *<~className>Class_<Arguments> {
 	return v.class_
 }
 `,
@@ -2215,8 +2213,8 @@ func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
 	instanceStructure_: `
 // Instance Structure
 
-type <~className>_ struct {
-	class_ *<~className>Class_<AttributeDeclarations>
+type <~className>_<Constraints> struct {
+	class_ *<~className>Class_<Arguments><AttributeDeclarations>
 }
 `,
 
@@ -2226,13 +2224,13 @@ type <~className>_ struct {
 	classStructure_: `
 // Class Structure
 
-type <~className>Class_ struct {
+type <~className>Class_<Constraints> struct {
 	// Define the class constants.<ConstantDeclarations>
 }
 `,
 
 	constantDeclaration_: `
-	<~constantName>_: <ConstantType>`,
+	<~constantName>_ <ConstantType>`,
 
 	classReference_: `
 // Class Reference
