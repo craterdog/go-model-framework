@@ -31,9 +31,10 @@ func (c *parameterizedClass_) Make(
 	parameters abs.Sequential[ParameterLike],
 ) ParameterizedLike {
 	if uti.IsUndefined(parameters) {
-		panic("The parameters attribute is required by this class.")
+		panic("The \"parameters\" attribute is required by this class.")
 	}
 	var instance = &parameterized_{
+		// Initialize the instance attributes.
 		class_:      c,
 		parameters_: parameters,
 	}
@@ -65,6 +66,7 @@ func (v *parameterized_) getClass() *parameterizedClass_ {
 // Instance Structure
 
 type parameterized_ struct {
+	// Declare the instance attributes.
 	class_      *parameterizedClass_
 	parameters_ abs.Sequential[ParameterLike]
 }
@@ -72,7 +74,7 @@ type parameterized_ struct {
 // Class Structure
 
 type parameterizedClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

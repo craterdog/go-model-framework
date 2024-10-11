@@ -32,12 +32,13 @@ func (c *argumentsClass_) Make(
 	additionalArguments abs.Sequential[AdditionalArgumentLike],
 ) ArgumentsLike {
 	if uti.IsUndefined(argument) {
-		panic("The argument attribute is required by this class.")
+		panic("The \"argument\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(additionalArguments) {
-		panic("The additionalArguments attribute is required by this class.")
+		panic("The \"additionalArguments\" attribute is required by this class.")
 	}
 	var instance = &arguments_{
+		// Initialize the instance attributes.
 		class_:               c,
 		argument_:            argument,
 		additionalArguments_: additionalArguments,
@@ -74,6 +75,7 @@ func (v *arguments_) getClass() *argumentsClass_ {
 // Instance Structure
 
 type arguments_ struct {
+	// Declare the instance attributes.
 	class_               *argumentsClass_
 	argument_            ArgumentLike
 	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
@@ -82,7 +84,7 @@ type arguments_ struct {
 // Class Structure
 
 type argumentsClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

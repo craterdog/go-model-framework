@@ -30,9 +30,10 @@ func (c *additionalConstraintClass_) Make(
 	constraint ConstraintLike,
 ) AdditionalConstraintLike {
 	if uti.IsUndefined(constraint) {
-		panic("The constraint attribute is required by this class.")
+		panic("The \"constraint\" attribute is required by this class.")
 	}
 	var instance = &additionalConstraint_{
+		// Initialize the instance attributes.
 		class_:      c,
 		constraint_: constraint,
 	}
@@ -64,6 +65,7 @@ func (v *additionalConstraint_) getClass() *additionalConstraintClass_ {
 // Instance Structure
 
 type additionalConstraint_ struct {
+	// Declare the instance attributes.
 	class_      *additionalConstraintClass_
 	constraint_ ConstraintLike
 }
@@ -71,7 +73,7 @@ type additionalConstraint_ struct {
 // Class Structure
 
 type additionalConstraintClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

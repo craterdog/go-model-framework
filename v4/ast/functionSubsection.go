@@ -31,9 +31,10 @@ func (c *functionSubsectionClass_) Make(
 	functionMethods abs.Sequential[FunctionMethodLike],
 ) FunctionSubsectionLike {
 	if uti.IsUndefined(functionMethods) {
-		panic("The functionMethods attribute is required by this class.")
+		panic("The \"functionMethods\" attribute is required by this class.")
 	}
 	var instance = &functionSubsection_{
+		// Initialize the instance attributes.
 		class_:           c,
 		functionMethods_: functionMethods,
 	}
@@ -65,6 +66,7 @@ func (v *functionSubsection_) getClass() *functionSubsectionClass_ {
 // Instance Structure
 
 type functionSubsection_ struct {
+	// Declare the instance attributes.
 	class_           *functionSubsectionClass_
 	functionMethods_ abs.Sequential[FunctionMethodLike]
 }
@@ -72,7 +74,7 @@ type functionSubsection_ struct {
 // Class Structure
 
 type functionSubsectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

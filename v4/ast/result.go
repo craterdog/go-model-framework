@@ -30,9 +30,10 @@ func (c *resultClass_) Make(
 	any_ any,
 ) ResultLike {
 	if uti.IsUndefined(any_) {
-		panic("The any attribute is required by this class.")
+		panic("The \"any\" attribute is required by this class.")
 	}
 	var instance = &result_{
+		// Initialize the instance attributes.
 		class_: c,
 		any_:   any_,
 	}
@@ -64,6 +65,7 @@ func (v *result_) getClass() *resultClass_ {
 // Instance Structure
 
 type result_ struct {
+	// Declare the instance attributes.
 	class_ *resultClass_
 	any_   any
 }
@@ -71,7 +73,7 @@ type result_ struct {
 // Class Structure
 
 type resultClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

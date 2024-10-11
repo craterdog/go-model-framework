@@ -30,9 +30,10 @@ func (c *additionalArgumentClass_) Make(
 	argument ArgumentLike,
 ) AdditionalArgumentLike {
 	if uti.IsUndefined(argument) {
-		panic("The argument attribute is required by this class.")
+		panic("The \"argument\" attribute is required by this class.")
 	}
 	var instance = &additionalArgument_{
+		// Initialize the instance attributes.
 		class_:    c,
 		argument_: argument,
 	}
@@ -64,6 +65,7 @@ func (v *additionalArgument_) getClass() *additionalArgumentClass_ {
 // Instance Structure
 
 type additionalArgument_ struct {
+	// Declare the instance attributes.
 	class_    *additionalArgumentClass_
 	argument_ ArgumentLike
 }
@@ -71,7 +73,7 @@ type additionalArgument_ struct {
 // Class Structure
 
 type additionalArgumentClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

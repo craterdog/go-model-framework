@@ -31,9 +31,10 @@ func (c *publicSubsectionClass_) Make(
 	publicMethods abs.Sequential[PublicMethodLike],
 ) PublicSubsectionLike {
 	if uti.IsUndefined(publicMethods) {
-		panic("The publicMethods attribute is required by this class.")
+		panic("The \"publicMethods\" attribute is required by this class.")
 	}
 	var instance = &publicSubsection_{
+		// Initialize the instance attributes.
 		class_:         c,
 		publicMethods_: publicMethods,
 	}
@@ -65,6 +66,7 @@ func (v *publicSubsection_) getClass() *publicSubsectionClass_ {
 // Instance Structure
 
 type publicSubsection_ struct {
+	// Declare the instance attributes.
 	class_         *publicSubsectionClass_
 	publicMethods_ abs.Sequential[PublicMethodLike]
 }
@@ -72,7 +74,7 @@ type publicSubsection_ struct {
 // Class Structure
 
 type publicSubsectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

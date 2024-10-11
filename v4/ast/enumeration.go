@@ -32,12 +32,13 @@ func (c *enumerationClass_) Make(
 	additionalValues abs.Sequential[AdditionalValueLike],
 ) EnumerationLike {
 	if uti.IsUndefined(value) {
-		panic("The value attribute is required by this class.")
+		panic("The \"value\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(additionalValues) {
-		panic("The additionalValues attribute is required by this class.")
+		panic("The \"additionalValues\" attribute is required by this class.")
 	}
 	var instance = &enumeration_{
+		// Initialize the instance attributes.
 		class_:            c,
 		value_:            value,
 		additionalValues_: additionalValues,
@@ -74,6 +75,7 @@ func (v *enumeration_) getClass() *enumerationClass_ {
 // Instance Structure
 
 type enumeration_ struct {
+	// Declare the instance attributes.
 	class_            *enumerationClass_
 	value_            ValueLike
 	additionalValues_ abs.Sequential[AdditionalValueLike]
@@ -82,7 +84,7 @@ type enumeration_ struct {
 // Class Structure
 
 type enumerationClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

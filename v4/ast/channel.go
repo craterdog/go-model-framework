@@ -24,6 +24,7 @@ func Channel() ChannelClassLike {
 
 func (c *channelClass_) Make() ChannelLike {
 	var instance = &channel_{
+		// Initialize the instance attributes.
 		class_: c,
 	}
 	return instance
@@ -48,13 +49,14 @@ func (v *channel_) getClass() *channelClass_ {
 // Instance Structure
 
 type channel_ struct {
+	// Declare the instance attributes.
 	class_ *channelClass_
 }
 
 // Class Structure
 
 type channelClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

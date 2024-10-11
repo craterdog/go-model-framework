@@ -32,12 +32,13 @@ func (c *typeDefinitionClass_) Make(
 	optionalEnumeration EnumerationLike,
 ) TypeDefinitionLike {
 	if uti.IsUndefined(declaration) {
-		panic("The declaration attribute is required by this class.")
+		panic("The \"declaration\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &typeDefinition_{
+		// Initialize the instance attributes.
 		class_:               c,
 		declaration_:         declaration,
 		abstraction_:         abstraction,
@@ -79,6 +80,7 @@ func (v *typeDefinition_) getClass() *typeDefinitionClass_ {
 // Instance Structure
 
 type typeDefinition_ struct {
+	// Declare the instance attributes.
 	class_               *typeDefinitionClass_
 	declaration_         DeclarationLike
 	abstraction_         AbstractionLike
@@ -88,7 +90,7 @@ type typeDefinition_ struct {
 // Class Structure
 
 type typeDefinitionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

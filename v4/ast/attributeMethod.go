@@ -30,9 +30,10 @@ func (c *attributeMethodClass_) Make(
 	any_ any,
 ) AttributeMethodLike {
 	if uti.IsUndefined(any_) {
-		panic("The any attribute is required by this class.")
+		panic("The \"any\" attribute is required by this class.")
 	}
 	var instance = &attributeMethod_{
+		// Initialize the instance attributes.
 		class_: c,
 		any_:   any_,
 	}
@@ -64,6 +65,7 @@ func (v *attributeMethod_) getClass() *attributeMethodClass_ {
 // Instance Structure
 
 type attributeMethod_ struct {
+	// Declare the instance attributes.
 	class_ *attributeMethodClass_
 	any_   any
 }
@@ -71,7 +73,7 @@ type attributeMethod_ struct {
 // Class Structure
 
 type attributeMethodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

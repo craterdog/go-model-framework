@@ -24,6 +24,7 @@ func Array() ArrayClassLike {
 
 func (c *arrayClass_) Make() ArrayLike {
 	var instance = &array_{
+		// Initialize the instance attributes.
 		class_: c,
 	}
 	return instance
@@ -48,13 +49,14 @@ func (v *array_) getClass() *arrayClass_ {
 // Instance Structure
 
 type array_ struct {
+	// Declare the instance attributes.
 	class_ *arrayClass_
 }
 
 // Class Structure
 
 type arrayClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

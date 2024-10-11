@@ -32,12 +32,13 @@ func (c *declarationClass_) Make(
 	optionalConstraints ConstraintsLike,
 ) DeclarationLike {
 	if uti.IsUndefined(comment) {
-		panic("The comment attribute is required by this class.")
+		panic("The \"comment\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	var instance = &declaration_{
+		// Initialize the instance attributes.
 		class_:               c,
 		comment_:             comment,
 		name_:                name,
@@ -79,6 +80,7 @@ func (v *declaration_) getClass() *declarationClass_ {
 // Instance Structure
 
 type declaration_ struct {
+	// Declare the instance attributes.
 	class_               *declarationClass_
 	comment_             string
 	name_                string
@@ -88,7 +90,7 @@ type declaration_ struct {
 // Class Structure
 
 type declarationClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

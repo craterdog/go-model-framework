@@ -30,9 +30,10 @@ func (c *noticeClass_) Make(
 	comment string,
 ) NoticeLike {
 	if uti.IsUndefined(comment) {
-		panic("The comment attribute is required by this class.")
+		panic("The \"comment\" attribute is required by this class.")
 	}
 	var instance = &notice_{
+		// Initialize the instance attributes.
 		class_:   c,
 		comment_: comment,
 	}
@@ -64,6 +65,7 @@ func (v *notice_) getClass() *noticeClass_ {
 // Instance Structure
 
 type notice_ struct {
+	// Declare the instance attributes.
 	class_   *noticeClass_
 	comment_ string
 }
@@ -71,7 +73,7 @@ type notice_ struct {
 // Class Structure
 
 type noticeClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

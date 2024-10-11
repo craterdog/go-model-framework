@@ -31,9 +31,10 @@ func (c *constantSubsectionClass_) Make(
 	constantMethods abs.Sequential[ConstantMethodLike],
 ) ConstantSubsectionLike {
 	if uti.IsUndefined(constantMethods) {
-		panic("The constantMethods attribute is required by this class.")
+		panic("The \"constantMethods\" attribute is required by this class.")
 	}
 	var instance = &constantSubsection_{
+		// Initialize the instance attributes.
 		class_:           c,
 		constantMethods_: constantMethods,
 	}
@@ -65,6 +66,7 @@ func (v *constantSubsection_) getClass() *constantSubsectionClass_ {
 // Instance Structure
 
 type constantSubsection_ struct {
+	// Declare the instance attributes.
 	class_           *constantSubsectionClass_
 	constantMethods_ abs.Sequential[ConstantMethodLike]
 }
@@ -72,7 +74,7 @@ type constantSubsection_ struct {
 // Class Structure
 
 type constantSubsectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

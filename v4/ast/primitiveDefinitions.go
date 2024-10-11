@@ -27,6 +27,7 @@ func (c *primitiveDefinitionsClass_) Make(
 	optionalFunctionalSection FunctionalSectionLike,
 ) PrimitiveDefinitionsLike {
 	var instance = &primitiveDefinitions_{
+		// Initialize the instance attributes.
 		class_:                     c,
 		optionalTypeSection_:       optionalTypeSection,
 		optionalFunctionalSection_: optionalFunctionalSection,
@@ -63,6 +64,7 @@ func (v *primitiveDefinitions_) getClass() *primitiveDefinitionsClass_ {
 // Instance Structure
 
 type primitiveDefinitions_ struct {
+	// Declare the instance attributes.
 	class_                     *primitiveDefinitionsClass_
 	optionalTypeSection_       TypeSectionLike
 	optionalFunctionalSection_ FunctionalSectionLike
@@ -71,7 +73,7 @@ type primitiveDefinitions_ struct {
 // Class Structure
 
 type primitiveDefinitionsClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

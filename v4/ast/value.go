@@ -31,12 +31,13 @@ func (c *valueClass_) Make(
 	abstraction AbstractionLike,
 ) ValueLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &value_{
+		// Initialize the instance attributes.
 		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
@@ -73,6 +74,7 @@ func (v *value_) getClass() *valueClass_ {
 // Instance Structure
 
 type value_ struct {
+	// Declare the instance attributes.
 	class_       *valueClass_
 	name_        string
 	abstraction_ AbstractionLike
@@ -81,7 +83,7 @@ type value_ struct {
 // Class Structure
 
 type valueClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

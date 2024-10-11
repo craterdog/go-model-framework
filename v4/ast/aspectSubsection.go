@@ -31,9 +31,10 @@ func (c *aspectSubsectionClass_) Make(
 	aspectInterfaces abs.Sequential[AspectInterfaceLike],
 ) AspectSubsectionLike {
 	if uti.IsUndefined(aspectInterfaces) {
-		panic("The aspectInterfaces attribute is required by this class.")
+		panic("The \"aspectInterfaces\" attribute is required by this class.")
 	}
 	var instance = &aspectSubsection_{
+		// Initialize the instance attributes.
 		class_:            c,
 		aspectInterfaces_: aspectInterfaces,
 	}
@@ -65,6 +66,7 @@ func (v *aspectSubsection_) getClass() *aspectSubsectionClass_ {
 // Instance Structure
 
 type aspectSubsection_ struct {
+	// Declare the instance attributes.
 	class_            *aspectSubsectionClass_
 	aspectInterfaces_ abs.Sequential[AspectInterfaceLike]
 }
@@ -72,7 +74,7 @@ type aspectSubsection_ struct {
 // Class Structure
 
 type aspectSubsectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

@@ -31,9 +31,10 @@ func (c *importsClass_) Make(
 	modules abs.Sequential[ModuleLike],
 ) ImportsLike {
 	if uti.IsUndefined(modules) {
-		panic("The modules attribute is required by this class.")
+		panic("The \"modules\" attribute is required by this class.")
 	}
 	var instance = &imports_{
+		// Initialize the instance attributes.
 		class_:   c,
 		modules_: modules,
 	}
@@ -65,6 +66,7 @@ func (v *imports_) getClass() *importsClass_ {
 // Instance Structure
 
 type imports_ struct {
+	// Declare the instance attributes.
 	class_   *importsClass_
 	modules_ abs.Sequential[ModuleLike]
 }
@@ -72,7 +74,7 @@ type imports_ struct {
 // Class Structure
 
 type importsClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

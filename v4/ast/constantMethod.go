@@ -31,12 +31,13 @@ func (c *constantMethodClass_) Make(
 	abstraction AbstractionLike,
 ) ConstantMethodLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &constantMethod_{
+		// Initialize the instance attributes.
 		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
@@ -73,6 +74,7 @@ func (v *constantMethod_) getClass() *constantMethodClass_ {
 // Instance Structure
 
 type constantMethod_ struct {
+	// Declare the instance attributes.
 	class_       *constantMethodClass_
 	name_        string
 	abstraction_ AbstractionLike
@@ -81,7 +83,7 @@ type constantMethod_ struct {
 // Class Structure
 
 type constantMethodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

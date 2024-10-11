@@ -31,9 +31,10 @@ func (c *constructorSubsectionClass_) Make(
 	constructorMethods abs.Sequential[ConstructorMethodLike],
 ) ConstructorSubsectionLike {
 	if uti.IsUndefined(constructorMethods) {
-		panic("The constructorMethods attribute is required by this class.")
+		panic("The \"constructorMethods\" attribute is required by this class.")
 	}
 	var instance = &constructorSubsection_{
+		// Initialize the instance attributes.
 		class_:              c,
 		constructorMethods_: constructorMethods,
 	}
@@ -65,6 +66,7 @@ func (v *constructorSubsection_) getClass() *constructorSubsectionClass_ {
 // Instance Structure
 
 type constructorSubsection_ struct {
+	// Declare the instance attributes.
 	class_              *constructorSubsectionClass_
 	constructorMethods_ abs.Sequential[ConstructorMethodLike]
 }
@@ -72,7 +74,7 @@ type constructorSubsection_ struct {
 // Class Structure
 
 type constructorSubsectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

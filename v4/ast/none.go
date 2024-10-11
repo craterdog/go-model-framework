@@ -30,9 +30,10 @@ func (c *noneClass_) Make(
 	newline string,
 ) NoneLike {
 	if uti.IsUndefined(newline) {
-		panic("The newline attribute is required by this class.")
+		panic("The \"newline\" attribute is required by this class.")
 	}
 	var instance = &none_{
+		// Initialize the instance attributes.
 		class_:   c,
 		newline_: newline,
 	}
@@ -64,6 +65,7 @@ func (v *none_) getClass() *noneClass_ {
 // Instance Structure
 
 type none_ struct {
+	// Declare the instance attributes.
 	class_   *noneClass_
 	newline_ string
 }
@@ -71,7 +73,7 @@ type none_ struct {
 // Class Structure
 
 type noneClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

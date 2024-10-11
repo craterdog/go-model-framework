@@ -31,9 +31,10 @@ func (c *attributeSubsectionClass_) Make(
 	attributeMethods abs.Sequential[AttributeMethodLike],
 ) AttributeSubsectionLike {
 	if uti.IsUndefined(attributeMethods) {
-		panic("The attributeMethods attribute is required by this class.")
+		panic("The \"attributeMethods\" attribute is required by this class.")
 	}
 	var instance = &attributeSubsection_{
+		// Initialize the instance attributes.
 		class_:            c,
 		attributeMethods_: attributeMethods,
 	}
@@ -65,6 +66,7 @@ func (v *attributeSubsection_) getClass() *attributeSubsectionClass_ {
 // Instance Structure
 
 type attributeSubsection_ struct {
+	// Declare the instance attributes.
 	class_            *attributeSubsectionClass_
 	attributeMethods_ abs.Sequential[AttributeMethodLike]
 }
@@ -72,7 +74,7 @@ type attributeSubsection_ struct {
 // Class Structure
 
 type attributeSubsectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

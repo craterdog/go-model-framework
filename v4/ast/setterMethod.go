@@ -31,12 +31,13 @@ func (c *setterMethodClass_) Make(
 	parameter ParameterLike,
 ) SetterMethodLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(parameter) {
-		panic("The parameter attribute is required by this class.")
+		panic("The \"parameter\" attribute is required by this class.")
 	}
 	var instance = &setterMethod_{
+		// Initialize the instance attributes.
 		class_:     c,
 		name_:      name,
 		parameter_: parameter,
@@ -73,6 +74,7 @@ func (v *setterMethod_) getClass() *setterMethodClass_ {
 // Instance Structure
 
 type setterMethod_ struct {
+	// Declare the instance attributes.
 	class_     *setterMethodClass_
 	name_      string
 	parameter_ ParameterLike
@@ -81,7 +83,7 @@ type setterMethod_ struct {
 // Class Structure
 
 type setterMethodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

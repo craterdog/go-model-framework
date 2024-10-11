@@ -31,9 +31,10 @@ func (c *functionalSectionClass_) Make(
 	functionalDefinitions abs.Sequential[FunctionalDefinitionLike],
 ) FunctionalSectionLike {
 	if uti.IsUndefined(functionalDefinitions) {
-		panic("The functionalDefinitions attribute is required by this class.")
+		panic("The \"functionalDefinitions\" attribute is required by this class.")
 	}
 	var instance = &functionalSection_{
+		// Initialize the instance attributes.
 		class_:                 c,
 		functionalDefinitions_: functionalDefinitions,
 	}
@@ -65,6 +66,7 @@ func (v *functionalSection_) getClass() *functionalSectionClass_ {
 // Instance Structure
 
 type functionalSection_ struct {
+	// Declare the instance attributes.
 	class_                 *functionalSectionClass_
 	functionalDefinitions_ abs.Sequential[FunctionalDefinitionLike]
 }
@@ -72,7 +74,7 @@ type functionalSection_ struct {
 // Class Structure
 
 type functionalSectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

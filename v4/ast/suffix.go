@@ -30,9 +30,10 @@ func (c *suffixClass_) Make(
 	name string,
 ) SuffixLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	var instance = &suffix_{
+		// Initialize the instance attributes.
 		class_: c,
 		name_:  name,
 	}
@@ -64,6 +65,7 @@ func (v *suffix_) getClass() *suffixClass_ {
 // Instance Structure
 
 type suffix_ struct {
+	// Declare the instance attributes.
 	class_ *suffixClass_
 	name_  string
 }
@@ -71,7 +73,7 @@ type suffix_ struct {
 // Class Structure
 
 type suffixClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

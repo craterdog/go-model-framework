@@ -32,12 +32,13 @@ func (c *moduleDefinitionClass_) Make(
 	optionalImports ImportsLike,
 ) ModuleDefinitionLike {
 	if uti.IsUndefined(notice) {
-		panic("The notice attribute is required by this class.")
+		panic("The \"notice\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(header) {
-		panic("The header attribute is required by this class.")
+		panic("The \"header\" attribute is required by this class.")
 	}
 	var instance = &moduleDefinition_{
+		// Initialize the instance attributes.
 		class_:           c,
 		notice_:          notice,
 		header_:          header,
@@ -79,6 +80,7 @@ func (v *moduleDefinition_) getClass() *moduleDefinitionClass_ {
 // Instance Structure
 
 type moduleDefinition_ struct {
+	// Declare the instance attributes.
 	class_           *moduleDefinitionClass_
 	notice_          NoticeLike
 	header_          HeaderLike
@@ -88,7 +90,7 @@ type moduleDefinition_ struct {
 // Class Structure
 
 type moduleDefinitionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

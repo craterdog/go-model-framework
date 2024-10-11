@@ -31,12 +31,13 @@ func (c *constraintClass_) Make(
 	abstraction AbstractionLike,
 ) ConstraintLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &constraint_{
+		// Initialize the instance attributes.
 		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
@@ -73,6 +74,7 @@ func (v *constraint_) getClass() *constraintClass_ {
 // Instance Structure
 
 type constraint_ struct {
+	// Declare the instance attributes.
 	class_       *constraintClass_
 	name_        string
 	abstraction_ AbstractionLike
@@ -81,7 +83,7 @@ type constraint_ struct {
 // Class Structure
 
 type constraintClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

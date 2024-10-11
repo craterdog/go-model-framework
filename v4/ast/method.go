@@ -33,12 +33,13 @@ func (c *methodClass_) Make(
 	optionalResult ResultLike,
 ) MethodLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(parameters) {
-		panic("The parameters attribute is required by this class.")
+		panic("The \"parameters\" attribute is required by this class.")
 	}
 	var instance = &method_{
+		// Initialize the instance attributes.
 		class_:          c,
 		name_:           name,
 		parameters_:     parameters,
@@ -80,6 +81,7 @@ func (v *method_) getClass() *methodClass_ {
 // Instance Structure
 
 type method_ struct {
+	// Declare the instance attributes.
 	class_          *methodClass_
 	name_           string
 	parameters_     abs.Sequential[ParameterLike]
@@ -89,7 +91,7 @@ type method_ struct {
 // Class Structure
 
 type methodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

@@ -31,12 +31,13 @@ func (c *headerClass_) Make(
 	name string,
 ) HeaderLike {
 	if uti.IsUndefined(comment) {
-		panic("The comment attribute is required by this class.")
+		panic("The \"comment\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	var instance = &header_{
+		// Initialize the instance attributes.
 		class_:   c,
 		comment_: comment,
 		name_:    name,
@@ -73,6 +74,7 @@ func (v *header_) getClass() *headerClass_ {
 // Instance Structure
 
 type header_ struct {
+	// Declare the instance attributes.
 	class_   *headerClass_
 	comment_ string
 	name_    string
@@ -81,7 +83,7 @@ type header_ struct {
 // Class Structure
 
 type headerClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

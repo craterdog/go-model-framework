@@ -30,9 +30,10 @@ func (c *argumentClass_) Make(
 	abstraction AbstractionLike,
 ) ArgumentLike {
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &argument_{
+		// Initialize the instance attributes.
 		class_:       c,
 		abstraction_: abstraction,
 	}
@@ -64,6 +65,7 @@ func (v *argument_) getClass() *argumentClass_ {
 // Instance Structure
 
 type argument_ struct {
+	// Declare the instance attributes.
 	class_       *argumentClass_
 	abstraction_ AbstractionLike
 }
@@ -71,7 +73,7 @@ type argument_ struct {
 // Class Structure
 
 type argumentClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

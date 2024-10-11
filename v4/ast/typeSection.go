@@ -31,9 +31,10 @@ func (c *typeSectionClass_) Make(
 	typeDefinitions abs.Sequential[TypeDefinitionLike],
 ) TypeSectionLike {
 	if uti.IsUndefined(typeDefinitions) {
-		panic("The typeDefinitions attribute is required by this class.")
+		panic("The \"typeDefinitions\" attribute is required by this class.")
 	}
 	var instance = &typeSection_{
+		// Initialize the instance attributes.
 		class_:           c,
 		typeDefinitions_: typeDefinitions,
 	}
@@ -65,6 +66,7 @@ func (v *typeSection_) getClass() *typeSectionClass_ {
 // Instance Structure
 
 type typeSection_ struct {
+	// Declare the instance attributes.
 	class_           *typeSectionClass_
 	typeDefinitions_ abs.Sequential[TypeDefinitionLike]
 }
@@ -72,7 +74,7 @@ type typeSection_ struct {
 // Class Structure
 
 type typeSectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

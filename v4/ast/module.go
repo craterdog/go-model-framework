@@ -31,12 +31,13 @@ func (c *moduleClass_) Make(
 	path string,
 ) ModuleLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(path) {
-		panic("The path attribute is required by this class.")
+		panic("The \"path\" attribute is required by this class.")
 	}
 	var instance = &module_{
+		// Initialize the instance attributes.
 		class_: c,
 		name_:  name,
 		path_:  path,
@@ -73,6 +74,7 @@ func (v *module_) getClass() *moduleClass_ {
 // Instance Structure
 
 type module_ struct {
+	// Declare the instance attributes.
 	class_ *moduleClass_
 	name_  string
 	path_  string
@@ -81,7 +83,7 @@ type module_ struct {
 // Class Structure
 
 type moduleClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

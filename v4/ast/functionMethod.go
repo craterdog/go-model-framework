@@ -33,15 +33,16 @@ func (c *functionMethodClass_) Make(
 	result ResultLike,
 ) FunctionMethodLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(parameters) {
-		panic("The parameters attribute is required by this class.")
+		panic("The \"parameters\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(result) {
-		panic("The result attribute is required by this class.")
+		panic("The \"result\" attribute is required by this class.")
 	}
 	var instance = &functionMethod_{
+		// Initialize the instance attributes.
 		class_:      c,
 		name_:       name,
 		parameters_: parameters,
@@ -83,6 +84,7 @@ func (v *functionMethod_) getClass() *functionMethodClass_ {
 // Instance Structure
 
 type functionMethod_ struct {
+	// Declare the instance attributes.
 	class_      *functionMethodClass_
 	name_       string
 	parameters_ abs.Sequential[ParameterLike]
@@ -92,7 +94,7 @@ type functionMethod_ struct {
 // Class Structure
 
 type functionMethodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

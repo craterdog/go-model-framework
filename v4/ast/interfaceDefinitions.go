@@ -32,12 +32,13 @@ func (c *interfaceDefinitionsClass_) Make(
 	optionalAspectSection AspectSectionLike,
 ) InterfaceDefinitionsLike {
 	if uti.IsUndefined(classSection) {
-		panic("The classSection attribute is required by this class.")
+		panic("The \"classSection\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(instanceSection) {
-		panic("The instanceSection attribute is required by this class.")
+		panic("The \"instanceSection\" attribute is required by this class.")
 	}
 	var instance = &interfaceDefinitions_{
+		// Initialize the instance attributes.
 		class_:                 c,
 		classSection_:          classSection,
 		instanceSection_:       instanceSection,
@@ -79,6 +80,7 @@ func (v *interfaceDefinitions_) getClass() *interfaceDefinitionsClass_ {
 // Instance Structure
 
 type interfaceDefinitions_ struct {
+	// Declare the instance attributes.
 	class_                 *interfaceDefinitionsClass_
 	classSection_          ClassSectionLike
 	instanceSection_       InstanceSectionLike
@@ -88,7 +90,7 @@ type interfaceDefinitions_ struct {
 // Class Structure
 
 type interfaceDefinitionsClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

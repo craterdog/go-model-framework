@@ -32,11 +32,11 @@ func Classes() ClassesClassLike {
 // Constructor Methods
 
 func (c *classesClass_) Make() ClassesLike {
-	var classes = &classes_{
+	var instance = &classes_{
 		// Initialize the instance attributes.
 		class_: c,
 	}
-	return classes
+	return instance
 }
 
 // INSTANCE INTERFACE
@@ -44,7 +44,7 @@ func (c *classesClass_) Make() ClassesLike {
 // Public Methods
 
 func (v *classes_) GetClass() ClassesClassLike {
-	return v.class_
+	return v.getClass()
 }
 
 func (v *classes_) GenerateModelClasses(

@@ -30,9 +30,10 @@ func (c *prefixClass_) Make(
 	any_ any,
 ) PrefixLike {
 	if uti.IsUndefined(any_) {
-		panic("The any attribute is required by this class.")
+		panic("The \"any\" attribute is required by this class.")
 	}
 	var instance = &prefix_{
+		// Initialize the instance attributes.
 		class_: c,
 		any_:   any_,
 	}
@@ -64,6 +65,7 @@ func (v *prefix_) getClass() *prefixClass_ {
 // Instance Structure
 
 type prefix_ struct {
+	// Declare the instance attributes.
 	class_ *prefixClass_
 	any_   any
 }
@@ -71,7 +73,7 @@ type prefix_ struct {
 // Class Structure
 
 type prefixClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

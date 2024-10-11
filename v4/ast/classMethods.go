@@ -32,9 +32,10 @@ func (c *classMethodsClass_) Make(
 	optionalFunctionSubsection FunctionSubsectionLike,
 ) ClassMethodsLike {
 	if uti.IsUndefined(constructorSubsection) {
-		panic("The constructorSubsection attribute is required by this class.")
+		panic("The \"constructorSubsection\" attribute is required by this class.")
 	}
 	var instance = &classMethods_{
+		// Initialize the instance attributes.
 		class_:                      c,
 		constructorSubsection_:      constructorSubsection,
 		optionalConstantSubsection_: optionalConstantSubsection,
@@ -76,6 +77,7 @@ func (v *classMethods_) getClass() *classMethodsClass_ {
 // Instance Structure
 
 type classMethods_ struct {
+	// Declare the instance attributes.
 	class_                      *classMethodsClass_
 	constructorSubsection_      ConstructorSubsectionLike
 	optionalConstantSubsection_ ConstantSubsectionLike
@@ -85,7 +87,7 @@ type classMethods_ struct {
 // Class Structure
 
 type classMethodsClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

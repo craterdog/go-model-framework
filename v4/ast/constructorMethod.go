@@ -33,15 +33,16 @@ func (c *constructorMethodClass_) Make(
 	abstraction AbstractionLike,
 ) ConstructorMethodLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(parameters) {
-		panic("The parameters attribute is required by this class.")
+		panic("The \"parameters\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &constructorMethod_{
+		// Initialize the instance attributes.
 		class_:       c,
 		name_:        name,
 		parameters_:  parameters,
@@ -83,6 +84,7 @@ func (v *constructorMethod_) getClass() *constructorMethodClass_ {
 // Instance Structure
 
 type constructorMethod_ struct {
+	// Declare the instance attributes.
 	class_       *constructorMethodClass_
 	name_        string
 	parameters_  abs.Sequential[ParameterLike]
@@ -92,7 +94,7 @@ type constructorMethod_ struct {
 // Class Structure
 
 type constructorMethodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

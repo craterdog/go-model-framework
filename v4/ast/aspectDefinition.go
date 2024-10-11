@@ -32,12 +32,13 @@ func (c *aspectDefinitionClass_) Make(
 	aspectMethods abs.Sequential[AspectMethodLike],
 ) AspectDefinitionLike {
 	if uti.IsUndefined(declaration) {
-		panic("The declaration attribute is required by this class.")
+		panic("The \"declaration\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(aspectMethods) {
-		panic("The aspectMethods attribute is required by this class.")
+		panic("The \"aspectMethods\" attribute is required by this class.")
 	}
 	var instance = &aspectDefinition_{
+		// Initialize the instance attributes.
 		class_:         c,
 		declaration_:   declaration,
 		aspectMethods_: aspectMethods,
@@ -74,6 +75,7 @@ func (v *aspectDefinition_) getClass() *aspectDefinitionClass_ {
 // Instance Structure
 
 type aspectDefinition_ struct {
+	// Declare the instance attributes.
 	class_         *aspectDefinitionClass_
 	declaration_   DeclarationLike
 	aspectMethods_ abs.Sequential[AspectMethodLike]
@@ -82,7 +84,7 @@ type aspectDefinition_ struct {
 // Class Structure
 
 type aspectDefinitionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

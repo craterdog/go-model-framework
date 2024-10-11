@@ -33,9 +33,10 @@ func (c *abstractionClass_) Make(
 	optionalArguments ArgumentsLike,
 ) AbstractionLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	var instance = &abstraction_{
+		// Initialize the instance attributes.
 		class_:             c,
 		optionalPrefix_:    optionalPrefix,
 		name_:              name,
@@ -82,6 +83,7 @@ func (v *abstraction_) getClass() *abstractionClass_ {
 // Instance Structure
 
 type abstraction_ struct {
+	// Declare the instance attributes.
 	class_             *abstractionClass_
 	optionalPrefix_    PrefixLike
 	name_              string
@@ -92,7 +94,7 @@ type abstraction_ struct {
 // Class Structure
 
 type abstractionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

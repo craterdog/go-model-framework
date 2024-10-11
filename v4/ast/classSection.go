@@ -31,9 +31,10 @@ func (c *classSectionClass_) Make(
 	classDefinitions abs.Sequential[ClassDefinitionLike],
 ) ClassSectionLike {
 	if uti.IsUndefined(classDefinitions) {
-		panic("The classDefinitions attribute is required by this class.")
+		panic("The \"classDefinitions\" attribute is required by this class.")
 	}
 	var instance = &classSection_{
+		// Initialize the instance attributes.
 		class_:            c,
 		classDefinitions_: classDefinitions,
 	}
@@ -65,6 +66,7 @@ func (v *classSection_) getClass() *classSectionClass_ {
 // Instance Structure
 
 type classSection_ struct {
+	// Declare the instance attributes.
 	class_            *classSectionClass_
 	classDefinitions_ abs.Sequential[ClassDefinitionLike]
 }
@@ -72,7 +74,7 @@ type classSection_ struct {
 // Class Structure
 
 type classSectionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

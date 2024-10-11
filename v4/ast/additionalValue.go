@@ -30,9 +30,10 @@ func (c *additionalValueClass_) Make(
 	name string,
 ) AdditionalValueLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	var instance = &additionalValue_{
+		// Initialize the instance attributes.
 		class_: c,
 		name_:  name,
 	}
@@ -64,6 +65,7 @@ func (v *additionalValue_) getClass() *additionalValueClass_ {
 // Instance Structure
 
 type additionalValue_ struct {
+	// Declare the instance attributes.
 	class_ *additionalValueClass_
 	name_  string
 }
@@ -71,7 +73,7 @@ type additionalValue_ struct {
 // Class Structure
 
 type additionalValueClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

@@ -30,9 +30,10 @@ func (c *aspectMethodClass_) Make(
 	method MethodLike,
 ) AspectMethodLike {
 	if uti.IsUndefined(method) {
-		panic("The method attribute is required by this class.")
+		panic("The \"method\" attribute is required by this class.")
 	}
 	var instance = &aspectMethod_{
+		// Initialize the instance attributes.
 		class_:  c,
 		method_: method,
 	}
@@ -64,6 +65,7 @@ func (v *aspectMethod_) getClass() *aspectMethodClass_ {
 // Instance Structure
 
 type aspectMethod_ struct {
+	// Declare the instance attributes.
 	class_  *aspectMethodClass_
 	method_ MethodLike
 }
@@ -71,7 +73,7 @@ type aspectMethod_ struct {
 // Class Structure
 
 type aspectMethodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

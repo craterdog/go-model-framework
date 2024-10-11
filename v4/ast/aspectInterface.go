@@ -30,9 +30,10 @@ func (c *aspectInterfaceClass_) Make(
 	abstraction AbstractionLike,
 ) AspectInterfaceLike {
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &aspectInterface_{
+		// Initialize the instance attributes.
 		class_:       c,
 		abstraction_: abstraction,
 	}
@@ -64,6 +65,7 @@ func (v *aspectInterface_) getClass() *aspectInterfaceClass_ {
 // Instance Structure
 
 type aspectInterface_ struct {
+	// Declare the instance attributes.
 	class_       *aspectInterfaceClass_
 	abstraction_ AbstractionLike
 }
@@ -71,7 +73,7 @@ type aspectInterface_ struct {
 // Class Structure
 
 type aspectInterfaceClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

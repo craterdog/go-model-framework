@@ -33,15 +33,16 @@ func (c *functionalDefinitionClass_) Make(
 	result ResultLike,
 ) FunctionalDefinitionLike {
 	if uti.IsUndefined(declaration) {
-		panic("The declaration attribute is required by this class.")
+		panic("The \"declaration\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(parameters) {
-		panic("The parameters attribute is required by this class.")
+		panic("The \"parameters\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(result) {
-		panic("The result attribute is required by this class.")
+		panic("The \"result\" attribute is required by this class.")
 	}
 	var instance = &functionalDefinition_{
+		// Initialize the instance attributes.
 		class_:       c,
 		declaration_: declaration,
 		parameters_:  parameters,
@@ -83,6 +84,7 @@ func (v *functionalDefinition_) getClass() *functionalDefinitionClass_ {
 // Instance Structure
 
 type functionalDefinition_ struct {
+	// Declare the instance attributes.
 	class_       *functionalDefinitionClass_
 	declaration_ DeclarationLike
 	parameters_  abs.Sequential[ParameterLike]
@@ -92,7 +94,7 @@ type functionalDefinition_ struct {
 // Class Structure
 
 type functionalDefinitionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

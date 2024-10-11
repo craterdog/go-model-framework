@@ -31,12 +31,13 @@ func (c *instanceDefinitionClass_) Make(
 	instanceMethods InstanceMethodsLike,
 ) InstanceDefinitionLike {
 	if uti.IsUndefined(declaration) {
-		panic("The declaration attribute is required by this class.")
+		panic("The \"declaration\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(instanceMethods) {
-		panic("The instanceMethods attribute is required by this class.")
+		panic("The \"instanceMethods\" attribute is required by this class.")
 	}
 	var instance = &instanceDefinition_{
+		// Initialize the instance attributes.
 		class_:           c,
 		declaration_:     declaration,
 		instanceMethods_: instanceMethods,
@@ -73,6 +74,7 @@ func (v *instanceDefinition_) getClass() *instanceDefinitionClass_ {
 // Instance Structure
 
 type instanceDefinition_ struct {
+	// Declare the instance attributes.
 	class_           *instanceDefinitionClass_
 	declaration_     DeclarationLike
 	instanceMethods_ InstanceMethodsLike
@@ -81,7 +83,7 @@ type instanceDefinition_ struct {
 // Class Structure
 
 type instanceDefinitionClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

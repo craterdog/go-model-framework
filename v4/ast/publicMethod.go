@@ -30,9 +30,10 @@ func (c *publicMethodClass_) Make(
 	method MethodLike,
 ) PublicMethodLike {
 	if uti.IsUndefined(method) {
-		panic("The method attribute is required by this class.")
+		panic("The \"method\" attribute is required by this class.")
 	}
 	var instance = &publicMethod_{
+		// Initialize the instance attributes.
 		class_:  c,
 		method_: method,
 	}
@@ -64,6 +65,7 @@ func (v *publicMethod_) getClass() *publicMethodClass_ {
 // Instance Structure
 
 type publicMethod_ struct {
+	// Declare the instance attributes.
 	class_  *publicMethodClass_
 	method_ MethodLike
 }
@@ -71,7 +73,7 @@ type publicMethod_ struct {
 // Class Structure
 
 type publicMethodClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

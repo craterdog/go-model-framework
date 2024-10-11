@@ -31,12 +31,13 @@ func (c *parameterClass_) Make(
 	abstraction AbstractionLike,
 ) ParameterLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(abstraction) {
-		panic("The abstraction attribute is required by this class.")
+		panic("The \"abstraction\" attribute is required by this class.")
 	}
 	var instance = &parameter_{
+		// Initialize the instance attributes.
 		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
@@ -73,6 +74,7 @@ func (v *parameter_) getClass() *parameterClass_ {
 // Instance Structure
 
 type parameter_ struct {
+	// Declare the instance attributes.
 	class_       *parameterClass_
 	name_        string
 	abstraction_ AbstractionLike
@@ -81,7 +83,7 @@ type parameter_ struct {
 // Class Structure
 
 type parameterClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

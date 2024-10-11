@@ -32,9 +32,10 @@ func (c *instanceMethodsClass_) Make(
 	optionalAspectSubsection AspectSubsectionLike,
 ) InstanceMethodsLike {
 	if uti.IsUndefined(publicSubsection) {
-		panic("The publicSubsection attribute is required by this class.")
+		panic("The \"publicSubsection\" attribute is required by this class.")
 	}
 	var instance = &instanceMethods_{
+		// Initialize the instance attributes.
 		class_:                       c,
 		publicSubsection_:            publicSubsection,
 		optionalAttributeSubsection_: optionalAttributeSubsection,
@@ -76,6 +77,7 @@ func (v *instanceMethods_) getClass() *instanceMethodsClass_ {
 // Instance Structure
 
 type instanceMethods_ struct {
+	// Declare the instance attributes.
 	class_                       *instanceMethodsClass_
 	publicSubsection_            PublicSubsectionLike
 	optionalAttributeSubsection_ AttributeSubsectionLike
@@ -85,7 +87,7 @@ type instanceMethods_ struct {
 // Class Structure
 
 type instanceMethodsClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

@@ -32,15 +32,16 @@ func (c *modelClass_) Make(
 	interfaceDefinitions InterfaceDefinitionsLike,
 ) ModelLike {
 	if uti.IsUndefined(moduleDefinition) {
-		panic("The moduleDefinition attribute is required by this class.")
+		panic("The \"moduleDefinition\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(primitiveDefinitions) {
-		panic("The primitiveDefinitions attribute is required by this class.")
+		panic("The \"primitiveDefinitions\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(interfaceDefinitions) {
-		panic("The interfaceDefinitions attribute is required by this class.")
+		panic("The \"interfaceDefinitions\" attribute is required by this class.")
 	}
 	var instance = &model_{
+		// Initialize the instance attributes.
 		class_:                c,
 		moduleDefinition_:     moduleDefinition,
 		primitiveDefinitions_: primitiveDefinitions,
@@ -82,6 +83,7 @@ func (v *model_) getClass() *modelClass_ {
 // Instance Structure
 
 type model_ struct {
+	// Declare the instance attributes.
 	class_                *modelClass_
 	moduleDefinition_     ModuleDefinitionLike
 	primitiveDefinitions_ PrimitiveDefinitionsLike
@@ -91,7 +93,7 @@ type model_ struct {
 // Class Structure
 
 type modelClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

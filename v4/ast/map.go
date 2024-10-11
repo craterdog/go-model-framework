@@ -30,9 +30,10 @@ func (c *mapClass_) Make(
 	name string,
 ) MapLike {
 	if uti.IsUndefined(name) {
-		panic("The name attribute is required by this class.")
+		panic("The \"name\" attribute is required by this class.")
 	}
 	var instance = &map_{
+		// Initialize the instance attributes.
 		class_: c,
 		name_:  name,
 	}
@@ -64,6 +65,7 @@ func (v *map_) getClass() *mapClass_ {
 // Instance Structure
 
 type map_ struct {
+	// Declare the instance attributes.
 	class_ *mapClass_
 	name_  string
 }
@@ -71,7 +73,7 @@ type map_ struct {
 // Class Structure
 
 type mapClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference

@@ -32,12 +32,13 @@ func (c *constraintsClass_) Make(
 	additionalConstraints abs.Sequential[AdditionalConstraintLike],
 ) ConstraintsLike {
 	if uti.IsUndefined(constraint) {
-		panic("The constraint attribute is required by this class.")
+		panic("The \"constraint\" attribute is required by this class.")
 	}
 	if uti.IsUndefined(additionalConstraints) {
-		panic("The additionalConstraints attribute is required by this class.")
+		panic("The \"additionalConstraints\" attribute is required by this class.")
 	}
 	var instance = &constraints_{
+		// Initialize the instance attributes.
 		class_:                 c,
 		constraint_:            constraint,
 		additionalConstraints_: additionalConstraints,
@@ -74,6 +75,7 @@ func (v *constraints_) getClass() *constraintsClass_ {
 // Instance Structure
 
 type constraints_ struct {
+	// Declare the instance attributes.
 	class_                 *constraintsClass_
 	constraint_            ConstraintLike
 	additionalConstraints_ abs.Sequential[AdditionalConstraintLike]
@@ -82,7 +84,7 @@ type constraints_ struct {
 // Class Structure
 
 type constraintsClass_ struct {
-	// Define the class constants.
+	// Declare the class constants.
 }
 
 // Class Reference
