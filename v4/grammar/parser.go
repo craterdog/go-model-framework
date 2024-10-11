@@ -21,79 +21,55 @@ import (
 	sts "strings"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var parserClass = &parserClass_{
-	// Initialize the class constants.
-	queueSize_: 16,
-	stackSize_: 4,
-}
-
-// Function
+// Access Function
 
 func Parser() ParserClassLike {
 	return parserClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type parserClass_ struct {
-	// Define the class constants.
-	queueSize_ uint
-	stackSize_ uint
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *parserClass_) Make() ParserLike {
-	return &parser_{
+	var instance = &parser_{
 		// Initialize the instance attributes.
 		class_: c,
 	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type parser_ struct {
-	// Define the instance attributes.
-	class_  *parserClass_
-	source_ string                   // The original source code.
-	tokens_ abs.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
-	next_   abs.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
-}
-
-// Public
+// Public Methods
 
 func (v *parser_) GetClass() ParserClassLike {
-	return v.class_
+	return v.getClass()
 }
 
-func (v *parser_) ParseSource(source string) ast.ModelLike {
+func (v *parser_) ParseSource(
+	source string,
+) ast.ModelLike {
+	// Create a scanner running in a separate Go routine.
 	v.source_ = source
 	v.tokens_ = col.Queue[TokenLike](parserClass.queueSize_)
+	Scanner().Make(v.source_, v.tokens_)
 	v.next_ = col.Stack[TokenLike](parserClass.stackSize_)
 
-	// The scanner runs in a separate Go routine.
-	Scanner().Make(v.source_, v.tokens_)
-
-	// Attempt to parse the model.
-	var model, token, ok = v.parseModel()
+	// Attempt to parse the model from the token stream.
+	var result_, token, ok = v.parseModel()
 	if !ok {
 		var message = v.formatError(token, "Model")
 		panic(message)
 	}
-
-	// Found the model.
-	return model
+	return result_
 }
 
-// Private
+// Private Methods
+
+func (v *parser_) getClass() *parserClass_ {
+	return v.class_
+}
 
 func (v *parser_) parseAbstraction() (
 	abstraction ast.AbstractionLike,
@@ -383,7 +359,7 @@ func (v *parser_) parseAspectDefinition() (
 	// Attempt to parse 1 to unlimited aspectMethod rules.
 	var aspectMethods = col.List[ast.AspectMethodLike]()
 aspectMethodsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var aspectMethod ast.AspectMethodLike
 		aspectMethod, token, ok = v.parseAspectMethod()
 		if !ok {
@@ -481,7 +457,7 @@ func (v *parser_) parseAspectSection() (
 	// Attempt to parse 1 to unlimited aspectDefinition rules.
 	var aspectDefinitions = col.List[ast.AspectDefinitionLike]()
 aspectDefinitionsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var aspectDefinition ast.AspectDefinitionLike
 		aspectDefinition, token, ok = v.parseAspectDefinition()
 		if !ok {
@@ -548,7 +524,7 @@ func (v *parser_) parseAspectSubsection() (
 	// Attempt to parse 1 to unlimited interface rules.
 	var interfaces = col.List[ast.AspectInterfaceLike]()
 interfacesLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var aspectInterface ast.AspectInterfaceLike
 		aspectInterface, token, ok = v.parseAspectInterface()
 		if !ok {
@@ -758,7 +734,7 @@ func (v *parser_) parseAttributeSubsection() (
 	// Attempt to parse 1 to unlimited attributeMethod rules.
 	var attributeMethods = col.List[ast.AttributeMethodLike]()
 attributeMethodsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var attributeMethod ast.AttributeMethodLike
 		attributeMethod, token, ok = v.parseAttributeMethod()
 		if !ok {
@@ -924,7 +900,7 @@ func (v *parser_) parseClassSection() (
 	// Attempt to parse 1 to unlimited classDefinition rules.
 	var classDefinitions = col.List[ast.ClassDefinitionLike]()
 classDefinitionsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var classDefinition ast.ClassDefinitionLike
 		classDefinition, token, ok = v.parseClass()
 		if !ok {
@@ -1111,7 +1087,7 @@ func (v *parser_) parseConstantSubsection() (
 	// Attempt to parse 1 to unlimited constantMethod rules.
 	var constantMethods = col.List[ast.ConstantMethodLike]()
 constantMethodsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var constantMethod ast.ConstantMethodLike
 		constantMethod, token, ok = v.parseConstantMethod()
 		if !ok {
@@ -1177,7 +1153,7 @@ func (v *parser_) parseConstructorMethod() (
 	// Attempt to parse 0 to unlimited parameter rules.
 	var parameters = col.List[ast.ParameterLike]()
 parametersLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var parameter ast.ParameterLike
 		parameter, token, ok = v.parseParameter()
 		if !ok {
@@ -1261,7 +1237,7 @@ func (v *parser_) parseConstructorSubsection() (
 	// Attempt to parse 1 to unlimited constructorMethod rules.
 	var constructorMethods = col.List[ast.ConstructorMethodLike]()
 constructorMethodsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var constructorMethod ast.ConstructorMethodLike
 		constructorMethod, token, ok = v.parseConstructorMethod()
 		if !ok {
@@ -1409,7 +1385,7 @@ func (v *parser_) parseEnumeration() (
 	// Attempt to parse 0 to unlimited additionalValue rules.
 	var additionalValues = col.List[ast.AdditionalValueLike]()
 additionalValuesLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var additionalValue ast.AdditionalValueLike
 		additionalValue, token, ok = v.parseAdditionalValue()
 		if !ok {
@@ -1492,7 +1468,7 @@ func (v *parser_) parseFunctionMethod() (
 	// Attempt to parse 0 to unlimited parameter rules.
 	var parameters = col.List[ast.ParameterLike]()
 parametersLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var parameter ast.ParameterLike
 		parameter, token, ok = v.parseParameter()
 		if !ok {
@@ -1576,7 +1552,7 @@ func (v *parser_) parseFunctionSubsection() (
 	// Attempt to parse 1 to unlimited functionMethod rules.
 	var functionMethods = col.List[ast.FunctionMethodLike]()
 functionMethodsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var functionMethod ast.FunctionMethodLike
 		functionMethod, token, ok = v.parseFunctionMethod()
 		if !ok {
@@ -1656,7 +1632,7 @@ func (v *parser_) parseFunctionalDefinition() (
 	// Attempt to parse 0 to unlimited parameter rules.
 	var parameters = col.List[ast.ParameterLike]()
 parametersLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var parameter ast.ParameterLike
 		parameter, token, ok = v.parseParameter()
 		if !ok {
@@ -1740,7 +1716,7 @@ func (v *parser_) parseFunctionalSection() (
 	// Attempt to parse 1 to unlimited functional rules.
 	var functionalDefinitions = col.List[ast.FunctionalDefinitionLike]()
 functionalDefinitionsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var functionalDefinition ast.FunctionalDefinitionLike
 		functionalDefinition, token, ok = v.parseFunctionalDefinition()
 		if !ok {
@@ -1822,7 +1798,7 @@ func (v *parser_) parseArguments() (
 	// Attempt to parse 0 to unlimited additionalArgument rules.
 	var additionalArguments = col.List[ast.AdditionalArgumentLike]()
 additionalArgumentsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var additionalArgument ast.AdditionalArgumentLike
 		additionalArgument, token, ok = v.parseAdditionalArgument()
 		if !ok {
@@ -1951,7 +1927,7 @@ func (v *parser_) parseConstraints() (
 	// Attempt to parse 0 to unlimited additionalConstraint rules.
 	var additionalConstraints = col.List[ast.AdditionalConstraintLike]()
 additionalConstraintsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var additionalConstraint ast.AdditionalConstraintLike
 		additionalConstraint, token, ok = v.parseAdditionalConstraint()
 		if !ok {
@@ -2093,7 +2069,7 @@ func (v *parser_) parseImports() (
 	// Attempt to parse 1 to unlimited module rules.
 	var modules = col.List[ast.ModuleLike]()
 modulesLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var module ast.ModuleLike
 		module, token, ok = v.parseModule()
 		if !ok {
@@ -2246,7 +2222,7 @@ func (v *parser_) parseInstanceSection() (
 	// Attempt to parse 1 to unlimited instanceDefinition rules.
 	var instanceDefinitions = col.List[ast.InstanceDefinitionLike]()
 instanceDefinitionsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var instanceDefinition ast.InstanceDefinitionLike
 		instanceDefinition, token, ok = v.parseInstanceDefinition()
 		if !ok {
@@ -2528,7 +2504,7 @@ func (v *parser_) parseMethod() (
 	// Attempt to parse 0 to unlimited parameter rules.
 	var parameters = col.List[ast.ParameterLike]()
 parametersLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var parameter ast.ParameterLike
 		parameter, token, ok = v.parseParameter()
 		if !ok {
@@ -2882,7 +2858,7 @@ func (v *parser_) parseParameterized() (
 	// Attempt to parse 1 to unlimited parameter rules.
 	var parameters = col.List[ast.ParameterLike]()
 parametersLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var parameter ast.ParameterLike
 		parameter, token, ok = v.parseParameter()
 		if !ok {
@@ -3043,7 +3019,7 @@ func (v *parser_) parsePublicSubsection() (
 	// Attempt to parse 1 to unlimited publicMethod rules.
 	var publicMethods = col.List[ast.PublicMethodLike]()
 publicMethodsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var publicMethod ast.PublicMethodLike
 		publicMethod, token, ok = v.parsePublicMethod()
 		if !ok {
@@ -3227,7 +3203,7 @@ func (v *parser_) parseTypeSection() (
 	// Attempt to parse 1 to unlimited typeDefinition rules.
 	var typeDefinitions = col.List[ast.TypeDefinitionLike]()
 typeDefinitionsLoop:
-	for numberFound_ := 0; numberFound_ < unlimited; numberFound_++ {
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
 		var typeDefinition ast.TypeDefinitionLike
 		typeDefinition, token, ok = v.parseTypeDefinition()
 		if !ok {
@@ -3433,7 +3409,7 @@ func (v *parser_) formatError(token TokenLike, ruleName string) string {
 }
 
 func (v *parser_) getDefinition(ruleName string) string {
-	return syntax_.GetValue(ruleName)
+	return v.getClass().syntax_.GetValue(ruleName)
 }
 
 func (v *parser_) getNextToken() TokenLike {
@@ -3462,69 +3438,104 @@ func (v *parser_) putBack(token TokenLike) {
 	v.next_.AddValue(token)
 }
 
-// PRIVATE GLOBALS
+// PRIVATE INTERFACE
 
-// Constants
+// Instance Structure
 
-const unlimited = 4294967295 // Default to a reasonable value.
+type parser_ struct {
+	// Declare the instance attributes.
+	class_  *parserClass_
+	source_ string                   // The original source code.
+	tokens_ abs.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
+	next_   abs.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
+}
 
-var syntax_ = col.Catalog[string, string](
-	map[string]string{
-		"Model":                `ModuleDefinition PrimitiveDefinitions InterfaceDefinitions`,
-		"ModuleDefinition":     `Notice Header Imports?`,
-		"PrimitiveDefinitions": `TypeSection? FunctionalSection?`,
-		"InterfaceDefinitions": `ClassSection InstanceSection AspectSection?`,
-		"Notice":               `comment`,
-		"Header":               `comment "package" name`,
-		"Imports":              `"import" "(" Module+ ")"`,
-		"Module":               `name path`,
-		"TypeSection":          `"// Type Definitions" Type+`,
-		"Type":                 `Declaration Abstraction Enumeration?`,
-		"Declaration":          `comment "type" name Constraints?`,
-		"Constraints":          `"[" Parameter+ "]"`,
-		"Parameter":            `name Abstraction ","`,
-		"Abstraction":          `Prefix? name Suffix? Arguments?`,
-		"Prefix": `
+// Class Structure
+
+type parserClass_ struct {
+	// Declare the class constants.
+	queueSize_ uint
+	stackSize_ uint
+	unlimited_ int
+	syntax_    abs.CatalogLike[string, string]
+}
+
+// Class Reference
+
+var parserClass = &parserClass_{
+	// Initialize the class constants.
+	queueSize_: 16,
+	stackSize_: 4,
+	unlimited_: 4294967295, // Default to a reasonable value.
+	syntax_: col.Catalog[string, string](
+		map[string]string{
+			"Model":                `ModuleDefinition PrimitiveDefinitions InterfaceDefinitions`,
+			"ModuleDefinition":     `Notice Header Imports?`,
+			"PrimitiveDefinitions": `TypeSection? FunctionalSection?`,
+			"InterfaceDefinitions": `ClassSection InstanceSection AspectSection?`,
+			"Notice":               `comment`,
+			"Header":               `comment "package" name`,
+			"Imports":              `"import" "(" Module+ ")"`,
+			"Module":               `name path`,
+			"TypeSection":          `"// Type Definitions" TypeDefinition+`,
+			"TypeDefinition":       `Declaration Abstraction Enumeration?`,
+			"Declaration":          `comment "type" name Constraints?`,
+			"Constraints":          `"[" Constraint AdditionalConstraint* "]"`,
+			"Constraint":           `name Abstraction`,
+			"AdditionalConstraint": `"," Constraint`,
+			"Abstraction":          `Prefix? name Suffix? Arguments?`,
+			"Prefix": `
   - Array
   - Map
-  - Channel`,
-		"Array":              `"[" "]"`,
-		"Map":                `"map" "[" name "]"`,
-		"Channel":            `"chan"`,
-		"Suffix":             `"." name`,
-		"Arguments":          `"[" Argument AdditionalArgument* "]"`,
-		"Argument":           `Abstraction`,
-		"AdditionalArgument": `"," Argument`,
-		"Enumeration":        `"const" "(" Value AdditionalValue* ")"`,
-		"Value":              `name Abstraction "=" "iota"`,
-		"AdditionalValue":    `name`,
-		"FunctionalSection":  `"// Functional Definitions" Functional+`,
-		"Functional":         `Declaration "func" "(" Parameter* ")" Result`,
-		"Result": `
+  - Channel
+`,
+			"Array":                `"[" "]"`,
+			"Map":                  `"map" "[" name "]"`,
+			"Channel":              `"chan"`,
+			"Suffix":               `"." name`,
+			"Arguments":            `"[" Argument AdditionalArgument* "]"`,
+			"Argument":             `Abstraction`,
+			"AdditionalArgument":   `"," Argument`,
+			"Enumeration":          `"const" "(" Value AdditionalValue* ")"`,
+			"Value":                `name Abstraction "=" "iota"`,
+			"AdditionalValue":      `name`,
+			"FunctionalSection":    `"// Functional Definitions" FunctionalDefinition+`,
+			"FunctionalDefinition": `Declaration "func" "(" Parameter* ")" Result`,
+			"Parameter":            `name Abstraction ","`,
+			"Result": `
   - None
   - Abstraction
-  - Parameterized`,
-		"None":                  `newline`,
-		"Parameterized":         `"(" Parameter+ ")"`,
-		"ClassSection":          `"// Class Definitions" Class+`,
-		"Class":                 `Declaration "interface" "{" ClassMethods "}"`,
-		"ClassMethods":          `ConstructorSubsection ConstantSubsection? FunctionSubsection?`,
-		"ConstructorSubsection": `"// Constructor Methods" Constructor+`,
-		"Constructor":           `name "(" Parameter* ")" Abstraction`,
-		"ConstantSubsection":    `"// Constant Methods" Constant+`,
-		"Constant":              `name "(" ")" Abstraction`,
-		"FunctionSubsection":    `"// Function Methods" Function+`,
-		"Function":              `name "(" Parameter* ")" Result`,
-		"InstanceSection":       `"// Instance Definitions" Instance+`,
-		"Instance":              `Declaration "interface" "{" InstanceMethods "}"`,
-		"InstanceMethods":       `PublicSubsection AttributeSubsection? AspectSubsection?`,
-		"PublicSubsection":      `"// Public Methods" Method+`,
-		"Method":                `name "(" Parameter* ")" Result?`,
-		"AttributeSubsection":   `"// Attribute Methods" Attribute+`,
-		"Attribute":             `name "(" Parameter? ")" Abstraction?`,
-		"AspectSubsection":      `"// Aspect Methods" Interface+`,
-		"Interface":             `Abstraction newline`,
-		"AspectSection":         `"// Aspect Definitions" Aspect+`,
-		"AspectDefinition":      `Declaration "interface" "{" Method+ "}"`,
-	},
-)
+  - Parameterized
+`,
+			"None":                  `newline`,
+			"Parameterized":         `"(" Parameter+ ")"`,
+			"ClassSection":          `"// Class Definitions" ClassDefinition+`,
+			"ClassDefinition":       `Declaration "interface" "{" ClassMethods "}"`,
+			"ClassMethods":          `ConstructorSubsection ConstantSubsection? FunctionSubsection?`,
+			"ConstructorSubsection": `"// Constructor Methods" ConstructorMethod+`,
+			"ConstructorMethod":     `name "(" Parameter* ")" Abstraction`,
+			"ConstantSubsection":    `"// Constant Methods" ConstantMethod+`,
+			"ConstantMethod":        `name "(" ")" Abstraction`,
+			"FunctionSubsection":    `"// Function Methods" FunctionMethod+`,
+			"FunctionMethod":        `name "(" Parameter* ")" Result`,
+			"InstanceSection":       `"// Instance Definitions" InstanceDefinition+`,
+			"InstanceDefinition":    `Declaration "interface" "{" InstanceMethods "}"`,
+			"InstanceMethods":       `PublicSubsection AttributeSubsection? AspectSubsection?`,
+			"PublicSubsection":      `"// Public Methods" PublicMethod+`,
+			"PublicMethod":          `Method`,
+			"Method":                `name "(" Parameter* ")" Result?`,
+			"AttributeSubsection":   `"// Attribute Methods" AttributeMethod+`,
+			"AttributeMethod": `
+  - GetterMethod
+  - SetterMethod
+`,
+			"GetterMethod":     `name "(" ")" Abstraction`,
+			"SetterMethod":     `name "(" Parameter ")"`,
+			"AspectSubsection": `"// Aspect Interfaces" AspectInterface+`,
+			"AspectInterface":  `Abstraction`,
+			"AspectSection":    `"// Aspect Definitions" AspectDefinition+`,
+			"AspectDefinition": `Declaration "interface" "{" AspectMethod+ "}"`,
+			"AspectMethod":     `Method`,
+		},
+	),
+}

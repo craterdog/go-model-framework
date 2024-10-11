@@ -15,65 +15,55 @@ package grammar
 import (
 	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var visitorClass = &visitorClass_{
-	// Initialize the class constants.
-}
-
-// Function
+// Access Function
 
 func Visitor() VisitorClassLike {
 	return visitorClass
 }
 
-// CLASS METHODS
+// Constructor Methods
 
-// Target
-
-type visitorClass_ struct {
-	// Define the class constants.
-}
-
-// Constructors
-
-func (c *visitorClass_) Make(processor Methodical) VisitorLike {
-	return &visitor_{
+func (c *visitorClass_) Make(
+	processor Methodical,
+) VisitorLike {
+	if uti.IsUndefined(processor) {
+		panic("The \"processor\" attribute is required by this class.")
+	}
+	var instance = &visitor_{
 		// Initialize the instance attributes.
 		class_:     c,
 		processor_: processor,
 	}
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type visitor_ struct {
-	// Define the instance attributes.
-	class_     *visitorClass_
-	processor_ Methodical
-}
-
-// Public
+// Public Methods
 
 func (v *visitor_) GetClass() VisitorClassLike {
-	return v.class_
+	return v.getClass()
 }
 
-func (v *visitor_) VisitModel(model ast.ModelLike) {
-	// Visit the model syntax.
+func (v *visitor_) VisitModel(
+	model ast.ModelLike,
+) {
 	v.processor_.PreprocessModel(model)
 	v.visitModel(model)
 	v.processor_.PostprocessModel(model)
 }
 
-// Private
+// Private Methods
+
+func (v *visitor_) getClass() *visitorClass_ {
+	return v.class_
+}
 
 func (v *visitor_) visitAbstraction(abstraction ast.AbstractionLike) {
 	// Visit the optional prefix rule.
@@ -1196,4 +1186,26 @@ func (v *visitor_) visitValue(value ast.ValueLike) {
 	v.processor_.PreprocessAbstraction(abstraction)
 	v.visitAbstraction(abstraction)
 	v.processor_.PostprocessAbstraction(abstraction)
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type visitor_ struct {
+	// Declare the instance attributes.
+	class_     *visitorClass_
+	processor_ Methodical
+}
+
+// Class Structure
+
+type visitorClass_ struct {
+	// Declare the class constants.
+}
+
+// Class Reference
+
+var visitorClass = &visitorClass_{
+	// Initialize the class constants.
 }

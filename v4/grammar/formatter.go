@@ -17,69 +17,31 @@ import (
 	sts "strings"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var formatterClass = &formatterClass_{
-	// Initialize the class constants.
-}
-
-// Function
+// Access Function
 
 func Formatter() FormatterClassLike {
 	return formatterClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type formatterClass_ struct {
-	// Define the class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *formatterClass_) Make() FormatterLike {
-	var formatter = &formatter_{
+	var instance = &formatter_{
 		// Initialize the instance attributes.
 		class_: c,
 
 		// Initialize the inherited aspects.
 		Methodical: Processor().Make(),
 	}
-	formatter.visitor_ = Visitor().Make(formatter)
-	return formatter
+	instance.visitor_ = Visitor().Make(instance)
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type formatter_ struct {
-	// Define the instance attributes.
-	class_   *formatterClass_
-	visitor_ VisitorLike
-	depth_   uint
-	result_  sts.Builder
-
-	// Define the inherited aspects.
-	Methodical
-}
-
-// Public
-
-func (v *formatter_) GetClass() FormatterClassLike {
-	return v.class_
-}
-
-func (v *formatter_) FormatModel(model ast.ModelLike) string {
-	v.visitor_.VisitModel(model)
-	return v.getResult()
-}
-
-// Methodical
+// Methodical Methods
 
 func (v *formatter_) ProcessComment(comment string) {
 	v.appendString(comment)
@@ -587,7 +549,26 @@ func (v *formatter_) PostprocessValue(value ast.ValueLike) {
 	v.appendString(" = iota")
 }
 
-// Private
+// Public Methods
+
+func (v *formatter_) GetClass() FormatterClassLike {
+	return v.getClass()
+}
+
+func (v *formatter_) FormatModel(
+	model ast.ModelLike,
+) string {
+	var result_ string
+	v.visitor_.VisitModel(model)
+	result_ = v.getResult()
+	return result_
+}
+
+// Private Methods
+
+func (v *formatter_) getClass() *formatterClass_ {
+	return v.class_
+}
 
 func (v *formatter_) appendNewline() {
 	var newline = "\n"
@@ -607,4 +588,31 @@ func (v *formatter_) getResult() string {
 	var result = v.result_.String()
 	v.result_.Reset()
 	return result
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type formatter_ struct {
+	// Declare the instance attributes.
+	class_   *formatterClass_
+	visitor_ VisitorLike
+	depth_   uint
+	result_  sts.Builder
+
+	// Declare the inherited aspects.
+	Methodical
+}
+
+// Class Structure
+
+type formatterClass_ struct {
+	// Declare the class constants.
+}
+
+// Class Reference
+
+var formatterClass = &formatterClass_{
+	// Initialize the class constants.
 }

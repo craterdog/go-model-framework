@@ -15,60 +15,33 @@ package grammar
 import (
 	fmt "fmt"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 	reg "regexp"
 	sts "strings"
 	uni "unicode"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var scannerClass = &scannerClass_{
-	// Initialize the class constants.
-	tokens_: map[TokenType]string{
-		ErrorToken:     "error",
-		CommentToken:   "comment",
-		DelimiterToken: "delimiter",
-		NameToken:      "name",
-		NewlineToken:   "newline",
-		PathToken:      "path",
-		SpaceToken:     "space",
-	},
-	matchers_: map[TokenType]*reg.Regexp{
-		// Define pattern matchers for each type of token.
-		CommentToken:   reg.MustCompile("^" + comment_),
-		DelimiterToken: reg.MustCompile("^" + delimiter_),
-		NameToken:      reg.MustCompile("^" + name_),
-		NewlineToken:   reg.MustCompile("^" + newline_),
-		PathToken:      reg.MustCompile("^" + path_),
-		SpaceToken:     reg.MustCompile("^" + space_),
-	},
-}
-
-// Function
+// Access Function
 
 func Scanner() ScannerClassLike {
 	return scannerClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type scannerClass_ struct {
-	// Define the class constants.
-	tokens_   map[TokenType]string
-	matchers_ map[TokenType]*reg.Regexp
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *scannerClass_) Make(
 	source string,
 	tokens abs.QueueLike[TokenLike],
 ) ScannerLike {
-	var scanner = &scanner_{
+	if uti.IsUndefined(source) {
+		panic("The \"source\" attribute is required by this class.")
+	}
+	if uti.IsUndefined(tokens) {
+		panic("The \"tokens\" attribute is required by this class.")
+	}
+	var instance = &scanner_{
 		// Initialize the instance attributes.
 		class_:    c,
 		line_:     1,
@@ -76,88 +49,58 @@ func (c *scannerClass_) Make(
 		runes_:    []rune(source),
 		tokens_:   tokens,
 	}
-	go scanner.scanTokens() // Start scanning tokens in the background.
-	return scanner
+	go instance.scanTokens() // Do scanning in the background...
+	return instance
 }
 
-// Functions
+// Function Methods
 
 func (c *scannerClass_) FormatToken(token TokenLike) string {
+	var result_ string
 	var value = token.GetValue()
-	var s = fmt.Sprintf("%q", value)
-	if len(s) > 40 {
-		s = fmt.Sprintf("%.40q...", value)
+	value = fmt.Sprintf("%q", value)
+	if len(value) > 40 {
+		value = fmt.Sprintf("%.40q...", value)
 	}
-	return fmt.Sprintf(
+	result_ = fmt.Sprintf(
 		"Token [type: %s, line: %d, position: %d]: %s",
 		c.tokens_[token.GetType()],
 		token.GetLine(),
 		token.GetPosition(),
-		s,
+		value,
 	)
+	return result_
 }
 
 func (c *scannerClass_) FormatType(tokenType TokenType) string {
-	return c.tokens_[tokenType]
+	var result_ = c.tokens_[tokenType]
+	return result_
 }
 
 func (c *scannerClass_) MatchesType(
 	tokenValue string,
 	tokenType TokenType,
 ) bool {
+	var result_ bool
 	var matcher = c.matchers_[tokenType]
 	var match = matcher.FindString(tokenValue)
-	return len(match) > 0
+	result_ = uti.IsDefined(match)
+	return result_
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type scanner_ struct {
-	// Define the instance attributes.
-	class_    *scannerClass_
-	first_    uint // A zero based index of the first possible rune in the next token.
-	next_     uint // A zero based index of the next possible rune in the next token.
-	line_     uint // The line number in the source string of the next rune.
-	position_ uint // The position in the current line of the next rune.
-	runes_    []rune
-	tokens_   abs.QueueLike[TokenLike]
-}
-
-// Public
+// Public Methods
 
 func (v *scanner_) GetClass() ScannerClassLike {
-	return v.class_
+	return v.getClass()
 }
 
-// Private
+// Private Methods
 
-/*
-NOTE:
-These private constants define the regular expression sub-patterns that make up
-the intrinsic types and token types.  Unfortunately there is no way to make them
-private to the scanner class since they must be TRUE Go constants to be used in
-this way.  We append an underscore to each name to lessen the chance of a name
-collision with other private Go class constants in this package.
-*/
-const (
-	// Define the regular expression patterns for each intrinsic type.
-	any_     = "." // This does NOT include newline characters.
-	control_ = "\\p{Cc}"
-	digit_   = "\\p{Nd}"
-	eol_     = "\\r?\\n"
-	lower_   = "\\p{Ll}"
-	upper_   = "\\p{Lu}"
-
-	// Define the regular expression patterns for each token type.
-	comment_   = "(?:/\\*" + eol_ + "(" + any_ + "|" + eol_ + ")*?" + eol_ + "\\*/" + eol_ + ")"
-	delimiter_ = "(?:type|package|map|iota|interface|import|func|const|chan|\\}|\\{|\\]|\\[|\\.|\\)|\\(|=|// Type Definitions|// Public Methods|// Instance Definitions|// Functional Definitions|// Function Methods|// Constructor Methods|// Constant Methods|// Class Definitions|// Attribute Methods|// Aspect Definitions|// Aspect Methods|,)"
-	name_      = "(?:(" + lower_ + "|" + upper_ + ")(" + lower_ + "|" + upper_ + "|" + digit_ + ")*_?)"
-	newline_   = "(?:\\r?\\n)"
-	path_      = "(?:\"" + any_ + "*?\")"
-	space_     = "(?:[ \\t]+)"
-)
+func (v *scanner_) getClass() *scannerClass_ {
+	return v.class_
+}
 
 func (v *scanner_) emitToken(tokenType TokenType) {
 	var value = string(v.runes_[v.first_:v.next_])
@@ -250,3 +193,77 @@ loop:
 	}
 	v.tokens_.CloseQueue()
 }
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type scanner_ struct {
+	// Declare the instance attributes.
+	class_    *scannerClass_
+	first_    uint // A zero based index of the first possible rune in the next token.
+	next_     uint // A zero based index of the next possible rune in the next token.
+	line_     uint // The line number in the source string of the next rune.
+	position_ uint // The position in the current line of the next rune.
+	runes_    []rune
+	tokens_   abs.QueueLike[TokenLike]
+}
+
+// Class Structure
+
+type scannerClass_ struct {
+	// Declare the class constants.
+	tokens_   map[TokenType]string
+	matchers_ map[TokenType]*reg.Regexp
+}
+
+// Class Reference
+
+var scannerClass = &scannerClass_{
+	// Initialize the class constants.
+	tokens_: map[TokenType]string{
+		ErrorToken:     "error",
+		CommentToken:   "comment",
+		DelimiterToken: "delimiter",
+		NameToken:      "name",
+		NewlineToken:   "newline",
+		PathToken:      "path",
+		SpaceToken:     "space",
+	},
+	matchers_: map[TokenType]*reg.Regexp{
+		CommentToken:   reg.MustCompile("^" + comment_),
+		DelimiterToken: reg.MustCompile("^" + delimiter_),
+		NameToken:      reg.MustCompile("^" + name_),
+		NewlineToken:   reg.MustCompile("^" + newline_),
+		PathToken:      reg.MustCompile("^" + path_),
+		SpaceToken:     reg.MustCompile("^" + space_),
+	},
+}
+
+// Private Constants
+
+/*
+NOTE:
+These private constants define the regular expression sub-patterns that make up
+the intrinsic types and token types.  Unfortunately there is no way to make them
+private to the scanner class since they must be TRUE Go constants to be combined
+in this way.  We append an underscore to each name to lessen the chance of a
+name collision with other private Go class constants in this package.
+*/
+const (
+	// Define the regular expression patterns for each intrinsic type.
+	any_     = "." // This does NOT include newline characters.
+	control_ = "\\p{Cc}"
+	digit_   = "\\p{Nd}"
+	eol_     = "\\r?\\n"
+	lower_   = "\\p{Ll}"
+	upper_   = "\\p{Lu}"
+
+	// Define the regular expression patterns for each token type.
+	comment_   = "(?:/\\*" + eol_ + "(" + any_ + "|" + eol_ + ")*?" + eol_ + "\\*/" + eol_ + ")"
+	delimiter_ = "(?:type|package|map|iota|interface|import|func|const|chan|\\}|\\{|\\]|\\[|\\.|\\)|\\(|=|// Type Definitions|// Public Methods|// Instance Definitions|// Functional Definitions|// Function Methods|// Constructor Methods|// Constant Methods|// Class Definitions|// Attribute Methods|// Aspect Definitions|// Aspect Methods|,)"
+	name_      = "(?:(" + lower_ + "|" + upper_ + ")(" + lower_ + "|" + upper_ + "|" + digit_ + ")*_?)"
+	newline_   = "(?:\\r?\\n)"
+	path_      = "(?:\"" + any_ + "*?\")"
+	space_     = "(?:[ \\t]+)"
+)

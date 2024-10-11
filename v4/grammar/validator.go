@@ -18,99 +18,50 @@ import (
 	sts "strings"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var validatorClass = &validatorClass_{
-	// Initialize the class constants.
-}
-
-// Function
+// Access Function
 
 func Validator() ValidatorClassLike {
 	return validatorClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type validatorClass_ struct {
-	// Define the class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *validatorClass_) Make() ValidatorLike {
-	var validator = &validator_{
+	var instance = &validator_{
 		// Initialize the instance attributes.
 		class_: c,
 
 		// Initialize the inherited aspects.
 		Methodical: Processor().Make(),
 	}
-	validator.visitor_ = Visitor().Make(validator)
-	return validator
+	instance.visitor_ = Visitor().Make(instance)
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type validator_ struct {
-	// Define the instance attributes.
-	class_   *validatorClass_
-	visitor_ VisitorLike
-
-	// Define the inherited aspects.
-	Methodical
-}
-
-// Public
-
-func (v *validator_) GetClass() ValidatorClassLike {
-	return v.class_
-}
-
-func (v *validator_) ValidateToken(
-	tokenValue string,
-	tokenType TokenType,
-) {
-	if !Scanner().MatchesType(tokenValue, tokenType) {
-		var message = fmt.Sprintf(
-			"The following token value is not of type %v: %v",
-			Scanner().FormatType(tokenType),
-			tokenValue,
-		)
-		panic(message)
-	}
-}
-
-func (v *validator_) ValidateModel(model ast.ModelLike) {
-	v.visitor_.VisitModel(model)
-}
-
-// Methodical
+// Methodical Methods
 
 func (v *validator_) ProcessComment(comment string) {
-	v.ValidateToken(comment, CommentToken)
+	v.validateToken(comment, CommentToken)
 }
 
 func (v *validator_) ProcessName(name string) {
-	v.ValidateToken(name, NameToken)
+	v.validateToken(name, NameToken)
 }
 
 func (v *validator_) ProcessNewline(newline string) {
-	v.ValidateToken(newline, NewlineToken)
+	v.validateToken(newline, NewlineToken)
 }
 
 func (v *validator_) ProcessPath(path string) {
-	v.ValidateToken(path, PathToken)
+	v.validateToken(path, PathToken)
 }
 
 func (v *validator_) ProcessSpace(space string) {
-	v.ValidateToken(space, SpaceToken)
+	v.validateToken(space, SpaceToken)
 }
 
 func (v *validator_) PreprocessInterfaceDefinitions(
@@ -139,11 +90,59 @@ func (v *validator_) PreprocessInterfaceDefinitions(
 	}
 }
 
-func (v *validator_) PreprocessModel(model ast.ModelLike) {
+// Public Methods
+
+func (v *validator_) GetClass() ValidatorClassLike {
+	return v.getClass()
 }
 
-func (v *validator_) ProcessModelSlot(slot uint) {
+func (v *validator_) ValidateModel(
+	model ast.ModelLike,
+) {
+	v.visitor_.VisitModel(model)
 }
 
-func (v *validator_) PostprocessModel(model ast.ModelLike) {
+// Private Methods
+
+func (v *validator_) getClass() *validatorClass_ {
+	return v.class_
+}
+
+func (v *validator_) validateToken(
+	tokenValue string,
+	tokenType TokenType,
+) {
+	if !Scanner().MatchesType(tokenValue, tokenType) {
+		var message = fmt.Sprintf(
+			"The following token value is not of type %v: %v",
+			Scanner().FormatType(tokenType),
+			tokenValue,
+		)
+		panic(message)
+	}
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type validator_ struct {
+	// Declare the instance attributes.
+	class_   *validatorClass_
+	visitor_ VisitorLike
+
+	// Define the inherited aspects.
+	Methodical
+}
+
+// Class Structure
+
+type validatorClass_ struct {
+	// Declare the class constants.
+}
+
+// Class Reference
+
+var validatorClass = &validatorClass_{
+	// Initialize the class constants.
 }

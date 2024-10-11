@@ -49,10 +49,8 @@ func (v *classes_) GetClass() ClassesClassLike {
 
 func (v *classes_) GenerateModelClasses(
 	model ast.ModelLike,
-) (
-	catalog abs.CatalogLike[string, string],
-) {
-	catalog = col.Catalog[string, string]()
+) abs.CatalogLike[string, string] {
+	var result_ = col.Catalog[string, string]()
 	var interfaceDefinitions = model.GetInterfaceDefinitions()
 	var classSection = interfaceDefinitions.GetClassSection()
 	var classDefinitions = classSection.GetClassDefinitions().GetIterator()
@@ -67,9 +65,9 @@ func (v *classes_) GenerateModelClasses(
 			classDefinition,
 			instanceDefinition,
 		)
-		catalog.SetValue(className, implementation)
+		result_.SetValue(className, implementation)
 	}
-	return catalog
+	return result_
 }
 
 // Private Methods
@@ -1338,6 +1336,7 @@ func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 	constructorMethod_: `
 func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>Like<Arguments> {<AttributeChecks>
 	var instance = &<~className>_<Arguments>{
+		// Initialize the instance attributes.
 		class_: c,<AttributeInitializations>
 	}
 	return instance
@@ -1435,6 +1434,7 @@ func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
 // Instance Structure
 
 type <~className>_<Constraints> struct {
+	// Declare the instance attributes.
 	class_ *<~className>Class_<Arguments><AttributeDeclarations>
 }
 `,
@@ -1446,7 +1446,7 @@ type <~className>_<Constraints> struct {
 // Class Structure
 
 type <~className>Class_<Constraints> struct {
-	// Define the class constants.<ConstantDeclarations>
+	// Declare the class constants.<ConstantDeclarations>
 }
 `,
 

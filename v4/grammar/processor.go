@@ -16,54 +16,27 @@ import (
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
 
-// CLASS ACCESS
+// CLASS INTERFACE
 
-// Reference
-
-var processorClass = &processorClass_{
-	// Initialize the class constants.
-}
-
-// Function
+// Access Function
 
 func Processor() ProcessorClassLike {
 	return processorClass
 }
 
-// CLASS METHODS
-
-// Target
-
-type processorClass_ struct {
-	// Define the class constants.
-}
-
-// Constructors
+// Constructor Methods
 
 func (c *processorClass_) Make() ProcessorLike {
-	var processor = &processor_{
+	var instance = &processor_{
 		// Initialize the instance attributes.
 		class_: c,
 	}
-	return processor
+	return instance
 }
 
-// INSTANCE METHODS
+// INSTANCE INTERFACE
 
-// Target
-
-type processor_ struct {
-	// Define the instance attributes.
-	class_ *processorClass_
-}
-
-// Public
-
-func (v *processor_) GetClass() ProcessorClassLike {
-	return v.class_
-}
-
-// Methodical
+// Methodical Methods
 
 func (v *processor_) ProcessComment(
 	comment string,
@@ -996,4 +969,37 @@ func (v *processor_) ProcessValueSlot(
 func (v *processor_) PostprocessValue(
 	value ast.ValueLike,
 ) {
+}
+
+// Public Methods
+
+func (v *processor_) GetClass() ProcessorClassLike {
+	return v.getClass()
+}
+
+// Private Methods
+
+func (v *processor_) getClass() *processorClass_ {
+	return v.class_
+}
+
+// PRIVATE INTERFACE
+
+// Instance Structure
+
+type processor_ struct {
+	// Declare the instance attributes.
+	class_ *processorClass_
+}
+
+// Class Structure
+
+type processorClass_ struct {
+	// Declare the class constants.
+}
+
+// Class Reference
+
+var processorClass = &processorClass_{
+	// Initialize the class constants.
 }
