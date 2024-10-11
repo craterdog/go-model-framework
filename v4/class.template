@@ -39,6 +39,7 @@ func (c *<className>Class_) Make(
 	...
 	default:
 		return &<className>_{
+			// Initialize the instance attributes.
 			class_:                  c,
 			<booleanAttributeName>_: <booleanAttributeName>,
 			...
@@ -111,7 +112,7 @@ func (v *<className>_) <MethodName>(
 // Public Methods
 
 func (v *<className>_) GetClass() <ClassName>ClassLike {
-	return v.class_
+	return v.getClass()
 }
 
 func (v *<className>_) <PublicMethodName>(
@@ -151,6 +152,7 @@ func (v *<className>_) <privateMethodName>(
 // Instance Structure
 
 type <className>_ struct {
+	// Declare the instance attributes.
 	class_                  *<className>Class_
 	<booleanAttributeName>_ bool
 	...
@@ -163,6 +165,7 @@ type <className>_ struct {
 // Class Structure
 
 type <className>Class_ struct {
+	// Declare the class constants.
 	<constantName>_ <ConstantType>
 	...
 }
@@ -170,6 +173,7 @@ type <className>Class_ struct {
 // Class Reference
 
 var <className>Class = &<className>Class_{
+	// Initialize the class constants.
 	<constantName>_: <ConstantValue>,
 	...
 }
