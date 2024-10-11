@@ -83,6 +83,14 @@ func (v *formatter_) PreprocessAdditionalValue(
 	v.appendNewline()
 }
 
+func (v *formatter_) PreprocessArguments(arguments ast.ArgumentsLike) {
+	v.appendString("[")
+}
+
+func (v *formatter_) PostprocessArguments(arguments ast.ArgumentsLike) {
+	v.appendString("]")
+}
+
 func (v *formatter_) PreprocessArray(array ast.ArrayLike) {
 	v.appendString("[")
 }
@@ -118,6 +126,14 @@ func (v *formatter_) PostprocessAspectDefinition(
 	v.appendNewline()
 }
 
+func (v *formatter_) PreprocessAspectInterface(
+	aspectInterface ast.AspectInterfaceLike,
+	index uint,
+	size uint,
+) {
+	v.appendNewline()
+}
+
 func (v *formatter_) PreprocessAspectMethod(
 	aspectMethod ast.AspectMethodLike,
 	index uint,
@@ -145,24 +161,6 @@ func (v *formatter_) PreprocessAttributeMethod(
 	v.appendNewline()
 }
 
-func (v *formatter_) ProcessGetterMethodSlot(slot uint) {
-	switch slot {
-	case 1:
-		v.appendString("() ")
-	}
-}
-
-func (v *formatter_) ProcessSetterMethodSlot(slot uint) {
-	switch slot {
-	case 1:
-		v.appendString("(")
-	}
-}
-
-func (v *formatter_) PostprocessSetterMethod(setterMethod ast.SetterMethodLike) {
-	v.appendString(")")
-}
-
 func (v *formatter_) PreprocessAttributeSubsection(attributeSubsection ast.AttributeSubsectionLike) {
 	v.appendString("\n")
 	v.appendNewline()
@@ -171,13 +169,6 @@ func (v *formatter_) PreprocessAttributeSubsection(attributeSubsection ast.Attri
 
 func (v *formatter_) PreprocessChannel(channel ast.ChannelLike) {
 	v.appendString("chan ")
-}
-
-func (v *formatter_) ProcessConstraintSlot(slot uint) {
-	switch slot {
-	case 1:
-		v.appendString(" ")
-	}
 }
 
 func (v *formatter_) PreprocessClassDefinition(
@@ -232,6 +223,23 @@ func (v *formatter_) PreprocessConstantSubsection(constantSubsection ast.Constan
 	v.appendString("\n")
 	v.appendNewline()
 	v.appendString("// Constant Methods")
+}
+
+func (v *formatter_) ProcessConstraintSlot(slot uint) {
+	switch slot {
+	case 1:
+		v.appendString(" ")
+	}
+}
+
+func (v *formatter_) PreprocessConstraints(constraints ast.ConstraintsLike) {
+	v.appendString("[")
+	v.depth_++
+}
+
+func (v *formatter_) PostprocessConstraints(constraints ast.ConstraintsLike) {
+	v.depth_--
+	v.appendString("]")
 }
 
 func (v *formatter_) PreprocessConstructorMethod(
@@ -330,22 +338,11 @@ func (v *formatter_) PreprocessFunctionalSection(functionalSection ast.Functiona
 	v.appendNewline()
 }
 
-func (v *formatter_) PreprocessArguments(arguments ast.ArgumentsLike) {
-	v.appendString("[")
-}
-
-func (v *formatter_) PostprocessArguments(arguments ast.ArgumentsLike) {
-	v.appendString("]")
-}
-
-func (v *formatter_) PreprocessConstraints(constraints ast.ConstraintsLike) {
-	v.appendString("[")
-	v.depth_++
-}
-
-func (v *formatter_) PostprocessConstraints(constraints ast.ConstraintsLike) {
-	v.depth_--
-	v.appendString("]")
+func (v *formatter_) ProcessGetterMethodSlot(slot uint) {
+	switch slot {
+	case 1:
+		v.appendString("() ")
+	}
 }
 
 func (v *formatter_) ProcessHeaderSlot(slot uint) {
@@ -395,14 +392,6 @@ func (v *formatter_) PostprocessInstanceDefinition(
 func (v *formatter_) PreprocessInstanceSection(instanceSection ast.InstanceSectionLike) {
 	v.appendNewline()
 	v.appendString("// Instance Definitions")
-	v.appendNewline()
-}
-
-func (v *formatter_) PreprocessAspectInterface(
-	aspectInterface ast.AspectInterfaceLike,
-	index uint,
-	size uint,
-) {
 	v.appendNewline()
 }
 
@@ -499,6 +488,17 @@ func (v *formatter_) PreprocessResult(result ast.ResultLike) {
 	default:
 		v.appendString(" ")
 	}
+}
+
+func (v *formatter_) ProcessSetterMethodSlot(slot uint) {
+	switch slot {
+	case 1:
+		v.appendString("(")
+	}
+}
+
+func (v *formatter_) PostprocessSetterMethod(setterMethod ast.SetterMethodLike) {
+	v.appendString(")")
 }
 
 func (v *formatter_) PreprocessSuffix(suffix ast.SuffixLike) {

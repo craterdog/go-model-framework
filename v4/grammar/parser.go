@@ -265,6 +265,89 @@ func (v *parser_) parseArgument() (
 	return argument, token, ruleFound_
 }
 
+func (v *parser_) parseArguments() (
+	arguments ast.ArgumentsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "[" delimiter.
+	_, token, ok = v.parseDelimiter("[")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Arguments")
+			panic(message)
+		} else {
+			// This is not a single arguments rule.
+			return arguments, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single argument rule.
+	var argument ast.ArgumentLike
+	argument, token, ok = v.parseArgument()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Arguments")
+			panic(message)
+		} else {
+			// This is not a single arguments rule.
+			return arguments, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited additionalArgument rules.
+	var additionalArguments = col.List[ast.AdditionalArgumentLike]()
+additionalArgumentsLoop:
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
+		var additionalArgument ast.AdditionalArgumentLike
+		additionalArgument, token, ok = v.parseAdditionalArgument()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single arguments rule.
+					return arguments, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Arguments")
+				message += "The number of additionalArgument rules must be at least 0."
+				panic(message)
+			default:
+				break additionalArgumentsLoop
+			}
+		}
+		additionalArguments.AppendValue(additionalArgument)
+	}
+
+	// Attempt to parse a single "]" delimiter.
+	_, token, ok = v.parseDelimiter("]")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Arguments")
+			panic(message)
+		} else {
+			// This is not a single arguments rule.
+			return arguments, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single arguments rule.
+	ruleFound_ = true
+	arguments = ast.Arguments().Make(
+		argument,
+		additionalArguments,
+	)
+	return arguments, token, ruleFound_
+}
+
 func (v *parser_) parseArray() (
 	array ast.ArrayLike,
 	token TokenLike,
@@ -401,6 +484,36 @@ aspectMethodsLoop:
 		aspectMethods,
 	)
 	return aspectDefinition, token, ruleFound_
+}
+
+func (v *parser_) parseAspectInterface() (
+	aspectInterface ast.AspectInterfaceLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "AspectInterface")
+			panic(message)
+		} else {
+			// This is not a single interface rule.
+			return aspectInterface, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single interface rule.
+	ruleFound_ = true
+	aspectInterface = ast.AspectInterface().Make(
+		abstraction,
+	)
+	return aspectInterface, token, ruleFound_
 }
 
 func (v *parser_) parseAspectMethod() (
@@ -578,138 +691,6 @@ func (v *parser_) parseAttributeMethod() (
 	return attributeMethod, token, false
 }
 
-func (v *parser_) parseGetterMethod() (
-	getterMethod ast.GetterMethodLike,
-	token TokenLike,
-	ok bool,
-) {
-	var ruleFound_ bool
-
-	// Attempt to parse a single name token.
-	var name string
-	var nameToken TokenLike
-	name, nameToken, ok = v.parseToken(NameToken)
-	if !ok {
-		// This is not a single getterMethod rule.
-		return getterMethod, nameToken, false
-	}
-
-	// Attempt to parse a single "(" delimiter.
-	var leftToken TokenLike
-	_, leftToken, ok = v.parseDelimiter("(")
-	if !ok {
-		// This is not a single getterMethod rule.
-		v.putBack(nameToken)
-		return getterMethod, leftToken, false
-	}
-
-	// Attempt to parse a single ")" delimiter.
-	_, token, ok = v.parseDelimiter(")")
-	if !ok {
-		// This is not a single getterMethod rule.
-		v.putBack(leftToken)
-		v.putBack(nameToken)
-		return getterMethod, token, false
-	}
-	ruleFound_ = true
-
-	// Attempt to parse a single abstraction rule.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "GetterMethod")
-			panic(message)
-		} else {
-			// This is not a single getterMethod rule.
-			return getterMethod, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Found a single getterMethod rule.
-	ruleFound_ = true
-	getterMethod = ast.GetterMethod().Make(
-		name,
-		abstraction,
-	)
-	return getterMethod, token, ruleFound_
-}
-
-func (v *parser_) parseSetterMethod() (
-	setterMethod ast.SetterMethodLike,
-	token TokenLike,
-	ok bool,
-) {
-	var ruleFound_ bool
-
-	// Attempt to parse a single name token.
-	var name string
-	name, token, ok = v.parseToken(NameToken)
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "SetterMethod")
-			panic(message)
-		} else {
-			// This is not a single setterMethod rule.
-			return setterMethod, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse a single "(" delimiter.
-	_, token, ok = v.parseDelimiter("(")
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "SetterMethod")
-			panic(message)
-		} else {
-			// This is not a single setterMethod rule.
-			return setterMethod, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse a single parameter rule.
-	var parameter ast.ParameterLike
-	parameter, token, ok = v.parseParameter()
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "SetterMethod")
-			panic(message)
-		} else {
-			// This is not a single setterMethod rule.
-			return setterMethod, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse a single ")" delimiter.
-	_, token, ok = v.parseDelimiter(")")
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "SetterMethod")
-			panic(message)
-		} else {
-			// This is not a single setterMethod rule.
-			return setterMethod, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Found a single setterMethod rule.
-	setterMethod = ast.SetterMethod().Make(
-		name,
-		parameter,
-	)
-	return setterMethod, token, ruleFound_
-}
-
 func (v *parser_) parseAttributeSubsection() (
 	attributeSubsection ast.AttributeSubsectionLike,
 	token TokenLike,
@@ -876,6 +857,52 @@ func (v *parser_) parseClass() (
 	return classDefinition, token, ruleFound_
 }
 
+func (v *parser_) parseClassMethods() (
+	classMethods ast.ClassMethodsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single constructorSubsection rule.
+	var constructorSubsection ast.ConstructorSubsectionLike
+	constructorSubsection, token, ok = v.parseConstructorSubsection()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "ClassMethods")
+			panic(message)
+		} else {
+			// This is not a single classMethods rule.
+			return classMethods, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse an optional constantSubsection rule.
+	var optionalConstantSubsection ast.ConstantSubsectionLike
+	optionalConstantSubsection, _, ok = v.parseConstantSubsection()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Attempt to parse an optional functionSubsection rule.
+	var optionalFunctionSubsection ast.FunctionSubsectionLike
+	optionalFunctionSubsection, _, ok = v.parseFunctionSubsection()
+	if ok {
+		ruleFound_ = true
+	}
+
+	// Found a single classMethods rule.
+	ruleFound_ = true
+	classMethods = ast.ClassMethods().Make(
+		constructorSubsection,
+		optionalConstantSubsection,
+		optionalFunctionSubsection,
+	)
+	return classMethods, token, ruleFound_
+}
+
 func (v *parser_) parseClassSection() (
 	classSection ast.ClassSectionLike,
 	token TokenLike,
@@ -941,52 +968,6 @@ classDefinitionsLoop:
 	ruleFound_ = true
 	classSection = ast.ClassSection().Make(classDefinitions)
 	return classSection, token, ruleFound_
-}
-
-func (v *parser_) parseClassMethods() (
-	classMethods ast.ClassMethodsLike,
-	token TokenLike,
-	ok bool,
-) {
-	var ruleFound_ bool
-
-	// Attempt to parse a single constructorSubsection rule.
-	var constructorSubsection ast.ConstructorSubsectionLike
-	constructorSubsection, token, ok = v.parseConstructorSubsection()
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "ClassMethods")
-			panic(message)
-		} else {
-			// This is not a single classMethods rule.
-			return classMethods, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse an optional constantSubsection rule.
-	var optionalConstantSubsection ast.ConstantSubsectionLike
-	optionalConstantSubsection, _, ok = v.parseConstantSubsection()
-	if ok {
-		ruleFound_ = true
-	}
-
-	// Attempt to parse an optional functionSubsection rule.
-	var optionalFunctionSubsection ast.FunctionSubsectionLike
-	optionalFunctionSubsection, _, ok = v.parseFunctionSubsection()
-	if ok {
-		ruleFound_ = true
-	}
-
-	// Found a single classMethods rule.
-	ruleFound_ = true
-	classMethods = ast.ClassMethods().Make(
-		constructorSubsection,
-		optionalConstantSubsection,
-		optionalFunctionSubsection,
-	)
-	return classMethods, token, ruleFound_
 }
 
 func (v *parser_) parseConstantMethod() (
@@ -1112,6 +1093,135 @@ constantMethodsLoop:
 	ruleFound_ = true
 	constantSubsection = ast.ConstantSubsection().Make(constantMethods)
 	return constantSubsection, token, ruleFound_
+}
+
+func (v *parser_) parseConstraint() (
+	constraint ast.ConstraintLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraint")
+			panic(message)
+		} else {
+			// This is not a single constraint rule.
+			return constraint, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single abstraction rule.
+	var abstraction ast.AbstractionLike
+	abstraction, token, ok = v.parseAbstraction()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraint")
+			panic(message)
+		} else {
+			// This is not a single constraint rule.
+			return constraint, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single constraint rule.
+	ruleFound_ = true
+	constraint = ast.Constraint().Make(
+		name,
+		abstraction,
+	)
+	return constraint, token, ruleFound_
+}
+
+func (v *parser_) parseConstraints() (
+	constraints ast.ConstraintsLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single "[" delimiter.
+	_, token, ok = v.parseDelimiter("[")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraints")
+			panic(message)
+		} else {
+			// This is not a single constraints rule.
+			return constraints, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single constraint rule.
+	var constraint ast.ConstraintLike
+	constraint, token, ok = v.parseConstraint()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraints")
+			panic(message)
+		} else {
+			// This is not a single constraints rule.
+			return constraints, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse 0 to unlimited additionalConstraint rules.
+	var additionalConstraints = col.List[ast.AdditionalConstraintLike]()
+additionalConstraintsLoop:
+	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
+		var additionalConstraint ast.AdditionalConstraintLike
+		additionalConstraint, token, ok = v.parseAdditionalConstraint()
+		if !ok {
+			switch {
+			case numberFound_ < 0:
+				if !ruleFound_ {
+					// This is not a single constraints rule.
+					return constraints, token, false
+				}
+				// Found a syntax error.
+				var message = v.formatError(token, "Constraints")
+				message += "The number of additionalConstraint rules must be at least 0."
+				panic(message)
+			default:
+				break additionalConstraintsLoop
+			}
+		}
+		additionalConstraints.AppendValue(additionalConstraint)
+	}
+
+	// Attempt to parse a single "]" delimiter.
+	_, token, ok = v.parseDelimiter("]")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "Constraints")
+			panic(message)
+		} else {
+			// This is not a single constraints rule.
+			return constraints, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single constraints rule.
+	ruleFound_ = true
+	constraints = ast.Constraints().Make(
+		constraint,
+		additionalConstraints,
+	)
+	return constraints, token, ruleFound_
 }
 
 func (v *parser_) parseConstructorMethod() (
@@ -1759,91 +1869,8 @@ functionalDefinitionsLoop:
 	return functionalSection, token, ruleFound_
 }
 
-func (v *parser_) parseArguments() (
-	arguments ast.ArgumentsLike,
-	token TokenLike,
-	ok bool,
-) {
-	var ruleFound_ bool
-
-	// Attempt to parse a single "[" delimiter.
-	_, token, ok = v.parseDelimiter("[")
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "Arguments")
-			panic(message)
-		} else {
-			// This is not a single arguments rule.
-			return arguments, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse a single argument rule.
-	var argument ast.ArgumentLike
-	argument, token, ok = v.parseArgument()
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "Arguments")
-			panic(message)
-		} else {
-			// This is not a single arguments rule.
-			return arguments, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse 0 to unlimited additionalArgument rules.
-	var additionalArguments = col.List[ast.AdditionalArgumentLike]()
-additionalArgumentsLoop:
-	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
-		var additionalArgument ast.AdditionalArgumentLike
-		additionalArgument, token, ok = v.parseAdditionalArgument()
-		if !ok {
-			switch {
-			case numberFound_ < 0:
-				if !ruleFound_ {
-					// This is not a single arguments rule.
-					return arguments, token, false
-				}
-				// Found a syntax error.
-				var message = v.formatError(token, "Arguments")
-				message += "The number of additionalArgument rules must be at least 0."
-				panic(message)
-			default:
-				break additionalArgumentsLoop
-			}
-		}
-		additionalArguments.AppendValue(additionalArgument)
-	}
-
-	// Attempt to parse a single "]" delimiter.
-	_, token, ok = v.parseDelimiter("]")
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "Arguments")
-			panic(message)
-		} else {
-			// This is not a single arguments rule.
-			return arguments, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Found a single arguments rule.
-	ruleFound_ = true
-	arguments = ast.Arguments().Make(
-		argument,
-		additionalArguments,
-	)
-	return arguments, token, ruleFound_
-}
-
-func (v *parser_) parseConstraint() (
-	constraint ast.ConstraintLike,
+func (v *parser_) parseGetterMethod() (
+	getterMethod ast.GetterMethodLike,
 	token TokenLike,
 	ok bool,
 ) {
@@ -1851,16 +1878,29 @@ func (v *parser_) parseConstraint() (
 
 	// Attempt to parse a single name token.
 	var name string
-	name, token, ok = v.parseToken(NameToken)
+	var nameToken TokenLike
+	name, nameToken, ok = v.parseToken(NameToken)
 	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "Constraint")
-			panic(message)
-		} else {
-			// This is not a single constraint rule.
-			return constraint, token, false
-		}
+		// This is not a single getterMethod rule.
+		return getterMethod, nameToken, false
+	}
+
+	// Attempt to parse a single "(" delimiter.
+	var leftToken TokenLike
+	_, leftToken, ok = v.parseDelimiter("(")
+	if !ok {
+		// This is not a single getterMethod rule.
+		v.putBack(nameToken)
+		return getterMethod, leftToken, false
+	}
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		// This is not a single getterMethod rule.
+		v.putBack(leftToken)
+		v.putBack(nameToken)
+		return getterMethod, token, false
 	}
 	ruleFound_ = true
 
@@ -1870,105 +1910,22 @@ func (v *parser_) parseConstraint() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constraint")
+			var message = v.formatError(token, "GetterMethod")
 			panic(message)
 		} else {
-			// This is not a single constraint rule.
-			return constraint, token, false
+			// This is not a single getterMethod rule.
+			return getterMethod, token, false
 		}
 	}
 	ruleFound_ = true
 
-	// Found a single constraint rule.
+	// Found a single getterMethod rule.
 	ruleFound_ = true
-	constraint = ast.Constraint().Make(
+	getterMethod = ast.GetterMethod().Make(
 		name,
 		abstraction,
 	)
-	return constraint, token, ruleFound_
-}
-
-func (v *parser_) parseConstraints() (
-	constraints ast.ConstraintsLike,
-	token TokenLike,
-	ok bool,
-) {
-	var ruleFound_ bool
-
-	// Attempt to parse a single "[" delimiter.
-	_, token, ok = v.parseDelimiter("[")
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "Constraints")
-			panic(message)
-		} else {
-			// This is not a single constraints rule.
-			return constraints, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse a single constraint rule.
-	var constraint ast.ConstraintLike
-	constraint, token, ok = v.parseConstraint()
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "Constraints")
-			panic(message)
-		} else {
-			// This is not a single constraints rule.
-			return constraints, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Attempt to parse 0 to unlimited additionalConstraint rules.
-	var additionalConstraints = col.List[ast.AdditionalConstraintLike]()
-additionalConstraintsLoop:
-	for numberFound_ := 0; numberFound_ < v.getClass().unlimited_; numberFound_++ {
-		var additionalConstraint ast.AdditionalConstraintLike
-		additionalConstraint, token, ok = v.parseAdditionalConstraint()
-		if !ok {
-			switch {
-			case numberFound_ < 0:
-				if !ruleFound_ {
-					// This is not a single constraints rule.
-					return constraints, token, false
-				}
-				// Found a syntax error.
-				var message = v.formatError(token, "Constraints")
-				message += "The number of additionalConstraint rules must be at least 0."
-				panic(message)
-			default:
-				break additionalConstraintsLoop
-			}
-		}
-		additionalConstraints.AppendValue(additionalConstraint)
-	}
-
-	// Attempt to parse a single "]" delimiter.
-	_, token, ok = v.parseDelimiter("]")
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "Constraints")
-			panic(message)
-		} else {
-			// This is not a single constraints rule.
-			return constraints, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Found a single constraints rule.
-	ruleFound_ = true
-	constraints = ast.Constraints().Make(
-		constraint,
-		additionalConstraints,
-	)
-	return constraints, token, ruleFound_
+	return getterMethod, token, ruleFound_
 }
 
 func (v *parser_) parseHeader() (
@@ -2309,36 +2266,6 @@ func (v *parser_) parseInstanceMethods() (
 		optionalAspectSubsection,
 	)
 	return instanceMethods, token, ruleFound_
-}
-
-func (v *parser_) parseAspectInterface() (
-	aspectInterface ast.AspectInterfaceLike,
-	token TokenLike,
-	ok bool,
-) {
-	var ruleFound_ bool
-
-	// Attempt to parse a single abstraction rule.
-	var abstraction ast.AbstractionLike
-	abstraction, token, ok = v.parseAbstraction()
-	if !ok {
-		if ruleFound_ {
-			// Found a syntax error.
-			var message = v.formatError(token, "AspectInterface")
-			panic(message)
-		} else {
-			// This is not a single interface rule.
-			return aspectInterface, token, false
-		}
-	}
-	ruleFound_ = true
-
-	// Found a single interface rule.
-	ruleFound_ = true
-	aspectInterface = ast.AspectInterface().Make(
-		abstraction,
-	)
-	return aspectInterface, token, ruleFound_
 }
 
 func (v *parser_) parseInterfaceDefinitions() (
@@ -3081,6 +3008,79 @@ func (v *parser_) parseResult() (
 	// This is not a single result rule.
 	return result, token, false
 
+}
+
+func (v *parser_) parseSetterMethod() (
+	setterMethod ast.SetterMethodLike,
+	token TokenLike,
+	ok bool,
+) {
+	var ruleFound_ bool
+
+	// Attempt to parse a single name token.
+	var name string
+	name, token, ok = v.parseToken(NameToken)
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "SetterMethod")
+			panic(message)
+		} else {
+			// This is not a single setterMethod rule.
+			return setterMethod, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single "(" delimiter.
+	_, token, ok = v.parseDelimiter("(")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "SetterMethod")
+			panic(message)
+		} else {
+			// This is not a single setterMethod rule.
+			return setterMethod, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single parameter rule.
+	var parameter ast.ParameterLike
+	parameter, token, ok = v.parseParameter()
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "SetterMethod")
+			panic(message)
+		} else {
+			// This is not a single setterMethod rule.
+			return setterMethod, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Attempt to parse a single ")" delimiter.
+	_, token, ok = v.parseDelimiter(")")
+	if !ok {
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "SetterMethod")
+			panic(message)
+		} else {
+			// This is not a single setterMethod rule.
+			return setterMethod, token, false
+		}
+	}
+	ruleFound_ = true
+
+	// Found a single setterMethod rule.
+	setterMethod = ast.SetterMethod().Make(
+		name,
+		parameter,
+	)
+	return setterMethod, token, ruleFound_
 }
 
 func (v *parser_) parseSuffix() (

@@ -76,16 +76,6 @@ func (v *classes_) getClass() *classesClass_ {
 	return v.class_
 }
 
-func (v *classes_) analyzeClassDefinition(
-	classDefinition ast.ClassDefinitionLike,
-	instanceDefinition ast.InstanceDefinitionLike,
-) {
-	v.analyzeClassGenerics(classDefinition)
-	v.analyzeClassConstants(classDefinition)
-	v.analyzePublicAttributes(instanceDefinition)
-	v.analyzePrivateAttributes(classDefinition)
-}
-
 func (v *classes_) analyzeClassConstants(
 	classDefinition ast.ClassDefinitionLike,
 ) {
@@ -101,6 +91,16 @@ func (v *classes_) analyzeClassConstants(
 			v.constants_.SetValue(constantName, constantType)
 		}
 	}
+}
+
+func (v *classes_) analyzeClassDefinition(
+	classDefinition ast.ClassDefinitionLike,
+	instanceDefinition ast.InstanceDefinitionLike,
+) {
+	v.analyzeClassGenerics(classDefinition)
+	v.analyzeClassConstants(classDefinition)
+	v.analyzePublicAttributes(instanceDefinition)
+	v.analyzePrivateAttributes(classDefinition)
 }
 
 func (v *classes_) analyzeClassGenerics(
@@ -162,15 +162,6 @@ func (v *classes_) analyzePublicAttributes(
 	}
 }
 
-func (v *classes_) extractClassName(
-	classDefinition ast.ClassDefinitionLike,
-) string {
-	var className = classDefinition.GetDeclaration().GetName()
-	className = sts.TrimSuffix(className, "ClassLike")
-	className = uti.MakeLowerCase(className)
-	return className
-}
-
 func (v *classes_) extractAttributeName(accessorName string) string {
 	var attributeName string
 	switch {
@@ -201,6 +192,59 @@ func (v *classes_) extractAttributeName(accessorName string) string {
 	}
 	attributeName = uti.MakeLowerCase(attributeName)
 	return attributeName
+}
+
+func (v *classes_) extractClassName(
+	classDefinition ast.ClassDefinitionLike,
+) string {
+	var className = classDefinition.GetDeclaration().GetName()
+	className = sts.TrimSuffix(className, "ClassLike")
+	className = uti.MakeLowerCase(className)
+	return className
+}
+
+func (v *classes_) extractConcreteMappings(
+	constraints ast.ConstraintsLike,
+	arguments ast.ArgumentsLike,
+) abs.CatalogLike[string, ast.AbstractionLike] {
+	// Create the mappings catalog.
+	var mappings = col.Catalog[string, ast.AbstractionLike]()
+	if uti.IsUndefined(constraints) || uti.IsUndefined(arguments) {
+		return mappings
+	}
+
+	// Map the name of the first constraint to its concrete type.
+	var constraint = constraints.GetConstraint()
+	var constraintName = constraint.GetName()
+	var argument = arguments.GetArgument()
+	var concreteType = argument.GetAbstraction()
+	mappings.SetValue(constraintName, concreteType)
+
+	// Map the name of the additional constraints to their concrete types.
+	var additionalConstraints = constraints.GetAdditionalConstraints().GetIterator()
+	var additionalArguments = arguments.GetAdditionalArguments().GetIterator()
+	for additionalConstraints.HasNext() {
+		constraint = additionalConstraints.GetNext().GetConstraint()
+		constraintName = constraint.GetName()
+		argument = additionalArguments.GetNext().GetArgument()
+		concreteType = argument.GetAbstraction()
+		mappings.SetValue(constraintName, concreteType)
+	}
+
+	return mappings
+}
+
+func (v *classes_) extractNotice(model ast.ModelLike) string {
+	var definition = model.GetModuleDefinition()
+	var notice = definition.GetNotice().GetComment()
+	return notice
+}
+
+func (v *classes_) extractPackageName(model ast.ModelLike) string {
+	var definition = model.GetModuleDefinition()
+	var header = definition.GetHeader()
+	var packageName = header.GetName()
+	return packageName
 }
 
 func (v *classes_) extractType(abstraction ast.AbstractionLike) string {
@@ -237,62 +281,15 @@ func (v *classes_) extractType(abstraction ast.AbstractionLike) string {
 	return abstractType
 }
 
-func (v *classes_) generateModules(
-	model ast.ModelLike,
-	class string,
-) (
+func (v *classes_) generateAccessFunction() (
 	implementation string,
 ) {
-	var moduleDefinition = model.GetModuleDefinition()
-	var imports = moduleDefinition.GetOptionalImports()
-	if uti.IsDefined(imports) {
-		var modules = imports.GetModules().GetIterator()
-		for modules.HasNext() {
-			var module = modules.GetNext()
-			var moduleName = module.GetName()
-			var prefix = moduleName + "."
-			var modulePath = module.GetPath()
-			if sts.Contains(class, prefix) && !sts.Contains(implementation, prefix) {
-				var alias = v.getClass().moduleAlias_
-				alias = uti.ReplaceAll(alias, "moduleName", moduleName)
-				alias = uti.ReplaceAll(alias, "modulePath", modulePath)
-				implementation += alias
-			}
-		}
+	implementation = v.getClass().accessFunction_
+	var function = v.getClass().classFunction_
+	if v.isGeneric_ {
+		function = v.getClass().genericFunction_
 	}
-	if sts.Contains(class, "fmt.") && !sts.Contains(implementation, "fmt.") {
-		var alias = v.getClass().moduleAlias_
-		alias = uti.ReplaceAll(alias, "moduleName", "fmt")
-		alias = uti.ReplaceAll(alias, "modulePath", "\"fmt\"")
-		implementation += alias
-	}
-	if sts.Contains(class, "uti.") && !sts.Contains(implementation, "uti.") {
-		var alias = v.getClass().moduleAlias_
-		alias = uti.ReplaceAll(alias, "moduleName", "uti")
-		alias = uti.ReplaceAll(alias, "modulePath", "\"github.com/craterdog/go-missing-utilities/v2\"")
-		implementation += alias
-	}
-	if sts.Contains(class, "col.") && !sts.Contains(implementation, "col.") {
-		var alias = v.getClass().moduleAlias_
-		alias = uti.ReplaceAll(alias, "moduleName", "col")
-		alias = uti.ReplaceAll(alias, "modulePath", "\"github.com/craterdog/go-collection-framework/v4\"")
-		implementation += alias
-	}
-	if sts.Contains(class, "abs.") && !sts.Contains(implementation, "abs.") {
-		var alias = v.getClass().moduleAlias_
-		alias = uti.ReplaceAll(alias, "moduleName", "abs")
-		alias = uti.ReplaceAll(alias, "modulePath", "\"github.com/craterdog/go-collection-framework/v4/collection\"")
-		implementation += alias
-	}
-	if sts.Contains(class, "syn.") && !sts.Contains(implementation, "syn.") {
-		var alias = v.getClass().moduleAlias_
-		alias = uti.ReplaceAll(alias, "moduleName", "syn")
-		alias = uti.ReplaceAll(alias, "modulePath", "\"sync\"")
-		implementation += alias
-	}
-	if uti.IsDefined(implementation) {
-		implementation += "\n"
-	}
+	implementation = uti.ReplaceAll(implementation, "function", function)
 	return implementation
 }
 
@@ -319,87 +316,197 @@ func (v *classes_) generateArguments(
 	return arguments
 }
 
-func (v *classes_) generateConstraints(
-	classDefinition ast.ClassDefinitionLike,
-) (
-	constraints string,
-) {
-	if v.isGeneric_ {
-		constraints = "["
-		var classDeclaration = classDefinition.GetDeclaration()
-		var optionalConstraints = classDeclaration.GetOptionalConstraints()
-		var constraint = optionalConstraints.GetConstraint()
-		var constraintName = constraint.GetName()
-		var constraintType = v.extractType(constraint.GetAbstraction())
-		constraints += constraintName + " " + constraintType
-		var additionalConstraints = optionalConstraints.GetAdditionalConstraints().GetIterator()
-		for additionalConstraints.HasNext() {
-			constraint = additionalConstraints.GetNext().GetConstraint()
-			constraintName = constraint.GetName()
-			constraintType = v.extractType(constraint.GetAbstraction())
-			constraints += ", " + constraintName + " " + constraintType
-		}
-		constraints += "]"
-	}
-	return constraints
-}
-
-func (v *classes_) generateImports(
-	model ast.ModelLike,
-	class string,
+func (v *classes_) generateAspectInterface(
+	aspectType ast.AbstractionLike,
+	aspectSection ast.AspectSectionLike,
 ) (
 	implementation string,
 ) {
-	var modules = v.generateModules(model, class)
-	if uti.IsDefined(modules) {
-		implementation = v.getClass().moduleImports_
-		implementation = uti.ReplaceAll(implementation, "modules", modules)
+	var methods string
+	if uti.IsDefined(aspectSection) {
+		var aspectDefinitions = aspectSection.GetAspectDefinitions().GetIterator()
+		for aspectDefinitions.HasNext() {
+			var aspectDefinition = aspectDefinitions.GetNext()
+			var declaration = aspectDefinition.GetDeclaration()
+			var constraints = declaration.GetOptionalConstraints()
+			var arguments = aspectType.GetOptionalArguments()
+			if uti.IsUndefined(aspectType.GetOptionalSuffix()) &&
+				declaration.GetName() == aspectType.GetName() {
+				var mappings = v.extractConcreteMappings(constraints, arguments)
+				methods = v.generateAspectMethods(
+					aspectType,
+					aspectDefinition,
+					mappings,
+				)
+			}
+		}
+	}
+	implementation = v.getClass().aspectInterface_
+	implementation = uti.ReplaceAll(
+		implementation,
+		"aspectType",
+		v.extractType(aspectType),
+	)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"methods",
+		methods,
+	)
+	return implementation
+}
+
+func (v *classes_) generateAspectInterfaces(
+	aspectSection ast.AspectSectionLike,
+	aspectSubsection ast.AspectSubsectionLike,
+) (
+	implementation string,
+) {
+	if uti.IsDefined(aspectSubsection) {
+		var aspectInterfaces = aspectSubsection.GetAspectInterfaces().GetIterator()
+		for aspectInterfaces.HasNext() {
+			var aspectType = aspectInterfaces.GetNext().GetAbstraction()
+			implementation += v.generateAspectInterface(aspectType, aspectSection)
+		}
 	}
 	return implementation
 }
 
-func (v *classes_) extractNotice(model ast.ModelLike) string {
-	var definition = model.GetModuleDefinition()
-	var notice = definition.GetNotice().GetComment()
-	return notice
+func (v *classes_) generateAspectMethod(
+	aspectType ast.AbstractionLike,
+	aspectMethod ast.AspectMethodLike,
+	mappings abs.CatalogLike[string, ast.AbstractionLike],
+) (
+	implementation string,
+) {
+	var method = aspectMethod.GetMethod()
+	var methodName = method.GetName()
+	var methodParameters = method.GetParameters()
+	var methodResult = method.GetOptionalResult()
+	if mappings.GetSize() > 0 {
+		methodParameters = v.replaceParameterTypes(method.GetParameters(), mappings)
+		if uti.IsDefined(methodResult) {
+			methodResult = v.replaceResultType(method.GetOptionalResult(), mappings)
+		}
+	}
+	var parameters = v.generateParameters(methodParameters)
+	var resultType = v.generateResult(methodResult)
+	implementation = v.getClass().instanceMethod_
+	if uti.IsDefined(resultType) {
+		implementation = v.getClass().instanceFunction_
+		implementation = uti.ReplaceAll(implementation, "resultType", resultType)
+	}
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
+	return implementation
 }
 
-func (v *classes_) extractPackageName(model ast.ModelLike) string {
-	var definition = model.GetModuleDefinition()
-	var header = definition.GetHeader()
-	var packageName = header.GetName()
-	return packageName
+func (v *classes_) generateAspectMethods(
+	aspectType ast.AbstractionLike,
+	aspectDefinition ast.AspectDefinitionLike,
+	mappings abs.CatalogLike[string, ast.AbstractionLike],
+) (
+	implementation string,
+) {
+	var aspectMethods = aspectDefinition.GetAspectMethods().GetIterator()
+	for aspectMethods.HasNext() {
+		var aspectMethod = aspectMethods.GetNext()
+		implementation += v.generateAspectMethod(
+			aspectType,
+			aspectMethod,
+			mappings,
+		)
+	}
+	return implementation
 }
 
-func (v *classes_) extractConcreteMappings(
-	constraints ast.ConstraintsLike,
-	arguments ast.ArgumentsLike,
-) abs.CatalogLike[string, ast.AbstractionLike] {
-	// Create the mappings catalog.
-	var mappings = col.Catalog[string, ast.AbstractionLike]()
-	if uti.IsUndefined(constraints) || uti.IsUndefined(arguments) {
-		return mappings
+func (v *classes_) generateAttributeCheck(parameter ast.ParameterLike) (
+	implementation string,
+) {
+	var parameterName = parameter.GetName()
+	var attributeName = sts.TrimSuffix(parameterName, "_")
+	// Ignore optional attributes.
+	if !sts.HasPrefix(attributeName, "optional") {
+		var template = v.getClass().attributeCheck_
+		template = uti.ReplaceAll(template, "attributeName", attributeName)
+		implementation += template
 	}
+	return implementation
+}
 
-	// Map the name of the first constraint to its concrete type.
-	var constraint = constraints.GetConstraint()
-	var constraintName = constraint.GetName()
-	var argument = arguments.GetArgument()
-	var concreteType = argument.GetAbstraction()
-	mappings.SetValue(constraintName, concreteType)
-
-	// Map the name of the additional constraints to their concrete types.
-	var additionalConstraints = constraints.GetAdditionalConstraints().GetIterator()
-	var additionalArguments = arguments.GetAdditionalArguments().GetIterator()
-	for additionalConstraints.HasNext() {
-		constraint = additionalConstraints.GetNext().GetConstraint()
-		constraintName = constraint.GetName()
-		argument = additionalArguments.GetNext().GetArgument()
-		concreteType = argument.GetAbstraction()
-		mappings.SetValue(constraintName, concreteType)
+func (v *classes_) generateAttributeChecks(
+	parameters abs.Sequential[ast.ParameterLike],
+) (
+	implementation string,
+) {
+	var iterator = parameters.GetIterator()
+	for iterator.HasNext() {
+		var parameter = iterator.GetNext()
+		var attributeCheck = v.generateAttributeCheck(parameter)
+		implementation += attributeCheck
 	}
+	return implementation
+}
 
-	return mappings
+func (v *classes_) generateAttributeDeclarations() (
+	implementation string,
+) {
+	var attributes = v.attributes_.GetIterator()
+	for attributes.HasNext() {
+		var attribute = attributes.GetNext()
+		var attributeName = attribute.GetKey()
+		var attributeType = attribute.GetValue()
+		var declaration = v.getClass().attributeDeclaration_
+		declaration = uti.ReplaceAll(declaration, "attributeName", attributeName)
+		declaration = uti.ReplaceAll(declaration, "attributeType", attributeType)
+		implementation += declaration
+	}
+	return implementation
+}
+
+func (v *classes_) generateAttributeInitializations(
+	parameters abs.Sequential[ast.ParameterLike],
+) (
+	implementation string,
+) {
+	var iterator = parameters.GetIterator()
+	for iterator.HasNext() {
+		var parameter = iterator.GetNext()
+		var parameterName = parameter.GetName()
+		var attributeName = sts.TrimSuffix(parameterName, "_")
+		if uti.IsDefined(v.attributes_.GetValue(attributeName)) {
+			var template = v.getClass().attributeInitialization_
+			template = uti.ReplaceAll(template, "attributeName", attributeName)
+			implementation += template
+		}
+	}
+	return implementation
+}
+
+func (v *classes_) generateAttributeMethods(
+	instanceDefinition ast.InstanceDefinitionLike,
+) (
+	implementation string,
+) {
+	var instanceMethods = instanceDefinition.GetInstanceMethods()
+	var attributeSubsection = instanceMethods.GetOptionalAttributeSubsection()
+	if uti.IsDefined(attributeSubsection) {
+		var methods string
+		var attributeMethods = attributeSubsection.GetAttributeMethods().GetIterator()
+		for attributeMethods.HasNext() {
+			var method string
+			var attributeMethod = attributeMethods.GetNext()
+			switch actual := attributeMethod.GetAny().(type) {
+			case ast.GetterMethodLike:
+				method = v.generateGetterMethod(actual)
+			case ast.SetterMethodLike:
+				method = v.generateSetterMethod(actual)
+			}
+			methods += method
+		}
+		implementation = v.getClass().attributeMethods_
+		implementation = uti.ReplaceAll(implementation, "methods", methods)
+	}
+	return implementation
 }
 
 func (v *classes_) generateClass(
@@ -557,109 +664,121 @@ func (v *classes_) generateClass(
 	return implementation
 }
 
-func (v *classes_) generatePackageDeclaration(model ast.ModelLike) (
+func (v *classes_) generateClassReference() (
 	implementation string,
 ) {
-	var packageName = v.extractPackageName(model)
-	implementation = v.getClass().packageDeclaration_
-	implementation = uti.ReplaceAll(implementation, "packageName", packageName)
-	return implementation
-}
-
-func (v *classes_) generateAccessFunction() (
-	implementation string,
-) {
-	implementation = v.getClass().accessFunction_
-	var function = v.getClass().classFunction_
+	implementation = v.getClass().classReference_
+	var variables = v.getClass().classVariables_
 	if v.isGeneric_ {
-		function = v.getClass().genericFunction_
+		variables = v.getClass().genericVariables_
 	}
-	implementation = uti.ReplaceAll(implementation, "function", function)
+	implementation = uti.ReplaceAll(implementation, "variables", variables)
+	var constantInitializations = v.generateConstantInitializations()
+	implementation = uti.ReplaceAll(
+		implementation,
+		"constantInitializations",
+		constantInitializations,
+	)
 	return implementation
 }
 
-func (v *classes_) generateAttributeCheck(parameter ast.ParameterLike) (
+func (v *classes_) generateClassStructure() (
 	implementation string,
 ) {
-	var parameterName = parameter.GetName()
-	var attributeName = sts.TrimSuffix(parameterName, "_")
-	// Ignore optional attributes.
-	if !sts.HasPrefix(attributeName, "optional") {
-		var template = v.getClass().attributeCheck_
-		template = uti.ReplaceAll(template, "attributeName", attributeName)
-		implementation += template
+	implementation = v.getClass().classStructure_
+	var constantDeclarations = v.generateConstantDeclarations()
+	implementation = uti.ReplaceAll(
+		implementation,
+		"constantDeclarations",
+		constantDeclarations,
+	)
+	return implementation
+}
+
+func (v *classes_) generateConstantDeclarations() (
+	implementation string,
+) {
+	var constants = v.constants_.GetIterator()
+	for constants.HasNext() {
+		var constant = constants.GetNext()
+		var constantName = constant.GetKey()
+		var constantType = constant.GetValue()
+		var declaration = v.getClass().constantDeclaration_
+		declaration = uti.ReplaceAll(declaration, "constantName", constantName)
+		declaration = uti.ReplaceAll(declaration, "constantType", constantType)
+		implementation += declaration
 	}
 	return implementation
 }
 
-func (v *classes_) generateAttributeChecks(
-	parameters abs.Sequential[ast.ParameterLike],
+func (v *classes_) generateConstantInitializations() (
+	implementation string,
+) {
+	var constants = v.constants_.GetIterator()
+	for constants.HasNext() {
+		var constant = constants.GetNext()
+		var constantName = constant.GetKey()
+		var initialization = v.getClass().constantInitialization_
+		initialization = uti.ReplaceAll(initialization, "constantName", constantName)
+		implementation += initialization
+	}
+	return implementation
+}
+
+func (v *classes_) generateConstantMethod(constantMethod ast.ConstantMethodLike) (
+	implementation string,
+) {
+	var methodName = constantMethod.GetName()
+	var resultType = v.extractType(constantMethod.GetAbstraction())
+	implementation = v.getClass().constantMethod_
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
+	return implementation
+}
+
+func (v *classes_) generateConstantMethods(
+	classDefinition ast.ClassDefinitionLike,
 ) (
 	implementation string,
 ) {
-	var iterator = parameters.GetIterator()
-	for iterator.HasNext() {
-		var parameter = iterator.GetNext()
-		var attributeCheck = v.generateAttributeCheck(parameter)
-		implementation += attributeCheck
-	}
-	return implementation
-}
-
-func (v *classes_) generateAttributeInitializations(
-	parameters abs.Sequential[ast.ParameterLike],
-) (
-	implementation string,
-) {
-	var iterator = parameters.GetIterator()
-	for iterator.HasNext() {
-		var parameter = iterator.GetNext()
-		var parameterName = parameter.GetName()
-		var attributeName = sts.TrimSuffix(parameterName, "_")
-		if uti.IsDefined(v.attributes_.GetValue(attributeName)) {
-			var template = v.getClass().attributeInitialization_
-			template = uti.ReplaceAll(template, "attributeName", attributeName)
-			implementation += template
+	var classMethods = classDefinition.GetClassMethods()
+	var constantSubsection = classMethods.GetOptionalConstantSubsection()
+	if uti.IsDefined(constantSubsection) {
+		var methods string
+		var constantMethods = constantSubsection.GetConstantMethods().GetIterator()
+		for constantMethods.HasNext() {
+			var constantMethod = constantMethods.GetNext()
+			methods += v.generateConstantMethod(constantMethod)
 		}
+		implementation = v.getClass().constantMethods_
+		implementation = uti.ReplaceAll(implementation, "methods", methods)
 	}
 	return implementation
 }
 
-func (v *classes_) generateParameters(
-	parameters abs.Sequential[ast.ParameterLike],
+func (v *classes_) generateConstraints(
+	classDefinition ast.ClassDefinitionLike,
 ) (
-	implementation string,
+	constraints string,
 ) {
-	var iterator = parameters.GetIterator()
-	for iterator.HasNext() {
-		var parameter = iterator.GetNext()
-		var parameterName = parameter.GetName()
-		var parameterType = v.extractType(parameter.GetAbstraction())
-		var template = v.getClass().methodParameter_
-		template = uti.ReplaceAll(template, "parameterName", parameterName)
-		template = uti.ReplaceAll(template, "parameterType", parameterType)
-		implementation += template
-	}
-	if uti.IsDefined(implementation) {
-		implementation += "\n"
-	}
-	return implementation
-}
-
-func (v *classes_) generateResult(
-	result ast.ResultLike,
-) (
-	implementation string,
-) {
-	if uti.IsDefined(result) {
-		switch actual := result.GetAny().(type) {
-		case ast.AbstractionLike:
-			implementation = v.extractType(actual)
-		case ast.ParameterizedLike:
-			implementation = "(" + v.generateParameters(actual.GetParameters()) + "\n)"
+	if v.isGeneric_ {
+		constraints = "["
+		var classDeclaration = classDefinition.GetDeclaration()
+		var optionalConstraints = classDeclaration.GetOptionalConstraints()
+		var constraint = optionalConstraints.GetConstraint()
+		var constraintName = constraint.GetName()
+		var constraintType = v.extractType(constraint.GetAbstraction())
+		constraints += constraintName + " " + constraintType
+		var additionalConstraints = optionalConstraints.GetAdditionalConstraints().GetIterator()
+		for additionalConstraints.HasNext() {
+			constraint = additionalConstraints.GetNext().GetConstraint()
+			constraintName = constraint.GetName()
+			constraintType = v.extractType(constraint.GetAbstraction())
+			constraints += ", " + constraintName + " " + constraintType
 		}
+		constraints += "]"
 	}
-	return implementation
+	return constraints
 }
 
 func (v *classes_) generateConstructorMethod(
@@ -699,37 +818,6 @@ func (v *classes_) generateConstructorMethods(
 	}
 	implementation = v.getClass().constructorMethods_
 	implementation = uti.ReplaceAll(implementation, "methods", methods)
-	return implementation
-}
-
-func (v *classes_) generateConstantMethod(constantMethod ast.ConstantMethodLike) (
-	implementation string,
-) {
-	var methodName = constantMethod.GetName()
-	var resultType = v.extractType(constantMethod.GetAbstraction())
-	implementation = v.getClass().constantMethod_
-	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
-	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
-	return implementation
-}
-
-func (v *classes_) generateConstantMethods(
-	classDefinition ast.ClassDefinitionLike,
-) (
-	implementation string,
-) {
-	var classMethods = classDefinition.GetClassMethods()
-	var constantSubsection = classMethods.GetOptionalConstantSubsection()
-	if uti.IsDefined(constantSubsection) {
-		var methods string
-		var constantMethods = constantSubsection.GetConstantMethods().GetIterator()
-		for constantMethods.HasNext() {
-			var constantMethod = constantMethods.GetNext()
-			methods += v.generateConstantMethod(constantMethod)
-		}
-		implementation = v.getClass().constantMethods_
-		implementation = uti.ReplaceAll(implementation, "methods", methods)
-	}
 	return implementation
 }
 
@@ -779,148 +867,118 @@ func (v *classes_) generateGetterMethod(getterMethod ast.GetterMethodLike) (
 	return implementation
 }
 
-func (v *classes_) generateSetterMethod(setterMethod ast.SetterMethodLike) (
-	implementation string,
-) {
-	var methodName = setterMethod.GetName()
-	var attributeName = v.extractAttributeName(methodName)
-	var parameter = setterMethod.GetParameter()
-	var attributeType = v.extractType(parameter.GetAbstraction())
-	var attributeCheck = v.generateAttributeCheck(parameter)
-	implementation = v.getClass().setterMethod_
-	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
-	implementation = uti.ReplaceAll(implementation, "attributeName", attributeName)
-	implementation = uti.ReplaceAll(implementation, "attributeType", attributeType)
-	implementation = uti.ReplaceAll(implementation, "attributeCheck", attributeCheck)
-	return implementation
-}
-
-func (v *classes_) generateAttributeMethods(
-	instanceDefinition ast.InstanceDefinitionLike,
+func (v *classes_) generateImports(
+	model ast.ModelLike,
+	class string,
 ) (
 	implementation string,
 ) {
-	var instanceMethods = instanceDefinition.GetInstanceMethods()
-	var attributeSubsection = instanceMethods.GetOptionalAttributeSubsection()
-	if uti.IsDefined(attributeSubsection) {
-		var methods string
-		var attributeMethods = attributeSubsection.GetAttributeMethods().GetIterator()
-		for attributeMethods.HasNext() {
-			var method string
-			var attributeMethod = attributeMethods.GetNext()
-			switch actual := attributeMethod.GetAny().(type) {
-			case ast.GetterMethodLike:
-				method = v.generateGetterMethod(actual)
-			case ast.SetterMethodLike:
-				method = v.generateSetterMethod(actual)
-			}
-			methods += method
-		}
-		implementation = v.getClass().attributeMethods_
-		implementation = uti.ReplaceAll(implementation, "methods", methods)
+	var modules = v.generateModules(model, class)
+	if uti.IsDefined(modules) {
+		implementation = v.getClass().moduleImports_
+		implementation = uti.ReplaceAll(implementation, "modules", modules)
 	}
 	return implementation
 }
 
-func (v *classes_) generateAspectInterface(
-	aspectType ast.AbstractionLike,
-	aspectSection ast.AspectSectionLike,
-) (
+func (v *classes_) generateInstanceStructure() (
 	implementation string,
 ) {
-	var methods string
-	if uti.IsDefined(aspectSection) {
-		var aspectDefinitions = aspectSection.GetAspectDefinitions().GetIterator()
-		for aspectDefinitions.HasNext() {
-			var aspectDefinition = aspectDefinitions.GetNext()
-			var declaration = aspectDefinition.GetDeclaration()
-			var constraints = declaration.GetOptionalConstraints()
-			var arguments = aspectType.GetOptionalArguments()
-			if uti.IsUndefined(aspectType.GetOptionalSuffix()) &&
-				declaration.GetName() == aspectType.GetName() {
-				var mappings = v.extractConcreteMappings(constraints, arguments)
-				methods = v.generateAspectMethods(
-					aspectType,
-					aspectDefinition,
-					mappings,
-				)
-			}
-		}
-	}
-	implementation = v.getClass().aspectInterface_
+	implementation = v.getClass().instanceStructure_
+	var attributeDeclarations = v.generateAttributeDeclarations()
 	implementation = uti.ReplaceAll(
 		implementation,
-		"aspectType",
-		v.extractType(aspectType),
-	)
-	implementation = uti.ReplaceAll(
-		implementation,
-		"methods",
-		methods,
+		"attributeDeclarations",
+		attributeDeclarations,
 	)
 	return implementation
 }
 
-func (v *classes_) generateAspectInterfaces(
-	aspectSection ast.AspectSectionLike,
-	aspectSubsection ast.AspectSubsectionLike,
+func (v *classes_) generateModules(
+	model ast.ModelLike,
+	class string,
 ) (
 	implementation string,
 ) {
-	if uti.IsDefined(aspectSubsection) {
-		var aspectInterfaces = aspectSubsection.GetAspectInterfaces().GetIterator()
-		for aspectInterfaces.HasNext() {
-			var aspectType = aspectInterfaces.GetNext().GetAbstraction()
-			implementation += v.generateAspectInterface(aspectType, aspectSection)
+	var moduleDefinition = model.GetModuleDefinition()
+	var imports = moduleDefinition.GetOptionalImports()
+	if uti.IsDefined(imports) {
+		var modules = imports.GetModules().GetIterator()
+		for modules.HasNext() {
+			var module = modules.GetNext()
+			var moduleName = module.GetName()
+			var prefix = moduleName + "."
+			var modulePath = module.GetPath()
+			if sts.Contains(class, prefix) && !sts.Contains(implementation, prefix) {
+				var alias = v.getClass().moduleAlias_
+				alias = uti.ReplaceAll(alias, "moduleName", moduleName)
+				alias = uti.ReplaceAll(alias, "modulePath", modulePath)
+				implementation += alias
+			}
 		}
+	}
+	if sts.Contains(class, "fmt.") && !sts.Contains(implementation, "fmt.") {
+		var alias = v.getClass().moduleAlias_
+		alias = uti.ReplaceAll(alias, "moduleName", "fmt")
+		alias = uti.ReplaceAll(alias, "modulePath", "\"fmt\"")
+		implementation += alias
+	}
+	if sts.Contains(class, "uti.") && !sts.Contains(implementation, "uti.") {
+		var alias = v.getClass().moduleAlias_
+		alias = uti.ReplaceAll(alias, "moduleName", "uti")
+		alias = uti.ReplaceAll(alias, "modulePath", "\"github.com/craterdog/go-missing-utilities/v2\"")
+		implementation += alias
+	}
+	if sts.Contains(class, "col.") && !sts.Contains(implementation, "col.") {
+		var alias = v.getClass().moduleAlias_
+		alias = uti.ReplaceAll(alias, "moduleName", "col")
+		alias = uti.ReplaceAll(alias, "modulePath", "\"github.com/craterdog/go-collection-framework/v4\"")
+		implementation += alias
+	}
+	if sts.Contains(class, "abs.") && !sts.Contains(implementation, "abs.") {
+		var alias = v.getClass().moduleAlias_
+		alias = uti.ReplaceAll(alias, "moduleName", "abs")
+		alias = uti.ReplaceAll(alias, "modulePath", "\"github.com/craterdog/go-collection-framework/v4/collection\"")
+		implementation += alias
+	}
+	if sts.Contains(class, "syn.") && !sts.Contains(implementation, "syn.") {
+		var alias = v.getClass().moduleAlias_
+		alias = uti.ReplaceAll(alias, "moduleName", "syn")
+		alias = uti.ReplaceAll(alias, "modulePath", "\"sync\"")
+		implementation += alias
+	}
+	if uti.IsDefined(implementation) {
+		implementation += "\n"
 	}
 	return implementation
 }
 
-func (v *classes_) generateAspectMethod(
-	aspectType ast.AbstractionLike,
-	aspectMethod ast.AspectMethodLike,
-	mappings abs.CatalogLike[string, ast.AbstractionLike],
-) (
+func (v *classes_) generatePackageDeclaration(model ast.ModelLike) (
 	implementation string,
 ) {
-	var method = aspectMethod.GetMethod()
-	var methodName = method.GetName()
-	var methodParameters = method.GetParameters()
-	var methodResult = method.GetOptionalResult()
-	if mappings.GetSize() > 0 {
-		methodParameters = v.replaceParameterTypes(method.GetParameters(), mappings)
-		if uti.IsDefined(methodResult) {
-			methodResult = v.replaceResultType(method.GetOptionalResult(), mappings)
-		}
-	}
-	var parameters = v.generateParameters(methodParameters)
-	var resultType = v.generateResult(methodResult)
-	implementation = v.getClass().instanceMethod_
-	if uti.IsDefined(resultType) {
-		implementation = v.getClass().instanceFunction_
-		implementation = uti.ReplaceAll(implementation, "resultType", resultType)
-	}
-	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
-	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
+	var packageName = v.extractPackageName(model)
+	implementation = v.getClass().packageDeclaration_
+	implementation = uti.ReplaceAll(implementation, "packageName", packageName)
 	return implementation
 }
 
-func (v *classes_) generateAspectMethods(
-	aspectType ast.AbstractionLike,
-	aspectDefinition ast.AspectDefinitionLike,
-	mappings abs.CatalogLike[string, ast.AbstractionLike],
+func (v *classes_) generateParameters(
+	parameters abs.Sequential[ast.ParameterLike],
 ) (
 	implementation string,
 ) {
-	var aspectMethods = aspectDefinition.GetAspectMethods().GetIterator()
-	for aspectMethods.HasNext() {
-		var aspectMethod = aspectMethods.GetNext()
-		implementation += v.generateAspectMethod(
-			aspectType,
-			aspectMethod,
-			mappings,
-		)
+	var iterator = parameters.GetIterator()
+	for iterator.HasNext() {
+		var parameter = iterator.GetNext()
+		var parameterName = parameter.GetName()
+		var parameterType = v.extractType(parameter.GetAbstraction())
+		var template = v.getClass().methodParameter_
+		template = uti.ReplaceAll(template, "parameterName", parameterName)
+		template = uti.ReplaceAll(template, "parameterType", parameterType)
+		implementation += template
+	}
+	if uti.IsDefined(implementation) {
+		implementation += "\n"
 	}
 	return implementation
 }
@@ -971,93 +1029,35 @@ func (v *classes_) generatePrivateMethods(
 	return implementation
 }
 
-func (v *classes_) generateClassReference() (
+func (v *classes_) generateResult(
+	result ast.ResultLike,
+) (
 	implementation string,
 ) {
-	implementation = v.getClass().classReference_
-	var variables = v.getClass().classVariables_
-	if v.isGeneric_ {
-		variables = v.getClass().genericVariables_
-	}
-	implementation = uti.ReplaceAll(implementation, "variables", variables)
-	var constantInitializations = v.generateConstantInitializations()
-	implementation = uti.ReplaceAll(
-		implementation,
-		"constantInitializations",
-		constantInitializations,
-	)
-	return implementation
-}
-
-func (v *classes_) generateClassStructure() (
-	implementation string,
-) {
-	implementation = v.getClass().classStructure_
-	var constantDeclarations = v.generateConstantDeclarations()
-	implementation = uti.ReplaceAll(
-		implementation,
-		"constantDeclarations",
-		constantDeclarations,
-	)
-	return implementation
-}
-
-func (v *classes_) generateInstanceStructure() (
-	implementation string,
-) {
-	implementation = v.getClass().instanceStructure_
-	var attributeDeclarations = v.generateAttributeDeclarations()
-	implementation = uti.ReplaceAll(
-		implementation,
-		"attributeDeclarations",
-		attributeDeclarations,
-	)
-	return implementation
-}
-
-func (v *classes_) generateAttributeDeclarations() (
-	implementation string,
-) {
-	var attributes = v.attributes_.GetIterator()
-	for attributes.HasNext() {
-		var attribute = attributes.GetNext()
-		var attributeName = attribute.GetKey()
-		var attributeType = attribute.GetValue()
-		var declaration = v.getClass().attributeDeclaration_
-		declaration = uti.ReplaceAll(declaration, "attributeName", attributeName)
-		declaration = uti.ReplaceAll(declaration, "attributeType", attributeType)
-		implementation += declaration
+	if uti.IsDefined(result) {
+		switch actual := result.GetAny().(type) {
+		case ast.AbstractionLike:
+			implementation = v.extractType(actual)
+		case ast.ParameterizedLike:
+			implementation = "(" + v.generateParameters(actual.GetParameters()) + "\n)"
+		}
 	}
 	return implementation
 }
 
-func (v *classes_) generateConstantDeclarations() (
+func (v *classes_) generateSetterMethod(setterMethod ast.SetterMethodLike) (
 	implementation string,
 ) {
-	var constants = v.constants_.GetIterator()
-	for constants.HasNext() {
-		var constant = constants.GetNext()
-		var constantName = constant.GetKey()
-		var constantType = constant.GetValue()
-		var declaration = v.getClass().constantDeclaration_
-		declaration = uti.ReplaceAll(declaration, "constantName", constantName)
-		declaration = uti.ReplaceAll(declaration, "constantType", constantType)
-		implementation += declaration
-	}
-	return implementation
-}
-
-func (v *classes_) generateConstantInitializations() (
-	implementation string,
-) {
-	var constants = v.constants_.GetIterator()
-	for constants.HasNext() {
-		var constant = constants.GetNext()
-		var constantName = constant.GetKey()
-		var initialization = v.getClass().constantInitialization_
-		initialization = uti.ReplaceAll(initialization, "constantName", constantName)
-		implementation += initialization
-	}
+	var methodName = setterMethod.GetName()
+	var attributeName = v.extractAttributeName(methodName)
+	var parameter = setterMethod.GetParameter()
+	var attributeType = v.extractType(parameter.GetAbstraction())
+	var attributeCheck = v.generateAttributeCheck(parameter)
+	implementation = v.getClass().setterMethod_
+	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
+	implementation = uti.ReplaceAll(implementation, "attributeName", attributeName)
+	implementation = uti.ReplaceAll(implementation, "attributeType", attributeType)
+	implementation = uti.ReplaceAll(implementation, "attributeCheck", attributeCheck)
 	return implementation
 }
 
@@ -1134,6 +1134,16 @@ func (v *classes_) replaceArgumentTypes(
 	return arguments
 }
 
+func (v *classes_) replaceParameterizedTypes(
+	parameterized ast.ParameterizedLike,
+	mappings abs.CatalogLike[string, ast.AbstractionLike],
+) ast.ParameterizedLike {
+	var parameters = parameterized.GetParameters()
+	var replacedParameters = v.replaceParameterTypes(parameters, mappings)
+	parameterized = ast.Parameterized().Make(replacedParameters)
+	return parameterized
+}
+
 func (v *classes_) replaceParameterType(
 	parameter ast.ParameterLike,
 	mappings abs.CatalogLike[string, ast.AbstractionLike],
@@ -1157,16 +1167,6 @@ func (v *classes_) replaceParameterTypes(
 		replacedParameters.AppendValue(parameter)
 	}
 	return replacedParameters
-}
-
-func (v *classes_) replaceParameterizedTypes(
-	parameterized ast.ParameterizedLike,
-	mappings abs.CatalogLike[string, ast.AbstractionLike],
-) ast.ParameterizedLike {
-	var parameters = parameterized.GetParameters()
-	var replacedParameters = v.replaceParameterTypes(parameters, mappings)
-	parameterized = ast.Parameterized().Make(replacedParameters)
-	return parameterized
 }
 
 func (v *classes_) replacePrefixType(
