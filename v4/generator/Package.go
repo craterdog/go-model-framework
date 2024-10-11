@@ -39,7 +39,7 @@ class constants, constructors and functions that must be supported by each
 concrete classes-like class.
 */
 type ClassesClassLike interface {
-	// Constructor
+	// Constructor Methods
 	Make() ClassesLike
 }
 
@@ -51,7 +51,7 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete classes-like class.
 */
 type ClassesLike interface {
-	// Public
+	// Public Methods
 	GetClass() ClassesClassLike
 	GenerateModelClasses(
 		model ast.ModelLike,

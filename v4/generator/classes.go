@@ -1306,7 +1306,7 @@ func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 	var class *<className>Class_<Arguments>
 	var name = fmt.Sprintf("%T", class)
 
-	// Check for existing bound class type.
+	// Check for an existing bound class type.
 	<className>Mutex.Lock()
 	var value = <className>Class[name]
 	switch actual := value.(type) {
@@ -1316,7 +1316,7 @@ func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 	default:
 		// Add a new bound class type.
 		class = &<className>Class_<Arguments>{
-			// Initialize class constants.
+			// Initialize the class constants.
 		}
 		<className>Class[name] = class
 	}
@@ -1346,7 +1346,7 @@ func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>L
 
 	attributeCheck_: `
 	if uti.IsUndefined(<attributeName_>) {
-		panic("The <~attributeName> attribute is required by this class.")
+		panic("The \"<~attributeName>\" attribute is required by this class.")
 	}`,
 
 	attributeInitialization_: `

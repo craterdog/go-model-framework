@@ -21,11 +21,9 @@ import (
 )
 
 var filenames = []string{
-	"../../../go-test-framework-model/v4/ast/Package.go",
-	"../../../go-test-framework-model/v4/grammar/Package.go",
-	"../../../go-test-framework-model/v4/example/Package.go",
-	//"../ast/Package.go",
-	//"../grammar/Package.go",
+	"../ast/Package.go",
+	"../grammar/Package.go",
+	"../generator/Package.go",
 }
 
 func TestRoundTrips(t *tes.T) {
