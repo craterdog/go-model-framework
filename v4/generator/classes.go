@@ -373,14 +373,15 @@ func (v *classes_) extractPackageName(model ast.ModelLike) string {
 	return packageName
 }
 
-/*
 func (v *classes_) extractConcreteMappings(
-	model ast.ModelLike,
 	constraints ast.ConstraintsLike,
 	arguments ast.ArgumentsLike,
 ) abs.CatalogLike[string, ast.AbstractionLike] {
 	// Create the mappings catalog.
 	var mappings = col.Catalog[string, ast.AbstractionLike]()
+	if uti.IsUndefined(constraints) || uti.IsUndefined(arguments) {
+		return mappings
+	}
 
 	// Map the name of the first constraint to its concrete type.
 	var constraint = constraints.GetConstraint()
@@ -402,7 +403,6 @@ func (v *classes_) extractConcreteMappings(
 
 	return mappings
 }
-*/
 
 func (v *classes_) generateClass(
 	model ast.ModelLike,
@@ -836,9 +836,16 @@ func (v *classes_) generateAspectInterface(
 		for aspectDefinitions.HasNext() {
 			var aspectDefinition = aspectDefinitions.GetNext()
 			var declaration = aspectDefinition.GetDeclaration()
+			var constraints = declaration.GetOptionalConstraints()
+			var arguments = aspectType.GetOptionalArguments()
 			if uti.IsUndefined(aspectType.GetOptionalSuffix()) &&
 				declaration.GetName() == aspectType.GetName() {
-				methods = v.generateAspectMethods(aspectType, aspectDefinition)
+				var mappings = v.extractConcreteMappings(constraints, arguments)
+				methods = v.generateAspectMethods(
+					aspectType,
+					aspectDefinition,
+					mappings,
+				)
 			}
 		}
 	}
@@ -875,13 +882,22 @@ func (v *classes_) generateAspectInterfaces(
 func (v *classes_) generateAspectMethod(
 	aspectType ast.AbstractionLike,
 	aspectMethod ast.AspectMethodLike,
+	mappings abs.CatalogLike[string, ast.AbstractionLike],
 ) (
 	implementation string,
 ) {
 	var method = aspectMethod.GetMethod()
 	var methodName = method.GetName()
-	var parameters = v.generateParameters(method.GetParameters())
-	var resultType = v.generateResult(method.GetOptionalResult())
+	var methodParameters = method.GetParameters()
+	var methodResult = method.GetOptionalResult()
+	if mappings.GetSize() > 0 {
+		methodParameters = v.replaceParameterTypes(method.GetParameters(), mappings)
+		if uti.IsDefined(methodResult) {
+			methodResult = v.replaceResultType(method.GetOptionalResult(), mappings)
+		}
+	}
+	var parameters = v.generateParameters(methodParameters)
+	var resultType = v.generateResult(methodResult)
 	implementation = v.getClass().instanceMethod_
 	if uti.IsDefined(resultType) {
 		implementation = v.getClass().instanceFunction_
@@ -895,13 +911,18 @@ func (v *classes_) generateAspectMethod(
 func (v *classes_) generateAspectMethods(
 	aspectType ast.AbstractionLike,
 	aspectDefinition ast.AspectDefinitionLike,
+	mappings abs.CatalogLike[string, ast.AbstractionLike],
 ) (
 	implementation string,
 ) {
 	var aspectMethods = aspectDefinition.GetAspectMethods().GetIterator()
 	for aspectMethods.HasNext() {
 		var aspectMethod = aspectMethods.GetNext()
-		implementation += v.generateAspectMethod(aspectType, aspectMethod)
+		implementation += v.generateAspectMethod(
+			aspectType,
+			aspectMethod,
+			mappings,
+		)
 	}
 	return implementation
 }
@@ -1042,207 +1063,6 @@ func (v *classes_) generateConstantInitializations() (
 	return implementation
 }
 
-/*
-func (v *classes_) extractInstanceAttributes(
-	instance ast.InstanceLike,
-	attributes abs.CatalogLike[string, string],
-) {
-	var iterator = instance.GetAttributes().GetAttributes().GetIterator()
-	for iterator.HasNext() {
-		var attribute = iterator.GetNext()
-		var attributeName, attributeType = v.extractType(attribute)
-		attributes.SetValue(attributeName, attributeType)
-	}
-}
-
-func (v *classes_) extractParameterAttribute(
-	parameter ast.ParameterLike,
-) {
-	var parameterName = parameter.GetName()
-	parameterName = sts.TrimSuffix(parameterName, "_")
-	var abstraction = parameter.GetAbstraction()
-	var parameterType = v.extractType(abstraction)
-	v.attributes_.SetValue(parameterName, parameterType)
-}
-
-func (v *classes_) extractParameterAttributes(
-	parameters ast.ParametersLike,
-) {
-	var parameter = parameters.GetParameter()
-	v.extractParameterAttribute(parameter, attributes)
-	var iterator = parameters.GetAdditionalParameters().GetIterator()
-	for iterator.HasNext() {
-		parameter = iterator.GetNext().GetParameter()
-		v.extractParameterAttribute(parameter, attributes)
-	}
-}
-
-func (v *classes_) extractTargetType(
-	class ast.ClassLike,
-) (
-	targetType string,
-) {
-	var constructorMethods = class.GetClassMethods().GetConstructorMethods()
-	var constructors = constructorMethods.GetConstructors().GetIterator()
-	for constructors.HasNext() {
-		var constructor = constructors.GetNext()
-		var name = constructor.GetName()
-		if name == "MakeFromValue" {
-			var parameter = constructor.GetParameters().GetIterator().GetNext()
-			var abstraction = parameter.GetAbstraction()
-			targetType = v.extractType(abstraction)
-			break
-		}
-	}
-	return targetType
-}
-
-func (v *classes_) extractInterfaceName(interface_ ast.InterfaceLike) string {
-	var name = interface_.GetName()
-	var suffix = interface_.GetOptionalSuffix()
-	if uti.IsDefined(suffix) {
-		name += "." + suffix.GetName()
-	}
-	return name
-}
-
-func (v *classes_) extractParameters(
-	parameters abs.Sequential[ast.ParameterLike],
-) (
-	implementation string,
-) {
-	var iterator = parameters.GetIterator()
-	for iterator.HasNext() {
-		var parameter = iterator.GetNext()
-		var parameterName = parameter.GetName()
-		var parameterType = v.extractType(parameter.GetAbstraction())
-		implementation += "\n\t" + parameterName + " " + parameterType + ","
-	}
-	if parameters.GetSize() > 1 {
-		implementation += "\n"
-	}
-	return implementation
-}
-
-func (v *classes_) extractResult(
-	result ast.ResultLike,
-) (
-	implementation string,
-) {
-	if uti.IsDefined(result) {
-		switch actual := result.GetAny().(type) {
-		case ast.AbstractionLike:
-			implementation = " " + v.extractType(actual)
-		case ast.ParameterizedLike:
-			implementation = " (" + v.extractParameters(actual.GetParameters()) + ")"
-		}
-	}
-	return implementation
-}
-
-func (v *classes_) generateAspectMethods(
-	aspect ast.AspectLike,
-	mappings abs.CatalogLike[string, ast.AbstractionLike],
-) (
-	implementation string,
-) {
-	var iterator = aspect.GetMethods().GetIterator()
-	for iterator.HasNext() {
-		var aspectMethod = iterator.GetNext()
-		var methodImplementation = v.generateMethodImplementation(
-			aspectMethod,
-			mappings,
-		)
-		implementation += methodImplementation
-	}
-	return implementation
-}
-
-func (v *classes_) generateAspects(
-	model ast.ModelLike,
-	instance ast.InstanceLike,
-) (
-	implementation string,
-) {
-	// Check to see if this instance interface includes aspects.
-	var instanceMethods = instance.GetInstanceMethods()
-	var aspectInterfaces = instanceMethods.GetOptionalAspectInterfaces()
-	if uti.IsUndefined(aspectInterfaces) {
-		return implementation
-	}
-
-	// Generate the methods for each aspect interface.
-	var interfaces = aspectInterfaces.GetInterfaces().GetIterator()
-	for interfaces.HasNext() {
-		// Each aspect interface binds to its own concrete arguments.
-		var interface_ = interfaces.GetNext()
-		var aspectName = v.extractInterfaceName(interface_)
-		var aspect = v.getTemplate(instanceAspect)
-		aspect = uti.ReplaceAll(aspect, "aspectName", aspectName)
-		var methods string
-		var suffix = interface_.GetOptionalSuffix()
-		if uti.IsUndefined(suffix) {
-			// We will only know the method signatures for the local aspects.
-			var mappings abs.CatalogLike[string, ast.AbstractionLike]
-			var aspect = v.retrieveAspect(model, interface_.GetName())
-			var declaration = aspect.GetDeclaration()
-			var constraints = declaration.GetOptionalConstraints()
-			var arguments = interface_.GetOptionalArguments()
-			if uti.IsDefined(constraints) && uti.IsDefined(arguments) {
-				mappings = v.extractConcreteMappings(constraints, arguments)
-			}
-			methods = v.generateAspectMethods(aspect, mappings)
-		}
-		aspect = uti.ReplaceAll(aspect, "methods", methods)
-		implementation += aspect
-	}
-
-	return implementation
-}
-
-func (v *classes_) generateMethodImplementation(
-	method ast.MethodLike,
-	mappings abs.CatalogLike[string, ast.AbstractionLike],
-) (
-	implementation string,
-) {
-	// Choose the right method template.
-	implementation = v.getTemplate(instanceMethod)
-	if v.isPrimitive_ {
-		implementation = v.getTemplate(typeMethod)
-	}
-	var methodName = method.GetName()
-	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
-
-	// Generate the right method body.
-	var methodResult = method.GetOptionalResult()
-	var body = v.generateMethodBody(methodResult)
-	implementation = uti.ReplaceAll(implementation, "body", body)
-
-	// Generate the method parameters.
-	var parameters string
-	var methodParameters = method.GetParameters()
-	if uti.IsDefined(mappings) && mappings.GetSize() > 0 {
-		methodParameters = v.replaceParameterTypes(methodParameters, mappings)
-	}
-	parameters = v.extractParameters(methodParameters)
-	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
-
-	// Generate the method result type.
-	var resultType string
-	if uti.IsDefined(methodResult) {
-		if uti.IsDefined(mappings) && mappings.GetSize() > 0 {
-			methodResult = v.replaceResultType(methodResult, mappings)
-		}
-		resultType = " " + v.extractResult(methodResult)
-	}
-	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
-
-	return implementation
-}
-*/
-
-/*
 func (v *classes_) replaceAbstractionType(
 	abstraction ast.AbstractionLike,
 	mappings abs.CatalogLike[string, ast.AbstractionLike],
@@ -1296,11 +1116,6 @@ func (v *classes_) replaceArgumentTypes(
 	arguments ast.ArgumentsLike,
 	mappings abs.CatalogLike[string, ast.AbstractionLike],
 ) ast.ArgumentsLike {
-	// Ignore the non-generic case.
-	if uti.IsUndefined(mappings) {
-		return arguments
-	}
-
 	// Replace the generic type of the first argument with its concrete type.
 	var argument = arguments.GetArgument()
 	argument = v.replaceArgumentType(argument, mappings)
@@ -1332,25 +1147,26 @@ func (v *classes_) replaceParameterType(
 	return parameter
 }
 
+func (v *classes_) replaceParameterTypes(
+	parameters abs.Sequential[ast.ParameterLike],
+	mappings abs.CatalogLike[string, ast.AbstractionLike],
+) abs.Sequential[ast.ParameterLike] {
+	var replacedParameters = col.List[ast.ParameterLike]()
+	var iterator = parameters.GetIterator()
+	for iterator.HasNext() {
+		var parameter = iterator.GetNext()
+		parameter = v.replaceParameterType(parameter, mappings)
+		replacedParameters.AppendValue(parameter)
+	}
+	return replacedParameters
+}
+
 func (v *classes_) replaceParameterizedTypes(
 	parameterized ast.ParameterizedLike,
 	mappings abs.CatalogLike[string, ast.AbstractionLike],
 ) ast.ParameterizedLike {
-	// Ignore the non-generic case.
-	if uti.IsUndefined(mappings) {
-		return parameterized
-	}
-
-	// Replace the generic type of each parameter with its concrete type.
-	var parameters = parameterized.GetParameters().GetIterator()
-	var replacedParameters = col.List[ast.ParameterLike]()
-	for parameters.HasNext() {
-		var parameter = parameters.GetNext()
-		parameter = v.replaceParameterType(parameter, mappings)
-		replacedParameters.AppendValue(parameter)
-	}
-
-	// Construct the updated sequence of parameters.
+	var parameters = parameterized.GetParameters()
+	var replacedParameters = v.replaceParameterTypes(parameters, mappings)
 	parameterized = ast.Parameterized().Make(replacedParameters)
 	return parameterized
 }
@@ -1377,8 +1193,11 @@ func (v *classes_) replaceResultType(
 	result ast.ResultLike,
 	mappings abs.CatalogLike[string, ast.AbstractionLike],
 ) ast.ResultLike {
-	// Handle the different kinds of results.
+	if uti.IsUndefined(result) {
+		return result
+	}
 	switch actual := result.GetAny().(type) {
+	case ast.NoneLike:
 	case ast.AbstractionLike:
 		var abstraction = actual
 		abstraction = v.replaceAbstractionType(abstraction, mappings)
@@ -1396,7 +1215,6 @@ func (v *classes_) replaceResultType(
 	}
 	return result
 }
-*/
 
 // PRIVATE INTERFACE
 
