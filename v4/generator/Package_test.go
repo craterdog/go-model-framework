@@ -22,10 +22,10 @@ import (
 )
 
 var testDirectories = []string{
-	"../../../go-test-framework-model/v4/ast/",
-	"../../../go-test-framework-model/v4/grammar/",
-	"../../../go-test-framework-model/v4/generator/",
-	"../../../go-test-framework-model/v4/example/",
+	"../../../go-test-framework/v4/ast/",
+	"../../../go-test-framework/v4/grammar/",
+	"../../../go-test-framework/v4/generator/",
+	"../../../go-test-framework/v4/example/",
 }
 
 func TestRoundTrips(t *tes.T) {
