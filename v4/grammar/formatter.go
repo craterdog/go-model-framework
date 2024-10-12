@@ -468,13 +468,12 @@ func (v *formatter_) PostprocessParameter(
 	}
 }
 
-func (v *formatter_) ProcessParameterizedSlot(slot uint) {
-	switch slot {
-	case 1:
-		v.appendString("(")
-	case 2:
-		v.appendString(")")
-	}
+func (v *formatter_) PreprocessParameterized(parameterized ast.ParameterizedLike) {
+	v.appendString("(")
+}
+
+func (v *formatter_) PostprocessParameterized(parameterized ast.ParameterizedLike) {
+	v.appendString(")")
 }
 
 func (v *formatter_) PreprocessPublicSubsection(publicSubsection ast.PublicSubsectionLike) {
