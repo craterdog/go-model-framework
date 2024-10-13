@@ -17,6 +17,7 @@ import (
 	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v4"
 	abs "github.com/craterdog/go-collection-framework/v4/collection"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 	sts "strings"
 )
@@ -3397,7 +3398,7 @@ func (v *parser_) formatError(token TokenLike, ruleName string) string {
 		message += fmt.Sprintf("%04d: ", line+1) + string(lines[line]) + "\n"
 	}
 	message += "\033[0m\n"
-	if col.IsDefined(ruleName) {
+	if uti.IsDefined(ruleName) {
 		message += "Was expecting:\n"
 		message += fmt.Sprintf(
 			"  \033[32m%v: \033[33m%v\033[0m\n\n",

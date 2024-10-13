@@ -14,7 +14,6 @@ package grammar
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v4"
 	uti "github.com/craterdog/go-missing-utilities/v2"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 )
@@ -68,7 +67,7 @@ func (v *visitor_) getClass() *visitorClass_ {
 func (v *visitor_) visitAbstraction(abstraction ast.AbstractionLike) {
 	// Visit the optional prefix rule.
 	var optionalPrefix = abstraction.GetOptionalPrefix()
-	if col.IsDefined(optionalPrefix) {
+	if uti.IsDefined(optionalPrefix) {
 		v.processor_.PreprocessPrefix(optionalPrefix)
 		v.visitPrefix(optionalPrefix)
 		v.processor_.PostprocessPrefix(optionalPrefix)
@@ -86,7 +85,7 @@ func (v *visitor_) visitAbstraction(abstraction ast.AbstractionLike) {
 
 	// Visit the optional suffix rule.
 	var optionalSuffix = abstraction.GetOptionalSuffix()
-	if col.IsDefined(optionalSuffix) {
+	if uti.IsDefined(optionalSuffix) {
 		v.processor_.PreprocessSuffix(optionalSuffix)
 		v.visitSuffix(optionalSuffix)
 		v.processor_.PostprocessSuffix(optionalSuffix)
@@ -97,7 +96,7 @@ func (v *visitor_) visitAbstraction(abstraction ast.AbstractionLike) {
 
 	// Visit the optional arguments rule.
 	var optionalArguments = abstraction.GetOptionalArguments()
-	if col.IsDefined(optionalArguments) {
+	if uti.IsDefined(optionalArguments) {
 		v.processor_.PreprocessArguments(optionalArguments)
 		v.visitArguments(optionalArguments)
 		v.processor_.PostprocessArguments(optionalArguments)
@@ -328,7 +327,7 @@ func (v *visitor_) visitClassMethods(classMethods ast.ClassMethodsLike) {
 
 	// Visit the optional constantSubsection rule.
 	var optionalConstantSubsection = classMethods.GetOptionalConstantSubsection()
-	if col.IsDefined(optionalConstantSubsection) {
+	if uti.IsDefined(optionalConstantSubsection) {
 		v.processor_.PreprocessConstantSubsection(optionalConstantSubsection)
 		v.visitConstantSubsection(optionalConstantSubsection)
 		v.processor_.PostprocessConstantSubsection(optionalConstantSubsection)
@@ -339,7 +338,7 @@ func (v *visitor_) visitClassMethods(classMethods ast.ClassMethodsLike) {
 
 	// Visit the optional functionSubsection rule.
 	var optionalFunctionSubsection = classMethods.GetOptionalFunctionSubsection()
-	if col.IsDefined(optionalFunctionSubsection) {
+	if uti.IsDefined(optionalFunctionSubsection) {
 		v.processor_.PreprocessFunctionSubsection(optionalFunctionSubsection)
 		v.visitFunctionSubsection(optionalFunctionSubsection)
 		v.processor_.PostprocessFunctionSubsection(optionalFunctionSubsection)
@@ -528,7 +527,7 @@ func (v *visitor_) visitDeclaration(declaration ast.DeclarationLike) {
 
 	// Visit the optional constraints rule.
 	var optionalConstraints = declaration.GetOptionalConstraints()
-	if col.IsDefined(optionalConstraints) {
+	if uti.IsDefined(optionalConstraints) {
 		v.processor_.PreprocessConstraints(optionalConstraints)
 		v.visitConstraints(optionalConstraints)
 		v.processor_.PostprocessConstraints(optionalConstraints)
@@ -698,7 +697,7 @@ func (v *visitor_) visitGetterMethod(getterMethod ast.GetterMethodLike) {
 
 	// Visit the single abstraction rule.
 	var abstraction = getterMethod.GetAbstraction()
-	if col.IsDefined(abstraction) {
+	if uti.IsDefined(abstraction) {
 		v.processor_.PreprocessAbstraction(abstraction)
 		v.visitAbstraction(abstraction)
 		v.processor_.PostprocessAbstraction(abstraction)
@@ -769,7 +768,7 @@ func (v *visitor_) visitInstanceMethods(instanceMethods ast.InstanceMethodsLike)
 
 	// Visit the optional attributeSubsection rule.
 	var optionalAttributeSubsection = instanceMethods.GetOptionalAttributeSubsection()
-	if col.IsDefined(optionalAttributeSubsection) {
+	if uti.IsDefined(optionalAttributeSubsection) {
 		v.processor_.PreprocessAttributeSubsection(optionalAttributeSubsection)
 		v.visitAttributeSubsection(optionalAttributeSubsection)
 		v.processor_.PostprocessAttributeSubsection(optionalAttributeSubsection)
@@ -780,7 +779,7 @@ func (v *visitor_) visitInstanceMethods(instanceMethods ast.InstanceMethodsLike)
 
 	// Visit the optional aspectSubsection rule.
 	var optionalAspectSubsection = instanceMethods.GetOptionalAspectSubsection()
-	if col.IsDefined(optionalAspectSubsection) {
+	if uti.IsDefined(optionalAspectSubsection) {
 		v.processor_.PreprocessAspectSubsection(optionalAspectSubsection)
 		v.visitAspectSubsection(optionalAspectSubsection)
 		v.processor_.PostprocessAspectSubsection(optionalAspectSubsection)
@@ -830,7 +829,7 @@ func (v *visitor_) visitInterfaceDefinitions(interfaceDefinitions ast.InterfaceD
 
 	// Visit the optional aspectSection rule.
 	var optionalAspectSection = interfaceDefinitions.GetOptionalAspectSection()
-	if col.IsDefined(optionalAspectSection) {
+	if uti.IsDefined(optionalAspectSection) {
 		v.processor_.PreprocessAspectSection(optionalAspectSection)
 		v.visitAspectSection(optionalAspectSection)
 		v.processor_.PostprocessAspectSection(optionalAspectSection)
@@ -876,7 +875,7 @@ func (v *visitor_) visitMethod(method ast.MethodLike) {
 
 	// Visit the optional result rule.
 	var optionalResult = method.GetOptionalResult()
-	if col.IsDefined(optionalResult) {
+	if uti.IsDefined(optionalResult) {
 		v.processor_.PreprocessResult(optionalResult)
 		v.visitResult(optionalResult)
 		v.processor_.PostprocessResult(optionalResult)
@@ -943,7 +942,7 @@ func (v *visitor_) visitModuleDefinition(moduleDefinition ast.ModuleDefinitionLi
 
 	// Visit the optional imports rule.
 	var optionalImports = moduleDefinition.GetOptionalImports()
-	if col.IsDefined(optionalImports) {
+	if uti.IsDefined(optionalImports) {
 		v.processor_.PreprocessImports(optionalImports)
 		v.visitImports(optionalImports)
 		v.processor_.PostprocessImports(optionalImports)
@@ -1027,7 +1026,7 @@ func (v *visitor_) visitPrefix(prefix ast.PrefixLike) {
 func (v *visitor_) visitPrimitiveDefinitions(primitiveDefinitions ast.PrimitiveDefinitionsLike) {
 	// Visit the optional typeSection rule.
 	var optionalTypeSection = primitiveDefinitions.GetOptionalTypeSection()
-	if col.IsDefined(optionalTypeSection) {
+	if uti.IsDefined(optionalTypeSection) {
 		v.processor_.PreprocessTypeSection(optionalTypeSection)
 		v.visitTypeSection(optionalTypeSection)
 		v.processor_.PostprocessTypeSection(optionalTypeSection)
@@ -1038,7 +1037,7 @@ func (v *visitor_) visitPrimitiveDefinitions(primitiveDefinitions ast.PrimitiveD
 
 	// Visit the optional functionalSection rule.
 	var optionalFunctionalSection = primitiveDefinitions.GetOptionalFunctionalSection()
-	if col.IsDefined(optionalFunctionalSection) {
+	if uti.IsDefined(optionalFunctionalSection) {
 		v.processor_.PreprocessFunctionalSection(optionalFunctionalSection)
 		v.visitFunctionalSection(optionalFunctionalSection)
 		v.processor_.PostprocessFunctionalSection(optionalFunctionalSection)
@@ -1110,7 +1109,7 @@ func (v *visitor_) visitSetterMethod(setterMethod ast.SetterMethodLike) {
 
 	// Visit the parameter rule.
 	var parameter = setterMethod.GetParameter()
-	if col.IsDefined(parameter) {
+	if uti.IsDefined(parameter) {
 		v.processor_.PreprocessParameter(parameter, 1, 1)
 		v.visitParameter(parameter)
 		v.processor_.PostprocessParameter(parameter, 1, 1)
@@ -1144,7 +1143,7 @@ func (v *visitor_) visitTypeDefinition(typeDefinition ast.TypeDefinitionLike) {
 
 	// Visit the optional enumeration rule.
 	var optionalEnumeration = typeDefinition.GetOptionalEnumeration()
-	if col.IsDefined(optionalEnumeration) {
+	if uti.IsDefined(optionalEnumeration) {
 		v.processor_.PreprocessEnumeration(optionalEnumeration)
 		v.visitEnumeration(optionalEnumeration)
 		v.processor_.PostprocessEnumeration(optionalEnumeration)

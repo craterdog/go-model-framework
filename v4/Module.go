@@ -11,26 +11,20 @@
 */
 
 /*
-Package "module" defines a universal constructor for each class that is exported
-by this module.  Each constructor delegates the actual construction process to
-one of the classes defined in a subpackage for this module.
+Package "module" defines type aliases for the commonly used types defined in the
+packages contained in this module.  It also provides a universal constructor for
+the commonly used classes that are exported by this module.  Each constructor
+delegates the actual construction process to its corresponding concrete class
+defined in a package contained within this module.
 
 For detailed documentation on this entire module refer to the wiki:
   - https://github.com/craterdog/go-model-framework/wiki
-
-This package follows the Crater Dog Technologies™ (craterdog) Go Coding
-Conventions located here:
-  - https://github.com/craterdog/go-model-framework/wiki
-
-The classes defined in this module provide the ability to parse, validate and
-format Go Class Model Notation (GCMN).  They can also generate concrete class
-implementation files for each abstract class defined in the Package.go file.
 */
 package module
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v4"
+	uti "github.com/craterdog/go-missing-utilities/v2"
 	ast "github.com/craterdog/go-model-framework/v4/ast"
 	gen "github.com/craterdog/go-model-framework/v4/generator"
 	gra "github.com/craterdog/go-model-framework/v4/grammar"
@@ -154,7 +148,7 @@ func Visitor(args ...any) VisitorLike {
 		case Methodical:
 			processor = actual
 		default:
-			if col.IsDefined(arg) {
+			if uti.IsDefined(arg) {
 				var message = fmt.Sprintf(
 					"An unknown argument type was passed into the \"visitor\" constructor: %T\n",
 					actual,
