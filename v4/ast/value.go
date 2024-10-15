@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Value() ValueClassLike {
-	return valueClass
+	return valueReference()
 }
 
 // Constructor Methods
@@ -88,6 +88,10 @@ type valueClass_ struct {
 
 // Class Reference
 
-var valueClass = &valueClass_{
+func valueReference() *valueClass_ {
+	return valueReference_
+}
+
+var valueReference_ = &valueClass_{
 	// Initialize the class constants.
 }

@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func PublicSubsection() PublicSubsectionClassLike {
-	return publicSubsectionClass
+	return publicSubsectionReference()
 }
 
 // Constructor Methods
@@ -79,6 +79,10 @@ type publicSubsectionClass_ struct {
 
 // Class Reference
 
-var publicSubsectionClass = &publicSubsectionClass_{
+func publicSubsectionReference() *publicSubsectionClass_ {
+	return publicSubsectionReference_
+}
+
+var publicSubsectionReference_ = &publicSubsectionClass_{
 	// Initialize the class constants.
 }

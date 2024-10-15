@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func AdditionalConstraint() AdditionalConstraintClassLike {
-	return additionalConstraintClass
+	return additionalConstraintReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type additionalConstraintClass_ struct {
 
 // Class Reference
 
-var additionalConstraintClass = &additionalConstraintClass_{
+func additionalConstraintReference() *additionalConstraintClass_ {
+	return additionalConstraintReference_
+}
+
+var additionalConstraintReference_ = &additionalConstraintClass_{
 	// Initialize the class constants.
 }

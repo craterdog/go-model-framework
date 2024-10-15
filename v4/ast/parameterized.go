@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func Parameterized() ParameterizedClassLike {
-	return parameterizedClass
+	return parameterizedReference()
 }
 
 // Constructor Methods
@@ -79,6 +79,10 @@ type parameterizedClass_ struct {
 
 // Class Reference
 
-var parameterizedClass = &parameterizedClass_{
+func parameterizedReference() *parameterizedClass_ {
+	return parameterizedReference_
+}
+
+var parameterizedReference_ = &parameterizedClass_{
 	// Initialize the class constants.
 }

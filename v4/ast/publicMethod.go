@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func PublicMethod() PublicMethodClassLike {
-	return publicMethodClass
+	return publicMethodReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type publicMethodClass_ struct {
 
 // Class Reference
 
-var publicMethodClass = &publicMethodClass_{
+func publicMethodReference() *publicMethodClass_ {
+	return publicMethodReference_
+}
+
+var publicMethodReference_ = &publicMethodClass_{
 	// Initialize the class constants.
 }

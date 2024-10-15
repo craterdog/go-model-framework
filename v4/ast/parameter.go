@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Parameter() ParameterClassLike {
-	return parameterClass
+	return parameterReference()
 }
 
 // Constructor Methods
@@ -88,6 +88,10 @@ type parameterClass_ struct {
 
 // Class Reference
 
-var parameterClass = &parameterClass_{
+func parameterReference() *parameterClass_ {
+	return parameterReference_
+}
+
+var parameterReference_ = &parameterClass_{
 	// Initialize the class constants.
 }

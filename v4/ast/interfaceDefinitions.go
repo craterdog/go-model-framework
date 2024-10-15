@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func InterfaceDefinitions() InterfaceDefinitionsClassLike {
-	return interfaceDefinitionsClass
+	return interfaceDefinitionsReference()
 }
 
 // Constructor Methods
@@ -95,6 +95,10 @@ type interfaceDefinitionsClass_ struct {
 
 // Class Reference
 
-var interfaceDefinitionsClass = &interfaceDefinitionsClass_{
+func interfaceDefinitionsReference() *interfaceDefinitionsClass_ {
+	return interfaceDefinitionsReference_
+}
+
+var interfaceDefinitionsReference_ = &interfaceDefinitionsClass_{
 	// Initialize the class constants.
 }

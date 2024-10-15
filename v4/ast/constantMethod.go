@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func ConstantMethod() ConstantMethodClassLike {
-	return constantMethodClass
+	return constantMethodReference()
 }
 
 // Constructor Methods
@@ -88,6 +88,10 @@ type constantMethodClass_ struct {
 
 // Class Reference
 
-var constantMethodClass = &constantMethodClass_{
+func constantMethodReference() *constantMethodClass_ {
+	return constantMethodReference_
+}
+
+var constantMethodReference_ = &constantMethodClass_{
 	// Initialize the class constants.
 }

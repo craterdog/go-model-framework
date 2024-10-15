@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Result() ResultClassLike {
-	return resultClass
+	return resultReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type resultClass_ struct {
 
 // Class Reference
 
-var resultClass = &resultClass_{
+func resultReference() *resultClass_ {
+	return resultReference_
+}
+
+var resultReference_ = &resultClass_{
 	// Initialize the class constants.
 }

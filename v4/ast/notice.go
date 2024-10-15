@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Notice() NoticeClassLike {
-	return noticeClass
+	return noticeReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type noticeClass_ struct {
 
 // Class Reference
 
-var noticeClass = &noticeClass_{
+func noticeReference() *noticeClass_ {
+	return noticeReference_
+}
+
+var noticeReference_ = &noticeClass_{
 	// Initialize the class constants.
 }

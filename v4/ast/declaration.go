@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Declaration() DeclarationClassLike {
-	return declarationClass
+	return declarationReference()
 }
 
 // Constructor Methods
@@ -95,6 +95,10 @@ type declarationClass_ struct {
 
 // Class Reference
 
-var declarationClass = &declarationClass_{
+func declarationReference() *declarationClass_ {
+	return declarationReference_
+}
+
+var declarationReference_ = &declarationClass_{
 	// Initialize the class constants.
 }

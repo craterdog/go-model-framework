@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Abstraction() AbstractionClassLike {
-	return abstractionClass
+	return abstractionReference()
 }
 
 // Constructor Methods
@@ -99,6 +99,10 @@ type abstractionClass_ struct {
 
 // Class Reference
 
-var abstractionClass = &abstractionClass_{
+func abstractionReference() *abstractionClass_ {
+	return abstractionReference_
+}
+
+var abstractionReference_ = &abstractionClass_{
 	// Initialize the class constants.
 }

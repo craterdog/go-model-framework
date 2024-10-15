@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func Enumeration() EnumerationClassLike {
-	return enumerationClass
+	return enumerationReference()
 }
 
 // Constructor Methods
@@ -89,6 +89,10 @@ type enumerationClass_ struct {
 
 // Class Reference
 
-var enumerationClass = &enumerationClass_{
+func enumerationReference() *enumerationClass_ {
+	return enumerationReference_
+}
+
+var enumerationReference_ = &enumerationClass_{
 	// Initialize the class constants.
 }

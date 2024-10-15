@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Suffix() SuffixClassLike {
-	return suffixClass
+	return suffixReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type suffixClass_ struct {
 
 // Class Reference
 
-var suffixClass = &suffixClass_{
+func suffixReference() *suffixClass_ {
+	return suffixReference_
+}
+
+var suffixReference_ = &suffixClass_{
 	// Initialize the class constants.
 }

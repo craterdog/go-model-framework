@@ -17,7 +17,7 @@ package ast
 // Access Function
 
 func Array() ArrayClassLike {
-	return arrayClass
+	return arrayReference()
 }
 
 // Constructor Methods
@@ -61,6 +61,10 @@ type arrayClass_ struct {
 
 // Class Reference
 
-var arrayClass = &arrayClass_{
+func arrayReference() *arrayClass_ {
+	return arrayReference_
+}
+
+var arrayReference_ = &arrayClass_{
 	// Initialize the class constants.
 }

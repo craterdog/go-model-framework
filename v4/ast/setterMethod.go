@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func SetterMethod() SetterMethodClassLike {
-	return setterMethodClass
+	return setterMethodReference()
 }
 
 // Constructor Methods
@@ -88,6 +88,10 @@ type setterMethodClass_ struct {
 
 // Class Reference
 
-var setterMethodClass = &setterMethodClass_{
+func setterMethodReference() *setterMethodClass_ {
+	return setterMethodReference_
+}
+
+var setterMethodReference_ = &setterMethodClass_{
 	// Initialize the class constants.
 }

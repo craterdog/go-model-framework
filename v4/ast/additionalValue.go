@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func AdditionalValue() AdditionalValueClassLike {
-	return additionalValueClass
+	return additionalValueReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type additionalValueClass_ struct {
 
 // Class Reference
 
-var additionalValueClass = &additionalValueClass_{
+func additionalValueReference() *additionalValueClass_ {
+	return additionalValueReference_
+}
+
+var additionalValueReference_ = &additionalValueClass_{
 	// Initialize the class constants.
 }

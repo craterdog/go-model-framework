@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func GetterMethod() GetterMethodClassLike {
-	return getterMethodClass
+	return getterMethodReference()
 }
 
 // Constructor Methods
@@ -88,6 +88,10 @@ type getterMethodClass_ struct {
 
 // Class Reference
 
-var getterMethodClass = &getterMethodClass_{
+func getterMethodReference() *getterMethodClass_ {
+	return getterMethodReference_
+}
+
+var getterMethodReference_ = &getterMethodClass_{
 	// Initialize the class constants.
 }

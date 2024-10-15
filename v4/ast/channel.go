@@ -17,7 +17,7 @@ package ast
 // Access Function
 
 func Channel() ChannelClassLike {
-	return channelClass
+	return channelReference()
 }
 
 // Constructor Methods
@@ -61,6 +61,10 @@ type channelClass_ struct {
 
 // Class Reference
 
-var channelClass = &channelClass_{
+func channelReference() *channelClass_ {
+	return channelReference_
+}
+
+var channelReference_ = &channelClass_{
 	// Initialize the class constants.
 }

@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func ConstructorMethod() ConstructorMethodClassLike {
-	return constructorMethodClass
+	return constructorMethodReference()
 }
 
 // Constructor Methods
@@ -99,6 +99,10 @@ type constructorMethodClass_ struct {
 
 // Class Reference
 
-var constructorMethodClass = &constructorMethodClass_{
+func constructorMethodReference() *constructorMethodClass_ {
+	return constructorMethodReference_
+}
+
+var constructorMethodReference_ = &constructorMethodClass_{
 	// Initialize the class constants.
 }

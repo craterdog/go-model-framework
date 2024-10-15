@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func None() NoneClassLike {
-	return noneClass
+	return noneReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type noneClass_ struct {
 
 // Class Reference
 
-var noneClass = &noneClass_{
+func noneReference() *noneClass_ {
+	return noneReference_
+}
+
+var noneReference_ = &noneClass_{
 	// Initialize the class constants.
 }

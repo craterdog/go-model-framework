@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func Imports() ImportsClassLike {
-	return importsClass
+	return importsReference()
 }
 
 // Constructor Methods
@@ -79,6 +79,10 @@ type importsClass_ struct {
 
 // Class Reference
 
-var importsClass = &importsClass_{
+func importsReference() *importsClass_ {
+	return importsReference_
+}
+
+var importsReference_ = &importsClass_{
 	// Initialize the class constants.
 }

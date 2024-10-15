@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func Method() MethodClassLike {
-	return methodClass
+	return methodReference()
 }
 
 // Constructor Methods
@@ -96,6 +96,10 @@ type methodClass_ struct {
 
 // Class Reference
 
-var methodClass = &methodClass_{
+func methodReference() *methodClass_ {
+	return methodReference_
+}
+
+var methodReference_ = &methodClass_{
 	// Initialize the class constants.
 }

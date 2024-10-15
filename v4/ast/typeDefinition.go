@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func TypeDefinition() TypeDefinitionClassLike {
-	return typeDefinitionClass
+	return typeDefinitionReference()
 }
 
 // Constructor Methods
@@ -95,6 +95,10 @@ type typeDefinitionClass_ struct {
 
 // Class Reference
 
-var typeDefinitionClass = &typeDefinitionClass_{
+func typeDefinitionReference() *typeDefinitionClass_ {
+	return typeDefinitionReference_
+}
+
+var typeDefinitionReference_ = &typeDefinitionClass_{
 	// Initialize the class constants.
 }

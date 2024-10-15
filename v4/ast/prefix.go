@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Prefix() PrefixClassLike {
-	return prefixClass
+	return prefixReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type prefixClass_ struct {
 
 // Class Reference
 
-var prefixClass = &prefixClass_{
+func prefixReference() *prefixClass_ {
+	return prefixReference_
+}
+
+var prefixReference_ = &prefixClass_{
 	// Initialize the class constants.
 }

@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func ModuleDefinition() ModuleDefinitionClassLike {
-	return moduleDefinitionClass
+	return moduleDefinitionReference()
 }
 
 // Constructor Methods
@@ -95,6 +95,10 @@ type moduleDefinitionClass_ struct {
 
 // Class Reference
 
-var moduleDefinitionClass = &moduleDefinitionClass_{
+func moduleDefinitionReference() *moduleDefinitionClass_ {
+	return moduleDefinitionReference_
+}
+
+var moduleDefinitionReference_ = &moduleDefinitionClass_{
 	// Initialize the class constants.
 }

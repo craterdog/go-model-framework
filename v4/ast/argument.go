@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Argument() ArgumentClassLike {
-	return argumentClass
+	return argumentReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type argumentClass_ struct {
 
 // Class Reference
 
-var argumentClass = &argumentClass_{
+func argumentReference() *argumentClass_ {
+	return argumentReference_
+}
+
+var argumentReference_ = &argumentClass_{
 	// Initialize the class constants.
 }

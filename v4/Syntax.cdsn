@@ -185,8 +185,6 @@ and are NOT ignored.
 <!
 comment: "/*" EOL (ANY | EOL)* EOL "*/" EOL  ! Chooses the shortest possible match.
 
-delimiter: "[" | "]" | "(" | ")" | "{" | "}" | "." | "," | "="
-
 name: (LOWER | UPPER) (LOWER | UPPER | DIGIT)* "_"?
 
 path: '"' ANY* '"'  ! Chooses the shortest possible match.

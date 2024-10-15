@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func TypeSection() TypeSectionClassLike {
-	return typeSectionClass
+	return typeSectionReference()
 }
 
 // Constructor Methods
@@ -79,6 +79,10 @@ type typeSectionClass_ struct {
 
 // Class Reference
 
-var typeSectionClass = &typeSectionClass_{
+func typeSectionReference() *typeSectionClass_ {
+	return typeSectionReference_
+}
+
+var typeSectionReference_ = &typeSectionClass_{
 	// Initialize the class constants.
 }

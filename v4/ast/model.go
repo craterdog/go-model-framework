@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Model() ModelClassLike {
-	return modelClass
+	return modelReference()
 }
 
 // Constructor Methods
@@ -98,6 +98,10 @@ type modelClass_ struct {
 
 // Class Reference
 
-var modelClass = &modelClass_{
+func modelReference() *modelClass_ {
+	return modelReference_
+}
+
+var modelReference_ = &modelClass_{
 	// Initialize the class constants.
 }

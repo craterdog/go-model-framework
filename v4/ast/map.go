@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Map() MapClassLike {
-	return mapClass
+	return mapReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type mapClass_ struct {
 
 // Class Reference
 
-var mapClass = &mapClass_{
+func mapReference() *mapClass_ {
+	return mapReference_
+}
+
+var mapReference_ = &mapClass_{
 	// Initialize the class constants.
 }

@@ -17,7 +17,7 @@ package ast
 // Access Function
 
 func PrimitiveDefinitions() PrimitiveDefinitionsClassLike {
-	return primitiveDefinitionsClass
+	return primitiveDefinitionsReference()
 }
 
 // Constructor Methods
@@ -78,6 +78,10 @@ type primitiveDefinitionsClass_ struct {
 
 // Class Reference
 
-var primitiveDefinitionsClass = &primitiveDefinitionsClass_{
+func primitiveDefinitionsReference() *primitiveDefinitionsClass_ {
+	return primitiveDefinitionsReference_
+}
+
+var primitiveDefinitionsReference_ = &primitiveDefinitionsClass_{
 	// Initialize the class constants.
 }

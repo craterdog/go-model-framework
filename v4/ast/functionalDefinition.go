@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func FunctionalDefinition() FunctionalDefinitionClassLike {
-	return functionalDefinitionClass
+	return functionalDefinitionReference()
 }
 
 // Constructor Methods
@@ -99,6 +99,10 @@ type functionalDefinitionClass_ struct {
 
 // Class Reference
 
-var functionalDefinitionClass = &functionalDefinitionClass_{
+func functionalDefinitionReference() *functionalDefinitionClass_ {
+	return functionalDefinitionReference_
+}
+
+var functionalDefinitionReference_ = &functionalDefinitionClass_{
 	// Initialize the class constants.
 }

@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func ClassDefinition() ClassDefinitionClassLike {
-	return classDefinitionClass
+	return classDefinitionReference()
 }
 
 // Constructor Methods
@@ -88,6 +88,10 @@ type classDefinitionClass_ struct {
 
 // Class Reference
 
-var classDefinitionClass = &classDefinitionClass_{
+func classDefinitionReference() *classDefinitionClass_ {
+	return classDefinitionReference_
+}
+
+var classDefinitionReference_ = &classDefinitionClass_{
 	// Initialize the class constants.
 }

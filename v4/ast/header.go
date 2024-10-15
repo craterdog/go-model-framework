@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Header() HeaderClassLike {
-	return headerClass
+	return headerReference()
 }
 
 // Constructor Methods
@@ -88,6 +88,10 @@ type headerClass_ struct {
 
 // Class Reference
 
-var headerClass = &headerClass_{
+func headerReference() *headerClass_ {
+	return headerReference_
+}
+
+var headerReference_ = &headerClass_{
 	// Initialize the class constants.
 }

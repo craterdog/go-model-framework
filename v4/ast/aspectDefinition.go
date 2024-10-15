@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func AspectDefinition() AspectDefinitionClassLike {
-	return aspectDefinitionClass
+	return aspectDefinitionReference()
 }
 
 // Constructor Methods
@@ -89,6 +89,10 @@ type aspectDefinitionClass_ struct {
 
 // Class Reference
 
-var aspectDefinitionClass = &aspectDefinitionClass_{
+func aspectDefinitionReference() *aspectDefinitionClass_ {
+	return aspectDefinitionReference_
+}
+
+var aspectDefinitionReference_ = &aspectDefinitionClass_{
 	// Initialize the class constants.
 }
