@@ -26,7 +26,7 @@ import (
 // Access Function
 
 func Classes() ClassesClassLike {
-	return classesClass
+	return classesReference()
 }
 
 // Constructor Methods
@@ -1256,7 +1256,11 @@ type classesClass_ struct {
 
 // Class Reference
 
-var classesClass = &classesClass_{
+func classesReference() *classesClass_ {
+	return classesReference_
+}
+
+var classesReference_ = &classesClass_{
 	// Initialize the class constants.
 	classTemplate_: `<Notice><PackageDeclaration><ModuleImports>
 
