@@ -668,11 +668,9 @@ func (v *classes_) generateClassReference() (
 	implementation string,
 ) {
 	implementation = v.getClass().classReference_
-	var variables = v.getClass().classVariables_
 	if v.isGeneric_ {
-		variables = v.getClass().genericVariables_
+		implementation = v.getClass().genericReference_
 	}
-	implementation = uti.ReplaceAll(implementation, "variables", variables)
 	var constantInitializations = v.generateConstantInitializations()
 	implementation = uti.ReplaceAll(
 		implementation,
@@ -1258,10 +1256,9 @@ type classesClass_ struct {
 	attributeDeclaration_    string
 	classStructure_          string
 	constantDeclaration_     string
-	classReference_          string
-	classVariables_          string
-	genericVariables_        string
 	constantInitialization_  string
+	classReference_          string
+	genericReference_        string
 }
 
 // Class Reference
@@ -1269,79 +1266,48 @@ type classesClass_ struct {
 var classesClass = &classesClass_{
 	// Initialize the class constants.
 	classTemplate_: `<Notice><PackageDeclaration><ModuleImports>
-// CLASS INTERFACE
-<AccessFunction><ConstructorMethods><ConstantMethods><FunctionMethods>
-// INSTANCE INTERFACE
-<AttributeMethods><AspectInterfaces><PublicMethods><PrivateMethods>
-// PRIVATE INTERFACE
-<InstanceStructure><ClassStructure><ClassReference>
+
+// CLASS INTERFACE<AccessFunction><ConstructorMethods><ConstantMethods><FunctionMethods>
+
+// INSTANCE INTERFACE<AttributeMethods><AspectInterfaces><PublicMethods><PrivateMethods>
+
+// PRIVATE INTERFACE<InstanceStructure><ClassStructure><ClassReference>
 `,
 
 	packageDeclaration_: `
-package <~packageName>
-`,
+package <~packageName>`,
 
 	moduleImports_: `
-import (<Modules>)
-`,
+
+import (<Modules>)`,
 
 	moduleAlias_: `
 	<~moduleName> <modulePath>`,
 
 	accessFunction_: `
+
 // Access Function
-<Function>`,
 
-	classFunction_: `
-func <~ClassName>() <~ClassName>ClassLike {
-	return <~className>Class
-}
-`,
-
-	genericFunction_: `
 func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
-	// Generate the name of the bound class type.
-	var class *<className>Class_<Arguments>
-	var name = fmt.Sprintf("%T", class)
-
-	// Check for an existing bound class type.
-	<className>Mutex.Lock()
-	var value = <className>Class[name]
-	switch actual := value.(type) {
-	case *<className>Class_<Arguments>:
-		// This bound class type already exists.
-		class = actual
-	default:
-		// Add a new bound class type.
-		class = &<className>Class_<Arguments>{
-			// Initialize the class constants.
-		}
-		<className>Class[name] = class
-	}
-	<className>Mutex.Unlock()
-
-	// Return a reference to the bound class type.
-	return class
-}
-`,
+	return <~className>Reference<Arguments>()
+}`,
 
 	methodParameter_: `
 	<parameterName_> <ParameterType>,`,
 
 	constructorMethods_: `
-// Constructor Methods
-<Methods>
-`,
+
+// Constructor Methods<Methods>`,
 
 	constructorMethod_: `
+
 func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>Like<Arguments> {<AttributeChecks>
 	var instance = &<~className>_<Arguments>{
 		// Initialize the instance attributes.
 		class_: c,<AttributeInitializations>
 	}
 	return instance
-}
-`,
+}`,
 
 	attributeCheck_: `
 	if uti.IsUndefined(<attributeName_>) {
@@ -1352,122 +1318,146 @@ func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>L
 		<~attributeName>_: <attributeName_>,`,
 
 	constantMethods_: `
-// Constant Methods
-<Methods>
-`,
+
+// Constant Methods<Methods>`,
 
 	constantMethod_: `
+
 func (c *<~className>Class_<Arguments>) <~MethodName>() <ResultType> {
 	return c.<~methodName>_
-}
-`,
+}`,
 
 	functionMethods_: `
-// Function Methods
-<Methods>
-`,
+
+// Function Methods<Methods>`,
 
 	functionMethod_: `
+
 func (c *<~className>Class_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
 	var result_ <ResultType>
 	// TBD - Add the function implementation.
 	return result_
-}
-`,
+}`,
 
 	attributeMethods_: `
-// Attribute Methods
-<Methods>
-`,
+
+// Attribute Methods<Methods>`,
 
 	getterMethod_: `
+
 func (v *<~className>_<Arguments>) <~MethodName>() <AttributeType> {
 	return v.<~attributeName>_
-}
-`,
+}`,
 
 	setterMethod_: `
+
 func (v *<~className>_<Arguments>) <~MethodName>(
 	<attributeName_> <AttributeType>,
 ) {<AttributeCheck>
 	v.<~attributeName>_ = <attributeName_>
-}
-`,
+}`,
 
 	aspectInterface_: `
-// <AspectType> Methods
-<Methods>
-`,
+
+// <AspectType> Methods<Methods>`,
 
 	publicMethods_: `
+
 // Public Methods
 
 func (v *<~className>_<Arguments>) GetClass() <~ClassName>ClassLike<Arguments> {
 	return v.getClass()
-}
-<Methods>
-`,
+}<Methods>`,
 
 	privateMethods_: `
+
 // Private Methods
 
 func (v *<~className>_<Arguments>) getClass() *<~className>Class_<Arguments> {
 	return v.class_
-}
-`,
+}`,
 
 	instanceMethod_: `
+
 func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) {
 	// TBD - Add the method implementation.
-}
-`,
+}`,
 
 	instanceFunction_: `
+
 func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
 	var result_ <ResultType>
 	// TBD - Add the method implementation.
 	return result_
-}
-`,
+}`,
 
 	instanceStructure_: `
+
 // Instance Structure
 
 type <~className>_<Constraints> struct {
 	// Declare the instance attributes.
 	class_ *<~className>Class_<Arguments><AttributeDeclarations>
-}
-`,
+}`,
 
 	attributeDeclaration_: `
 	<~attributeName>_ <AttributeType>`,
 
 	classStructure_: `
+
 // Class Structure
 
 type <~className>Class_<Constraints> struct {
 	// Declare the class constants.<ConstantDeclarations>
-}
-`,
+}`,
 
 	constantDeclaration_: `
 	<~constantName>_ <ConstantType>`,
 
-	classReference_: `
-// Class Reference
-<Variables>`,
-
-	classVariables_: `
-var <~className>Class = &<~className>Class_{
-	// Initialize the class constants.<ConstantInitializations>
-}
-`,
-
-	genericVariables_: `
-var <~className>Class = map[string]any{}
-var <~className>Mutex syn.Mutex
-`,
-
 	constantInitialization_: `
 	// <~constantName>_: constantValue,`,
+
+	classReference_: `
+
+// Class Reference
+
+func <~className>Reference() *<~className>Class_ {
+	return <~className>Reference_
+}
+
+var <~className>Reference_ = &<~className>Class_{
+	// Initialize the class constants.<ConstantInitializations>
+}`,
+
+	genericReference_: `
+
+// Class Reference
+
+var <~className>Reference_ = map[string]any{}
+var <~className>Mutex_ syn.Mutex
+
+func <~className>Reference<Constraints>() *<~className>Class_<Arguments> {
+	// Generate the name of the bound class type.
+	var class *<className>Class_<Arguments>
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for an existing bound class type.
+	<className>Mutex_.Lock()
+	var value = <className>Reference_[name]
+	switch actual := value.(type) {
+	case *<className>Class_<Arguments>:
+		// This bound class type already exists.
+		class = actual
+	default:
+		// Add a new bound class type.
+		class = &<className>Class_<Arguments>{
+			// Initialize the class constants.<ConstantInitializations>
+		}
+		<className>Reference_[name] = class
+	}
+	<className>Mutex_.Unlock()
+
+	// Return a reference to the bound class type.
+	return class
+}`,
 }
