@@ -48,11 +48,16 @@ func (v *parser_) GetClass() ParserClassLike {
 	return v.getClass()
 }
 
+// NOTE: For consistent error reporting we must replace each tab with 4
+// spaces prior to scanning for tokens.  Unfortunately this will replace
+// any tabs in comments as well.  What's worse, the `go fmt` command
+// automatically replaces any leading spaces on each indented line in a
+// comment with a tab.  Very annoying!
 func (v *parser_) ParseSource(
 	source string,
 ) ast.ModelLike {
 	// Create a scanner running in a separate Go routine.
-	v.source_ = source
+	v.source_ = sts.ReplaceAll(source, "\t", "    ")
 	v.tokens_ = col.Queue[TokenLike](v.getClass().queueSize_)
 	Scanner().Make(v.source_, v.tokens_)
 	v.next_ = col.Stack[TokenLike](v.getClass().stackSize_)
@@ -984,7 +989,7 @@ func (v *parser_) parseConstantMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constant")
+			var message = v.formatError(token, "ConstantMethod")
 			panic(message)
 		} else {
 			// This is not a single constantMethod rule.
@@ -998,7 +1003,7 @@ func (v *parser_) parseConstantMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constant")
+			var message = v.formatError(token, "ConstantMethod")
 			panic(message)
 		} else {
 			// This is not a single constantMethod rule.
@@ -1012,7 +1017,7 @@ func (v *parser_) parseConstantMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constant")
+			var message = v.formatError(token, "ConstantMethod")
 			panic(message)
 		} else {
 			// This is not a single constantMethod rule.
@@ -1027,7 +1032,7 @@ func (v *parser_) parseConstantMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constant")
+			var message = v.formatError(token, "ConstantMethod")
 			panic(message)
 		} else {
 			// This is not a single constantMethod rule.
@@ -1238,7 +1243,7 @@ func (v *parser_) parseConstructorMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constructor")
+			var message = v.formatError(token, "ConstructorMethod")
 			panic(message)
 		} else {
 			// This is not a single constructorMethod rule.
@@ -1252,7 +1257,7 @@ func (v *parser_) parseConstructorMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constructor")
+			var message = v.formatError(token, "ConstructorMethod")
 			panic(message)
 		} else {
 			// This is not a single constructorMethod rule.
@@ -1275,7 +1280,7 @@ parametersLoop:
 					return constructorMethod, token, false
 				}
 				// Found a syntax error.
-				var message = v.formatError(token, "Constructor")
+				var message = v.formatError(token, "ConstructorMethod")
 				message += "The number of parameter rules must be at least 0."
 				panic(message)
 			default:
@@ -1290,7 +1295,7 @@ parametersLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constructor")
+			var message = v.formatError(token, "ConstructorMethod")
 			panic(message)
 		} else {
 			// This is not a single constructorMethod rule.
@@ -1305,7 +1310,7 @@ parametersLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Constructor")
+			var message = v.formatError(token, "ConstructorMethod")
 			panic(message)
 		} else {
 			// This is not a single constructorMethod rule.
@@ -1553,7 +1558,7 @@ func (v *parser_) parseFunctionMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Function")
+			var message = v.formatError(token, "FunctionMethod")
 			panic(message)
 		} else {
 			// This is not a single functionMethod rule.
@@ -1567,7 +1572,7 @@ func (v *parser_) parseFunctionMethod() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Function")
+			var message = v.formatError(token, "FunctionMethod")
 			panic(message)
 		} else {
 			// This is not a single functionMethod rule.
@@ -1590,7 +1595,7 @@ parametersLoop:
 					return functionMethod, token, false
 				}
 				// Found a syntax error.
-				var message = v.formatError(token, "Function")
+				var message = v.formatError(token, "FunctionMethod")
 				message += "The number of parameter rules must be at least 0."
 				panic(message)
 			default:
@@ -1605,7 +1610,7 @@ parametersLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Function")
+			var message = v.formatError(token, "FunctionMethod")
 			panic(message)
 		} else {
 			// This is not a single functionMethod rule.
@@ -1620,7 +1625,7 @@ parametersLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Function")
+			var message = v.formatError(token, "FunctionMethod")
 			panic(message)
 		} else {
 			// This is not a single functionMethod rule.
@@ -1703,7 +1708,7 @@ func (v *parser_) parseFunctionalDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Functional")
+			var message = v.formatError(token, "FunctionalDefinition")
 			panic(message)
 		} else {
 			// This is not a single functional rule.
@@ -1717,7 +1722,7 @@ func (v *parser_) parseFunctionalDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Functional")
+			var message = v.formatError(token, "FunctionalDefinition")
 			panic(message)
 		} else {
 			// This is not a single functional rule.
@@ -1731,7 +1736,7 @@ func (v *parser_) parseFunctionalDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Functional")
+			var message = v.formatError(token, "FunctionalDefinition")
 			panic(message)
 		} else {
 			// This is not a single functional rule.
@@ -1754,7 +1759,7 @@ parametersLoop:
 					return functionalDefinition, token, false
 				}
 				// Found a syntax error.
-				var message = v.formatError(token, "Functional")
+				var message = v.formatError(token, "FunctionalDefinition")
 				message += "The number of parameter rules must be at least 0."
 				panic(message)
 			default:
@@ -1769,7 +1774,7 @@ parametersLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Functional")
+			var message = v.formatError(token, "FunctionalDefinition")
 			panic(message)
 		} else {
 			// This is not a single functional rule.
@@ -1784,7 +1789,7 @@ parametersLoop:
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Functional")
+			var message = v.formatError(token, "FunctionalDefinition")
 			panic(message)
 		} else {
 			// This is not a single functional rule.
@@ -1876,34 +1881,65 @@ func (v *parser_) parseGetterMethod() (
 	ok bool,
 ) {
 	var ruleFound_ bool
+	var tokens_ = col.List[TokenLike]()
 
 	// Attempt to parse a single name token.
 	var name string
-	var nameToken TokenLike
-	name, nameToken, ok = v.parseToken(NameToken)
+	name, token, ok = v.parseToken(NameToken)
 	if !ok {
-		// This is not a single getterMethod rule.
-		return getterMethod, nameToken, false
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GetterMethod")
+			panic(message)
+		} else {
+			// This is not a single getterMethod rule.
+			var iterator = tokens_.GetIterator()
+			for iterator.ToEnd(); iterator.HasPrevious(); {
+				token = iterator.GetPrevious()
+				v.putBack(token)
+			}
+			return getterMethod, token, false
+		}
 	}
+	tokens_.AppendValue(token)
 
 	// Attempt to parse a single "(" delimiter.
-	var leftToken TokenLike
-	_, leftToken, ok = v.parseDelimiter("(")
+	_, token, ok = v.parseDelimiter("(")
 	if !ok {
-		// This is not a single getterMethod rule.
-		v.putBack(nameToken)
-		return getterMethod, leftToken, false
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GetterMethod")
+			panic(message)
+		} else {
+			// This is not a single getterMethod rule.
+			var iterator = tokens_.GetIterator()
+			for iterator.ToEnd(); iterator.HasPrevious(); {
+				token = iterator.GetPrevious()
+				v.putBack(token)
+			}
+			return getterMethod, token, false
+		}
 	}
+	tokens_.AppendValue(token)
 
 	// Attempt to parse a single ")" delimiter.
 	_, token, ok = v.parseDelimiter(")")
 	if !ok {
-		// This is not a single getterMethod rule.
-		v.putBack(leftToken)
-		v.putBack(nameToken)
-		return getterMethod, token, false
+		if ruleFound_ {
+			// Found a syntax error.
+			var message = v.formatError(token, "GetterMethod")
+			panic(message)
+		} else {
+			// This is not a single getterMethod rule.
+			var iterator = tokens_.GetIterator()
+			for iterator.ToEnd(); iterator.HasPrevious(); {
+				token = iterator.GetPrevious()
+				v.putBack(token)
+			}
+			return getterMethod, token, false
+		}
 	}
-	ruleFound_ = true
+	tokens_.AppendValue(token)
 
 	// Attempt to parse a single abstraction rule.
 	var abstraction ast.AbstractionLike
@@ -1915,13 +1951,17 @@ func (v *parser_) parseGetterMethod() (
 			panic(message)
 		} else {
 			// This is not a single getterMethod rule.
+			var iterator = tokens_.GetIterator()
+			for iterator.ToEnd(); iterator.HasPrevious(); {
+				token = iterator.GetPrevious()
+				v.putBack(token)
+			}
 			return getterMethod, token, false
 		}
 	}
 	ruleFound_ = true
 
 	// Found a single getterMethod rule.
-	ruleFound_ = true
 	getterMethod = ast.GetterMethod().Make(
 		name,
 		abstraction,
@@ -2081,7 +2121,7 @@ func (v *parser_) parseInstanceDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Instance")
+			var message = v.formatError(token, "InstanceDefinition")
 			panic(message)
 		} else {
 			// This is not a single instanceDefinition rule.
@@ -2095,7 +2135,7 @@ func (v *parser_) parseInstanceDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Instance")
+			var message = v.formatError(token, "InstanceDefinition")
 			panic(message)
 		} else {
 			// This is not a single instanceDefinition rule.
@@ -2109,7 +2149,7 @@ func (v *parser_) parseInstanceDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Instance")
+			var message = v.formatError(token, "InstanceDefinition")
 			panic(message)
 		} else {
 			// This is not a single instanceDefinition rule.
@@ -2124,7 +2164,7 @@ func (v *parser_) parseInstanceDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Instance")
+			var message = v.formatError(token, "InstanceDefinition")
 			panic(message)
 		} else {
 			// This is not a single instanceDefinition rule.
@@ -2138,7 +2178,7 @@ func (v *parser_) parseInstanceDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Instance")
+			var message = v.formatError(token, "InstanceDefinition")
 			panic(message)
 		} else {
 			// This is not a single instanceDefinition rule.
@@ -3139,7 +3179,7 @@ func (v *parser_) parseTypeDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Type")
+			var message = v.formatError(token, "TypeDefinition")
 			panic(message)
 		} else {
 			// This is not a single type rule.
@@ -3154,7 +3194,7 @@ func (v *parser_) parseTypeDefinition() (
 	if !ok {
 		if ruleFound_ {
 			// Found a syntax error.
-			var message = v.formatError(token, "Type")
+			var message = v.formatError(token, "TypeDefinition")
 			panic(message)
 		} else {
 			// This is not a single type rule.
@@ -3377,10 +3417,12 @@ func (v *parser_) formatError(token TokenLike, ruleName string) string {
 	var line = token.GetLine()
 	var lines = sts.Split(v.source_, "\n")
 
-	// Append the source line with the error in it.
+	// Append the source lines with the error in it.
 	message += "\033[36m"
-	if line > 1 {
-		message += fmt.Sprintf("%04d: ", line-1) + string(lines[line-2]) + "\n"
+	for index := line - 3; index < line; index++ {
+		if index > 1 {
+			message += fmt.Sprintf("%04d: ", index) + string(lines[index-1]) + "\n"
+		}
 	}
 	message += fmt.Sprintf("%04d: ", line) + string(lines[line-1]) + "\n"
 
