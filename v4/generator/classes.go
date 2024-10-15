@@ -282,15 +282,10 @@ func (v *classes_) extractType(abstraction ast.AbstractionLike) string {
 }
 
 func (v *classes_) generateAccessFunction() (
-	implementation string,
+	accessFunction string,
 ) {
-	implementation = v.getClass().accessFunction_
-	var function = v.getClass().classFunction_
-	if v.isGeneric_ {
-		function = v.getClass().genericFunction_
-	}
-	implementation = uti.ReplaceAll(implementation, "function", function)
-	return implementation
+	accessFunction = v.getClass().accessFunction_
+	return accessFunction
 }
 
 func (v *classes_) generateArguments(
@@ -669,7 +664,7 @@ func (v *classes_) generateClassReference() (
 ) {
 	implementation = v.getClass().classReference_
 	if v.isGeneric_ {
-		implementation = v.getClass().genericReference_
+		implementation = v.getClass().classMap_
 	}
 	var constantInitializations = v.generateConstantInitializations()
 	implementation = uti.ReplaceAll(
@@ -1233,13 +1228,8 @@ type classesClass_ struct {
 	moduleImports_           string
 	moduleAlias_             string
 	accessFunction_          string
-	classFunction_           string
-	genericFunction_         string
-	methodParameter_         string
 	constructorMethods_      string
 	constructorMethod_       string
-	attributeCheck_          string
-	attributeInitialization_ string
 	constantMethods_         string
 	constantMethod_          string
 	functionMethods_         string
@@ -1252,13 +1242,16 @@ type classesClass_ struct {
 	privateMethods_          string
 	instanceMethod_          string
 	instanceFunction_        string
+	methodParameter_         string
 	instanceStructure_       string
 	attributeDeclaration_    string
+	attributeCheck_          string
+	attributeInitialization_ string
 	classStructure_          string
 	constantDeclaration_     string
 	constantInitialization_  string
 	classReference_          string
-	genericReference_        string
+	classMap_                string
 }
 
 // Class Reference
@@ -1292,9 +1285,6 @@ func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 	return <~className>Reference<Arguments>()
 }`,
 
-	methodParameter_: `
-	<parameterName_> <ParameterType>,`,
-
 	constructorMethods_: `
 
 // Constructor Methods<Methods>`,
@@ -1308,14 +1298,6 @@ func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>L
 	}
 	return instance
 }`,
-
-	attributeCheck_: `
-	if uti.IsUndefined(<attributeName_>) {
-		panic("The \"<~attributeName>\" attribute is required by this class.")
-	}`,
-
-	attributeInitialization_: `
-		<~attributeName>_: <attributeName_>,`,
 
 	constantMethods_: `
 
@@ -1391,6 +1373,9 @@ func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
 	return result_
 }`,
 
+	methodParameter_: `
+	<parameterName_> <ParameterType>,`,
+
 	instanceStructure_: `
 
 // Instance Structure
@@ -1402,6 +1387,14 @@ type <~className>_<Constraints> struct {
 
 	attributeDeclaration_: `
 	<~attributeName>_ <AttributeType>`,
+
+	attributeCheck_: `
+	if uti.IsUndefined(<attributeName_>) {
+		panic("The \"<~attributeName>\" attribute is required by this class.")
+	}`,
+
+	attributeInitialization_: `
+		<~attributeName>_: <attributeName_>,`,
 
 	classStructure_: `
 
@@ -1429,11 +1422,11 @@ var <~className>Reference_ = &<~className>Class_{
 	// Initialize the class constants.<ConstantInitializations>
 }`,
 
-	genericReference_: `
+	classMap_: `
 
 // Class Reference
 
-var <~className>Reference_ = map[string]any{}
+var <~className>Map_ = map[string]any{}
 var <~className>Mutex_ syn.Mutex
 
 func <~className>Reference<Constraints>() *<~className>Class_<Arguments> {
@@ -1443,7 +1436,7 @@ func <~className>Reference<Constraints>() *<~className>Class_<Arguments> {
 
 	// Check for an existing bound class type.
 	<className>Mutex_.Lock()
-	var value = <className>Reference_[name]
+	var value = <className>Map_[name]
 	switch actual := value.(type) {
 	case *<className>Class_<Arguments>:
 		// This bound class type already exists.
@@ -1453,7 +1446,7 @@ func <~className>Reference<Constraints>() *<~className>Class_<Arguments> {
 		class = &<className>Class_<Arguments>{
 			// Initialize the class constants.<ConstantInitializations>
 		}
-		<className>Reference_[name] = class
+		<className>Map_[name] = class
 	}
 	<className>Mutex_.Unlock()
 
