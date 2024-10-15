@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Processor() ProcessorClassLike {
-	return processorClass
+	return processorReference()
 }
 
 // Constructor Methods
@@ -1000,6 +1000,10 @@ type processorClass_ struct {
 
 // Class Reference
 
-var processorClass = &processorClass_{
+func processorReference() *processorClass_ {
+	return processorReference_
+}
+
+var processorReference_ = &processorClass_{
 	// Initialize the class constants.
 }

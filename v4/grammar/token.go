@@ -21,7 +21,7 @@ import (
 // Access Function
 
 func Token() TokenClassLike {
-	return tokenClass
+	return tokenReference()
 }
 
 // Constructor Methods
@@ -108,6 +108,10 @@ type tokenClass_ struct {
 
 // Class Reference
 
-var tokenClass = &tokenClass_{
+func tokenReference() *tokenClass_ {
+	return tokenReference_
+}
+
+var tokenReference_ = &tokenClass_{
 	// Initialize the class constants.
 }

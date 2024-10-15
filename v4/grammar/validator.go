@@ -23,7 +23,7 @@ import (
 // Access Function
 
 func Validator() ValidatorClassLike {
-	return validatorClass
+	return validatorReference()
 }
 
 // Constructor Methods
@@ -143,6 +143,10 @@ type validatorClass_ struct {
 
 // Class Reference
 
-var validatorClass = &validatorClass_{
+func validatorReference() *validatorClass_ {
+	return validatorReference_
+}
+
+var validatorReference_ = &validatorClass_{
 	// Initialize the class constants.
 }

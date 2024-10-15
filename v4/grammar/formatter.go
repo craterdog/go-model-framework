@@ -22,7 +22,7 @@ import (
 // Access Function
 
 func Formatter() FormatterClassLike {
-	return formatterClass
+	return formatterReference()
 }
 
 // Constructor Methods
@@ -612,6 +612,10 @@ type formatterClass_ struct {
 
 // Class Reference
 
-var formatterClass = &formatterClass_{
+func formatterReference() *formatterClass_ {
+	return formatterReference_
+}
+
+var formatterReference_ = &formatterClass_{
 	// Initialize the class constants.
 }

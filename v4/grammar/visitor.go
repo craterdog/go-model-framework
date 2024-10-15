@@ -23,7 +23,7 @@ import (
 // Access Function
 
 func Visitor() VisitorClassLike {
-	return visitorClass
+	return visitorReference()
 }
 
 // Constructor Methods
@@ -1205,6 +1205,10 @@ type visitorClass_ struct {
 
 // Class Reference
 
-var visitorClass = &visitorClass_{
+func visitorReference() *visitorClass_ {
+	return visitorReference_
+}
+
+var visitorReference_ = &visitorClass_{
 	// Initialize the class constants.
 }

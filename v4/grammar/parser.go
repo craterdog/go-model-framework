@@ -27,7 +27,7 @@ import (
 // Access Function
 
 func Parser() ParserClassLike {
-	return parserClass
+	return parserReference()
 }
 
 // Constructor Methods
@@ -53,9 +53,9 @@ func (v *parser_) ParseSource(
 ) ast.ModelLike {
 	// Create a scanner running in a separate Go routine.
 	v.source_ = source
-	v.tokens_ = col.Queue[TokenLike](parserClass.queueSize_)
+	v.tokens_ = col.Queue[TokenLike](v.getClass().queueSize_)
 	Scanner().Make(v.source_, v.tokens_)
-	v.next_ = col.Stack[TokenLike](parserClass.stackSize_)
+	v.next_ = col.Stack[TokenLike](v.getClass().stackSize_)
 
 	// Attempt to parse the model from the token stream.
 	var result_, token, ok = v.parseModel()
@@ -3463,7 +3463,11 @@ type parserClass_ struct {
 
 // Class Reference
 
-var parserClass = &parserClass_{
+func parserReference() *parserClass_ {
+	return parserReference_
+}
+
+var parserReference_ = &parserClass_{
 	// Initialize the class constants.
 	queueSize_: 16,
 	stackSize_: 4,
