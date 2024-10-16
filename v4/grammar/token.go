@@ -46,7 +46,6 @@ func (c *tokenClass_) Make(
 	}
 	var instance = &token_{
 		// Initialize the instance attributes.
-		class_:    c,
 		line_:     line,
 		position_: position,
 		type_:     type_,
@@ -84,7 +83,7 @@ func (v *token_) GetClass() TokenClassLike {
 // Private Methods
 
 func (v *token_) getClass() *tokenClass_ {
-	return v.class_
+	return tokenReference()
 }
 
 // PRIVATE INTERFACE
@@ -93,7 +92,6 @@ func (v *token_) getClass() *tokenClass_ {
 
 type token_ struct {
 	// Declare the instance attributes.
-	class_    *tokenClass_
 	line_     uint
 	position_ uint
 	type_     TokenType

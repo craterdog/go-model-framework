@@ -31,7 +31,6 @@ func Validator() ValidatorClassLike {
 func (c *validatorClass_) Make() ValidatorLike {
 	var instance = &validator_{
 		// Initialize the instance attributes.
-		class_: c,
 
 		// Initialize the inherited aspects.
 		Methodical: Processor().Make(),
@@ -105,7 +104,7 @@ func (v *validator_) ValidateModel(
 // Private Methods
 
 func (v *validator_) getClass() *validatorClass_ {
-	return v.class_
+	return validatorReference()
 }
 
 func (v *validator_) validateToken(
@@ -128,7 +127,6 @@ func (v *validator_) validateToken(
 
 type validator_ struct {
 	// Declare the instance attributes.
-	class_   *validatorClass_
 	visitor_ VisitorLike
 
 	// Define the inherited aspects.

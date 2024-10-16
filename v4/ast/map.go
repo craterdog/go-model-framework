@@ -34,10 +34,10 @@ func (c *mapClass_) Make(
 	}
 	var instance = &map_{
 		// Initialize the instance attributes.
-		class_: c,
-		name_:  name,
+		name_: name,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *map_) GetClass() MapClassLike {
 // Private Methods
 
 func (v *map_) getClass() *mapClass_ {
-	return v.class_
+	return mapReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,8 +66,7 @@ func (v *map_) getClass() *mapClass_ {
 
 type map_ struct {
 	// Declare the instance attributes.
-	class_ *mapClass_
-	name_  string
+	name_ string
 }
 
 // Class Structure

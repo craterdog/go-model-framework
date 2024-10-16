@@ -38,11 +38,11 @@ func (c *constantMethodClass_) Make(
 	}
 	var instance = &constantMethod_{
 		// Initialize the instance attributes.
-		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *constantMethod_) GetClass() ConstantMethodClassLike {
 // Private Methods
 
 func (v *constantMethod_) getClass() *constantMethodClass_ {
-	return v.class_
+	return constantMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,7 +75,6 @@ func (v *constantMethod_) getClass() *constantMethodClass_ {
 
 type constantMethod_ struct {
 	// Declare the instance attributes.
-	class_       *constantMethodClass_
 	name_        string
 	abstraction_ AbstractionLike
 }

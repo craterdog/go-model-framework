@@ -43,12 +43,12 @@ func (c *functionalDefinitionClass_) Make(
 	}
 	var instance = &functionalDefinition_{
 		// Initialize the instance attributes.
-		class_:       c,
 		declaration_: declaration,
 		parameters_:  parameters,
 		result_:      result,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -76,7 +76,7 @@ func (v *functionalDefinition_) GetClass() FunctionalDefinitionClassLike {
 // Private Methods
 
 func (v *functionalDefinition_) getClass() *functionalDefinitionClass_ {
-	return v.class_
+	return functionalDefinitionReference()
 }
 
 // PRIVATE INTERFACE
@@ -85,7 +85,6 @@ func (v *functionalDefinition_) getClass() *functionalDefinitionClass_ {
 
 type functionalDefinition_ struct {
 	// Declare the instance attributes.
-	class_       *functionalDefinitionClass_
 	declaration_ DeclarationLike
 	parameters_  abs.Sequential[ParameterLike]
 	result_      ResultLike

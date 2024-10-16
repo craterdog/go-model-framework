@@ -34,10 +34,10 @@ func (c *aspectMethodClass_) Make(
 	}
 	var instance = &aspectMethod_{
 		// Initialize the instance attributes.
-		class_:  c,
 		method_: method,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *aspectMethod_) GetClass() AspectMethodClassLike {
 // Private Methods
 
 func (v *aspectMethod_) getClass() *aspectMethodClass_ {
-	return v.class_
+	return aspectMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,7 +66,6 @@ func (v *aspectMethod_) getClass() *aspectMethodClass_ {
 
 type aspectMethod_ struct {
 	// Declare the instance attributes.
-	class_  *aspectMethodClass_
 	method_ MethodLike
 }
 

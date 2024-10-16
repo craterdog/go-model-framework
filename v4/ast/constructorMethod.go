@@ -43,12 +43,12 @@ func (c *constructorMethodClass_) Make(
 	}
 	var instance = &constructorMethod_{
 		// Initialize the instance attributes.
-		class_:       c,
 		name_:        name,
 		parameters_:  parameters,
 		abstraction_: abstraction,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -76,7 +76,7 @@ func (v *constructorMethod_) GetClass() ConstructorMethodClassLike {
 // Private Methods
 
 func (v *constructorMethod_) getClass() *constructorMethodClass_ {
-	return v.class_
+	return constructorMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -85,7 +85,6 @@ func (v *constructorMethod_) getClass() *constructorMethodClass_ {
 
 type constructorMethod_ struct {
 	// Declare the instance attributes.
-	class_       *constructorMethodClass_
 	name_        string
 	parameters_  abs.Sequential[ParameterLike]
 	abstraction_ AbstractionLike

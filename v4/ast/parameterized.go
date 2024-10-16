@@ -35,10 +35,10 @@ func (c *parameterizedClass_) Make(
 	}
 	var instance = &parameterized_{
 		// Initialize the instance attributes.
-		class_:      c,
 		parameters_: parameters,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -58,7 +58,7 @@ func (v *parameterized_) GetClass() ParameterizedClassLike {
 // Private Methods
 
 func (v *parameterized_) getClass() *parameterizedClass_ {
-	return v.class_
+	return parameterizedReference()
 }
 
 // PRIVATE INTERFACE
@@ -67,7 +67,6 @@ func (v *parameterized_) getClass() *parameterizedClass_ {
 
 type parameterized_ struct {
 	// Declare the instance attributes.
-	class_      *parameterizedClass_
 	parameters_ abs.Sequential[ParameterLike]
 }
 

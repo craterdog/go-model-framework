@@ -43,12 +43,12 @@ func (c *functionMethodClass_) Make(
 	}
 	var instance = &functionMethod_{
 		// Initialize the instance attributes.
-		class_:      c,
 		name_:       name,
 		parameters_: parameters,
 		result_:     result,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -76,7 +76,7 @@ func (v *functionMethod_) GetClass() FunctionMethodClassLike {
 // Private Methods
 
 func (v *functionMethod_) getClass() *functionMethodClass_ {
-	return v.class_
+	return functionMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -85,7 +85,6 @@ func (v *functionMethod_) getClass() *functionMethodClass_ {
 
 type functionMethod_ struct {
 	// Declare the instance attributes.
-	class_      *functionMethodClass_
 	name_       string
 	parameters_ abs.Sequential[ParameterLike]
 	result_     ResultLike

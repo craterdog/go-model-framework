@@ -34,10 +34,10 @@ func (c *additionalValueClass_) Make(
 	}
 	var instance = &additionalValue_{
 		// Initialize the instance attributes.
-		class_: c,
-		name_:  name,
+		name_: name,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *additionalValue_) GetClass() AdditionalValueClassLike {
 // Private Methods
 
 func (v *additionalValue_) getClass() *additionalValueClass_ {
-	return v.class_
+	return additionalValueReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,8 +66,7 @@ func (v *additionalValue_) getClass() *additionalValueClass_ {
 
 type additionalValue_ struct {
 	// Declare the instance attributes.
-	class_ *additionalValueClass_
-	name_  string
+	name_ string
 }
 
 // Class Structure

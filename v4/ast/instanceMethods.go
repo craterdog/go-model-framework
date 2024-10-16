@@ -36,12 +36,12 @@ func (c *instanceMethodsClass_) Make(
 	}
 	var instance = &instanceMethods_{
 		// Initialize the instance attributes.
-		class_:                       c,
 		publicSubsection_:            publicSubsection,
 		optionalAttributeSubsection_: optionalAttributeSubsection,
 		optionalAspectSubsection_:    optionalAspectSubsection,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -69,7 +69,7 @@ func (v *instanceMethods_) GetClass() InstanceMethodsClassLike {
 // Private Methods
 
 func (v *instanceMethods_) getClass() *instanceMethodsClass_ {
-	return v.class_
+	return instanceMethodsReference()
 }
 
 // PRIVATE INTERFACE
@@ -78,7 +78,6 @@ func (v *instanceMethods_) getClass() *instanceMethodsClass_ {
 
 type instanceMethods_ struct {
 	// Declare the instance attributes.
-	class_                       *instanceMethodsClass_
 	publicSubsection_            PublicSubsectionLike
 	optionalAttributeSubsection_ AttributeSubsectionLike
 	optionalAspectSubsection_    AspectSubsectionLike

@@ -28,11 +28,11 @@ func (c *primitiveDefinitionsClass_) Make(
 ) PrimitiveDefinitionsLike {
 	var instance = &primitiveDefinitions_{
 		// Initialize the instance attributes.
-		class_:                     c,
 		optionalTypeSection_:       optionalTypeSection,
 		optionalFunctionalSection_: optionalFunctionalSection,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -56,7 +56,7 @@ func (v *primitiveDefinitions_) GetClass() PrimitiveDefinitionsClassLike {
 // Private Methods
 
 func (v *primitiveDefinitions_) getClass() *primitiveDefinitionsClass_ {
-	return v.class_
+	return primitiveDefinitionsReference()
 }
 
 // PRIVATE INTERFACE
@@ -65,7 +65,6 @@ func (v *primitiveDefinitions_) getClass() *primitiveDefinitionsClass_ {
 
 type primitiveDefinitions_ struct {
 	// Declare the instance attributes.
-	class_                     *primitiveDefinitionsClass_
 	optionalTypeSection_       TypeSectionLike
 	optionalFunctionalSection_ FunctionalSectionLike
 }

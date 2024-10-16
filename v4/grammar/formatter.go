@@ -30,7 +30,6 @@ func Formatter() FormatterClassLike {
 func (c *formatterClass_) Make() FormatterLike {
 	var instance = &formatter_{
 		// Initialize the instance attributes.
-		class_: c,
 
 		// Initialize the inherited aspects.
 		Methodical: Processor().Make(),
@@ -566,7 +565,7 @@ func (v *formatter_) FormatModel(
 // Private Methods
 
 func (v *formatter_) getClass() *formatterClass_ {
-	return v.class_
+	return formatterReference()
 }
 
 func (v *formatter_) appendNewline() {
@@ -595,7 +594,6 @@ func (v *formatter_) getResult() string {
 
 type formatter_ struct {
 	// Declare the instance attributes.
-	class_   *formatterClass_
 	visitor_ VisitorLike
 	depth_   uint
 	result_  sts.Builder

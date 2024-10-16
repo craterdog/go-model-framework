@@ -39,12 +39,12 @@ func (c *moduleDefinitionClass_) Make(
 	}
 	var instance = &moduleDefinition_{
 		// Initialize the instance attributes.
-		class_:           c,
 		notice_:          notice,
 		header_:          header,
 		optionalImports_: optionalImports,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -72,7 +72,7 @@ func (v *moduleDefinition_) GetClass() ModuleDefinitionClassLike {
 // Private Methods
 
 func (v *moduleDefinition_) getClass() *moduleDefinitionClass_ {
-	return v.class_
+	return moduleDefinitionReference()
 }
 
 // PRIVATE INTERFACE
@@ -81,7 +81,6 @@ func (v *moduleDefinition_) getClass() *moduleDefinitionClass_ {
 
 type moduleDefinition_ struct {
 	// Declare the instance attributes.
-	class_           *moduleDefinitionClass_
 	notice_          NoticeLike
 	header_          HeaderLike
 	optionalImports_ ImportsLike

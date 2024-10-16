@@ -34,10 +34,10 @@ func (c *resultClass_) Make(
 	}
 	var instance = &result_{
 		// Initialize the instance attributes.
-		class_: c,
-		any_:   any_,
+		any_: any_,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *result_) GetClass() ResultClassLike {
 // Private Methods
 
 func (v *result_) getClass() *resultClass_ {
-	return v.class_
+	return resultReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,8 +66,7 @@ func (v *result_) getClass() *resultClass_ {
 
 type result_ struct {
 	// Declare the instance attributes.
-	class_ *resultClass_
-	any_   any
+	any_ any
 }
 
 // Class Structure

@@ -35,10 +35,10 @@ func (c *importsClass_) Make(
 	}
 	var instance = &imports_{
 		// Initialize the instance attributes.
-		class_:   c,
 		modules_: modules,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -58,7 +58,7 @@ func (v *imports_) GetClass() ImportsClassLike {
 // Private Methods
 
 func (v *imports_) getClass() *importsClass_ {
-	return v.class_
+	return importsReference()
 }
 
 // PRIVATE INTERFACE
@@ -67,7 +67,6 @@ func (v *imports_) getClass() *importsClass_ {
 
 type imports_ struct {
 	// Declare the instance attributes.
-	class_   *importsClass_
 	modules_ abs.Sequential[ModuleLike]
 }
 

@@ -38,11 +38,11 @@ func (c *getterMethodClass_) Make(
 	}
 	var instance = &getterMethod_{
 		// Initialize the instance attributes.
-		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *getterMethod_) GetClass() GetterMethodClassLike {
 // Private Methods
 
 func (v *getterMethod_) getClass() *getterMethodClass_ {
-	return v.class_
+	return getterMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,7 +75,6 @@ func (v *getterMethod_) getClass() *getterMethodClass_ {
 
 type getterMethod_ struct {
 	// Declare the instance attributes.
-	class_       *getterMethodClass_
 	name_        string
 	abstraction_ AbstractionLike
 }

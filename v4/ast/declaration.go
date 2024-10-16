@@ -39,12 +39,12 @@ func (c *declarationClass_) Make(
 	}
 	var instance = &declaration_{
 		// Initialize the instance attributes.
-		class_:               c,
 		comment_:             comment,
 		name_:                name,
 		optionalConstraints_: optionalConstraints,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -72,7 +72,7 @@ func (v *declaration_) GetClass() DeclarationClassLike {
 // Private Methods
 
 func (v *declaration_) getClass() *declarationClass_ {
-	return v.class_
+	return declarationReference()
 }
 
 // PRIVATE INTERFACE
@@ -81,7 +81,6 @@ func (v *declaration_) getClass() *declarationClass_ {
 
 type declaration_ struct {
 	// Declare the instance attributes.
-	class_               *declarationClass_
 	comment_             string
 	name_                string
 	optionalConstraints_ ConstraintsLike

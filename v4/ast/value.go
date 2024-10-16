@@ -38,11 +38,11 @@ func (c *valueClass_) Make(
 	}
 	var instance = &value_{
 		// Initialize the instance attributes.
-		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *value_) GetClass() ValueClassLike {
 // Private Methods
 
 func (v *value_) getClass() *valueClass_ {
-	return v.class_
+	return valueReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,7 +75,6 @@ func (v *value_) getClass() *valueClass_ {
 
 type value_ struct {
 	// Declare the instance attributes.
-	class_       *valueClass_
 	name_        string
 	abstraction_ AbstractionLike
 }

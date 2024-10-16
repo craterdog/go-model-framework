@@ -38,11 +38,11 @@ func (c *headerClass_) Make(
 	}
 	var instance = &header_{
 		// Initialize the instance attributes.
-		class_:   c,
 		comment_: comment,
 		name_:    name,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *header_) GetClass() HeaderClassLike {
 // Private Methods
 
 func (v *header_) getClass() *headerClass_ {
-	return v.class_
+	return headerReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,7 +75,6 @@ func (v *header_) getClass() *headerClass_ {
 
 type header_ struct {
 	// Declare the instance attributes.
-	class_   *headerClass_
 	comment_ string
 	name_    string
 }

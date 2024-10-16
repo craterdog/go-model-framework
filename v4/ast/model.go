@@ -42,12 +42,12 @@ func (c *modelClass_) Make(
 	}
 	var instance = &model_{
 		// Initialize the instance attributes.
-		class_:                c,
 		moduleDefinition_:     moduleDefinition,
 		primitiveDefinitions_: primitiveDefinitions,
 		interfaceDefinitions_: interfaceDefinitions,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -75,7 +75,7 @@ func (v *model_) GetClass() ModelClassLike {
 // Private Methods
 
 func (v *model_) getClass() *modelClass_ {
-	return v.class_
+	return modelReference()
 }
 
 // PRIVATE INTERFACE
@@ -84,7 +84,6 @@ func (v *model_) getClass() *modelClass_ {
 
 type model_ struct {
 	// Declare the instance attributes.
-	class_                *modelClass_
 	moduleDefinition_     ModuleDefinitionLike
 	primitiveDefinitions_ PrimitiveDefinitionsLike
 	interfaceDefinitions_ InterfaceDefinitionsLike

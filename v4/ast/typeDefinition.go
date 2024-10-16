@@ -39,12 +39,12 @@ func (c *typeDefinitionClass_) Make(
 	}
 	var instance = &typeDefinition_{
 		// Initialize the instance attributes.
-		class_:               c,
 		declaration_:         declaration,
 		abstraction_:         abstraction,
 		optionalEnumeration_: optionalEnumeration,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -72,7 +72,7 @@ func (v *typeDefinition_) GetClass() TypeDefinitionClassLike {
 // Private Methods
 
 func (v *typeDefinition_) getClass() *typeDefinitionClass_ {
-	return v.class_
+	return typeDefinitionReference()
 }
 
 // PRIVATE INTERFACE
@@ -81,7 +81,6 @@ func (v *typeDefinition_) getClass() *typeDefinitionClass_ {
 
 type typeDefinition_ struct {
 	// Declare the instance attributes.
-	class_               *typeDefinitionClass_
 	declaration_         DeclarationLike
 	abstraction_         AbstractionLike
 	optionalEnumeration_ EnumerationLike

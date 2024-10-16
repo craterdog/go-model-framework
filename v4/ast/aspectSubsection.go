@@ -35,10 +35,10 @@ func (c *aspectSubsectionClass_) Make(
 	}
 	var instance = &aspectSubsection_{
 		// Initialize the instance attributes.
-		class_:            c,
 		aspectInterfaces_: aspectInterfaces,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -58,7 +58,7 @@ func (v *aspectSubsection_) GetClass() AspectSubsectionClassLike {
 // Private Methods
 
 func (v *aspectSubsection_) getClass() *aspectSubsectionClass_ {
-	return v.class_
+	return aspectSubsectionReference()
 }
 
 // PRIVATE INTERFACE
@@ -67,7 +67,6 @@ func (v *aspectSubsection_) getClass() *aspectSubsectionClass_ {
 
 type aspectSubsection_ struct {
 	// Declare the instance attributes.
-	class_            *aspectSubsectionClass_
 	aspectInterfaces_ abs.Sequential[AspectInterfaceLike]
 }
 

@@ -38,11 +38,11 @@ func (c *parameterClass_) Make(
 	}
 	var instance = &parameter_{
 		// Initialize the instance attributes.
-		class_:       c,
 		name_:        name,
 		abstraction_: abstraction,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *parameter_) GetClass() ParameterClassLike {
 // Private Methods
 
 func (v *parameter_) getClass() *parameterClass_ {
-	return v.class_
+	return parameterReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,7 +75,6 @@ func (v *parameter_) getClass() *parameterClass_ {
 
 type parameter_ struct {
 	// Declare the instance attributes.
-	class_       *parameterClass_
 	name_        string
 	abstraction_ AbstractionLike
 }

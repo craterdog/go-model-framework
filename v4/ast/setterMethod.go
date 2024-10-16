@@ -38,11 +38,11 @@ func (c *setterMethodClass_) Make(
 	}
 	var instance = &setterMethod_{
 		// Initialize the instance attributes.
-		class_:     c,
 		name_:      name,
 		parameter_: parameter,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *setterMethod_) GetClass() SetterMethodClassLike {
 // Private Methods
 
 func (v *setterMethod_) getClass() *setterMethodClass_ {
-	return v.class_
+	return setterMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,7 +75,6 @@ func (v *setterMethod_) getClass() *setterMethodClass_ {
 
 type setterMethod_ struct {
 	// Declare the instance attributes.
-	class_     *setterMethodClass_
 	name_      string
 	parameter_ ParameterLike
 }

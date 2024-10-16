@@ -34,10 +34,10 @@ func (c *argumentClass_) Make(
 	}
 	var instance = &argument_{
 		// Initialize the instance attributes.
-		class_:       c,
 		abstraction_: abstraction,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *argument_) GetClass() ArgumentClassLike {
 // Private Methods
 
 func (v *argument_) getClass() *argumentClass_ {
-	return v.class_
+	return argumentReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,7 +66,6 @@ func (v *argument_) getClass() *argumentClass_ {
 
 type argument_ struct {
 	// Declare the instance attributes.
-	class_       *argumentClass_
 	abstraction_ AbstractionLike
 }
 

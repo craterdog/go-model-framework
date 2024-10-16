@@ -36,7 +36,6 @@ func (c *visitorClass_) Make(
 	}
 	var instance = &visitor_{
 		// Initialize the instance attributes.
-		class_:     c,
 		processor_: processor,
 	}
 	return instance
@@ -61,7 +60,7 @@ func (v *visitor_) VisitModel(
 // Private Methods
 
 func (v *visitor_) getClass() *visitorClass_ {
-	return v.class_
+	return visitorReference()
 }
 
 func (v *visitor_) visitAbstraction(abstraction ast.AbstractionLike) {
@@ -1193,7 +1192,6 @@ func (v *visitor_) visitValue(value ast.ValueLike) {
 
 type visitor_ struct {
 	// Declare the instance attributes.
-	class_     *visitorClass_
 	processor_ Methodical
 }
 

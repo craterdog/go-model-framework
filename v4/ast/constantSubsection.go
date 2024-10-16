@@ -35,10 +35,10 @@ func (c *constantSubsectionClass_) Make(
 	}
 	var instance = &constantSubsection_{
 		// Initialize the instance attributes.
-		class_:           c,
 		constantMethods_: constantMethods,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -58,7 +58,7 @@ func (v *constantSubsection_) GetClass() ConstantSubsectionClassLike {
 // Private Methods
 
 func (v *constantSubsection_) getClass() *constantSubsectionClass_ {
-	return v.class_
+	return constantSubsectionReference()
 }
 
 // PRIVATE INTERFACE
@@ -67,7 +67,6 @@ func (v *constantSubsection_) getClass() *constantSubsectionClass_ {
 
 type constantSubsection_ struct {
 	// Declare the instance attributes.
-	class_           *constantSubsectionClass_
 	constantMethods_ abs.Sequential[ConstantMethodLike]
 }
 

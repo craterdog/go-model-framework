@@ -34,10 +34,10 @@ func (c *suffixClass_) Make(
 	}
 	var instance = &suffix_{
 		// Initialize the instance attributes.
-		class_: c,
-		name_:  name,
+		name_: name,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *suffix_) GetClass() SuffixClassLike {
 // Private Methods
 
 func (v *suffix_) getClass() *suffixClass_ {
-	return v.class_
+	return suffixReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,8 +66,7 @@ func (v *suffix_) getClass() *suffixClass_ {
 
 type suffix_ struct {
 	// Declare the instance attributes.
-	class_ *suffixClass_
-	name_  string
+	name_ string
 }
 
 // Class Structure

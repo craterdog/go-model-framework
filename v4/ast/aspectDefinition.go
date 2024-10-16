@@ -39,11 +39,11 @@ func (c *aspectDefinitionClass_) Make(
 	}
 	var instance = &aspectDefinition_{
 		// Initialize the instance attributes.
-		class_:         c,
 		declaration_:   declaration,
 		aspectMethods_: aspectMethods,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -67,7 +67,7 @@ func (v *aspectDefinition_) GetClass() AspectDefinitionClassLike {
 // Private Methods
 
 func (v *aspectDefinition_) getClass() *aspectDefinitionClass_ {
-	return v.class_
+	return aspectDefinitionReference()
 }
 
 // PRIVATE INTERFACE
@@ -76,7 +76,6 @@ func (v *aspectDefinition_) getClass() *aspectDefinitionClass_ {
 
 type aspectDefinition_ struct {
 	// Declare the instance attributes.
-	class_         *aspectDefinitionClass_
 	declaration_   DeclarationLike
 	aspectMethods_ abs.Sequential[AspectMethodLike]
 }

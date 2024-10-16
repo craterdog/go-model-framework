@@ -38,11 +38,11 @@ func (c *classDefinitionClass_) Make(
 	}
 	var instance = &classDefinition_{
 		// Initialize the instance attributes.
-		class_:        c,
 		declaration_:  declaration,
 		classMethods_: classMethods,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *classDefinition_) GetClass() ClassDefinitionClassLike {
 // Private Methods
 
 func (v *classDefinition_) getClass() *classDefinitionClass_ {
-	return v.class_
+	return classDefinitionReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,7 +75,6 @@ func (v *classDefinition_) getClass() *classDefinitionClass_ {
 
 type classDefinition_ struct {
 	// Declare the instance attributes.
-	class_        *classDefinitionClass_
 	declaration_  DeclarationLike
 	classMethods_ ClassMethodsLike
 }

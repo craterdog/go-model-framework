@@ -37,13 +37,13 @@ func (c *abstractionClass_) Make(
 	}
 	var instance = &abstraction_{
 		// Initialize the instance attributes.
-		class_:             c,
 		optionalPrefix_:    optionalPrefix,
 		name_:              name,
 		optionalSuffix_:    optionalSuffix,
 		optionalArguments_: optionalArguments,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -75,7 +75,7 @@ func (v *abstraction_) GetClass() AbstractionClassLike {
 // Private Methods
 
 func (v *abstraction_) getClass() *abstractionClass_ {
-	return v.class_
+	return abstractionReference()
 }
 
 // PRIVATE INTERFACE
@@ -84,7 +84,6 @@ func (v *abstraction_) getClass() *abstractionClass_ {
 
 type abstraction_ struct {
 	// Declare the instance attributes.
-	class_             *abstractionClass_
 	optionalPrefix_    PrefixLike
 	name_              string
 	optionalSuffix_    SuffixLike

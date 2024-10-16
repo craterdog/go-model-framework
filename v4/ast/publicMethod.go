@@ -34,10 +34,10 @@ func (c *publicMethodClass_) Make(
 	}
 	var instance = &publicMethod_{
 		// Initialize the instance attributes.
-		class_:  c,
 		method_: method,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *publicMethod_) GetClass() PublicMethodClassLike {
 // Private Methods
 
 func (v *publicMethod_) getClass() *publicMethodClass_ {
-	return v.class_
+	return publicMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,7 +66,6 @@ func (v *publicMethod_) getClass() *publicMethodClass_ {
 
 type publicMethod_ struct {
 	// Declare the instance attributes.
-	class_  *publicMethodClass_
 	method_ MethodLike
 }
 

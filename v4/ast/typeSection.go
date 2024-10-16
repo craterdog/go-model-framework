@@ -35,10 +35,10 @@ func (c *typeSectionClass_) Make(
 	}
 	var instance = &typeSection_{
 		// Initialize the instance attributes.
-		class_:           c,
 		typeDefinitions_: typeDefinitions,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -58,7 +58,7 @@ func (v *typeSection_) GetClass() TypeSectionClassLike {
 // Private Methods
 
 func (v *typeSection_) getClass() *typeSectionClass_ {
-	return v.class_
+	return typeSectionReference()
 }
 
 // PRIVATE INTERFACE
@@ -67,7 +67,6 @@ func (v *typeSection_) getClass() *typeSectionClass_ {
 
 type typeSection_ struct {
 	// Declare the instance attributes.
-	class_           *typeSectionClass_
 	typeDefinitions_ abs.Sequential[TypeDefinitionLike]
 }
 

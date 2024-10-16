@@ -29,7 +29,6 @@ func Processor() ProcessorClassLike {
 func (c *processorClass_) Make() ProcessorLike {
 	var instance = &processor_{
 		// Initialize the instance attributes.
-		class_: c,
 	}
 	return instance
 }
@@ -980,7 +979,7 @@ func (v *processor_) GetClass() ProcessorClassLike {
 // Private Methods
 
 func (v *processor_) getClass() *processorClass_ {
-	return v.class_
+	return processorReference()
 }
 
 // PRIVATE INTERFACE
@@ -989,7 +988,6 @@ func (v *processor_) getClass() *processorClass_ {
 
 type processor_ struct {
 	// Declare the instance attributes.
-	class_ *processorClass_
 }
 
 // Class Structure

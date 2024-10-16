@@ -38,11 +38,11 @@ func (c *moduleClass_) Make(
 	}
 	var instance = &module_{
 		// Initialize the instance attributes.
-		class_: c,
-		name_:  name,
-		path_:  path,
+		name_: name,
+		path_: path,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -66,7 +66,7 @@ func (v *module_) GetClass() ModuleClassLike {
 // Private Methods
 
 func (v *module_) getClass() *moduleClass_ {
-	return v.class_
+	return moduleReference()
 }
 
 // PRIVATE INTERFACE
@@ -75,9 +75,8 @@ func (v *module_) getClass() *moduleClass_ {
 
 type module_ struct {
 	// Declare the instance attributes.
-	class_ *moduleClass_
-	name_  string
-	path_  string
+	name_ string
+	path_ string
 }
 
 // Class Structure

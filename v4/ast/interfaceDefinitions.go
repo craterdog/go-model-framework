@@ -39,12 +39,12 @@ func (c *interfaceDefinitionsClass_) Make(
 	}
 	var instance = &interfaceDefinitions_{
 		// Initialize the instance attributes.
-		class_:                 c,
 		classSection_:          classSection,
 		instanceSection_:       instanceSection,
 		optionalAspectSection_: optionalAspectSection,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -72,7 +72,7 @@ func (v *interfaceDefinitions_) GetClass() InterfaceDefinitionsClassLike {
 // Private Methods
 
 func (v *interfaceDefinitions_) getClass() *interfaceDefinitionsClass_ {
-	return v.class_
+	return interfaceDefinitionsReference()
 }
 
 // PRIVATE INTERFACE
@@ -81,7 +81,6 @@ func (v *interfaceDefinitions_) getClass() *interfaceDefinitionsClass_ {
 
 type interfaceDefinitions_ struct {
 	// Declare the instance attributes.
-	class_                 *interfaceDefinitionsClass_
 	classSection_          ClassSectionLike
 	instanceSection_       InstanceSectionLike
 	optionalAspectSection_ AspectSectionLike

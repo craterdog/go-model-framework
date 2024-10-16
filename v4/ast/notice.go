@@ -34,10 +34,10 @@ func (c *noticeClass_) Make(
 	}
 	var instance = &notice_{
 		// Initialize the instance attributes.
-		class_:   c,
 		comment_: comment,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *notice_) GetClass() NoticeClassLike {
 // Private Methods
 
 func (v *notice_) getClass() *noticeClass_ {
-	return v.class_
+	return noticeReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,7 +66,6 @@ func (v *notice_) getClass() *noticeClass_ {
 
 type notice_ struct {
 	// Declare the instance attributes.
-	class_   *noticeClass_
 	comment_ string
 }
 

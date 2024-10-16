@@ -43,7 +43,6 @@ func (c *scannerClass_) Make(
 	}
 	var instance = &scanner_{
 		// Initialize the instance attributes.
-		class_:    c,
 		line_:     1,
 		position_: 1,
 		runes_:    []rune(source),
@@ -99,7 +98,7 @@ func (v *scanner_) GetClass() ScannerClassLike {
 // Private Methods
 
 func (v *scanner_) getClass() *scannerClass_ {
-	return v.class_
+	return scannerReference()
 }
 
 func (v *scanner_) emitToken(tokenType TokenType) {
@@ -200,7 +199,6 @@ loop:
 
 type scanner_ struct {
 	// Declare the instance attributes.
-	class_    *scannerClass_
 	first_    uint // A zero based index of the first possible rune in the next token.
 	next_     uint // A zero based index of the next possible rune in the next token.
 	line_     uint // The line number in the source string of the next rune.

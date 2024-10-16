@@ -34,10 +34,10 @@ func (c *additionalConstraintClass_) Make(
 	}
 	var instance = &additionalConstraint_{
 		// Initialize the instance attributes.
-		class_:      c,
 		constraint_: constraint,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *additionalConstraint_) GetClass() AdditionalConstraintClassLike {
 // Private Methods
 
 func (v *additionalConstraint_) getClass() *additionalConstraintClass_ {
-	return v.class_
+	return additionalConstraintReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,7 +66,6 @@ func (v *additionalConstraint_) getClass() *additionalConstraintClass_ {
 
 type additionalConstraint_ struct {
 	// Declare the instance attributes.
-	class_      *additionalConstraintClass_
 	constraint_ ConstraintLike
 }
 

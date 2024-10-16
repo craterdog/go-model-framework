@@ -39,11 +39,11 @@ func (c *argumentsClass_) Make(
 	}
 	var instance = &arguments_{
 		// Initialize the instance attributes.
-		class_:               c,
 		argument_:            argument,
 		additionalArguments_: additionalArguments,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -67,7 +67,7 @@ func (v *arguments_) GetClass() ArgumentsClassLike {
 // Private Methods
 
 func (v *arguments_) getClass() *argumentsClass_ {
-	return v.class_
+	return argumentsReference()
 }
 
 // PRIVATE INTERFACE
@@ -76,7 +76,6 @@ func (v *arguments_) getClass() *argumentsClass_ {
 
 type arguments_ struct {
 	// Declare the instance attributes.
-	class_               *argumentsClass_
 	argument_            ArgumentLike
 	additionalArguments_ abs.Sequential[AdditionalArgumentLike]
 }

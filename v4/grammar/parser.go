@@ -35,7 +35,6 @@ func Parser() ParserClassLike {
 func (c *parserClass_) Make() ParserLike {
 	var instance = &parser_{
 		// Initialize the instance attributes.
-		class_: c,
 	}
 	return instance
 }
@@ -74,7 +73,7 @@ func (v *parser_) ParseSource(
 // Private Methods
 
 func (v *parser_) getClass() *parserClass_ {
-	return v.class_
+	return parserReference()
 }
 
 func (v *parser_) parseAbstraction() (
@@ -3487,7 +3486,6 @@ func (v *parser_) putBack(token TokenLike) {
 
 type parser_ struct {
 	// Declare the instance attributes.
-	class_  *parserClass_
 	source_ string                   // The original source code.
 	tokens_ abs.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
 	next_   abs.StackLike[TokenLike] // A stack of read, but unprocessed tokens.

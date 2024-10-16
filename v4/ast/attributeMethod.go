@@ -34,10 +34,10 @@ func (c *attributeMethodClass_) Make(
 	}
 	var instance = &attributeMethod_{
 		// Initialize the instance attributes.
-		class_: c,
-		any_:   any_,
+		any_: any_,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *attributeMethod_) GetClass() AttributeMethodClassLike {
 // Private Methods
 
 func (v *attributeMethod_) getClass() *attributeMethodClass_ {
-	return v.class_
+	return attributeMethodReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,8 +66,7 @@ func (v *attributeMethod_) getClass() *attributeMethodClass_ {
 
 type attributeMethod_ struct {
 	// Declare the instance attributes.
-	class_ *attributeMethodClass_
-	any_   any
+	any_ any
 }
 
 // Class Structure

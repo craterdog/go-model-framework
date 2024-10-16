@@ -35,10 +35,10 @@ func (c *constructorSubsectionClass_) Make(
 	}
 	var instance = &constructorSubsection_{
 		// Initialize the instance attributes.
-		class_:              c,
 		constructorMethods_: constructorMethods,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -58,7 +58,7 @@ func (v *constructorSubsection_) GetClass() ConstructorSubsectionClassLike {
 // Private Methods
 
 func (v *constructorSubsection_) getClass() *constructorSubsectionClass_ {
-	return v.class_
+	return constructorSubsectionReference()
 }
 
 // PRIVATE INTERFACE
@@ -67,7 +67,6 @@ func (v *constructorSubsection_) getClass() *constructorSubsectionClass_ {
 
 type constructorSubsection_ struct {
 	// Declare the instance attributes.
-	class_              *constructorSubsectionClass_
 	constructorMethods_ abs.Sequential[ConstructorMethodLike]
 }
 

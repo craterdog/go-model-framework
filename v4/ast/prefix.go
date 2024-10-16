@@ -34,10 +34,10 @@ func (c *prefixClass_) Make(
 	}
 	var instance = &prefix_{
 		// Initialize the instance attributes.
-		class_: c,
-		any_:   any_,
+		any_: any_,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *prefix_) GetClass() PrefixClassLike {
 // Private Methods
 
 func (v *prefix_) getClass() *prefixClass_ {
-	return v.class_
+	return prefixReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,8 +66,7 @@ func (v *prefix_) getClass() *prefixClass_ {
 
 type prefix_ struct {
 	// Declare the instance attributes.
-	class_ *prefixClass_
-	any_   any
+	any_ any
 }
 
 // Class Structure

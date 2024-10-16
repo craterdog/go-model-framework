@@ -39,11 +39,11 @@ func (c *enumerationClass_) Make(
 	}
 	var instance = &enumeration_{
 		// Initialize the instance attributes.
-		class_:            c,
 		value_:            value,
 		additionalValues_: additionalValues,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -67,7 +67,7 @@ func (v *enumeration_) GetClass() EnumerationClassLike {
 // Private Methods
 
 func (v *enumeration_) getClass() *enumerationClass_ {
-	return v.class_
+	return enumerationReference()
 }
 
 // PRIVATE INTERFACE
@@ -76,7 +76,6 @@ func (v *enumeration_) getClass() *enumerationClass_ {
 
 type enumeration_ struct {
 	// Declare the instance attributes.
-	class_            *enumerationClass_
 	value_            ValueLike
 	additionalValues_ abs.Sequential[AdditionalValueLike]
 }

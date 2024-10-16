@@ -34,10 +34,10 @@ func (c *noneClass_) Make(
 	}
 	var instance = &none_{
 		// Initialize the instance attributes.
-		class_:   c,
 		newline_: newline,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -57,7 +57,7 @@ func (v *none_) GetClass() NoneClassLike {
 // Private Methods
 
 func (v *none_) getClass() *noneClass_ {
-	return v.class_
+	return noneReference()
 }
 
 // PRIVATE INTERFACE
@@ -66,7 +66,6 @@ func (v *none_) getClass() *noneClass_ {
 
 type none_ struct {
 	// Declare the instance attributes.
-	class_   *noneClass_
 	newline_ string
 }
 

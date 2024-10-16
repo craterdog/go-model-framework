@@ -34,7 +34,6 @@ func Classes() ClassesClassLike {
 func (c *classesClass_) Make() ClassesLike {
 	var instance = &classes_{
 		// Initialize the instance attributes.
-		class_: c,
 	}
 	return instance
 }
@@ -73,7 +72,7 @@ func (v *classes_) GenerateModelClasses(
 // Private Methods
 
 func (v *classes_) getClass() *classesClass_ {
-	return v.class_
+	return classesReference()
 }
 
 func (v *classes_) analyzeClassConstants(
@@ -98,6 +97,7 @@ func (v *classes_) analyzeClassDefinition(
 	instanceDefinition ast.InstanceDefinitionLike,
 ) {
 	v.analyzeClassGenerics(classDefinition)
+	v.analyzeClassStructure(instanceDefinition)
 	v.analyzeClassConstants(classDefinition)
 	v.analyzePublicAttributes(instanceDefinition)
 	v.analyzePrivateAttributes(classDefinition)
@@ -114,6 +114,25 @@ func (v *classes_) analyzeClassGenerics(
 	}
 }
 
+func (v *classes_) analyzeClassStructure(
+	instanceDefinition ast.InstanceDefinitionLike,
+) {
+	v.isIntrinsic_ = false
+	v.intrinsicType_ = nil
+	var instanceMethods = instanceDefinition.GetInstanceMethods()
+	var publicSubsection = instanceMethods.GetPublicSubsection()
+	var publicMethods = publicSubsection.GetPublicMethods().GetIterator()
+	for publicMethods.HasNext() {
+		var method = publicMethods.GetNext().GetMethod()
+		var methodName = method.GetName()
+		if methodName == "GetIntrinsic" {
+			v.isIntrinsic_ = true
+			var result = method.GetOptionalResult()
+			v.intrinsicType_ = result.GetAny().(ast.AbstractionLike)
+		}
+	}
+}
+
 func (v *classes_) analyzePrivateAttributes(
 	classDefinition ast.ClassDefinitionLike,
 ) {
@@ -124,7 +143,8 @@ func (v *classes_) analyzePrivateAttributes(
 		var constructorMethod = constructorMethods.GetNext()
 		var name = constructorMethod.GetName()
 		// Focus only on constructors that are passed attributes as arguments.
-		if name == "Make" || sts.HasPrefix(name, "MakeWith") {
+		if !v.isIntrinsic_ &&
+			(name == "Make" || sts.HasPrefix(name, "MakeWith")) {
 			var parameters = constructorMethod.GetParameters().GetIterator()
 			for parameters.HasNext() {
 				var parameter = parameters.GetNext()
@@ -630,6 +650,17 @@ func (v *classes_) generateClass(
 		className,
 	)
 
+	// Set the instance method targets to "by value" if necessary.
+	var star = "*"
+	if v.isIntrinsic_ {
+		star = ""
+	}
+	implementation = uti.ReplaceAll(
+		implementation,
+		"*",
+		star,
+	)
+
 	// Insert generics if necessary.
 	var constraints string
 	var arguments string
@@ -783,16 +814,28 @@ func (v *classes_) generateConstructorMethod(
 	var constructorParameters = constructorMethod.GetParameters()
 	var parameters = v.generateParameters(constructorParameters)
 	var resultType = v.extractType(constructorMethod.GetAbstraction())
-	var attributeChecks = v.generateAttributeChecks(constructorParameters)
-	var attributeInitializations = v.generateAttributeInitializations(
-		constructorParameters,
-	)
+	var instanceInstantiation = v.generateInstanceInstantiation(constructorMethod)
 	implementation = v.getClass().constructorMethod_
-	implementation = uti.ReplaceAll(implementation, "methodName", methodName)
-	implementation = uti.ReplaceAll(implementation, "parameters", parameters)
-	implementation = uti.ReplaceAll(implementation, "resultType", resultType)
-	implementation = uti.ReplaceAll(implementation, "attributeChecks", attributeChecks)
-	implementation = uti.ReplaceAll(implementation, "attributeInitializations", attributeInitializations)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"methodName",
+		methodName,
+	)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"parameters",
+		parameters,
+	)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"resultType",
+		resultType,
+	)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"instanceInstantiation",
+		instanceInstantiation,
+	)
 	return implementation
 }
 
@@ -874,16 +917,75 @@ func (v *classes_) generateImports(
 	return implementation
 }
 
+func (v *classes_) generateInstanceInstantiation(
+	constructorMethod ast.ConstructorMethodLike,
+) (
+	implementation string,
+) {
+	var methodName = constructorMethod.GetName()
+	implementation = v.getClass().instanceInstantiation_
+	if v.isIntrinsic_ {
+		if methodName == "Make" {
+			implementation = v.getClass().intrinsicInstantiation_
+		}
+	} else {
+		if methodName == "Make" || sts.HasPrefix(methodName, "MakeWith") {
+			implementation = v.getClass().structureInstantiation_
+			var constructorParameters = constructorMethod.GetParameters()
+			var attributeChecks = v.generateAttributeChecks(constructorParameters)
+			var attributeInitializations = v.generateAttributeInitializations(
+				constructorParameters,
+			)
+			implementation = uti.ReplaceAll(
+				implementation,
+				"attributeChecks",
+				attributeChecks,
+			)
+			implementation = uti.ReplaceAll(
+				implementation,
+				"attributeInitializations",
+				attributeInitializations,
+			)
+		}
+	}
+	return implementation
+}
+
 func (v *classes_) generateInstanceStructure() (
 	implementation string,
 ) {
-	implementation = v.getClass().instanceStructure_
-	var attributeDeclarations = v.generateAttributeDeclarations()
-	implementation = uti.ReplaceAll(
-		implementation,
-		"attributeDeclarations",
-		attributeDeclarations,
-	)
+	if v.isIntrinsic_ {
+		var intrinsicType = v.extractType(v.intrinsicType_)
+		implementation = v.getClass().instanceIntrinsic_
+		implementation = uti.ReplaceAll(
+			implementation,
+			"intrinsicType",
+			intrinsicType,
+		)
+	} else {
+		implementation = v.getClass().instanceStructure_
+		var attributeDeclarations = v.generateAttributeDeclarations()
+		implementation = uti.ReplaceAll(
+			implementation,
+			"attributeDeclarations",
+			attributeDeclarations,
+		)
+	}
+	return implementation
+}
+
+func (v *classes_) generateIntrinsicMethod() (
+	implementation string,
+) {
+	if v.isIntrinsic_ {
+		var intrinsicType = v.extractType(v.intrinsicType_)
+		implementation = v.getClass().intrinsicMethod_
+		implementation = uti.ReplaceAll(
+			implementation,
+			"intrinsicType",
+			intrinsicType,
+		)
+	}
 	return implementation
 }
 
@@ -1004,12 +1106,24 @@ func (v *classes_) generatePublicMethods(
 	var publicMethods = publicSubsection.GetPublicMethods().GetIterator()
 	for publicMethods.HasNext() {
 		var publicMethod = publicMethods.GetNext()
-		if publicMethod.GetMethod().GetName() != "GetClass" {
-			methods += v.generatePublicMethod(publicMethod)
+		if publicMethod.GetMethod().GetName() == "GetClass" ||
+			publicMethod.GetMethod().GetName() == "GetIntrinsic" {
+			continue
 		}
+		methods += v.generatePublicMethod(publicMethod)
 	}
 	implementation = v.getClass().publicMethods_
-	implementation = uti.ReplaceAll(implementation, "methods", methods)
+	implementation = uti.ReplaceAll(
+		implementation,
+		"methods",
+		methods,
+	)
+	var intrinsicMethod = v.generateIntrinsicMethod()
+	implementation = uti.ReplaceAll(
+		implementation,
+		"intrinsicMethod",
+		intrinsicMethod,
+	)
 	return implementation
 }
 
@@ -1213,10 +1327,11 @@ func (v *classes_) replaceResultType(
 
 type classes_ struct {
 	// Declare the instance attributes.
-	class_      *classesClass_
-	isGeneric_  bool
-	constants_  abs.CatalogLike[string, string]
-	attributes_ abs.CatalogLike[string, string]
+	isGeneric_     bool
+	isIntrinsic_   bool
+	intrinsicType_ ast.AbstractionLike
+	constants_     abs.CatalogLike[string, string]
+	attributes_    abs.CatalogLike[string, string]
 }
 
 // Class Structure
@@ -1230,6 +1345,9 @@ type classesClass_ struct {
 	accessFunction_          string
 	constructorMethods_      string
 	constructorMethod_       string
+	instanceInstantiation_   string
+	intrinsicInstantiation_  string
+	structureInstantiation_  string
 	constantMethods_         string
 	constantMethod_          string
 	functionMethods_         string
@@ -1240,9 +1358,11 @@ type classesClass_ struct {
 	aspectInterface_         string
 	publicMethods_           string
 	privateMethods_          string
+	intrinsicMethod_         string
 	instanceMethod_          string
 	instanceFunction_        string
 	methodParameter_         string
+	instanceIntrinsic_       string
 	instanceStructure_       string
 	attributeDeclaration_    string
 	attributeCheck_          string
@@ -1295,13 +1415,26 @@ func <~ClassName><Constraints>() <~ClassName>ClassLike<Arguments> {
 
 	constructorMethod_: `
 
-func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>Like<Arguments> {<AttributeChecks>
+func (c *<~className>Class_<Arguments>) <MethodName>(<Parameters>) <~ClassName>Like<Arguments> {<InstanceInstantiation>
+}`,
+
+	instanceInstantiation_: `
+	var instance <~ClassName>Like<Arguments>
+	// TBD - Add the constructor implementation.
+	return instance
+`,
+
+	intrinsicInstantiation_: `
+	var instance = <~className>_<Arguments>(intrinsic)
+	return instance
+`,
+
+	structureInstantiation_: `<AttributeChecks>
 	var instance = &<~className>_<Arguments>{
-		// Initialize the instance attributes.
-		class_: c,<AttributeInitializations>
+		// Initialize the instance attributes.<AttributeInitializations>
 	}
 	return instance
-}`,
+`,
 
 	constantMethods_: `
 
@@ -1331,13 +1464,13 @@ func (c *<~className>Class_<Arguments>) <~MethodName>(<Parameters>) <ResultType>
 
 	getterMethod_: `
 
-func (v *<~className>_<Arguments>) <~MethodName>() <AttributeType> {
+func (v <*><~className>_<Arguments>) <~MethodName>() <AttributeType> {
 	return v.<~attributeName>_
 }`,
 
 	setterMethod_: `
 
-func (v *<~className>_<Arguments>) <~MethodName>(
+func (v <*><~className>_<Arguments>) <~MethodName>(
 	<attributeName_> <AttributeType>,
 ) {<AttributeCheck>
 	v.<~attributeName>_ = <attributeName_>
@@ -1351,27 +1484,33 @@ func (v *<~className>_<Arguments>) <~MethodName>(
 
 // Public Methods
 
-func (v *<~className>_<Arguments>) GetClass() <~ClassName>ClassLike<Arguments> {
+func (v <*><~className>_<Arguments>) GetClass() <~ClassName>ClassLike<Arguments> {
 	return v.getClass()
-}<Methods>`,
+}<IntrinsicMethod><Methods>`,
 
 	privateMethods_: `
 
 // Private Methods
 
-func (v *<~className>_<Arguments>) getClass() *<~className>Class_<Arguments> {
-	return v.class_
+func (v <*><~className>_<Arguments>) getClass() *<~className>Class_<Arguments> {
+	return <~className>Reference<Arguments>()
+}`,
+
+	intrinsicMethod_: `
+
+func (v <*><~className>_<Arguments>) GetIntrinsic() <IntrinsicType> {
+	return <IntrinsicType>(v)
 }`,
 
 	instanceMethod_: `
 
-func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) {
+func (v <*><~className>_<Arguments>) <~MethodName>(<Parameters>) {
 	// TBD - Add the method implementation.
 }`,
 
 	instanceFunction_: `
 
-func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
+func (v <*><~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
 	var result_ <ResultType>
 	// TBD - Add the method implementation.
 	return result_
@@ -1380,13 +1519,19 @@ func (v *<~className>_<Arguments>) <~MethodName>(<Parameters>) <ResultType> {
 	methodParameter_: `
 	<parameterName_> <ParameterType>,`,
 
+	instanceIntrinsic_: `
+
+// Instance Structure
+
+type <~className>_<Constraints> <IntrinsicType>
+`,
+
 	instanceStructure_: `
 
 // Instance Structure
 
 type <~className>_<Constraints> struct {
-	// Declare the instance attributes.
-	class_ *<~className>Class_<Arguments><AttributeDeclarations>
+	// Declare the instance attributes.<AttributeDeclarations>
 }`,
 
 	attributeDeclaration_: `

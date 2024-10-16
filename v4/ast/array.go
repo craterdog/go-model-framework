@@ -25,9 +25,9 @@ func Array() ArrayClassLike {
 func (c *arrayClass_) Make() ArrayLike {
 	var instance = &array_{
 		// Initialize the instance attributes.
-		class_: c,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -41,7 +41,7 @@ func (v *array_) GetClass() ArrayClassLike {
 // Private Methods
 
 func (v *array_) getClass() *arrayClass_ {
-	return v.class_
+	return arrayReference()
 }
 
 // PRIVATE INTERFACE
@@ -50,7 +50,6 @@ func (v *array_) getClass() *arrayClass_ {
 
 type array_ struct {
 	// Declare the instance attributes.
-	class_ *arrayClass_
 }
 
 // Class Structure

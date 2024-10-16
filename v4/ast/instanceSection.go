@@ -35,10 +35,10 @@ func (c *instanceSectionClass_) Make(
 	}
 	var instance = &instanceSection_{
 		// Initialize the instance attributes.
-		class_:               c,
 		instanceDefinitions_: instanceDefinitions,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -58,7 +58,7 @@ func (v *instanceSection_) GetClass() InstanceSectionClassLike {
 // Private Methods
 
 func (v *instanceSection_) getClass() *instanceSectionClass_ {
-	return v.class_
+	return instanceSectionReference()
 }
 
 // PRIVATE INTERFACE
@@ -67,7 +67,6 @@ func (v *instanceSection_) getClass() *instanceSectionClass_ {
 
 type instanceSection_ struct {
 	// Declare the instance attributes.
-	class_               *instanceSectionClass_
 	instanceDefinitions_ abs.Sequential[InstanceDefinitionLike]
 }
 

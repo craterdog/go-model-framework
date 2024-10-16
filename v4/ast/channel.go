@@ -25,9 +25,9 @@ func Channel() ChannelClassLike {
 func (c *channelClass_) Make() ChannelLike {
 	var instance = &channel_{
 		// Initialize the instance attributes.
-		class_: c,
 	}
 	return instance
+
 }
 
 // INSTANCE INTERFACE
@@ -41,7 +41,7 @@ func (v *channel_) GetClass() ChannelClassLike {
 // Private Methods
 
 func (v *channel_) getClass() *channelClass_ {
-	return v.class_
+	return channelReference()
 }
 
 // PRIVATE INTERFACE
@@ -50,7 +50,6 @@ func (v *channel_) getClass() *channelClass_ {
 
 type channel_ struct {
 	// Declare the instance attributes.
-	class_ *channelClass_
 }
 
 // Class Structure
